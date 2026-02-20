@@ -124,7 +124,7 @@ export function Dokumenter() {
       id: `doc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       title: newDoc.title.trim(),
       type: newDoc.type,
-      childId: newDoc.childId || undefined,
+      childId: newDoc.childId && newDoc.childId !== 'none' ? newDoc.childId : undefined,
       url: uploadedFileUrl,
       uploadedBy: currentUser.id,
       uploadedAt: new Date().toISOString(),
@@ -583,7 +583,7 @@ export function Dokumenter() {
                           <SelectValue placeholder="Valgfrit" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Ingen</SelectItem>
+                          <SelectItem value="none">Ingen</SelectItem>
                           {children.map((c) => (
                             <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                           ))}

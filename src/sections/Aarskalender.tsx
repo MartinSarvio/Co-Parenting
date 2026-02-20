@@ -194,7 +194,7 @@ export function Aarskalender() {
               {/* Weekday headers */}
               <div className="mb-1 grid grid-cols-7 gap-px">
                 {['M', 'T', 'O', 'T', 'F', 'L', 'S'].map((d, i) => (
-                  <div key={i} className="text-center text-[9px] font-semibold text-[#b0ae a6]">{d}</div>
+                  <div key={i} className="text-center text-[9px] font-semibold text-[#b0aea6]">{d}</div>
                 ))}
               </div>
               {/* Days grid */}

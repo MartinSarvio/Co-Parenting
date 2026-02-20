@@ -185,6 +185,26 @@ interface AppStore {
   addFamilyMember: (user: User) => void;
   removeFamilyMember: (userId: string) => void;
 
+  // Bulk setters for server data
+  hydrateFromServer: (data: {
+    users?: User[];
+    household?: Household | null;
+    children?: Child[];
+    events?: CalendarEvent[];
+    tasks?: Task[];
+    expenses?: Expense[];
+    documents?: Document[];
+    mealPlans?: MealPlan[];
+    threads?: MessageThread[];
+    decisions?: DecisionLog[];
+    keyDates?: KeyDate[];
+    diaryEntries?: DiaryEntry[];
+    milestones?: Milestone[];
+  }) => void;
+
+  // Auth
+  logout: () => void;
+
   // Initialize demo data
   initDemoData: () => void;
   initProfessionalDemo: () => void;
@@ -532,6 +552,65 @@ export const useAppStore = create<AppStore>()(
         users: state.users.filter(u => u.id !== userId),
         household: state.household ? { ...state.household, members: state.household.members.filter(id => id !== userId) } : state.household,
       })),
+
+      // Bulk setters for server data
+      hydrateFromServer: (data) => set((state) => ({
+        users: data.users ?? state.users,
+        household: data.household !== undefined ? (data.household ? { ...data.household, subscription: normalizeSubscription(data.household) } : null) : state.household,
+        children: data.children ?? state.children,
+        events: data.events ?? state.events,
+        tasks: data.tasks ?? state.tasks,
+        expenses: data.expenses ?? state.expenses,
+        documents: data.documents ?? state.documents,
+        mealPlans: data.mealPlans ?? state.mealPlans,
+        threads: data.threads ?? state.threads,
+        decisions: data.decisions ?? state.decisions,
+        keyDates: data.keyDates ?? state.keyDates,
+        diaryEntries: data.diaryEntries ?? state.diaryEntries,
+        milestones: data.milestones ?? state.milestones,
+        currentChildId: data.children && data.children.length > 0
+          ? (state.currentChildId && data.children.some(c => c.id === state.currentChildId)
+              ? state.currentChildId
+              : data.children[0].id)
+          : state.currentChildId,
+      })),
+
+      // Auth — clear everything on logout
+      logout: () => set({
+        currentUser: null,
+        isAuthenticated: false,
+        isProfessionalView: false,
+        currentChildId: null,
+        users: [],
+        children: [],
+        institutions: [],
+        household: null,
+        paymentAccounts: [],
+        transfers: [],
+        custodyPlans: [],
+        events: [],
+        tasks: [],
+        shoppingItems: [],
+        mealPlans: [],
+        messages: [],
+        threads: [],
+        milestones: [],
+        documents: [],
+        expenses: [],
+        handovers: [],
+        notifications: [],
+        meetingMinutes: [],
+        photos: [],
+        diaryEntries: [],
+        keyDates: [],
+        decisions: [],
+        eventTemplates: [],
+        calendarColorPreferences: {},
+        calendarSharing: null,
+        fridgeItems: [],
+        userRecipes: [],
+        activeTab: 'dashboard',
+      }),
 
       // Initialize demo data for parents
       initDemoData: () => {
@@ -984,6 +1063,15 @@ export const useAppStore = create<AppStore>()(
         handovers: state.handovers,
         notifications: state.notifications,
         meetingMinutes: state.meetingMinutes,
+        photos: state.photos,
+        diaryEntries: state.diaryEntries,
+        keyDates: state.keyDates,
+        decisions: state.decisions,
+        eventTemplates: state.eventTemplates,
+        calendarColorPreferences: state.calendarColorPreferences,
+        calendarSharing: state.calendarSharing,
+        fridgeItems: state.fridgeItems,
+        userRecipes: state.userRecipes,
         activeTab: state.activeTab
       })
     }

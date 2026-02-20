@@ -7,18 +7,25 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Card, CardContent } from '@/components/ui/card';
-import { 
-  Users, 
-  Calendar, 
-  MessageCircle, 
-  CheckCircle, 
-  ChevronRight, 
+import {
+  Users,
+  Calendar,
+  MessageCircle,
+  CheckCircle,
+  ChevronRight,
   ChevronLeft,
   Heart,
   Shield,
-  Clock
+  Clock,
+  Lock,
+  Loader2,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { registerUser } from '@/lib/auth';
+import { api } from '@/lib/api';
+import { mapChild, mapHousehold, extractUsersFromHousehold } from '@/lib/mappers';
+import { ApiError } from '@/lib/api';
+import type { ApiHousehold, ApiChild } from '@/lib/mappers';
 
 type FamilyType = 'co-parents-fixed' | 'co-parents-flex' | 'same-household' | 'blended';
 type CustodyPattern = '7/7' | '10/4' | 'custom';
@@ -27,6 +34,7 @@ interface OnboardingData {
   familyType: FamilyType | null;
   parentName: string;
   parentEmail: string;
+  parentPassword: string;
   childName: string;
   childBirthDate: string;
   otherParentEmail: string;
@@ -34,27 +42,27 @@ interface OnboardingData {
 }
 
 const familyTypes: { value: FamilyType; label: string; description: string; icon: React.ReactNode }[] = [
-  { 
-    value: 'co-parents-fixed', 
-    label: 'Co-parents med fast ordning', 
+  {
+    value: 'co-parents-fixed',
+    label: 'Co-parents med fast ordning',
     description: 'Fast samværsplan som 7/7 eller 10/4',
     icon: <Calendar className="w-6 h-6" />
   },
-  { 
-    value: 'co-parents-flex', 
-    label: 'Co-parents med fleksibel ordning', 
+  {
+    value: 'co-parents-flex',
+    label: 'Co-parents med fleksibel ordning',
     description: 'Tilpasset plan efter behov',
     icon: <Clock className="w-6 h-6" />
   },
-  { 
-    value: 'same-household', 
-    label: 'Samboende familie', 
+  {
+    value: 'same-household',
+    label: 'Samboende familie',
     description: 'Samme husstand, travl hverdag',
     icon: <Heart className="w-6 h-6" />
   },
-  { 
-    value: 'blended', 
-    label: 'Bonusfamilie', 
+  {
+    value: 'blended',
+    label: 'Bonusfamilie',
     description: 'Flere børn og kalendere',
     icon: <Users className="w-6 h-6" />
   },
@@ -66,19 +74,25 @@ const custodyPatterns: { value: CustodyPattern; label: string; description: stri
   { value: 'custom', label: 'Tilpasset', description: 'Lav din egen plan' },
 ];
 
-export function OnboardingFlow() {
+interface OnboardingFlowProps {
+  onSwitchToLogin: () => void;
+}
+
+export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
   const [step, setStep] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [data, setData] = useState<OnboardingData>({
     familyType: null,
     parentName: '',
     parentEmail: '',
+    parentPassword: '',
     childName: '',
     childBirthDate: '',
     otherParentEmail: '',
     custodyPattern: null,
   });
-  
-  const { setAuthenticated, setCurrentUser, addUser, addChild, setHousehold, addCustodyPlan } = useAppStore();
+
+  const { setAuthenticated, setCurrentUser, addChild, setHousehold, addCustodyPlan, hydrateFromServer } = useAppStore();
 
   const updateData = <K extends keyof OnboardingData>(key: K, value: OnboardingData[K]) => {
     setData(prev => ({ ...prev, [key]: value }));
@@ -89,8 +103,12 @@ export function OnboardingFlow() {
       toast.error('Vælg venligst en familietype');
       return;
     }
-    if (step === 2 && (!data.parentName || !data.parentEmail)) {
+    if (step === 2 && (!data.parentName || !data.parentEmail || !data.parentPassword)) {
       toast.error('Udfyld venligst alle felter');
+      return;
+    }
+    if (step === 2 && data.parentPassword.length < 6) {
+      toast.error('Adgangskode skal være mindst 6 tegn');
       return;
     }
     if (step === 3 && (!data.childName || !data.childBirthDate)) {
@@ -101,7 +119,7 @@ export function OnboardingFlow() {
       toast.error('Vælg venligst en samværsmodel');
       return;
     }
-    
+
     if (step === 6) {
       completeOnboarding();
     } else {
@@ -113,100 +131,113 @@ export function OnboardingFlow() {
     setStep(prev => prev - 1);
   };
 
-  const completeOnboarding = () => {
+  const completeOnboarding = async () => {
+    setIsSubmitting(true);
+
     const familyMode: 'together' | 'blended' | 'co_parenting' = data.familyType === 'same-household'
       ? 'together'
       : data.familyType === 'blended'
         ? 'blended'
         : 'co_parenting';
 
-    const derivedPartnerName = data.otherParentEmail
-      ? data.otherParentEmail.split('@')[0].replace(/[._-]/g, ' ')
-      : 'Forælder 2';
+    try {
+      // 1. Register user on backend
+      const { user } = await registerUser({
+        email: data.parentEmail,
+        password: data.parentPassword,
+        name: data.parentName,
+        role: 'parent',
+        color: 'warm',
+      });
 
-    // Create user
-    const user = {
-      id: 'u1',
-      name: data.parentName,
-      email: data.parentEmail,
-      color: 'warm' as const,
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.parentName}`,
-      role: 'parent' as const,
-    };
+      setCurrentUser(user);
 
-    const secondaryUser = {
-      id: 'u2',
-      name: derivedPartnerName
-        .split(' ')
-        .filter(Boolean)
-        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-        .join(' '),
-      email: data.otherParentEmail || 'partner@example.com',
-      color: 'cool' as const,
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${derivedPartnerName || 'Partner'}`,
-      role: 'parent' as const,
-    };
-    
-    // Create child
-    const child = {
-      id: 'c1',
-      name: data.childName,
-      birthDate: data.childBirthDate,
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${data.childName}&gender=female`,
-      parent1Id: 'u1',
-      parent2Id: secondaryUser.id,
-    };
-    
-    // Create household
-    const household = {
-      id: 'h1',
-      name: `${data.childName}'s Familie`,
-      members: ['u1', 'u2'],
-      children: ['c1'],
-      familyMode,
-      calendarSources: [],
-      subscription: {
-        plan: 'free' as const,
-        billingModel: getDefaultBillingModel(familyMode),
-        status: 'active' as const,
-        startedAt: new Date().toISOString()
-      },
-      singleParentSupport: {
-        evidenceVaultEnabled: false,
-        autoArchiveReceipts: false,
-        lawyerIds: [] as string[]
-      },
-      custodyPlanId: 'cp1',
-    };
-    
-    // Create custody plan
-    const selectedCustodyPattern = data.familyType === 'same-household'
-      ? 'custom'
-      : data.custodyPattern || '7/7';
+      // 2. Create household on backend
+      const householdRaw = await api.post<ApiHousehold>('/api/household', {
+        name: `${data.childName}'s Familie`,
+        familyMode,
+      });
 
-    const custodyPlan = {
-      id: 'cp1',
-      name: data.familyType === 'same-household' ? 'Hverdagsplan' : `${selectedCustodyPattern} Ordning`,
-      pattern: selectedCustodyPattern,
-      startDate: new Date().toISOString().split('T')[0],
-      swapDay: 4, // Friday
-      swapTime: '18:00',
-      parent1Weeks: 1,
-      parent2Weeks: 1,
-      parent1Days: data.familyType === 'same-household' ? [0, 1, 2, 3, 4, 5, 6] : [0, 1, 2, 3, 4, 5, 6],
-      parent2Days: data.familyType === 'same-household' ? [0, 1, 2, 3, 4, 5, 6] : [] as number[],
-      childId: child.id,
-    };
-    
-    setCurrentUser(user);
-    addUser(user);
-    addUser(secondaryUser);
-    addChild(child);
-    setHousehold(household);
-    addCustodyPlan(custodyPlan);
-    setAuthenticated(true);
-    
-    toast.success('Velkommen');
+      const householdMapped = mapHousehold(householdRaw);
+      const users = extractUsersFromHousehold(householdRaw);
+
+      // Enrich household with local subscription info
+      const household = {
+        ...householdMapped,
+        calendarSources: [],
+        subscription: {
+          plan: 'free' as const,
+          billingModel: getDefaultBillingModel(familyMode),
+          status: 'active' as const,
+          startedAt: new Date().toISOString(),
+        },
+        singleParentSupport: {
+          evidenceVaultEnabled: false,
+          autoArchiveReceipts: false,
+          lawyerIds: [] as string[],
+        },
+      };
+
+      setHousehold(household);
+      hydrateFromServer({ users });
+
+      // 3. Create child on backend
+      const childRaw = await api.post<ApiChild>('/api/children', {
+        name: data.childName,
+        birthDate: data.childBirthDate,
+        parent1Id: user.id,
+        parent2Id: user.id, // Same user initially until partner joins
+        householdId: householdRaw.id,
+      });
+
+      const child = mapChild(childRaw);
+      addChild(child);
+
+      // 4. Create local custody plan (no backend route yet)
+      const selectedCustodyPattern = data.familyType === 'same-household'
+        ? 'custom'
+        : data.custodyPattern || '7/7';
+
+      const custodyPlan = {
+        id: `cp-${Date.now()}`,
+        name: data.familyType === 'same-household' ? 'Hverdagsplan' : `${selectedCustodyPattern} Ordning`,
+        pattern: selectedCustodyPattern,
+        startDate: new Date().toISOString().split('T')[0],
+        swapDay: 4,
+        swapTime: '18:00',
+        parent1Weeks: 1,
+        parent2Weeks: 1,
+        parent1Days: [0, 1, 2, 3, 4, 5, 6],
+        parent2Days: data.familyType === 'same-household' ? [0, 1, 2, 3, 4, 5, 6] : [] as number[],
+        childId: child.id,
+      };
+
+      addCustodyPlan(custodyPlan);
+
+      // 5. If other parent email provided, try invite
+      if (data.otherParentEmail) {
+        try {
+          await api.post(`/api/household/${householdRaw.id}/invite`, {
+            email: data.otherParentEmail,
+            role: 'parent',
+          });
+        } catch {
+          // Invite failure is non-fatal — partner may not have registered yet
+          console.log('Partner invitation pending — they need to register first');
+        }
+      }
+
+      setAuthenticated(true);
+      toast.success('Velkommen! Din konto er oprettet.');
+    } catch (err) {
+      if (err instanceof ApiError) {
+        toast.error(err.message);
+      } else {
+        toast.error('Noget gik galt. Prøv igen.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderStep = () => {
@@ -242,17 +273,26 @@ export function OnboardingFlow() {
                 <span>Gratis</span>
               </div>
             </div>
-            <Button 
-              onClick={handleNext} 
-              size="lg"
-              className="w-full max-w-xs"
-            >
-              Kom i gang
-              <ChevronRight className="w-5 h-5 ml-2" />
-            </Button>
+            <div className="space-y-3">
+              <Button
+                onClick={handleNext}
+                size="lg"
+                className="w-full max-w-xs"
+              >
+                Opret konto
+                <ChevronRight className="w-5 h-5 ml-2" />
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={onSwitchToLogin}
+                className="w-full max-w-xs text-slate-500"
+              >
+                Har du allerede en konto? Log ind
+              </Button>
+            </div>
           </motion.div>
         );
-        
+
       case 1:
         return (
           <motion.div
@@ -265,8 +305,8 @@ export function OnboardingFlow() {
               <h2 className="text-2xl font-bold text-slate-900 mb-2">Vælg din familietype</h2>
               <p className="text-slate-600">Dette hjælper os med at tilpasse appen til dine behov</p>
             </div>
-            <RadioGroup 
-              value={data.familyType || ''} 
+            <RadioGroup
+              value={data.familyType || ''}
               onValueChange={(v) => updateData('familyType', v as FamilyType)}
               className="space-y-3"
             >
@@ -275,8 +315,8 @@ export function OnboardingFlow() {
                   key={type.value}
                   htmlFor={type.value}
                   className={`flex items-start gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                    data.familyType === type.value 
-                      ? 'border-[#f3c59d] bg-[#fff2e6]' 
+                    data.familyType === type.value
+                      ? 'border-[#f3c59d] bg-[#fff2e6]'
                       : 'border-slate-200 hover:border-slate-300'
                   }`}
                 >
@@ -293,7 +333,7 @@ export function OnboardingFlow() {
             </RadioGroup>
           </motion.div>
         );
-        
+
       case 2:
         return (
           <motion.div
@@ -303,7 +343,7 @@ export function OnboardingFlow() {
             className="space-y-6"
           >
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-slate-900 mb-2">Fortæl om dig selv</h2>
+              <h2 className="text-2xl font-bold text-slate-900 mb-2">Opret din konto</h2>
               <p className="text-slate-600">Dine oplysninger gemmes sikkert</p>
             </div>
             <div className="space-y-4">
@@ -328,10 +368,24 @@ export function OnboardingFlow() {
                   className="h-12"
                 />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="parentPassword">Adgangskode</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <Input
+                    id="parentPassword"
+                    type="password"
+                    value={data.parentPassword}
+                    onChange={(e) => updateData('parentPassword', e.target.value)}
+                    placeholder="Mindst 6 tegn"
+                    className="h-12 pl-10"
+                  />
+                </div>
+              </div>
             </div>
           </motion.div>
         );
-        
+
       case 3:
         return (
           <motion.div
@@ -368,7 +422,7 @@ export function OnboardingFlow() {
             </div>
           </motion.div>
         );
-        
+
       case 4:
         return (
           <motion.div
@@ -399,7 +453,7 @@ export function OnboardingFlow() {
                     <MessageCircle className="w-5 h-5 text-[#f58a2d] mt-0.5" />
                     <div className="text-sm text-[#9a622f]">
                       <p className="font-medium mb-1">Hvad sker der nu?</p>
-                      <p>Den anden forælder modtager en email med invitation til at tilslutte sig familien. Indtil da kan du bruge appen alene.</p>
+                      <p>Den anden forælder skal først oprette en konto. Derefter kan de inviteres til husstanden. Du kan springe dette over.</p>
                     </div>
                   </div>
                 </CardContent>
@@ -407,7 +461,7 @@ export function OnboardingFlow() {
             </div>
           </motion.div>
         );
-        
+
       case 5:
         if (data.familyType === 'same-household') {
           return (
@@ -447,8 +501,8 @@ export function OnboardingFlow() {
               <h2 className="text-2xl font-bold text-slate-900 mb-2">Vælg samværsmodel</h2>
               <p className="text-slate-600">Du kan altid ændre dette senere</p>
             </div>
-            <RadioGroup 
-              value={data.custodyPattern || ''} 
+            <RadioGroup
+              value={data.custodyPattern || ''}
               onValueChange={(v) => updateData('custodyPattern', v as CustodyPattern)}
               className="space-y-3"
             >
@@ -457,8 +511,8 @@ export function OnboardingFlow() {
                   key={pattern.value}
                   htmlFor={pattern.value}
                   className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                    data.custodyPattern === pattern.value 
-                      ? 'border-[#f3c59d] bg-[#fff2e6]' 
+                    data.custodyPattern === pattern.value
+                      ? 'border-[#f3c59d] bg-[#fff2e6]'
                       : 'border-slate-200 hover:border-slate-300'
                   }`}
                 >
@@ -472,7 +526,7 @@ export function OnboardingFlow() {
             </RadioGroup>
           </motion.div>
         );
-        
+
       case 6:
         return (
           <motion.div
@@ -523,7 +577,7 @@ export function OnboardingFlow() {
             </div>
           </motion.div>
         );
-        
+
       default:
         return null;
     }
@@ -541,7 +595,7 @@ export function OnboardingFlow() {
                 <span className="text-sm font-medium text-[#b96424]">{Math.round((step / 6) * 100)}%</span>
               </div>
               <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                <motion.div 
+                <motion.div
                   className="h-full bg-gradient-to-r from-[#f7a95c] to-[#f58a2d]"
                   initial={{ width: 0 }}
                   animate={{ width: `${(step / 6) * 100}%` }}
@@ -550,12 +604,12 @@ export function OnboardingFlow() {
               </div>
             </div>
           )}
-          
+
           {/* Content */}
           <AnimatePresence mode="wait">
             {renderStep()}
           </AnimatePresence>
-          
+
           {/* Navigation buttons */}
           {step > 0 && (
             <div className="flex gap-3 mt-8">
@@ -564,6 +618,7 @@ export function OnboardingFlow() {
                   variant="outline"
                   onClick={handleBack}
                   className="flex-1"
+                  disabled={isSubmitting}
                 >
                   <ChevronLeft className="w-4 h-4 mr-2" />
                   Tilbage
@@ -572,9 +627,21 @@ export function OnboardingFlow() {
               <Button
                 onClick={handleNext}
                 className={`${step === 1 ? 'w-full' : 'flex-1'}`}
+                disabled={isSubmitting}
               >
-                {step === 6 ? 'Start appen' : 'Fortsæt'}
-                {step !== 6 && <ChevronRight className="w-4 h-4 ml-2" />}
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Opretter...
+                  </>
+                ) : step === 6 ? (
+                  'Start appen'
+                ) : (
+                  <>
+                    Fortsæt
+                    <ChevronRight className="w-4 h-4 ml-2" />
+                  </>
+                )}
               </Button>
             </div>
           )}

@@ -53,7 +53,7 @@ export function Borneoverblik() {
     addDocument 
   } = useAppStore();
   
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('milestones');
   const [isAddMilestoneOpen, setIsAddMilestoneOpen] = useState(false);
   const [isAddDocumentOpen, setIsAddDocumentOpen] = useState(false);
   const [newMilestone, setNewMilestone] = useState<{

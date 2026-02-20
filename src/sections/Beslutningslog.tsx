@@ -63,7 +63,7 @@ export function Beslutningslog() {
     if (!currentUser || !title.trim() || !description.trim()) return;
     addDecision({
       id: generateId('dec'),
-      childId: childId || undefined,
+      childId: childId && childId !== 'none' ? childId : undefined,
       title: title.trim(),
       description: description.trim(),
       category,
@@ -277,7 +277,7 @@ export function Beslutningslog() {
                       <SelectValue placeholder="Ingen" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Ingen</SelectItem>
+                      <SelectItem value="none">Ingen</SelectItem>
                       {children.map(c => (
                         <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                       ))}

@@ -37,6 +37,9 @@ import {
   Timer,
   UserCircle,
   ChevronDown,
+  Lock,
+  Share2,
+  Users,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, isSameDay, parseISO, addMonths, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from 'date-fns';
@@ -244,9 +247,10 @@ function parseIcsEvents(icsContent: string): ParsedCalendarEvent[] {
 
 export function Kalender() {
   const {
-    events, users, children, addEvent, updateEvent, deleteEvent, household, setHousehold,
+    events, users, children, currentUser, addEvent, updateEvent, deleteEvent, household, setHousehold,
     eventTemplates, addEventTemplate, deleteEventTemplate,
     calendarColorPreferences, setCalendarColorPreference, resetCalendarColorPreferences,
+    calendarSharing, requestCalendarSharing, respondToCalendarSharing,
   } = useAppStore();
   const [currentDate, setCurrentDate] = useState(new Date());
   const syncCalendarSourceRef = useRef<
@@ -288,11 +292,19 @@ export function Kalender() {
   const [templateStartTimer, setTemplateStartTimer] = useState(false);
 
   const _features = getPlanFeatures(household);
-  void _features; // Will be used for free-tier gating
+  void _features;
   const currentChild = children[0];
   const warmParent = users.find((user) => user.role === 'parent' && user.color === 'warm');
   const coolParent = users.find((user) => user.role === 'parent' && user.color === 'cool');
   const calendarSources = household?.calendarSources || [];
+
+  // Calendar sharing logic for separated families
+  const isTogether = household?.familyMode === 'together';
+  const isSharingAccepted = calendarSharing?.status === 'accepted';
+  const isSharingPending = calendarSharing?.status === 'pending';
+  // For separated/single_parent families, partner events are hidden unless sharing is accepted
+  const canSeePartnerEvents = isTogether || isSharingAccepted;
+  const otherParent = users.find(u => u.role === 'parent' && u.id !== currentUser?.id);
 
   // Get month days
   const monthStart = startOfMonth(currentDate);
@@ -311,6 +323,8 @@ export function Kalender() {
       if (!isSameDay(eventDate, day)) return false;
       if (filter !== 'all' && e.type !== filter) return false;
       if (personFilter && e.createdBy !== personFilter) return false;
+      // Hide partner's events if calendar sharing is not accepted (separated families)
+      if (!canSeePartnerEvents && otherParent && e.createdBy === otherParent.id) return false;
       return true;
     });
   };
@@ -546,9 +560,13 @@ export function Kalender() {
     });
   };
 
-  // All upcoming events
+  // All upcoming events (hide partner events when sharing not accepted)
   const allUpcoming = events
-    .filter(e => parseISO(e.startDate) >= new Date())
+    .filter(e => {
+      if (parseISO(e.startDate) < new Date()) return false;
+      if (!canSeePartnerEvents && otherParent && e.createdBy === otherParent.id) return false;
+      return true;
+    })
     .sort((a, b) => parseISO(a.startDate).getTime() - parseISO(b.startDate).getTime());
 
   // Handle template use: open config dialog
@@ -848,50 +866,129 @@ export function Kalender() {
         </div>
       </motion.div>
 
-      {/* Parent color badges – clickable for person filter */}
+      {/* Person filter dropdown + calendar sharing gate */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.08 }}
-        className="grid grid-cols-1 gap-2 sm:grid-cols-2"
+        className="flex items-center gap-2"
       >
-        {coolParent && (
-          <button
-            onClick={() => setPersonFilter(personFilter === coolParent.id ? null : coolParent.id)}
-            className={cn(
-              "flex items-center gap-2 rounded-xl border px-3 py-2 transition-all text-left",
-              personFilter === coolParent.id
-                ? "border-[#2f2f2f] bg-[#2f2f2f] ring-2 ring-[#f58a2d] ring-offset-1"
-                : personFilter === null
-                  ? "border-[#2f2f2f] bg-[#2f2f2f]"
-                  : "border-[#d8d7cf] bg-[#ecebe5] opacity-50"
+        <Select
+          value={personFilter ?? 'all'}
+          onValueChange={(v) => setPersonFilter(v === 'all' ? null : v)}
+        >
+          <SelectTrigger className="h-10 flex-1 rounded-xl border-[#d8d7cf] bg-white text-sm font-medium text-[#2f2f2d]">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-[#78766d]" />
+              <SelectValue placeholder="Alle personer" />
+            </div>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">
+              <div className="flex items-center gap-2">
+                <span className="h-3 w-3 rounded-full bg-[#8b8677]" />
+                Alle
+              </div>
+            </SelectItem>
+            {coolParent && (
+              <SelectItem value={coolParent.id}>
+                <div className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-full bg-[#2f2f2f]" />
+                  {coolParent.name}
+                </div>
+              </SelectItem>
             )}
-          >
-            <span className="h-3 w-3 rounded-full bg-white" />
-            <p className={cn("truncate text-sm font-medium", personFilter !== null && personFilter !== coolParent.id ? "text-[#5f5d56]" : "text-white")}>
-              {coolParent.name} • Sort
-            </p>
-          </button>
-        )}
-        {warmParent && (
-          <button
-            onClick={() => setPersonFilter(personFilter === warmParent.id ? null : warmParent.id)}
-            className={cn(
-              "flex items-center gap-2 rounded-xl border px-3 py-2 transition-all text-left",
-              personFilter === warmParent.id
-                ? "border-[#f3c59d] bg-[#fff2e6] ring-2 ring-[#f58a2d] ring-offset-1"
-                : personFilter === null
-                  ? "border-[#f3c59d] bg-[#fff2e6]"
-                  : "border-[#d8d7cf] bg-[#ecebe5] opacity-50"
+            {warmParent && canSeePartnerEvents && (
+              <SelectItem value={warmParent.id}>
+                <div className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded-full bg-[#f58a2d]" />
+                  {warmParent.name}
+                </div>
+              </SelectItem>
             )}
+          </SelectContent>
+        </Select>
+
+        {/* Calendar sharing prompt for separated families */}
+        {!isTogether && !isSharingAccepted && (
+          <button
+            onClick={() => {
+              if (!isSharingPending && currentUser) {
+                requestCalendarSharing(currentUser.id);
+                toast.info('Anmodning om kalenderdeling sendt til din partner');
+              }
+            }}
+            className={cn(
+              "flex h-10 items-center gap-1.5 rounded-xl border px-3 text-xs font-semibold transition-colors whitespace-nowrap",
+              isSharingPending
+                ? "border-[#f3c59d] bg-[#fff8f0] text-[#cc6f1f]"
+                : "border-[#d8d7cf] bg-white text-[#78766d] hover:bg-[#faf9f6]"
+            )}
+            title={isSharingPending ? 'Afventer accept fra partner' : 'Anmod om kalenderdeling'}
           >
-            <span className="h-3 w-3 rounded-full bg-[#f58a2d]" />
-            <p className={cn("truncate text-sm font-medium", personFilter !== null && personFilter !== warmParent.id ? "text-[#5f5d56]" : "text-[#cc6f1f]")}>
-              {warmParent.name} • Orange
-            </p>
+            {isSharingPending ? (
+              <>
+                <Clock className="h-3.5 w-3.5" />
+                Afventer
+              </>
+            ) : (
+              <>
+                <Share2 className="h-3.5 w-3.5" />
+                Del kalender
+              </>
+            )}
           </button>
         )}
       </motion.div>
+
+      {/* Calendar sharing invitation banner (if pending and current user didn't request) */}
+      {!isTogether && isSharingPending && calendarSharing?.requestedBy !== currentUser?.id && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl border border-[#f3c59d] bg-[#fff8f0] p-3"
+        >
+          <div className="flex items-start gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f58a2d]/10">
+              <Share2 className="h-4 w-4 text-[#f58a2d]" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-semibold text-[#2f2f2d]">Anmodning om kalenderdeling</p>
+              <p className="text-[11px] text-[#78766d] mt-0.5">
+                {users.find(u => u.id === calendarSharing.requestedBy)?.name ?? 'Din partner'} ønsker at dele kalender med dig.
+              </p>
+              <div className="mt-2 flex gap-2">
+                <button
+                  onClick={() => { respondToCalendarSharing(true); toast.success('Kalenderdeling accepteret'); }}
+                  className="rounded-lg bg-[#f58a2d] px-3 py-1 text-[11px] font-semibold text-white hover:bg-[#e47921]"
+                >
+                  Acceptér
+                </button>
+                <button
+                  onClick={() => { respondToCalendarSharing(false); toast.info('Kalenderdeling afvist'); }}
+                  className="rounded-lg border border-[#d8d7cf] bg-white px-3 py-1 text-[11px] font-semibold text-[#4a4945] hover:bg-[#faf9f6]"
+                >
+                  Afvis
+                </button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Partner events hidden notice */}
+      {!isTogether && !canSeePartnerEvents && otherParent && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-2.5 rounded-xl border border-[#e8e7e0] bg-[#faf9f6] px-3 py-2"
+        >
+          <Lock className="h-4 w-4 shrink-0 text-[#a09e96]" />
+          <p className="text-[11px] text-[#78766d]">
+            {otherParent.name}s kalender er skjult. Del kalender for at se hinandens aftaler.
+          </p>
+        </motion.div>
+      )}
 
       {/* Month Navigation */}
       <motion.div

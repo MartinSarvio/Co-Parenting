@@ -90,7 +90,7 @@ export function VigtigeDatoer() {
     if (!currentUser || !title.trim() || !date) return;
     addKeyDate({
       id: generateId('kd'),
-      childId: childId || undefined,
+      childId: childId && childId !== 'none' ? childId : undefined,
       title: title.trim(),
       date,
       type,
@@ -260,7 +260,7 @@ export function VigtigeDatoer() {
                     <SelectValue placeholder="Ingen" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Ingen</SelectItem>
+                    <SelectItem value="none">Ingen</SelectItem>
                     {children.map(c => (
                       <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
                     ))}

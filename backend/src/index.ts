@@ -14,6 +14,11 @@ import { messagesRouter } from './routes/messages';
 import { expensesRouter } from './routes/expenses';
 import { documentsRouter } from './routes/documents';
 import { mealPlansRouter } from './routes/mealPlans';
+import { decisionsRouter } from './routes/decisions';
+import { keyDatesRouter } from './routes/keyDates';
+import { diaryRouter } from './routes/diary';
+import { milestonesRouter } from './routes/milestones';
+import { custodyPlansRouter } from './routes/custodyPlans';
 import { errorHandler } from './middleware/errorHandler';
 import { authenticate } from './middleware/auth';
 
@@ -24,8 +29,23 @@ const PORT = process.env.PORT || 3000;
 
 // Security middleware
 app.use(helmet());
+
+// CORS — allow multiple origins (Railway prod + local dev)
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:5173',
+  'http://localhost:4173',
+].filter(Boolean) as string[];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, server-to-server, health checks)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    }
+  },
   credentials: true,
 }));
 
@@ -64,6 +84,11 @@ app.use('/api/messages', authenticate, messagesRouter);
 app.use('/api/expenses', authenticate, expensesRouter);
 app.use('/api/documents', authenticate, documentsRouter);
 app.use('/api/meal-plans', authenticate, mealPlansRouter);
+app.use('/api/decisions', authenticate, decisionsRouter);
+app.use('/api/key-dates', authenticate, keyDatesRouter);
+app.use('/api/diary', authenticate, diaryRouter);
+app.use('/api/milestones', authenticate, milestonesRouter);
+app.use('/api/custody-plans', authenticate, custodyPlansRouter);
 
 // Error handler
 app.use(errorHandler);

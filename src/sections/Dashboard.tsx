@@ -14,24 +14,27 @@ import {
   Home,
   User,
   CheckCircle2,
-  UtensilsCrossed
+  UtensilsCrossed,
+  Users,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { parseISO, isToday, isTomorrow, format } from 'date-fns';
 import { da } from 'date-fns/locale';
 
 export function Dashboard() {
-  const { 
-    currentUser, 
-    users, 
-    children, 
-    custodyPlans, 
-    events, 
-    tasks, 
+  const {
+    currentUser,
+    users,
+    children,
+    custodyPlans,
+    events,
+    tasks,
     handovers,
-    setActiveTab 
+    household,
+    setActiveTab
   } = useAppStore();
   const custodyPlan = custodyPlans[0];
+  const isTogether = household?.familyMode === 'together';
 
   const currentChild = children[0];
   
@@ -89,56 +92,90 @@ export function Dashboard() {
         <p className="mt-1 text-sm text-[#7e7c74]">Her er dagens overblik</p>
       </motion.div>
 
-      {/* Status Card - Where is the child */}
+      {/* Status Card – Family overview (together) or custody status (separated) */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <Card className={cn(
-          "overflow-hidden border transition-all duration-300",
-          isWithCurrentUser 
-            ? "border-[#d8d7d1] bg-[#faf8f3]"
-            : "border-[#d8d7d1] bg-[#f7f6f2]"
-        )}>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
+        {isTogether ? (
+          /* ── Together mode: show all family member avatars ── */
+          <Card className="overflow-hidden border border-[#d8d7d1] bg-[#faf8f3]">
+            <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <div className={cn(
-                  "h-14 w-14 rounded-2xl border border-[#d5d4cc] bg-[#f0eee8] flex items-center justify-center"
-                )}>
-                  {isWithCurrentUser ? (
-                    <Home className={cn("h-7 w-7 text-[#2f2f2f]")} />
-                  ) : (
-                    <User className={cn("h-7 w-7 text-[#2f2f2f]")} />
-                  )}
+                <div className="h-14 w-14 shrink-0 rounded-2xl border border-[#d5d4cc] bg-[#f0eee8] flex items-center justify-center">
+                  <Users className="h-7 w-7 text-[#2f2f2f]" />
                 </div>
-                <div>
-                  <p className="mb-1 text-sm text-[#74726a]">{currentChild?.name} er hos</p>
-                  <p className={cn(
-                    "text-2xl font-semibold tracking-[-0.02em] text-[#2f2f2d]"
-                  )}>
-                    {isWithCurrentUser ? 'Dig' : currentParent?.name}
+                <div className="flex-1 min-w-0">
+                  <p className="mb-1.5 text-sm text-[#74726a]">Vores familie</p>
+                  <div className="flex -space-x-2">
+                    {users.map((u) => (
+                      <Avatar key={u.id} className="h-10 w-10 border-2 border-white shadow-sm">
+                        <AvatarImage src={u.avatar} />
+                        <AvatarFallback className="bg-[#eceae2] text-xs text-[#4e4d47]">
+                          {u.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                        </AvatarFallback>
+                      </Avatar>
+                    ))}
+                    {children.map((c) => (
+                      <Avatar key={c.id} className="h-10 w-10 border-2 border-white shadow-sm">
+                        <AvatarImage src={c.avatar} />
+                        <AvatarFallback className="bg-[#eceae2] text-xs text-[#4e4d47]">
+                          {c.name[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                    ))}
+                  </div>
+                  <p className="mt-1.5 text-[11px] text-[#a09e96]">
+                    {users.length + children.length} familiemedlemmer
                   </p>
-                  {nextHandover && (
-                    <div className="mt-1 flex items-center gap-1 text-sm text-[#7b796f]">
-                      <Clock className="h-4 w-4" />
-                      <span>
-                        {isWithCurrentUser ? 'Aflevering' : 'Afhentning'} {formatRelative(nextHandover).toLowerCase()}
-                      </span>
-                    </div>
-                  )}
                 </div>
               </div>
-              <Avatar className="h-14 w-14 border-2 border-white shadow-md">
-                <AvatarImage src={currentChild?.avatar} />
-                <AvatarFallback className="bg-[#eceae2] text-lg text-[#4e4d47]">
-                  {currentChild?.name[0]}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        ) : (
+          /* ── Separated / co-parenting / single parent: custody status ── */
+          <Card className={cn(
+            "overflow-hidden border transition-all duration-300",
+            isWithCurrentUser
+              ? "border-[#d8d7d1] bg-[#faf8f3]"
+              : "border-[#d8d7d1] bg-[#f7f6f2]"
+          )}>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="h-14 w-14 rounded-2xl border border-[#d5d4cc] bg-[#f0eee8] flex items-center justify-center">
+                    {isWithCurrentUser ? (
+                      <Home className="h-7 w-7 text-[#2f2f2f]" />
+                    ) : (
+                      <User className="h-7 w-7 text-[#2f2f2f]" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="mb-1 text-sm text-[#74726a]">{currentChild?.name} er hos</p>
+                    <p className="text-2xl font-semibold tracking-[-0.02em] text-[#2f2f2d]">
+                      {isWithCurrentUser ? 'Dig' : currentParent?.name}
+                    </p>
+                    {nextHandover && (
+                      <div className="mt-1 flex items-center gap-1 text-sm text-[#7b796f]">
+                        <Clock className="h-4 w-4" />
+                        <span>
+                          {isWithCurrentUser ? 'Aflevering' : 'Afhentning'} {formatRelative(nextHandover).toLowerCase()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <Avatar className="h-14 w-14 border-2 border-white shadow-md">
+                  <AvatarImage src={currentChild?.avatar} />
+                  <AvatarFallback className="bg-[#eceae2] text-lg text-[#4e4d47]">
+                    {currentChild?.name[0]}
+                  </AvatarFallback>
+                </Avatar>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </motion.div>
 
       {/* Quick Actions */}

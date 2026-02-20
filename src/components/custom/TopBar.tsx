@@ -1,6 +1,6 @@
 import { useAppStore } from '@/store';
 import { getParentColor } from '@/lib/utils';
-import { Bell, Settings, ChevronDown, Briefcase, User } from 'lucide-react';
+import { Bell, Settings, ChevronDown, Briefcase, User, LogOut } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,8 +11,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { logoutUser } from '@/lib/auth';
 export function TopBar() {
-  const { currentUser, children, notifications, isProfessionalView, setProfessionalView, household, setActiveTab } = useAppStore();
+  const { currentUser, children, notifications, isProfessionalView, setProfessionalView, household, setActiveTab, logout } = useAppStore();
 
   const unreadNotifications = notifications.filter(n => !n.read).length;
   const currentChild = children[0];
@@ -171,7 +172,14 @@ export function TopBar() {
                 Indstillinger
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="flex items-center gap-2 text-[#b56522]">
+              <DropdownMenuItem
+                className="flex items-center gap-2 text-[#b56522]"
+                onClick={() => {
+                  logoutUser();
+                  logout();
+                }}
+              >
+                <LogOut className="h-4 w-4" aria-hidden="true" />
                 Log ud
               </DropdownMenuItem>
             </DropdownMenuContent>

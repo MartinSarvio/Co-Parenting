@@ -1,13 +1,19 @@
-import { Suspense, lazy, useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useState, useCallback } from 'react';
 import { useAppStore } from '@/store';
 import { BottomNav } from '@/components/custom/BottomNav';
 import { TopBar } from '@/components/custom/TopBar';
 import { Toaster } from '@/components/ui/sonner';
 import { ErrorBoundary } from '@/components/custom/ErrorBoundary';
+import { getToken } from '@/lib/api';
+import { fetchMe } from '@/lib/auth';
+import { loadInitialData } from '@/lib/dataSync';
 import './App.css';
 
 const OnboardingFlow = lazy(() =>
   import('@/sections/OnboardingFlow').then((module) => ({ default: module.OnboardingFlow }))
+);
+const LoginScreen = lazy(() =>
+  import('@/sections/LoginScreen').then((module) => ({ default: module.LoginScreen }))
 );
 const Dashboard = lazy(() =>
   import('@/sections/Dashboard').then((module) => ({ default: module.Dashboard }))
@@ -86,19 +92,45 @@ function SectionLoading() {
 }
 
 function App() {
-  const { isAuthenticated, isProfessionalView, initDemoData, activeTab, household } = useAppStore();
+  const { isAuthenticated, isProfessionalView, activeTab, household, setCurrentUser, setAuthenticated, hydrateFromServer, logout } = useAppStore();
   const [isReady, setIsReady] = useState(false);
+  const [authScreen, setAuthScreen] = useState<'login' | 'register'>('login');
   const canUseProfessionalView = household?.familyMode !== 'together';
   const showProfessionalView = isProfessionalView && canUseProfessionalView;
 
-  useEffect(() => {
-    // Initialize demo data on first load
-    const hasData = localStorage.getItem('familiekoordinering-storage');
-    if (!hasData) {
-      initDemoData();
+  // Session restore — check for existing JWT token on mount
+  const restoreSession = useCallback(async () => {
+    const token = getToken();
+    if (!token) {
+      setIsReady(true);
+      return;
     }
-    setIsReady(true);
-  }, [initDemoData]);
+
+    try {
+      // Validate token and get user
+      const user = await fetchMe();
+      setCurrentUser(user);
+
+      // Load all data from server
+      try {
+        const data = await loadInitialData();
+        hydrateFromServer(data);
+      } catch {
+        console.warn('Data sync failed — using cached data');
+      }
+
+      setAuthenticated(true);
+    } catch {
+      // Token invalid/expired — clear and show login
+      logout();
+    } finally {
+      setIsReady(true);
+    }
+  }, [setCurrentUser, setAuthenticated, hydrateFromServer, logout]);
+
+  useEffect(() => {
+    restoreSession();
+  }, [restoreSession]);
 
   if (!isReady) {
     return (
@@ -120,7 +152,11 @@ function App() {
       <>
         <ErrorBoundary sectionName="Opstart">
           <Suspense fallback={<SectionLoading />}>
-            <OnboardingFlow />
+            {authScreen === 'login' ? (
+              <LoginScreen onSwitchToRegister={() => setAuthScreen('register')} />
+            ) : (
+              <OnboardingFlow onSwitchToLogin={() => setAuthScreen('login')} />
+            )}
           </Suspense>
         </ErrorBoundary>
         <Toaster position="top-center" />

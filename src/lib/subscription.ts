@@ -38,7 +38,7 @@ const PLAN_FEATURES: Record<SubscriptionPlan, PlanFeatures> = {
     maxChildren: 1,
     multipleChildren: false,
     shoppingScanner: false,
-    expenses: false,
+    expenses: true,
     inAppPayments: false,
     recurringExpenses: false,
     singleParentEvidence: false,
