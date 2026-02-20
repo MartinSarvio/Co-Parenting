@@ -22,6 +22,7 @@ import { custodyPlansRouter } from './routes/custodyPlans';
 import { adminRouter } from './routes/admin';
 import { errorHandler } from './middleware/errorHandler';
 import { authenticate } from './middleware/auth';
+import { prisma } from './lib/prisma';
 
 dotenv.config();
 
@@ -97,10 +98,24 @@ app.use('/api/admin', adminRouter);
 // Error handler
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`🚀 Co-Parenting API running on port ${PORT}`);
-  console.log(`   Health: http://localhost:${PORT}/health`);
-  console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
+// Add isAdmin column if it doesn't exist (safe migration on startup)
+async function ensureSchema() {
+  try {
+    await prisma.$executeRawUnsafe(
+      `ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "isAdmin" BOOLEAN NOT NULL DEFAULT false`
+    );
+    console.log('✅ Schema check: isAdmin column ready');
+  } catch (e) {
+    console.log('ℹ️  Schema check skipped:', (e as Error).message);
+  }
+}
+
+ensureSchema().then(() => {
+  app.listen(PORT, () => {
+    console.log(`🚀 Co-Parenting API running on port ${PORT}`);
+    console.log(`   Health: http://localhost:${PORT}/health`);
+    console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
 });
 
 export default app;
