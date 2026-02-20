@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAppStore } from '@/store';
-import { childId as generateChildId } from '@/lib/id';
+import { useApiActions } from '@/hooks/useApiActions';
+// ID generation handled by backend via useApiActions
 import { cn, formatDate } from '@/lib/utils';
 import { getMaxChildren } from '@/lib/subscription';
 import { Card, CardContent } from '@/components/ui/card';
@@ -25,18 +26,16 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
 export function ChildManagement() {
-  const { 
+  const {
     users,
-    children, 
+    children,
     institutions,
     custodyPlans,
     household,
     currentChildId,
     setCurrentChildId,
-    addChild,
-    updateChild,
-    removeChild
   } = useAppStore();
+  const { createChild, updateChild, deleteChild } = useApiActions();
   
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -58,7 +57,7 @@ export function ChildManagement() {
   const isAtChildLimit = children.length >= maxChildren;
   const canAddChild = !isAtChildLimit;
 
-  const handleAddChild = () => {
+  const handleAddChild = async () => {
     if (!canAddChild) {
       toast.error('Din plan tillader ikke flere børn. Opgrader abonnement for at tilføje flere.');
       return;
@@ -69,23 +68,17 @@ export function ChildManagement() {
       return;
     }
 
-    const childId = generateChildId();
     const parent1 = parents[0]?.id || '';
     const parent2 = parents[1]?.id || parents[0]?.id || '';
 
-    addChild({
-      id: childId,
+    await createChild({
       name: newChild.name,
       birthDate: newChild.birthDate,
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${newChild.name}`,
       parent1Id: newChild.parent1Id || parent1,
       parent2Id: newChild.parent2Id || parent2,
+      householdId: household?.id || '',
       allergies: newChild.allergies ? newChild.allergies.split(',').map(s => s.trim()) : [],
       medications: newChild.medications ? newChild.medications.split(',').map(s => s.trim()) : [],
-      emergencyContacts: [],
-      institutions: [],
-      institutionName: newChild.institutionName || undefined,
-      institutionType: newChild.institutionType !== 'none' ? newChild.institutionType as any : undefined,
     });
 
     setIsAddOpen(false);
@@ -124,10 +117,10 @@ export function ChildManagement() {
     setIsEditOpen(true);
   };
 
-  const handleUpdateChild = () => {
+  const handleUpdateChild = async () => {
     if (!editingChild) return;
 
-    updateChild(editingChild, {
+    await updateChild(editingChild, {
       name: newChild.name,
       birthDate: newChild.birthDate,
       parent1Id: newChild.parent1Id,
@@ -145,7 +138,7 @@ export function ChildManagement() {
 
   const handleRemoveChild = (childId: string) => {
     if (confirm('Er du sikker på at du vil fjerne dette barn?')) {
-      removeChild(childId);
+      void deleteChild(childId);
       toast.success('Barn fjernet');
     }
   };

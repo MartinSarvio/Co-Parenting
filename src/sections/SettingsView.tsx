@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { requestNotificationPermission, scheduleAllHandoverReminders } from '@/lib/notifications';
-import { paymentAccountId, userId as generateUserId, documentId } from '@/lib/id';
+import { paymentAccountId, userId as generateUserId } from '@/lib/id';
 import {
   BadgeCheck,
   Bell,
@@ -22,6 +22,7 @@ import {
 import { toast } from 'sonner';
 import { useTheme } from 'next-themes';
 import { useAppStore } from '@/store';
+import { useApiActions } from '@/hooks/useApiActions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -72,10 +73,10 @@ export function SettingsView() {
     addPaymentAccount,
     updatePaymentAccount,
     addUser,
-    addDocument,
     addFamilyMember,
     removeFamilyMember,
   } = useAppStore();
+  const { createDocument } = useApiActions();
 
   const [profileDraft, setProfileDraft] = useState({
     name: currentUser?.name || '',
@@ -312,16 +313,12 @@ export function SettingsView() {
       lawyerIds: []
     };
 
-    addDocument({
-      id: documentId(),
+    void createDocument({
       title: evidenceDraft.title.trim(),
       type: 'authority_document',
       url: evidenceDraft.url.trim(),
-      uploadedBy: currentUser.id,
-      uploadedAt: new Date().toISOString(),
       sharedWith: [currentUser.id, ...support.lawyerIds],
       isOfficial: true,
-      authorityReference: evidenceDraft.description.trim() || 'Dokumentation'
     });
 
     setEvidenceDraft({ title: '', url: '', description: '' });

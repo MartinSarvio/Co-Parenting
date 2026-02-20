@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, type ChangeEvent } from 'react';
 import { useAppStore } from '@/store';
-import { messageId, attachmentId, threadId as generateThreadId } from '@/lib/id';
+import { useApiActions } from '@/hooks/useApiActions';
+import { attachmentId } from '@/lib/id';
 import { cn, getParentColor } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -25,16 +26,14 @@ import { toast } from 'sonner';
 import type { Attachment } from '@/types';
 
 export function Kommunikation() {
-  const { 
-    currentUser, 
-    users, 
-    children, 
-    messages, 
-    threads, 
-    addMessage,
-    addThread,
-    deleteThread,
+  const {
+    currentUser,
+    users,
+    children,
+    messages,
+    threads,
   } = useAppStore();
+  const { createThread, sendMessage, deleteThread } = useApiActions();
   
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState('');
@@ -58,21 +57,13 @@ export function Kommunikation() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [threadMessages]);
 
-  const handleSendMessage = (content: string = newMessage, attachments?: Attachment[]) => {
+  const handleSendMessage = (content: string = newMessage, _attachments?: Attachment[]) => {
     if (!selectedThreadId) return;
     const trimmed = content.trim();
-    if (!trimmed && (!attachments || attachments.length === 0)) return;
+    if (!trimmed && (!_attachments || _attachments.length === 0)) return;
 
-    addMessage({
-      id: messageId(),
-      content: trimmed,
-      senderId: currentUser?.id || 'u1',
-      timestamp: new Date().toISOString(),
-      threadId: selectedThreadId,
-      attachments,
-      readBy: [currentUser?.id || 'u1'],
-    });
-    
+    void sendMessage(selectedThreadId, trimmed);
+
     setNewMessage('');
   };
 
@@ -106,26 +97,24 @@ export function Kommunikation() {
     }
   };
 
-  const handleCreateThread = () => {
+  const handleCreateThread = async () => {
     if (newThreadTitle.trim().length < 3) {
       toast.error('Tilføj en tydelig titel til samtalen');
       return;
     }
-    
-    const newThreadId = generateThreadId();
-    addThread({
-      id: newThreadId,
+
+    const thread = await createThread({
       title: newThreadTitle.trim(),
       participants: [currentUser?.id || 'u1', otherParent?.id || 'u2'],
       childId: currentChild?.id,
-      unreadCount: 0,
-      createdAt: new Date().toISOString(),
     });
-    
+
     setNewThreadTitle('');
     setNewThreadCategory('institution');
     setShowNewThread(false);
-    setSelectedThreadId(newThreadId);
+    if (thread) {
+      setSelectedThreadId(thread.id);
+    }
     toast.success('Samtale oprettet');
   };
 
@@ -281,7 +270,7 @@ export function Kommunikation() {
                           onClick={(e) => {
                             e.stopPropagation();
                             if (currentUser) {
-                              deleteThread(thread.id, currentUser.id);
+                              void deleteThread(thread.id, currentUser.id);
                               toast.success('Samtale skjult for dig');
                             }
                           }}

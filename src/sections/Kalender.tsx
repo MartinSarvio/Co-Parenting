@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppStore } from '@/store';
-import { eventId, calendarSourceId, templateId } from '@/lib/id';
+import { useApiActions } from '@/hooks/useApiActions';
+import { calendarSourceId, templateId } from '@/lib/id';
 import { cn, formatTime, getEventTypeLabel } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -247,11 +248,12 @@ function parseIcsEvents(icsContent: string): ParsedCalendarEvent[] {
 
 export function Kalender() {
   const {
-    events, users, children, currentUser, addEvent, updateEvent, deleteEvent, household, setHousehold,
+    events, users, children, currentUser, household, setHousehold,
     eventTemplates, addEventTemplate, deleteEventTemplate,
     calendarColorPreferences, setCalendarColorPreference, resetCalendarColorPreferences,
     calendarSharing, requestCalendarSharing, respondToCalendarSharing,
   } = useAppStore();
+  const { createEvent, updateEvent, deleteEvent } = useApiActions();
   const [currentDate, setCurrentDate] = useState(new Date());
   const syncCalendarSourceRef = useRef<
     ((source: { id: string; name: string; type: CalendarSourceType; url: string; enabled: boolean; autoSync: boolean; lastSyncedAt?: string }, showToast?: boolean) => Promise<void>) | null
@@ -404,13 +406,12 @@ export function Kalender() {
         };
 
         if (existingEvent) {
-          updateEvent(existingEvent.id, payload);
+          void updateEvent(existingEvent.id, payload);
           updatedCount += 1;
           return;
         }
 
-        addEvent({
-          id: `ext-${source.id}-${encodeURIComponent(externalEvent.uid)}`,
+        void createEvent({
           title: payload.title || 'Ekstern kalenderaftale',
           description: payload.description,
           startDate: payload.startDate || new Date().toISOString(),
@@ -511,7 +512,7 @@ export function Kalender() {
     updateCalendarSources(calendarSources.filter((source) => source.id !== sourceId));
     events
       .filter((event) => event.sourceCalendarId === sourceId)
-      .forEach((event) => deleteEvent(event.id));
+      .forEach((event) => void deleteEvent(event.id));
     toast.success('Kalenderkilde fjernet');
   };
 
@@ -532,11 +533,10 @@ export function Kalender() {
     };
   }, [calendarSources]);
 
-  const handleAddEvent = () => {
+  const handleAddEvent = async () => {
     if (!newEvent.title || !newEvent.startDate) return;
 
-    addEvent({
-      id: eventId(),
+    await createEvent({
       title: newEvent.title,
       type: newEvent.type as EventType,
       startDate: new Date(newEvent.startDate).toISOString(),
@@ -580,13 +580,12 @@ export function Kalender() {
   };
 
   // Confirm template use
-  const handleConfirmTemplateUse = () => {
+  const handleConfirmTemplateUse = async () => {
     if (!templateToUse || !templateStartTime) return;
     const start = new Date(templateStartTime);
     const endDate = new Date(start.getTime() + templateToUse.duration * 60000);
     const user = users.find(u => u.role === 'parent');
-    addEvent({
-      id: eventId(),
+    await createEvent({
       title: templateToUse.title,
       type: templateToUse.type,
       startDate: start.toISOString(),
@@ -1591,7 +1590,7 @@ export function Kalender() {
               <SwipeableEventRow
                 key={event.id}
                 eventId={event.id}
-                onDelete={() => { deleteEvent(event.id); toast.success('Aftale slettet'); }}
+                onDelete={() => { void deleteEvent(event.id); toast.success('Aftale slettet'); }}
               >
                 <button
                   onClick={() => { setSelectedEvent(event); setEventDetailOpen(true); setAllUpcomingOpen(false); }}
@@ -1679,7 +1678,7 @@ export function Kalender() {
                   className="flex-1 rounded-2xl border-red-200 text-red-600 hover:bg-red-50"
                   onClick={() => {
                     if (selectedEvent) {
-                      deleteEvent(selectedEvent.id);
+                      void deleteEvent(selectedEvent.id);
                       toast.success('Aftale slettet');
                       setEventDetailOpen(false);
                       setSelectedEvent(null);

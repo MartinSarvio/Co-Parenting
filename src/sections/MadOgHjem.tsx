@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAppStore } from '@/store';
+import { useApiActions } from '@/hooks/useApiActions';
 import { getPlanFeatures } from '@/lib/subscription';
 import { cn, getMealTypeLabel } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -42,7 +43,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { shoppingItemId, mealPlanId, taskId, eventId, notificationId } from '@/lib/id';
+import { shoppingItemId, notificationId } from '@/lib/id';
 import { recipes, recipeCategories } from '@/data/recipes';
 import type { Recipe } from '@/types';
 
@@ -503,21 +504,23 @@ export function MadOgHjem() {
     tasks,
     events,
     notifications,
-    addMealPlan,
-    updateMealPlan,
-    deleteMealPlan,
     addShoppingItem,
     updateShoppingItem,
     deleteShoppingItem,
-    addTask,
-    updateTask,
-    deleteTask,
-    addEvent,
     addNotification,
     userRecipes,
     addUserRecipe,
     setActiveTab: setAppTab
   } = useAppStore();
+  const {
+    createEvent,
+    createTask,
+    updateTask,
+    deleteTask,
+    createMealPlan,
+    updateMealPlan,
+    deleteMealPlan,
+  } = useApiActions();
 
   const [activeTab, setActiveTab] = useState('meal-plan');
   const [isAddMealOpen, setIsAddMealOpen] = useState(false);
@@ -949,14 +952,11 @@ export function MadOgHjem() {
     }
 
     const ingredients = parseIngredients(newMeal.ingredientsText);
-    addMealPlan({
-      id: mealPlanId(),
+    void createMealPlan({
       date: newMeal.date,
       mealType: newMeal.mealType as 'breakfast' | 'lunch' | 'dinner' | 'snack',
       title: newMeal.title.trim(),
       notes: newMeal.notes.trim() || undefined,
-      createdBy: currentUser?.id || users[0]?.id || 'p1',
-      createdAt: new Date().toISOString(),
       recipe: ingredients.length > 0 || newMeal.instructions.trim()
         ? {
             name: newMeal.title.trim(),
@@ -989,7 +989,7 @@ export function MadOgHjem() {
 
     const originDate = parseISO(meal.date);
     const weekday = (originDate.getDay() + 6) % 7;
-    updateMealPlan(meal.id, {
+    void updateMealPlan(meal.id, {
       isRecurring: true,
       recurringPattern: 'weekly',
       recurringWeekday: weekday
@@ -1006,14 +1006,11 @@ export function MadOgHjem() {
 
       if (exists) continue;
 
-      addMealPlan({
-        id: mealPlanId(),
+      void createMealPlan({
         date: targetDate,
         mealType: meal.mealType,
         title: meal.title,
         notes: meal.notes,
-        createdBy: currentUser?.id || users[0]?.id || 'p1',
-        createdAt: new Date().toISOString(),
         isRecurring: true,
         recurringPattern: 'weekly',
         recurringWeekday: weekday,
@@ -1182,8 +1179,7 @@ export function MadOgHjem() {
       return;
     }
 
-    addTask({
-      id: taskId(),
+    void createTask({
       title: newCleaning.title.trim(),
       area: newCleaning.area.trim() || undefined,
       assignedTo: newCleaning.assignedTo,
@@ -1207,8 +1203,7 @@ export function MadOgHjem() {
   };
 
   const addTemplateCleaningTask = (template: { title: string; area: string; weekday: number; recurringPattern: string }) => {
-    addTask({
-      id: taskId(),
+    void createTask({
       title: template.title,
       area: template.area,
       assignedTo: currentUser?.id || users[0]?.id || 'p1',
@@ -1232,8 +1227,7 @@ export function MadOgHjem() {
       const endAt = new Date(targetDay);
       endAt.setHours(20, 0, 0, 0);
 
-      addEvent({
-        id: eventId(),
+      void createEvent({
         title: 'Ugentlig familie check-in',
         type: 'meeting',
         startDate: startAt.toISOString(),
@@ -1246,8 +1240,7 @@ export function MadOgHjem() {
     }
 
     if (ideaId === 'meal-routine') {
-      addTask({
-        id: taskId(),
+      void createTask({
         title: 'Lav madplan for næste uge',
         assignedTo: currentUser?.id || users[0]?.id || 'p1',
         createdBy: currentUser?.id || users[0]?.id || 'p1',
@@ -1279,8 +1272,7 @@ export function MadOgHjem() {
     }
 
     if (ideaId === 'monthly-deep-clean') {
-      addTask({
-        id: taskId(),
+      void createTask({
         title: 'Månedlig dybderengøring af køkken og bad',
         area: 'Køkken + badeværelse',
         assignedTo: currentUser?.id || users[0]?.id || 'p1',
@@ -1335,8 +1327,7 @@ export function MadOgHjem() {
       event.title === 'Madplan check-in' && event.isRecurring
     ));
     if (!hasWeeklyMealEvent) {
-      addEvent({
-        id: eventId(),
+      void createEvent({
         title: 'Madplan check-in',
         description: 'Planlæg den kommende uge: måltider, indkøb og opgaver.',
         type: 'meeting',
@@ -1353,8 +1344,7 @@ export function MadOgHjem() {
       task.title === 'Tjek indkøb for de næste 2 dage' && task.isRecurring
     ));
     if (!hasShoppingTask) {
-      addTask({
-        id: taskId(),
+      void createTask({
         title: 'Tjek indkøb for de næste 2 dage',
         assignedTo: ownerId,
         createdBy: ownerId,
@@ -1370,8 +1360,7 @@ export function MadOgHjem() {
       task.title === 'Gennemgå ugens rengøringsplan' && task.isRecurring
     ));
     if (!hasCleaningTask) {
-      addTask({
-        id: taskId(),
+      void createTask({
         title: 'Gennemgå ugens rengøringsplan',
         assignedTo: ownerId,
         createdBy: ownerId,
@@ -1413,14 +1402,11 @@ export function MadOgHjem() {
       ));
       if (exists) return;
 
-      addMealPlan({
-        id: mealPlanId(),
+      void createMealPlan({
         date,
         mealType: meal.mealType,
         title: meal.title,
         notes: meal.notes,
-        createdBy: ownerId,
-        createdAt: new Date().toISOString(),
         recipe: {
           name: meal.title,
           ingredients: meal.ingredients,
@@ -1438,8 +1424,7 @@ export function MadOgHjem() {
       ));
       if (exists) return;
 
-      addTask({
-        id: taskId(),
+      void createTask({
         title: item.title,
         area: item.area,
         assignedTo: ownerId,
@@ -1498,7 +1483,6 @@ export function MadOgHjem() {
   };
 
   const generateAutoWeekPlan = () => {
-    const ownerId = currentUser?.id || users[0]?.id || 'p1';
     const baseDate = startOfToday();
     const favoriteKeywords = parseKeywordList(autoPlannerSettings.favoriteKeywords);
     const manualAvoidKeywords = parseKeywordList(autoPlannerSettings.avoidIngredients);
@@ -1535,15 +1519,14 @@ export function MadOgHjem() {
       }
 
       if (autoPlannerSettings.replaceExisting) {
-        existingDinners.forEach((meal) => deleteMealPlan(meal.id));
+        existingDinners.forEach((meal) => void deleteMealPlan(meal.id));
         replaced += existingDinners.length;
       }
 
       const suggestion = rankedCandidates[dayOffset % rankedCandidates.length];
       const suggestionText = `${suggestion.title} ${suggestion.ingredients.join(' ')}`.toLowerCase();
       const matchingFavorites = favoriteKeywords.filter((keyword) => suggestionText.includes(keyword));
-      addMealPlan({
-        id: mealPlanId(),
+      void createMealPlan({
         date,
         mealType: 'dinner',
         title: suggestion.title,
@@ -1552,8 +1535,6 @@ export function MadOgHjem() {
           : autoPlannerSettings.childFriendly
             ? 'Auto-plan: børnevenlig prioritering'
             : 'Auto-plan: baseret på dine valg',
-        createdBy: ownerId,
-        createdAt: new Date().toISOString(),
         recipe: {
           name: suggestion.title,
           ingredients: suggestion.ingredients,
@@ -1916,7 +1897,7 @@ export function MadOgHjem() {
                               size="sm"
                               onClick={(event) => {
                                 event.stopPropagation();
-                                deleteMealPlan(meal.id);
+                                void deleteMealPlan(meal.id);
                               }}
                               className="text-rose-500 hover:text-rose-600"
                             >
@@ -2791,7 +2772,7 @@ export function MadOgHjem() {
                         <Checkbox
                           checked={task.completed}
                           onCheckedChange={(checked) => {
-                            updateTask(task.id, {
+                            void updateTask(task.id, {
                               completed: checked as boolean,
                               completedAt: checked ? new Date().toISOString() : undefined
                             });
@@ -2818,7 +2799,7 @@ export function MadOgHjem() {
                           </div>
                         </div>
                         <button
-                          onClick={() => deleteTask(task.id)}
+                          onClick={() => void deleteTask(task.id)}
                           className="shrink-0 p-1.5 text-[#c5c4be] hover:text-[#ef4444] transition-colors"
                         >
                           <Trash2 className="h-3.5 w-3.5" />

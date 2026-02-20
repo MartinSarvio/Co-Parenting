@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useAppStore } from '@/store';
+import { useApiActions } from '@/hooks/useApiActions';
 import { expenseId as generateExpenseId, transferId as generateTransferId } from '@/lib/id';
 import { exportExpensesCSV, printExpenses } from '@/lib/export';
 import { cn, formatCurrency, formatDate } from '@/lib/utils';
@@ -125,9 +126,6 @@ export function Expenses() {
     paymentAccounts,
     transfers,
     expenses,
-    addExpense,
-    updateExpense,
-    approveExpense,
     disputeExpense,
     resolveExpenseDispute,
     addTransfer,
@@ -135,6 +133,7 @@ export function Expenses() {
     addDocument,
     setActiveTab: setAppTab
   } = useAppStore();
+  const { createExpense, updateExpense, approveExpense } = useApiActions();
 
   const features = getPlanFeatures(household);
   const canUseExpenses = features.expenses;
@@ -396,8 +395,9 @@ export function Expenses() {
       isUnexpected: newExpense.isUnexpected,
     };
 
-    addExpense(expense);
-    archiveReceiptAsEvidence(expense);
+    void createExpense(expense).then((created) => {
+      if (created) archiveReceiptAsEvidence(created);
+    });
 
     if (splitMode === 'full_request' && canUsePayments && splitTargetUserId && splitTargetUserId !== currentUser.id) {
       const transferId = generateTransferId();
@@ -412,7 +412,7 @@ export function Expenses() {
         expenseId,
         createdAt: new Date().toISOString(),
       });
-      updateExpense(expenseId, { linkedTransferId: transferId });
+      void updateExpense(expenseId, { linkedTransferId: transferId });
     }
 
     setIsAddOpen(false);
@@ -458,7 +458,7 @@ export function Expenses() {
       createdAt: new Date().toISOString(),
     });
 
-    updateExpense(expense.id, { linkedTransferId: transferId });
+    void updateExpense(expense.id, { linkedTransferId: transferId });
     toast.success(`Betalingsanmodning sendt til ${debtor.name}`);
   };
 
@@ -515,7 +515,7 @@ export function Expenses() {
 
   const handleApprove = (expenseId: string) => {
     if (!currentUser) return;
-    approveExpense(expenseId, currentUser.id);
+    void approveExpense(expenseId, currentUser.id);
     toast.success('Udgift godkendt');
   };
 

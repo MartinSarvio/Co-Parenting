@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAppStore } from '@/store';
+import { useApiActions } from '@/hooks/useApiActions';
 import { useFamilyContext } from '@/hooks/useFamilyContext';
 import {
   startOfYear, endOfYear, eachMonthOfInterval,
@@ -15,7 +16,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { eventId } from '@/lib/id';
 import type { EventType } from '@/types';
 
 function getParentForDay(date: Date, custodyPlan: ReturnType<typeof useFamilyContext>['custodyPlan'], parent1Id: string, parent2Id: string): string | null {
@@ -71,7 +71,8 @@ function getParentForDay(date: Date, custodyPlan: ReturnType<typeof useFamilyCon
 }
 
 export function Aarskalender() {
-  const { users, events, addEvent, currentUser } = useAppStore();
+  const { users, events, currentUser } = useAppStore();
+  const { createEvent } = useApiActions();
   const { currentChild, custodyPlan, parents } = useFamilyContext();
   const [year, setYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState<Date | null>(null);
@@ -394,8 +395,7 @@ export function Aarskalender() {
               onClick={() => {
                 if (!quickAddDate || !newEventTitle.trim() || !currentUser) return;
                 const dateStr = format(quickAddDate, 'yyyy-MM-dd');
-                addEvent({
-                  id: eventId(),
+                void createEvent({
                   title: newEventTitle.trim(),
                   startDate: `${dateStr}T09:00:00`,
                   endDate: `${dateStr}T10:00:00`,

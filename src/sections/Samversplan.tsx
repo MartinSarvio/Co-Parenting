@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useAppStore } from '@/store';
-import { eventId, notificationId } from '@/lib/id';
+import { useApiActions } from '@/hooks/useApiActions';
+import { notificationId } from '@/lib/id';
 import { cn, getCurrentParentForChild, weekdayNames } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -61,7 +62,8 @@ const getParentDayPalette = (color: 'warm' | 'cool' | 'neutral') => {
 };
 
 export function Samversplan() {
-  const { users, children, custodyPlans, currentUser, addEvent, addNotification, setActiveTab } = useAppStore();
+  const { users, children, custodyPlans, currentUser, addNotification, setActiveTab } = useAppStore();
+  const { createEvent } = useApiActions();
   const custodyPlan = custodyPlans[0];
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
@@ -183,8 +185,7 @@ export function Samversplan() {
     const endAt = new Date(selectedSwapDate);
     endAt.setHours(12, 30, 0, 0);
 
-    addEvent({
-      id: eventId(),
+    void createEvent({
       title: `Bytteanmodning · ${format(selectedSwapDate, 'EEE d. MMM', { locale: da })}`,
       description: `${currentUser.name} ønsker at bytte samvær.\nBegrundelse: ${swapReason.trim() || 'Ikke angivet'}`,
       type: 'handover',

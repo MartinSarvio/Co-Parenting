@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAppStore } from '@/store';
-import { milestoneId, documentId } from '@/lib/id';
+import { useApiActions } from '@/hooks/useApiActions';
+import { milestoneId } from '@/lib/id';
 import { cn, formatDate, getDocumentTypeLabel } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -43,15 +44,15 @@ const documentTypes = [
 ];
 
 export function Borneoverblik() {
-  const { 
-    currentUser, 
-    users, 
-    children, 
-    milestones, 
-    documents, 
-    addMilestone, 
-    addDocument 
+  const {
+    currentUser,
+    users,
+    children,
+    milestones,
+    documents,
+    addMilestone,
   } = useAppStore();
+  const { createDocument } = useApiActions();
   
   const [activeTab, setActiveTab] = useState('milestones');
   const [isAddMilestoneOpen, setIsAddMilestoneOpen] = useState(false);
@@ -121,14 +122,10 @@ export function Borneoverblik() {
       return;
     }
     
-    addDocument({
-      id: documentId(),
-      childId: currentChild.id,
+    void createDocument({
       title: newDocument.title.trim(),
       type: newDocument.type,
       url: newDocument.url.trim(),
-      uploadedBy: currentUser?.id || 'u1',
-      uploadedAt: new Date().toISOString(),
       sharedWith: [parent1?.id, parent2?.id].filter(Boolean) as string[],
     });
     

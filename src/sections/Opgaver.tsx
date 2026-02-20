@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAppStore } from '@/store';
-import { taskId, shoppingItemId } from '@/lib/id';
+import { useApiActions } from '@/hooks/useApiActions';
+import { shoppingItemId } from '@/lib/id';
 import { cn, getTaskCategoryLabel } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -38,18 +39,16 @@ const categories = [
 ];
 
 export function Opgaver() {
-  const { 
-    tasks, 
-    shoppingItems, 
-    users, 
-    currentUser, 
-    addTask, 
-    updateTask, 
-    deleteTask,
+  const {
+    tasks,
+    shoppingItems,
+    users,
+    currentUser,
     addShoppingItem,
     updateShoppingItem,
     deleteShoppingItem
   } = useAppStore();
+  const { createTask, updateTask, deleteTask } = useApiActions();
   
   const [activeTab, setActiveTab] = useState('tasks');
   const [filter, setFilter] = useState('all');
@@ -84,11 +83,10 @@ export function Opgaver() {
   const pendingShopping = shoppingItems.filter(i => !i.purchased);
   const purchasedShopping = shoppingItems.filter(i => i.purchased);
 
-  const handleAddTask = () => {
+  const handleAddTask = async () => {
     if (!newTask.title) return;
-    
-    addTask({
-      id: taskId(),
+
+    await createTask({
       title: newTask.title,
       category: newTask.category,
       assignedTo: newTask.assignedTo || currentUser?.id || 'u1',
@@ -96,7 +94,7 @@ export function Opgaver() {
       deadline: newTask.deadline || undefined,
       completed: false,
     });
-    
+
     setIsAddTaskOpen(false);
     setNewTask({ title: '', category: 'general', assignedTo: '', deadline: '' });
     toast.success('Opgave tilføjet');
@@ -119,12 +117,12 @@ export function Opgaver() {
     toast.success('Vare tilføjet til indkøbslisten');
   };
 
-  const toggleTask = (taskId: string, completed: boolean) => {
-    updateTask(taskId, { 
+  const toggleTask = (id: string, completed: boolean) => {
+    void updateTask(id, {
       completed,
       completedAt: completed ? new Date().toISOString() : undefined
     });
-    
+
     if (completed) {
       toast.success('Opgave fuldført!');
     }
@@ -142,7 +140,7 @@ export function Opgaver() {
     if (pendingTasks.length === 0) return;
     const completedAt = new Date().toISOString();
     pendingTasks.forEach((task) => {
-      updateTask(task.id, { completed: true, completedAt });
+      void updateTask(task.id, { completed: true, completedAt });
     });
     toast.success(`${pendingTasks.length} opgaver markeret som fuldført`);
   };
@@ -366,7 +364,7 @@ export function Opgaver() {
                               variant="ghost" 
                               size="icon" 
                               className="h-8 w-8 text-slate-400 hover:text-rose-500"
-                              onClick={() => deleteTask(task.id)}
+                              onClick={() => void deleteTask(task.id)}
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>

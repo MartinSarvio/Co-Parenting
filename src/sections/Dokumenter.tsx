@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAppStore } from '@/store';
+import { useApiActions } from '@/hooks/useApiActions';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -61,7 +62,8 @@ const documentTypeLabels: Record<string, string> = {
 };
 
 export function Dokumenter() {
-  const { documents, addDocument, currentUser, users, children } = useAppStore();
+  const { documents, currentUser, users, children } = useAppStore();
+  const { createDocument } = useApiActions();
   const [activeSection, setActiveSection] = useState<'official' | 'family'>('official');
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -118,20 +120,15 @@ export function Dokumenter() {
     reader.readAsDataURL(file);
   };
 
-  const handleSaveDocument = () => {
+  const handleSaveDocument = async () => {
     if (!newDoc.title.trim() || !uploadedFileUrl || !currentUser) return;
-    const doc: Document = {
-      id: `doc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    await createDocument({
       title: newDoc.title.trim(),
       type: newDoc.type,
-      childId: newDoc.childId && newDoc.childId !== 'none' ? newDoc.childId : undefined,
       url: uploadedFileUrl,
-      uploadedBy: currentUser.id,
-      uploadedAt: new Date().toISOString(),
       sharedWith: users.map((u) => u.id),
       isOfficial: false,
-    };
-    addDocument(doc);
+    });
     setUploadDialogOpen(false);
     setNewDoc({ title: '', type: 'custody_agreement', childId: '', notes: '' });
     setUploadedFileUrl('');
