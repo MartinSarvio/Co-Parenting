@@ -7,6 +7,7 @@ import {
   Bell,
   Briefcase,
   Camera,
+  Check,
   CreditCard,
   Link2,
   Moon,
@@ -15,7 +16,8 @@ import {
   Sun,
   SunMoon,
   Upload,
-  UserPlus
+  UserPlus,
+  X as XIcon
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTheme } from 'next-themes';
@@ -333,13 +335,10 @@ export function SettingsView() {
         animate={{ opacity: 1, y: 0 }}
       >
         <h1 className="text-2xl font-semibold text-[#2f2f2d]">Indstillinger</h1>
-        <p className="text-sm text-[#75736b]">
-          Familietype, abonnement, betaling og dokumentation
-        </p>
       </motion.div>
 
       <Tabs defaultValue="profile" className="space-y-4">
-        <div className="relative">
+        <div className="sticky top-0 z-10 bg-[#faf9f6] pb-2 pt-1 -mx-1 px-1">
           <TabsList className="flex w-full justify-start gap-0 overflow-x-auto rounded-2xl p-1 scrollbar-hide">
             <TabsTrigger value="profile" className="flex-none min-w-[80px]">Konto</TabsTrigger>
             <TabsTrigger value="family" className="flex-none min-w-[80px]">Familie</TabsTrigger>
@@ -347,10 +346,7 @@ export function SettingsView() {
             <TabsTrigger value="payments" className="flex-none min-w-[95px]">Betaling</TabsTrigger>
             <TabsTrigger value="members" className="flex-none min-w-[105px]">Medlemmer</TabsTrigger>
           </TabsList>
-          {/* Scroll indicator */}
-          <div className="pointer-events-none absolute right-0 top-0 h-full w-8 rounded-r-2xl bg-gradient-to-l from-[#ecebe5] to-transparent" />
         </div>
-        <p className="text-[11px] text-[#9b9a93] text-center -mt-1">← Swipe for flere indstillinger →</p>
 
         <TabsContent value="profile" className="space-y-4">
           {/* Avatar section */}
@@ -736,53 +732,112 @@ export function SettingsView() {
         </TabsContent>
 
         <TabsContent value="subscription" className="space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Abonnement</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 pt-0">
-              <div className="grid grid-cols-1 gap-2">
-                {(['free', 'family_plus', 'single_parent_plus'] as SubscriptionPlan[]).map((planId) => (
-                  <button
-                    key={planId}
-                    type="button"
-                    onClick={() => handlePlanChange(planId)}
-                    className={`rounded-xl border p-3 text-left transition-colors ${
-                      plan === planId
-                        ? 'border-[#f3c59d] bg-[#fff2e6]'
-                        : 'border-[#d8d7cf] bg-[#f8f7f3] hover:bg-[#efeee8]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <p className="font-semibold">{subscriptionPlanLabels[planId]}</p>
-                      {plan === planId ? <BadgeCheck className="h-4 w-4 text-[#f58a2d]" /> : null}
+          {/* Plan cards with included features */}
+          {([
+            {
+              id: 'free' as SubscriptionPlan,
+              name: 'Gratis',
+              price: '0 kr/md',
+              description: 'Grundlæggende co-parenting',
+              features: [
+                { label: '1 barn', included: true },
+                { label: 'Samværsplan', included: true },
+                { label: 'Kalender', included: true },
+                { label: 'Kommunikation', included: true },
+                { label: 'Flere børn', included: false },
+                { label: 'Udgiftsmodul', included: false },
+                { label: 'Indkøbsscanner', included: false },
+              ],
+            },
+            {
+              id: 'family_plus' as SubscriptionPlan,
+              name: 'Family Plus',
+              price: '49 kr/md',
+              description: 'Alt til den aktive familie',
+              badge: 'Populær',
+              features: [
+                { label: 'Op til 8 børn', included: true },
+                { label: 'Udgiftsmodul', included: true },
+                { label: 'Send/anmod penge', included: true },
+                { label: 'Faste udgifter', included: true },
+                { label: 'Indkøbsscanner', included: true },
+                { label: 'Familiemedlemmer (6)', included: true },
+                { label: 'Kalenderdeling', included: true },
+                { label: 'Advokatadgang', included: false },
+              ],
+            },
+            {
+              id: 'single_parent_plus' as SubscriptionPlan,
+              name: 'Enlig Plus',
+              price: '79 kr/md',
+              description: 'Fuld dokumentation + juridisk',
+              features: [
+                { label: 'Op til 8 børn', included: true },
+                { label: 'Udgiftsmodul', included: true },
+                { label: 'Send/anmod penge', included: true },
+                { label: 'Faste udgifter', included: true },
+                { label: 'Indkøbsscanner', included: true },
+                { label: 'Familiemedlemmer (8)', included: true },
+                { label: 'Kalenderdeling', included: true },
+                { label: 'Advokatadgang', included: true },
+                { label: 'Dokumentationsarkiv', included: true },
+                { label: 'Auto-arkivér kvitteringer', included: true },
+              ],
+            },
+          ]).map((planCard) => {
+            const isActive = plan === planCard.id;
+            return (
+              <button
+                key={planCard.id}
+                type="button"
+                onClick={() => handlePlanChange(planCard.id)}
+                className={cn(
+                  'relative w-full rounded-2xl border-2 p-4 text-left transition-all',
+                  isActive
+                    ? 'border-[#f58a2d] bg-[#fff8f0] shadow-[0_2px_12px_rgba(245,138,45,0.12)]'
+                    : 'border-[#e0dfd8] bg-white hover:border-[#cccbc3]'
+                )}
+              >
+                {planCard.badge && (
+                  <span className="absolute -top-2.5 right-4 rounded-full bg-[#f58a2d] px-3 py-0.5 text-[11px] font-bold text-white">
+                    {planCard.badge}
+                  </span>
+                )}
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-lg font-bold text-[#2f2f2d]">{planCard.name}</p>
+                      {isActive && <BadgeCheck className="h-5 w-5 text-[#f58a2d]" />}
                     </div>
-                    <p className="mt-1 text-xs text-[#75736b]">
-                      {planId === 'free' && 'Basis app uden premiumfunktioner'}
-                      {planId === 'family_plus' && 'Flere børn, scanning, udgifter, faste betalinger'}
-                      {planId === 'single_parent_plus' && 'Alle plus-funktioner + advokat og dokumentation'}
-                    </p>
-                  </button>
-                ))}
-              </div>
-
-              <div className="rounded-xl border border-[#d8d7cf] bg-[#f8f7f3] p-3">
-                <p className="text-sm font-medium">Aktiv plan: {subscriptionPlanLabels[plan]}</p>
-                <p className="text-xs text-[#75736b]">
-                  Fakturering: {isTogetherMode ? 'Delt abonnement' : subscription.billingModel === 'shared' ? 'Delt' : 'Separat'}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <FeaturePill active={features.multipleChildren} label="Flere børn" />
-                <FeaturePill active={features.shoppingScanner} label="Scanning til indkøb" />
-                <FeaturePill active={features.expenses} label="Udgiftsmodul" />
-                <FeaturePill active={features.inAppPayments} label="Send/anmod penge" />
-                <FeaturePill active={features.recurringExpenses} label="Faste udgifter" />
-                <FeaturePill active={features.lawyerAccess} label="Advokatadgang" />
-              </div>
-            </CardContent>
-          </Card>
+                    <p className="text-xs text-[#78766d]">{planCard.description}</p>
+                  </div>
+                  <p className="text-right">
+                    <span className="text-lg font-bold text-[#2f2f2d]">{planCard.price.split('/')[0]}</span>
+                    <span className="text-xs text-[#9b9a93]">/{planCard.price.split('/')[1]}</span>
+                  </p>
+                </div>
+                <div className="mt-3 grid grid-cols-1 gap-1">
+                  {planCard.features.map((f) => (
+                    <div key={f.label} className="flex items-center gap-2">
+                      {f.included ? (
+                        <Check className="h-3.5 w-3.5 shrink-0 text-[#f58a2d]" />
+                      ) : (
+                        <XIcon className="h-3.5 w-3.5 shrink-0 text-[#d0cec5]" />
+                      )}
+                      <span className={cn('text-xs', f.included ? 'text-[#4a4945]' : 'text-[#b5b3ab]')}>
+                        {f.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                {isActive && (
+                  <div className="mt-3 rounded-lg bg-[#f58a2d]/10 px-3 py-1.5 text-center text-xs font-semibold text-[#b96424]">
+                    Aktiv plan
+                  </div>
+                )}
+              </button>
+            );
+          })}
         </TabsContent>
 
         <TabsContent value="payments" className="space-y-4">
@@ -1027,16 +1082,3 @@ export function SettingsView() {
   );
 }
 
-function FeaturePill({ active, label }: { active: boolean; label: string }) {
-  return (
-    <div
-      className={`rounded-xl border px-3 py-2 text-sm ${
-        active
-          ? 'border-[#f3c59d] bg-[#fff2e6] text-[#9d5d23]'
-          : 'border-[#d8d7cf] bg-[#f8f7f3] text-[#77746b]'
-      }`}
-    >
-      {label}
-    </div>
-  );
-}

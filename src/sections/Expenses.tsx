@@ -10,8 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -36,7 +36,11 @@ import {
   TriangleAlert,
   Lock,
   Download,
-  Printer
+  Printer,
+  ChevronLeft,
+  ChevronRight,
+  Filter,
+  BarChart3
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -140,7 +144,11 @@ export function Expenses() {
     household?.singleParentSupport?.autoArchiveReceipts && features.singleParentEvidence
   );
 
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [showStats, setShowStats] = useState(false);
+  const [periodYear, setPeriodYear] = useState(new Date().getFullYear());
+  const [periodMonth, setPeriodMonth] = useState<number | null>(null); // null = all months
+  const [detailExpenseId, setDetailExpenseId] = useState<string | null>(null);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isTransferOpen, setIsTransferOpen] = useState(false);
   const [transferMode, setTransferMode] = useState<TransferMode>('request');
@@ -192,14 +200,25 @@ export function Expenses() {
   }, [parentUsers, splitTargetUserId, currentUser]);
 
   const filteredExpenses = expenses.filter((expense) => {
-    if (activeTab === 'all' || activeTab === 'statistik') return true;
-    if (activeTab === 'pending') return expense.status === 'pending';
-    if (activeTab === 'paid') return expense.status === 'paid';
-    if (activeTab === 'disputed') return expense.status === 'disputed';
-    if (activeTab === 'recurring') return Boolean(expense.isRecurring);
-    if (activeTab === 'unexpected') return Boolean(expense.isUnexpected);
-    return expense.category === activeTab;
+    // Period filter
+    const expDate = new Date(expense.date);
+    if (expDate.getFullYear() !== periodYear) return false;
+    if (periodMonth !== null && expDate.getMonth() !== periodMonth) return false;
+
+    // Status/type filter
+    if (activeFilter === 'all') return true;
+    if (activeFilter === 'pending') return expense.status === 'pending';
+    if (activeFilter === 'paid') return expense.status === 'paid';
+    if (activeFilter === 'disputed') return expense.status === 'disputed';
+    if (activeFilter === 'recurring') return Boolean(expense.isRecurring);
+    if (activeFilter === 'unexpected') return Boolean(expense.isUnexpected);
+    return expense.category === activeFilter;
   });
+
+  const detailExpense = detailExpenseId ? expenses.find(e => e.id === detailExpenseId) : null;
+
+  const danishMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'Maj', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'];
+  const danishMonthsFull = ['Januar', 'Februar', 'Marts', 'April', 'Maj', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'December'];
 
   // Monthly totals for chart (last 6 months)
   const monthlyStats = useMemo(() => {
@@ -967,279 +986,270 @@ export function Expenses() {
         </Dialog>
       </motion.div>
 
+      {/* Filter bar: dropdown + period + stats toggle */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
+        className="space-y-3"
       >
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="flex h-auto w-full overflow-x-auto scrollbar-hide">
-            <TabsTrigger value="all" className="shrink-0 px-3 py-2 text-sm">Alle</TabsTrigger>
-            <TabsTrigger value="pending" className="shrink-0 px-3 py-2 text-sm">Afventer</TabsTrigger>
-            <TabsTrigger value="paid" className="shrink-0 px-3 py-2 text-sm">Betalt</TabsTrigger>
-            <TabsTrigger value="disputed" className="shrink-0 px-3 py-2 text-sm">Anfægtet</TabsTrigger>
-            <TabsTrigger value="recurring" className="shrink-0 px-3 py-2 text-sm">Faste</TabsTrigger>
-            <TabsTrigger value="unexpected" className="shrink-0 px-3 py-2 text-sm">Uventet</TabsTrigger>
-            <TabsTrigger value="statistik" className="shrink-0 px-3 py-2 text-sm">Statistik</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value={activeTab} className="mt-4 space-y-3">
-            <AnimatePresence>
-              {filteredExpenses.length === 0 ? (
-                <div className="py-8 text-center text-[#75736b]">
-                  <Receipt className="mx-auto mb-3 h-11 w-11 text-[#c5c3bb]" />
-                  Ingen udgifter i dette filter
+        <div className="flex items-center gap-2">
+          <div className="flex-1">
+            <Select value={activeFilter} onValueChange={setActiveFilter}>
+              <SelectTrigger className="h-10 rounded-xl border-[#d8d7cf] bg-[#f8f7f3]">
+                <div className="flex items-center gap-2">
+                  <Filter className="h-3.5 w-3.5 text-[#78766d]" />
+                  <SelectValue />
                 </div>
-              ) : (
-                filteredExpenses
-                  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-                  .map((expense, index) => {
-                    const category = expenseCategories.find((item) => item.value === expense.category);
-                    const paidByUser = users.find((user) => user.id === expense.paidBy);
-                    const isApproved = expense.approvedBy?.includes(currentUser?.id || '');
-                    const needsApproval =
-                      expense.status === 'pending' && expense.paidBy !== currentUser?.id && !isApproved;
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle udgifter</SelectItem>
+                <SelectItem value="pending">Afventer</SelectItem>
+                <SelectItem value="paid">Betalt</SelectItem>
+                <SelectItem value="disputed">Anfægtet</SelectItem>
+                <SelectItem value="recurring">Faste</SelectItem>
+                <SelectItem value="unexpected">Uventet</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Button
+            variant={showStats ? 'default' : 'outline'}
+            size="icon"
+            className="h-10 w-10 shrink-0 rounded-xl border-[#d8d7cf]"
+            onClick={() => setShowStats(!showStats)}
+          >
+            <BarChart3 className="h-4 w-4" />
+          </Button>
+        </div>
 
-                    return (
-                      <motion.div
-                        key={expense.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 20 }}
-                        transition={{ delay: index * 0.03 }}
-                      >
-                        <Card
-                          className={cn(
-                            'border-[#d8d7cf]',
-                            expense.status === 'disputed' && 'border-[#e6b894] bg-[#fff6ef]'
-                          )}
-                        >
-                          <CardContent className="space-y-3 p-4">
-                            <div className="flex items-start gap-3">
-                              <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', category?.color || 'bg-[#eceae2] text-[#4f4b43]')}>
-                                {category ? <category.icon className="h-5 w-5" /> : <Receipt className="h-5 w-5" />}
-                              </div>
+        {/* Period selector */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setPeriodYear(y => y - 1)}
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#d8d7cf] bg-[#f8f7f3] text-[#5f5d56] hover:bg-[#efeee9]"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => { setPeriodMonth(null); }}
+            className={cn(
+              'h-8 rounded-lg border px-3 text-sm font-semibold transition-colors',
+              periodMonth === null
+                ? 'border-[#f3c59d] bg-[#fff2e6] text-[#b96424]'
+                : 'border-[#d8d7cf] bg-[#f8f7f3] text-[#4a4945] hover:bg-[#efeee9]'
+            )}
+          >
+            {periodYear}
+          </button>
+          <div className="flex flex-1 gap-1 overflow-x-auto scrollbar-hide">
+            {danishMonths.map((m, i) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setPeriodMonth(periodMonth === i ? null : i)}
+                className={cn(
+                  'shrink-0 rounded-lg px-2 py-1 text-xs font-medium transition-colors',
+                  periodMonth === i
+                    ? 'bg-[#f58a2d] text-white'
+                    : 'text-[#78766d] hover:bg-[#ecebe5]'
+                )}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => setPeriodYear(y => y + 1)}
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#d8d7cf] bg-[#f8f7f3] text-[#5f5d56] hover:bg-[#efeee9]"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+        </div>
 
-                              <div className="min-w-0 flex-1">
-                                <div className="flex items-start justify-between gap-3">
-                                  <div className="min-w-0">
-                                    <p className="truncate font-semibold text-[#2f2f2d]">{expense.title}</p>
-                                    {expense.description && (
-                                      <p className="line-clamp-1 text-sm text-[#75736b]">{expense.description}</p>
-                                    )}
-                                  </div>
-                                  <p className="shrink-0 text-base font-semibold text-[#2f2f2d]">
-                                    {formatCurrency(expense.amount)}
-                                  </p>
-                                </div>
-
-                                <div className="mt-2 flex flex-wrap items-center gap-2">
-                                  <Badge variant="outline" className="text-xs">{category?.label || expense.category}</Badge>
-                                  <Badge variant="outline" className="text-xs">{formatDate(expense.date)}</Badge>
-                                  <Badge variant="outline" className="text-xs">Betalt af {paidByUser?.name}</Badge>
-                                  {expense.isRecurring && (
-                                    <Badge className="bg-[#eceae2] text-[#2f2f2f] hover:bg-[#eceae2]">
-                                      <Repeat2 className="mr-1 h-3 w-3" />
-                                      Fast
-                                    </Badge>
-                                  )}
-                                  {expense.isUnexpected && (
-                                    <Badge className="bg-[#fff2e6] text-[#b96424] hover:bg-[#fff2e6]">
-                                      <TriangleAlert className="mr-1 h-3 w-3" />
-                                      Uventet
-                                    </Badge>
-                                  )}
-                                </div>
-
-                                <div className="mt-3 rounded-lg bg-[#f4f3ee] p-2.5">
-                                  <p className="mb-1 text-xs text-[#75736b]">Fordeling</p>
-                                  <div className="flex flex-wrap gap-x-3 gap-y-1">
-                                    {Object.entries(expense.splitAmounts).map(([userId, amount]) => {
-                                      const user = users.find((item) => item.id === userId);
-                                      return (
-                                        <span key={userId} className="text-xs text-[#4e4b43]">
-                                          {user?.name}: {formatCurrency(amount)}
-                                        </span>
-                                      );
-                                    })}
-                                  </div>
-                                </div>
-
-                                {expense.isRecurring && expense.nextDueDate && (
-                                  <p className="mt-2 text-xs text-[#75736b]">Næste betaling: {formatDate(expense.nextDueDate)}</p>
-                                )}
-
-                                {expense.receiptUrl && (
-                                  <a
-                                    href={expense.receiptUrl}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="mt-1 inline-block text-xs font-medium text-[#b96424] underline underline-offset-2"
-                                  >
-                                    Åbn kvittering
-                                  </a>
-                                )}
-
-                                {needsApproval && (
-                                  <div className="mt-3 flex gap-2">
-                                    <Button size="sm" variant="outline" className="flex-1" onClick={() => handleApprove(expense.id)}>
-                                      <Check className="mr-1 h-4 w-4" />
-                                      Godkend
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      className="flex-1 text-[#b55f22]"
-                                      onClick={() => handleDispute(expense.id)}
-                                    >
-                                      <X className="mr-1 h-4 w-4" />
-                                      Anfægt
-                                    </Button>
-                                  </div>
-                                )}
-
-                                {canUsePayments && expense.status === 'pending' && expense.paidBy === currentUser?.id && (
-                                  <div className="mt-2">
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      className="w-full"
-                                      onClick={() => requestPaymentForExpense(expense)}
-                                    >
-                                      <CreditCard className="mr-1 h-4 w-4" />
-                                      Anmod betaling
-                                    </Button>
-                                  </div>
-                                )}
-
-                                {expense.status === 'paid' && (
-                                  <div className="mt-2 flex items-center gap-1 text-sm text-[#4f4b43]">
-                                    <CheckCircle2 className="h-4 w-4" />
-                                    Godkendt
-                                  </div>
-                                )}
-
-                                {expense.status === 'disputed' && (
-                                  <div className="mt-2 space-y-2 rounded-lg border border-[#f3c59d] bg-[#fff6ef] p-2.5">
-                                    <div className="flex items-center gap-1 text-sm font-medium text-[#b96424]">
-                                      <AlertCircle className="h-4 w-4" />
-                                      Anfægtet
-                                    </div>
-                                    {expense.disputeReason && (
-                                      <p className="text-xs text-[#7a6453]">{expense.disputeReason}</p>
-                                    )}
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      className="w-full text-xs"
-                                      onClick={() => handleResolve(expense.id)}
-                                    >
-                                      <CheckCircle2 className="mr-1 h-3.5 w-3.5" />
-                                      Foreslå løsning
-                                    </Button>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    );
-                  })
-              )}
-            </AnimatePresence>
-          </TabsContent>
-
-          {/* Statistik tab — only rendered when active to avoid recharts issues when hidden */}
-          {activeTab === 'statistik' && (
-            <TabsContent value="statistik" className="mt-4 space-y-5">
-              {expenses.length === 0 ? (
-                <div className="py-10 text-center text-[#75736b]">
-                  <Receipt className="mx-auto mb-3 h-10 w-10 text-[#c5c3bb]" />
-                  Ingen udgifter at vise statistik for
-                </div>
-              ) : (
-                <>
-                  {/* Monthly totals */}
-                  <div className="rounded-2xl border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-                    <p className="mb-3 text-[0.95rem] font-semibold tracking-[-0.01em] text-[#2f2f2d]">Månedlig udgift (6 mdr.)</p>
-                    <ResponsiveContainer width="100%" height={180}>
-                      <BarChart data={monthlyStats} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
-                        <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#78766d' }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 10, fill: '#78766d' }} axisLine={false} tickLine={false} tickFormatter={v => v === 0 ? '' : `${v}`} />
-                        <Tooltip
-                          formatter={(value: number) => [`${value.toFixed(0)} kr`, 'Total']}
-                          contentStyle={{ borderRadius: '12px', border: '1px solid #e8e7e0', fontSize: 12 }}
-                        />
-                        <Bar dataKey="total" radius={[6, 6, 0, 0]}>
-                          {monthlyStats.map((_, i) => (
-                            <Cell key={i} fill={i === monthlyStats.length - 1 ? '#f58a2d' : '#d0cec5'} />
-                          ))}
-                        </Bar>
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-
-                  {/* Category totals */}
-                  <div className="rounded-2xl border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-                    <p className="mb-3 text-[0.95rem] font-semibold tracking-[-0.01em] text-[#2f2f2d]">Udgifter pr. kategori</p>
-                    {categoryStats.length === 0 ? (
-                      <p className="text-sm text-[#78766d]">Ingen kategoriserede udgifter</p>
-                    ) : (
-                      <div className="space-y-2.5">
-                        {categoryStats.map(cat => {
-                          const max = categoryStats[0].total;
-                          const pct = max > 0 ? (cat.total / max) * 100 : 0;
-                          return (
-                            <div key={cat.name}>
-                              <div className="flex items-center justify-between text-[12px]">
-                                <span className="font-medium text-[#3f3e3a]">{cat.name}</span>
-                                <span className="font-semibold text-[#2f2f2d]">{cat.total.toFixed(0)} kr</span>
-                              </div>
-                              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-[#ecebe5]">
-                                <div
-                                  className="h-full rounded-full bg-[#f58a2d] transition-all"
-                                  style={{ width: `${pct}%` }}
-                                />
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Summary totals per parent */}
-                  <div className="rounded-2xl border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-                    <p className="mb-3 text-[0.95rem] font-semibold tracking-[-0.01em] text-[#2f2f2d]">Betalt pr. forælder</p>
-                    <div className="space-y-2">
-                      {parentUsers.map(u => {
-                        const paid = expenses.filter(e => e.paidBy === u.id).reduce((s, e) => s + e.amount, 0);
-                        const total = expenses.reduce((s, e) => s + e.amount, 0);
-                        const pct = total > 0 ? (paid / total) * 100 : 0;
-                        return (
-                          <div key={u.id}>
-                            <div className="flex items-center justify-between text-[12px]">
-                              <span className="font-medium text-[#3f3e3a]">{u.name}</span>
-                              <span className="font-semibold text-[#2f2f2d]">{paid.toFixed(0)} kr ({pct.toFixed(0)}%)</span>
-                            </div>
-                            <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-[#ecebe5]">
-                              <div
-                                className="h-full rounded-full bg-[#2f2f2f] transition-all"
-                                style={{ width: `${pct}%` }}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </>
-              )}
-            </TabsContent>
-          )}
-        </Tabs>
+        {/* Period summary */}
+        <div className="flex items-center justify-between rounded-xl border border-[#e8e7e0] bg-white px-4 py-2.5">
+          <span className="text-sm text-[#78766d]">
+            {periodMonth !== null ? `${danishMonthsFull[periodMonth]} ${periodYear}` : `Hele ${periodYear}`}
+          </span>
+          <span className="text-sm font-semibold text-[#2f2f2d]">
+            {formatCurrency(filteredExpenses.reduce((s, e) => s + e.amount, 0))}
+          </span>
+        </div>
       </motion.div>
+
+      {/* Stats view */}
+      {showStats && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-4"
+        >
+          {expenses.length === 0 ? (
+            <div className="py-10 text-center text-[#75736b]">
+              <Receipt className="mx-auto mb-3 h-10 w-10 text-[#c5c3bb]" />
+              Ingen udgifter at vise statistik for
+            </div>
+          ) : (
+            <>
+              <div className="rounded-2xl border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+                <p className="mb-3 text-[0.95rem] font-semibold tracking-[-0.01em] text-[#2f2f2d]">Månedlig udgift (6 mdr.)</p>
+                <ResponsiveContainer width="100%" height={180}>
+                  <BarChart data={monthlyStats} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
+                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#78766d' }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 10, fill: '#78766d' }} axisLine={false} tickLine={false} tickFormatter={v => v === 0 ? '' : `${v}`} />
+                    <Tooltip
+                      formatter={(value: number) => [`${value.toFixed(0)} kr`, 'Total']}
+                      contentStyle={{ borderRadius: '12px', border: '1px solid #e8e7e0', fontSize: 12 }}
+                    />
+                    <Bar dataKey="total" radius={[6, 6, 0, 0]}>
+                      {monthlyStats.map((_, i) => (
+                        <Cell key={i} fill={i === monthlyStats.length - 1 ? '#f58a2d' : '#d0cec5'} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="rounded-2xl border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+                <p className="mb-3 text-[0.95rem] font-semibold tracking-[-0.01em] text-[#2f2f2d]">Udgifter pr. kategori</p>
+                {categoryStats.length === 0 ? (
+                  <p className="text-sm text-[#78766d]">Ingen kategoriserede udgifter</p>
+                ) : (
+                  <div className="space-y-2.5">
+                    {categoryStats.map(cat => {
+                      const max = categoryStats[0].total;
+                      const pct = max > 0 ? (cat.total / max) * 100 : 0;
+                      return (
+                        <div key={cat.name}>
+                          <div className="flex items-center justify-between text-[12px]">
+                            <span className="font-medium text-[#3f3e3a]">{cat.name}</span>
+                            <span className="font-semibold text-[#2f2f2d]">{cat.total.toFixed(0)} kr</span>
+                          </div>
+                          <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-[#ecebe5]">
+                            <div className="h-full rounded-full bg-[#f58a2d] transition-all" style={{ width: `${pct}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              <div className="rounded-2xl border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+                <p className="mb-3 text-[0.95rem] font-semibold tracking-[-0.01em] text-[#2f2f2d]">Betalt pr. forælder</p>
+                <div className="space-y-2">
+                  {parentUsers.map(u => {
+                    const paid = expenses.filter(e => e.paidBy === u.id).reduce((s, e) => s + e.amount, 0);
+                    const total = expenses.reduce((s, e) => s + e.amount, 0);
+                    const pct = total > 0 ? (paid / total) * 100 : 0;
+                    return (
+                      <div key={u.id}>
+                        <div className="flex items-center justify-between text-[12px]">
+                          <span className="font-medium text-[#3f3e3a]">{u.name}</span>
+                          <span className="font-semibold text-[#2f2f2d]">{paid.toFixed(0)} kr ({pct.toFixed(0)}%)</span>
+                        </div>
+                        <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-[#ecebe5]">
+                          <div className="h-full rounded-full bg-[#2f2f2f] transition-all" style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
+        </motion.div>
+      )}
+
+      {/* Expense list */}
+      {!showStats && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="space-y-3"
+        >
+          <AnimatePresence>
+            {filteredExpenses.length === 0 ? (
+              <div className="py-8 text-center text-[#75736b]">
+                <Receipt className="mx-auto mb-3 h-11 w-11 text-[#c5c3bb]" />
+                Ingen udgifter i denne periode
+              </div>
+            ) : (
+              filteredExpenses
+                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                .map((expense, index) => {
+                  const category = expenseCategories.find((item) => item.value === expense.category);
+                  const paidByUser = users.find((user) => user.id === expense.paidBy);
+                  const isApproved = expense.approvedBy?.includes(currentUser?.id || '');
+                  const needsApproval =
+                    expense.status === 'pending' && expense.paidBy !== currentUser?.id && !isApproved;
+
+                  return (
+                    <motion.div
+                      key={expense.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ delay: index * 0.03 }}
+                    >
+                      <Card
+                        className={cn(
+                          'border-[#d8d7cf] cursor-pointer transition-colors hover:border-[#c5c3bb]',
+                          expense.status === 'disputed' && 'border-[#e6b894] bg-[#fff6ef]'
+                        )}
+                        onClick={() => setDetailExpenseId(expense.id)}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-3">
+                            <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', category?.color || 'bg-[#eceae2] text-[#4f4b43]')}>
+                              {category ? <category.icon className="h-5 w-5" /> : <Receipt className="h-5 w-5" />}
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between gap-2">
+                                <p className="truncate font-semibold text-[#2f2f2d]">{expense.title}</p>
+                                <p className="shrink-0 font-semibold text-[#2f2f2d]">{formatCurrency(expense.amount)}</p>
+                              </div>
+                              <div className="flex items-center gap-2 text-xs text-[#78766d]">
+                                <span>{formatDate(expense.date)}</span>
+                                <span>·</span>
+                                <span>{paidByUser?.name}</span>
+                                {expense.isRecurring && (
+                                  <>
+                                    <span>·</span>
+                                    <span className="flex items-center gap-0.5 text-[#b96424]"><Repeat2 className="h-3 w-3" /> Fast</span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                            {needsApproval && (
+                              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#fff2e6]">
+                                <AlertCircle className="h-3.5 w-3.5 text-[#f58a2d]" />
+                              </div>
+                            )}
+                            {expense.status === 'disputed' && (
+                              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#fff2e6]">
+                                <TriangleAlert className="h-3.5 w-3.5 text-[#b96424]" />
+                              </div>
+                            )}
+                            {expense.status === 'paid' && (
+                              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#eceae2]">
+                                <CheckCircle2 className="h-3.5 w-3.5 text-[#4f4b43]" />
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  );
+                })
+            )}
+          </AnimatePresence>
+        </motion.div>
+      )}
 
       {transferHistory.length > 0 && (
         <motion.div
@@ -1307,6 +1317,170 @@ export function Expenses() {
           </Button>
         </motion.div>
       )}
+
+      {/* Expense detail Sheet */}
+      <Sheet open={!!detailExpense} onOpenChange={(open) => { if (!open) setDetailExpenseId(null); }}>
+        <SheetContent side="bottom" className="rounded-t-[28px] bg-[#faf9f6] max-h-[85vh] overflow-y-auto">
+          {detailExpense && (() => {
+            const cat = expenseCategories.find(c => c.value === detailExpense.category);
+            const paidBy = users.find(u => u.id === detailExpense.paidBy);
+            const isApproved = detailExpense.approvedBy?.includes(currentUser?.id || '');
+            const needsApproval = detailExpense.status === 'pending' && detailExpense.paidBy !== currentUser?.id && !isApproved;
+            const linkedTransfer = detailExpense.linkedTransferId ? transfers.find(t => t.id === detailExpense.linkedTransferId) : null;
+
+            return (
+              <>
+                <SheetHeader className="pb-2">
+                  <SheetTitle className="text-left text-lg font-bold text-[#2f2f2d]">{detailExpense.title}</SheetTitle>
+                </SheetHeader>
+                <div className="space-y-4 px-4 pb-8">
+                  {/* Amount + category header */}
+                  <div className="flex items-center gap-3">
+                    <div className={cn('flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl', cat?.color || 'bg-[#eceae2] text-[#4f4b43]')}>
+                      {cat ? <cat.icon className="h-6 w-6" /> : <Receipt className="h-6 w-6" />}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-2xl font-bold text-[#2f2f2d]">{formatCurrency(detailExpense.amount)}</p>
+                      <div className="flex items-center gap-2 text-sm text-[#78766d]">
+                        <span>{cat?.label || detailExpense.category}</span>
+                        <span>·</span>
+                        <span>{formatDate(detailExpense.date)}</span>
+                      </div>
+                    </div>
+                    <Badge
+                      className={cn(
+                        'shrink-0',
+                        detailExpense.status === 'pending' && 'bg-[#fff2e6] text-[#b96424]',
+                        detailExpense.status === 'paid' && 'bg-[#eceae2] text-[#4f4b43]',
+                        detailExpense.status === 'disputed' && 'bg-[#fff2e6] text-[#b55f22]'
+                      )}
+                    >
+                      {detailExpense.status === 'pending' ? 'Afventer' : detailExpense.status === 'paid' ? 'Godkendt' : 'Anfægtet'}
+                    </Badge>
+                  </div>
+
+                  {detailExpense.description && (
+                    <p className="text-sm text-[#5f5d56]">{detailExpense.description}</p>
+                  )}
+
+                  {/* Payment info */}
+                  <div className="rounded-2xl border border-[#e8e7e0] bg-white p-4 space-y-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[#9b9a93]">Betalingsdetaljer</p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-[#78766d]">Betalt af</span>
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-6 w-6">
+                          <AvatarImage src={paidBy?.avatar} />
+                          <AvatarFallback className="text-[10px]">{paidBy?.name?.[0]}</AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm font-medium text-[#2f2f2d]">{paidBy?.name}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-[#78766d]">Fordelingstype</span>
+                      <span className="text-sm font-medium text-[#2f2f2d]">
+                        {detailExpense.splitType === 'equal' ? 'Lige fordeling' : detailExpense.splitType === 'percentage' ? 'Procentvis' : 'Fast beløb'}
+                      </span>
+                    </div>
+                    {detailExpense.isRecurring && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-[#78766d]">Gentagelse</span>
+                        <span className="text-sm font-medium text-[#2f2f2d]">
+                          {detailExpense.recurringInterval === 'weekly' ? 'Ugentlig' : detailExpense.recurringInterval === 'monthly' ? 'Månedlig' : 'Årlig'}
+                        </span>
+                      </div>
+                    )}
+                    {detailExpense.isRecurring && detailExpense.nextDueDate && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-[#78766d]">Næste betaling</span>
+                        <span className="text-sm font-medium text-[#2f2f2d]">{formatDate(detailExpense.nextDueDate)}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Split breakdown */}
+                  <div className="rounded-2xl border border-[#e8e7e0] bg-white p-4 space-y-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[#9b9a93]">Fordeling</p>
+                    {Object.entries(detailExpense.splitAmounts).map(([userId, amount]) => {
+                      const user = users.find(u => u.id === userId);
+                      const pct = detailExpense.amount > 0 ? ((amount / detailExpense.amount) * 100).toFixed(0) : '0';
+                      return (
+                        <div key={userId} className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Avatar className="h-7 w-7">
+                              <AvatarImage src={user?.avatar} />
+                              <AvatarFallback className="text-[10px]">{user?.name?.[0]}</AvatarFallback>
+                            </Avatar>
+                            <span className="text-sm text-[#2f2f2d]">{user?.name}</span>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-sm font-semibold text-[#2f2f2d]">{formatCurrency(amount)}</span>
+                            <span className="ml-1.5 text-xs text-[#9b9a93]">({pct}%)</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Linked transfer info */}
+                  {linkedTransfer && (
+                    <div className="rounded-2xl border border-[#e8e7e0] bg-white p-4 space-y-2">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-[#9b9a93]">Betalingsstatus</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-[#78766d]">Status</span>
+                        <Badge variant="outline">
+                          {linkedTransfer.status === 'requested' ? 'Anmodet' : linkedTransfer.status === 'sent' ? 'Sendt' : linkedTransfer.status === 'completed' ? 'Gennemført' : 'Afvist'}
+                        </Badge>
+                      </div>
+                      {linkedTransfer.completedAt && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-[#78766d]">Betalt</span>
+                          <span className="text-sm font-medium text-[#2f2f2d]">{formatDate(linkedTransfer.completedAt)}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {detailExpense.receiptUrl && (
+                    <a
+                      href={detailExpense.receiptUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block rounded-2xl border border-[#e8e7e0] bg-white p-3 text-center text-sm font-medium text-[#b96424]"
+                    >
+                      Åbn kvittering
+                    </a>
+                  )}
+
+                  {/* Action buttons */}
+                  <div className="flex gap-2">
+                    {needsApproval && (
+                      <>
+                        <Button className="flex-1" onClick={() => { handleApprove(detailExpense.id); setDetailExpenseId(null); }}>
+                          <Check className="mr-1.5 h-4 w-4" /> Godkend
+                        </Button>
+                        <Button variant="outline" className="flex-1 text-[#b55f22]" onClick={() => { handleDispute(detailExpense.id); setDetailExpenseId(null); }}>
+                          <X className="mr-1.5 h-4 w-4" /> Anfægt
+                        </Button>
+                      </>
+                    )}
+                    {canUsePayments && detailExpense.status === 'pending' && detailExpense.paidBy === currentUser?.id && (
+                      <Button variant="outline" className="w-full" onClick={() => { requestPaymentForExpense(detailExpense); setDetailExpenseId(null); }}>
+                        <CreditCard className="mr-1.5 h-4 w-4" /> Anmod betaling
+                      </Button>
+                    )}
+                    {detailExpense.status === 'disputed' && (
+                      <Button variant="outline" className="w-full" onClick={() => { handleResolve(detailExpense.id); setDetailExpenseId(null); }}>
+                        <CheckCircle2 className="mr-1.5 h-4 w-4" /> Foreslå løsning
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </>
+            );
+          })()}
+        </SheetContent>
+      </Sheet>
 
       {/* Dispute reason dialog */}
       <Dialog open={disputeDialogExpenseId !== null} onOpenChange={(open) => { if (!open) setDisputeDialogExpenseId(null); }}>

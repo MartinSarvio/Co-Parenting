@@ -156,7 +156,6 @@ export function Kommunikation() {
         >
           <div>
             <h1 className="text-2xl font-semibold text-[#2f2f2d]">Kommunikation</h1>
-            <p className="text-[#75736b]">Strukturerede samtaler med tydelig titel</p>
           </div>
           <Button 
             size="icon"

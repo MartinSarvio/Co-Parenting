@@ -219,7 +219,7 @@ export function Samversplan() {
       >
         <div>
           <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Samværsplan</h1>
-          <p className="text-[13px] text-[#78766d] max-w-[260px] truncate">
+          <p className="text-[13px] leading-snug text-[#78766d] max-w-[220px]">
             {custodyPlan?.name || 'Ingen plan'}
           </p>
         </div>

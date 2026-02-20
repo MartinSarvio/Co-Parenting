@@ -175,7 +175,6 @@ export function Opgaver() {
       >
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Opgaver & Indkøb</h1>
-          <p className="text-slate-500">Hold styr på jeres opgaver</p>
         </div>
       </motion.div>
 
