@@ -20,6 +20,7 @@ model User {
   role              String   @default("parent") // parent | guardian | professional | family_member
   professionalType  String?  // caseworker | family_counselor | lawyer | mediator
   organization      String?
+  isAdmin           Boolean  @default(false)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 

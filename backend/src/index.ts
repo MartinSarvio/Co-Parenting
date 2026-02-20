@@ -19,6 +19,7 @@ import { keyDatesRouter } from './routes/keyDates';
 import { diaryRouter } from './routes/diary';
 import { milestonesRouter } from './routes/milestones';
 import { custodyPlansRouter } from './routes/custodyPlans';
+import { adminRouter } from './routes/admin';
 import { errorHandler } from './middleware/errorHandler';
 import { authenticate } from './middleware/auth';
 
@@ -89,6 +90,9 @@ app.use('/api/key-dates', authenticate, keyDatesRouter);
 app.use('/api/diary', authenticate, diaryRouter);
 app.use('/api/milestones', authenticate, milestonesRouter);
 app.use('/api/custody-plans', authenticate, custodyPlansRouter);
+
+// Admin routes (mixed: /promote uses ADMIN_SECRET, others use JWT+isAdmin)
+app.use('/api/admin', adminRouter);
 
 // Error handler
 app.use(errorHandler);

@@ -135,6 +135,7 @@ authRouter.get('/me', async (req: Request, res: Response) => {
         phone: true,
         professionalType: true,
         organization: true,
+        isAdmin: true,
       },
     });
 
