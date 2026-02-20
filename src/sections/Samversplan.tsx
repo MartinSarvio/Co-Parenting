@@ -12,7 +12,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Calendar,
-  Repeat,
   Settings,
   CheckCircle2
 } from 'lucide-react';
@@ -220,9 +219,8 @@ export function Samversplan() {
       >
         <div>
           <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Samværsplan</h1>
-          <p className="flex items-center gap-1.5 text-[13px] text-[#78766d] max-w-[260px] truncate">
-            <Repeat className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">{custodyPlan?.name || 'Ingen plan'}</span>
+          <p className="text-[13px] text-[#78766d] max-w-[260px] truncate">
+            {custodyPlan?.name || 'Ingen plan'}
           </p>
         </div>
         <Button

@@ -973,14 +973,14 @@ export function Expenses() {
         transition={{ delay: 0.15 }}
       >
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-4 sm:grid-cols-7">
-            <TabsTrigger value="all">Alle</TabsTrigger>
-            <TabsTrigger value="pending">Afventer</TabsTrigger>
-            <TabsTrigger value="paid">Betalt</TabsTrigger>
-            <TabsTrigger value="disputed">Anfægtet</TabsTrigger>
-            <TabsTrigger value="recurring">Faste</TabsTrigger>
-            <TabsTrigger value="unexpected">Uventet</TabsTrigger>
-            <TabsTrigger value="statistik">Statistik</TabsTrigger>
+          <TabsList className="flex h-auto w-full overflow-x-auto scrollbar-hide">
+            <TabsTrigger value="all" className="shrink-0 px-3 py-2 text-sm">Alle</TabsTrigger>
+            <TabsTrigger value="pending" className="shrink-0 px-3 py-2 text-sm">Afventer</TabsTrigger>
+            <TabsTrigger value="paid" className="shrink-0 px-3 py-2 text-sm">Betalt</TabsTrigger>
+            <TabsTrigger value="disputed" className="shrink-0 px-3 py-2 text-sm">Anfægtet</TabsTrigger>
+            <TabsTrigger value="recurring" className="shrink-0 px-3 py-2 text-sm">Faste</TabsTrigger>
+            <TabsTrigger value="unexpected" className="shrink-0 px-3 py-2 text-sm">Uventet</TabsTrigger>
+            <TabsTrigger value="statistik" className="shrink-0 px-3 py-2 text-sm">Statistik</TabsTrigger>
           </TabsList>
 
           <TabsContent value={activeTab} className="mt-4 space-y-3">

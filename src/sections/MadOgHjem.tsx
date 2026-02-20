@@ -1711,21 +1711,21 @@ export function MadOgHjem() {
       </motion.div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid h-auto w-full grid-cols-4">
-          <TabsTrigger value="meal-plan" className="flex items-center gap-2 py-2">
-            <UtensilsCrossed className="h-4 w-4" />
+        <TabsList className="flex h-auto w-full overflow-x-auto scrollbar-hide">
+          <TabsTrigger value="meal-plan" className="flex shrink-0 items-center gap-1.5 px-4 py-2 text-sm">
+            <UtensilsCrossed className="h-4 w-4 shrink-0" />
             Madplan
           </TabsTrigger>
-          <TabsTrigger value="shopping" className="flex items-center gap-2 py-2">
-            <ShoppingCart className="h-4 w-4" />
+          <TabsTrigger value="shopping" className="flex shrink-0 items-center gap-1.5 px-4 py-2 text-sm">
+            <ShoppingCart className="h-4 w-4 shrink-0" />
             Indkøb
           </TabsTrigger>
-          <TabsTrigger value="cleaning" className="flex items-center gap-2 py-2">
-            <Home className="h-4 w-4" />
+          <TabsTrigger value="cleaning" className="flex shrink-0 items-center gap-1.5 px-4 py-2 text-sm">
+            <Home className="h-4 w-4 shrink-0" />
             Rengøring
           </TabsTrigger>
-          <TabsTrigger value="ideas" className="flex items-center gap-2 py-2">
-            <Lightbulb className="h-4 w-4" />
+          <TabsTrigger value="ideas" className="flex shrink-0 items-center gap-1.5 px-4 py-2 text-sm">
+            <Lightbulb className="h-4 w-4 shrink-0" />
             Flere ting
           </TabsTrigger>
         </TabsList>

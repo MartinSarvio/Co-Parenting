@@ -7,7 +7,7 @@ import {
   getDay, format, isSameDay, isToday, getISOWeek,
 } from 'date-fns';
 import { da } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, Sun, Plus, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sun, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -266,16 +266,10 @@ export function Aarskalender() {
 
             return (
               <>
-                <SheetHeader className="flex-row items-center justify-between pb-2">
+                <SheetHeader className="pb-2">
                   <SheetTitle className="text-[1.1rem] font-bold tracking-[-0.02em] text-[#2f2f2d] capitalize">
                     {format(selectedMonth, 'MMMM yyyy', { locale: da })}
                   </SheetTitle>
-                  <button
-                    onClick={() => setSelectedMonth(null)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-[#ecebe5] text-[#5f5d56] hover:bg-[#e0deda]"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
                 </SheetHeader>
 
                 <div className="px-4 pb-6">

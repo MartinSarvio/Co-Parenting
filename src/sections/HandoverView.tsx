@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAppStore } from '@/store';
 import { cn, getParentColor } from '@/lib/utils';
+import { notificationId } from '@/lib/id';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -61,13 +62,14 @@ const createChecklistId = (handoverId: string, checklistIds: string[]) => {
 };
 
 export function HandoverView() {
-  const { 
-    currentUser, 
-    users, 
-    children, 
-    handovers, 
+  const {
+    currentUser,
+    users,
+    children,
+    handovers,
     updateHandover,
-    addHandover
+    addHandover,
+    addNotification
   } = useAppStore();
   
   const [note, setNote] = useState('');
@@ -158,13 +160,29 @@ export function HandoverView() {
 
   const confirmHandover = () => {
     if (!activeHandover) return;
-    
+
     updateHandover(activeHandover.id, {
       status: 'completed',
       completedDate: new Date().toISOString(),
       notes: note
     });
-    
+
+    // Notify the other parent
+    const otherParentUser = users.find(u => u.id !== currentUser?.id);
+    if (otherParentUser) {
+      const senderName = currentUser?.name || 'Den anden forælder';
+      const childName = currentChild ? ` med ${currentChild.name}` : '';
+      addNotification({
+        id: notificationId(),
+        type: 'handover_reminder',
+        title: 'Aflevering bekræftet',
+        message: `${senderName} har bekræftet afleveringen${childName}. Pakkelisten er fuldt afmærket.`,
+        recipientId: otherParentUser.id,
+        read: false,
+        createdAt: new Date().toISOString()
+      });
+    }
+
     toast.success('Aflevering bekræftet!');
   };
 
