@@ -168,18 +168,18 @@ export function BottomNav() {
           </SheetTrigger>
           <SheetContent
             side="bottom"
-            className="h-auto max-h-[76vh] rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] pb-[calc(env(safe-area-inset-bottom,0px)+12px)] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]"
+            className="flex max-h-[90vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]"
           >
-            <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5]" />
-            <SheetHeader className="pb-1">
+            <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+            <SheetHeader className="pb-0 px-2 shrink-0">
               <SheetTitle className="text-[1.05rem] text-[#2f2f2d]">Menu</SheetTitle>
             </SheetHeader>
             {/* Global search at top of menu */}
-            <div className="px-1 pb-2">
+            <div className="px-3 pb-1 shrink-0">
               <GlobalSearch variant="inline" />
             </div>
-            <nav aria-label="Yderligere menupunkter" className="flex-1 overflow-hidden">
-              <div className="max-h-[calc(76vh-120px)] space-y-2 overflow-y-auto px-1 pb-3">
+            <nav aria-label="Yderligere menupunkter" className="flex-1 min-h-0 overflow-y-auto">
+              <div className="space-y-2 px-3 pb-[calc(env(safe-area-inset-bottom,0px)+24px)]">
                 {moreNavItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeTab === item.id;
@@ -213,6 +213,31 @@ export function BottomNav() {
                     </button>
                   );
                 })}
+                {/* Settings at bottom */}
+                <button
+                  onClick={() => {
+                    setActiveTab('settings');
+                    setMoreOpen(false);
+                  }}
+                  aria-label="Indstillinger"
+                  className={cn(
+                    'flex h-14 w-full items-center justify-between rounded-2xl border px-4 text-left transition-colors',
+                    activeTab === 'settings'
+                      ? 'border-[#f5bf8f] bg-[#fff2e6] text-[#2f2f2d]'
+                      : 'border-[#d8d7cf] bg-[#faf9f6] text-[#3f3e3a] hover:bg-[#f2f1ec]'
+                  )}
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div aria-hidden="true" className={cn(
+                      'flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
+                      activeTab === 'settings' ? 'bg-[#f58a2d] text-white' : 'bg-[#ecebe5] text-[#5f5d56]'
+                    )}>
+                      <Settings className="h-5 w-5" />
+                    </div>
+                    <span className="truncate text-sm font-semibold tracking-[-0.01em]">Indstillinger</span>
+                  </div>
+                  <ChevronRight aria-hidden="true" className="h-4 w-4 shrink-0 text-[#9d9b93]" />
+                </button>
               </div>
             </nav>
           </SheetContent>

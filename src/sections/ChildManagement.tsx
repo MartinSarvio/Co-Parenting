@@ -19,6 +19,7 @@ import {
   AlertTriangle,
   Heart,
   Building2,
+  GraduationCap,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -47,6 +48,9 @@ export function ChildManagement() {
     parent2Id: '',
     allergies: '',
     medications: '',
+    institutionName: '',
+    institutionType: 'none',
+    custodyArrangement: 'none',
   });
 
   const parents = users.filter(u => u.role === 'parent');
@@ -80,6 +84,8 @@ export function ChildManagement() {
       medications: newChild.medications ? newChild.medications.split(',').map(s => s.trim()) : [],
       emergencyContacts: [],
       institutions: [],
+      institutionName: newChild.institutionName || undefined,
+      institutionType: newChild.institutionType !== 'none' ? newChild.institutionType as any : undefined,
     });
 
     setIsAddOpen(false);
@@ -90,6 +96,9 @@ export function ChildManagement() {
       parent2Id: '',
       allergies: '',
       medications: '',
+      institutionName: '',
+      institutionType: 'none',
+      custodyArrangement: 'none',
     });
     toast.success('Barn tilføjet');
   };
@@ -97,6 +106,8 @@ export function ChildManagement() {
   const handleEditChild = (childId: string) => {
     const child = children.find(c => c.id === childId);
     if (!child) return;
+
+    const childInst = institutions.find(i => child.institutions?.includes(i.id));
 
     setEditingChild(childId);
     setNewChild({
@@ -106,6 +117,9 @@ export function ChildManagement() {
       parent2Id: child.parent2Id,
       allergies: child.allergies?.join(', ') || '',
       medications: child.medications?.join(', ') || '',
+      institutionName: child.institutionName || (childInst ? childInst.name : ''),
+      institutionType: child.institutionType || (childInst ? childInst.type : 'none'),
+      custodyArrangement: custodyPlans.find(cp => cp.childId === childId)?.pattern || 'none',
     });
     setIsEditOpen(true);
   };
@@ -120,6 +134,8 @@ export function ChildManagement() {
       parent2Id: newChild.parent2Id,
       allergies: newChild.allergies ? newChild.allergies.split(',').map(s => s.trim()) : [],
       medications: newChild.medications ? newChild.medications.split(',').map(s => s.trim()) : [],
+      institutionName: newChild.institutionName || undefined,
+      institutionType: newChild.institutionType !== 'none' ? newChild.institutionType as any : undefined,
     });
 
     setIsEditOpen(false);
@@ -140,6 +156,16 @@ export function ChildManagement() {
 
   const getChildCustodyPlan = (child: typeof children[0]) => {
     return custodyPlans.find(cp => cp.childId === child.id);
+  };
+
+  const getInstitutionTypeLabel = (type?: string) => {
+    switch (type) {
+      case 'vuggestue': return 'Vuggestue';
+      case 'børnehave': return 'Børnehave';
+      case 'skole': return 'Skole';
+      case 'sfo': return 'SFO/Fritidsordning';
+      default: return '';
+    }
   };
 
   return (
@@ -224,11 +250,55 @@ export function ChildManagement() {
               </div>
               <div className="space-y-2">
                 <Label>Medicin (kommasepareret)</Label>
-                <Input 
+                <Input
                   value={newChild.medications}
                   onChange={(e) => setNewChild({...newChild, medications: e.target.value})}
                   placeholder="F.eks. astmaspray"
                 />
+              </div>
+              <div className="space-y-2">
+                <Label>Institutionsnavn</Label>
+                <Input
+                  value={newChild.institutionName}
+                  onChange={(e) => setNewChild({...newChild, institutionName: e.target.value})}
+                  placeholder="F.eks. Børnehaven Solstrålen"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Institutionstype</Label>
+                <Select
+                  value={newChild.institutionType}
+                  onValueChange={(v) => setNewChild({...newChild, institutionType: v})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Vælg institutionstype" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="vuggestue">Vuggestue</SelectItem>
+                    <SelectItem value="børnehave">Børnehave</SelectItem>
+                    <SelectItem value="skole">Skole</SelectItem>
+                    <SelectItem value="sfo">SFO/Fritidsordning</SelectItem>
+                    <SelectItem value="none">Ingen</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Samværsordning</Label>
+                <Select
+                  value={newChild.custodyArrangement}
+                  onValueChange={(v) => setNewChild({...newChild, custodyArrangement: v})}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Vælg samværsordning" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="7/7">7/7 ordning</SelectItem>
+                    <SelectItem value="10/4">10/4 ordning</SelectItem>
+                    <SelectItem value="14/0">14/0 (fuld forældremyndighed)</SelectItem>
+                    <SelectItem value="custom">Individuel aftale</SelectItem>
+                    <SelectItem value="none">Ikke fastlagt</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             <Button onClick={handleAddChild} className="w-full">
               Tilføj barn
@@ -314,6 +384,16 @@ export function ChildManagement() {
                             <Building2 className="w-3 h-3 text-slate-400" />
                             <span className="text-xs text-slate-500">
                               {childInstitutions.map(i => i.name).join(', ')}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Institution (direct on child) */}
+                        {child.institutionName && (
+                          <div className="flex items-center gap-2 mt-2">
+                            <GraduationCap className="w-3 h-3 text-slate-400" />
+                            <span className="text-xs text-slate-500">
+                              {child.institutionName}{child.institutionType && child.institutionType !== 'none' ? ` (${getInstitutionTypeLabel(child.institutionType)})` : ''}
                             </span>
                           </div>
                         )}
@@ -412,10 +492,54 @@ export function ChildManagement() {
             </div>
             <div className="space-y-2">
               <Label>Medicin (kommasepareret)</Label>
-              <Input 
+              <Input
                 value={newChild.medications}
                 onChange={(e) => setNewChild({...newChild, medications: e.target.value})}
               />
+            </div>
+            <div className="space-y-2">
+              <Label>Institutionsnavn</Label>
+              <Input
+                value={newChild.institutionName}
+                onChange={(e) => setNewChild({...newChild, institutionName: e.target.value})}
+                placeholder="F.eks. Børnehaven Solstrålen"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Institutionstype</Label>
+              <Select
+                value={newChild.institutionType}
+                onValueChange={(v) => setNewChild({...newChild, institutionType: v})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Vælg institutionstype" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="vuggestue">Vuggestue</SelectItem>
+                  <SelectItem value="børnehave">Børnehave</SelectItem>
+                  <SelectItem value="skole">Skole</SelectItem>
+                  <SelectItem value="sfo">SFO/Fritidsordning</SelectItem>
+                  <SelectItem value="none">Ingen</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Samværsordning</Label>
+              <Select
+                value={newChild.custodyArrangement}
+                onValueChange={(v) => setNewChild({...newChild, custodyArrangement: v})}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Vælg samværsordning" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="7/7">7/7 ordning</SelectItem>
+                  <SelectItem value="10/4">10/4 ordning</SelectItem>
+                  <SelectItem value="14/0">14/0 (fuld forældremyndighed)</SelectItem>
+                  <SelectItem value="custom">Individuel aftale</SelectItem>
+                  <SelectItem value="none">Ikke fastlagt</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <Button onClick={handleUpdateChild} className="w-full">
               Gem ændringer

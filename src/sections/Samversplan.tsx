@@ -211,25 +211,6 @@ export function Samversplan() {
     setSwapReason('');
   };
 
-  const getPatternDescription = () => {
-    switch (custodyPlan?.pattern) {
-      case '7/7':
-        return 'En uge hos hver forælder';
-      case '10/4':
-        return '10 dage / 4 dage';
-      case '14/0':
-        return '14 dage / weekend';
-      case 'weekday-weekend':
-        return 'Hverdage / weekend';
-      case 'alternating':
-        return 'Skift hver anden dag';
-      case 'custom':
-        return 'Tilpasset lige/ulige uger';
-      default:
-        return '';
-    }
-  };
-
   return (
     <div className="space-y-4 p-1">
       <motion.div
@@ -238,10 +219,10 @@ export function Samversplan() {
         className="flex items-center justify-between"
       >
         <div>
-          <h1 className="text-2xl font-semibold text-[#2f2f2d]">Samværsplan</h1>
-          <p className="flex items-center gap-2 text-[#75736b]">
-            <Repeat className="h-4 w-4" />
-            {custodyPlan?.name} • {getPatternDescription()}
+          <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Samværsplan</h1>
+          <p className="flex items-center gap-1.5 text-[13px] text-[#78766d] max-w-[260px] truncate">
+            <Repeat className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">{custodyPlan?.name || 'Ingen plan'}</span>
           </p>
         </div>
         <Button

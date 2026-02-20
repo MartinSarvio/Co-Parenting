@@ -1707,11 +1707,11 @@ export function MadOgHjem() {
         animate={{ opacity: 1, y: 0 }}
       >
         <h1 className="text-2xl font-semibold text-[#2f2f2d]">Mad & Hjem</h1>
-        <p className="text-[#75736b]">Madplan, indkøb pr. dag, rengøring og smarte næste skridt</p>
+        <p className="text-[#75736b]">Madplan, indkøb og rengøring</p>
       </motion.div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid h-auto w-full grid-cols-2 gap-2 sm:grid-cols-4">
+        <TabsList className="grid h-auto w-full grid-cols-4">
           <TabsTrigger value="meal-plan" className="flex items-center gap-2 py-2">
             <UtensilsCrossed className="h-4 w-4" />
             Madplan

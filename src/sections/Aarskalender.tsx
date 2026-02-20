@@ -7,8 +7,16 @@ import {
   getDay, format, isSameDay, isToday, getISOWeek,
 } from 'date-fns';
 import { da } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, Sun } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sun, Plus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { eventId } from '@/lib/id';
+import type { EventType } from '@/types';
 
 function getParentForDay(date: Date, custodyPlan: ReturnType<typeof useFamilyContext>['custodyPlan'], parent1Id: string, parent2Id: string): string | null {
   if (!custodyPlan) return null;
@@ -63,9 +71,13 @@ function getParentForDay(date: Date, custodyPlan: ReturnType<typeof useFamilyCon
 }
 
 export function Aarskalender() {
-  const { users, events } = useAppStore();
+  const { users, events, addEvent, currentUser } = useAppStore();
   const { currentChild, custodyPlan, parents } = useFamilyContext();
   const [year, setYear] = useState(new Date().getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState<Date | null>(null);
+  const [quickAddDate, setQuickAddDate] = useState<Date | null>(null);
+  const [newEventTitle, setNewEventTitle] = useState('');
+  const [newEventType, setNewEventType] = useState<EventType>('personal');
 
   const parent1 = parents[0] ?? null;
   const parent2 = parents[1] ?? null;
@@ -171,7 +183,11 @@ export function Aarskalender() {
           const firstDay = firstDayJs === 0 ? 6 : firstDayJs - 1;
 
           return (
-            <div key={month.toISOString()} className="rounded-2xl border border-[#e8e7e0] bg-white px-3 py-3 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+            <div
+              key={month.toISOString()}
+              className="rounded-2xl border border-[#e8e7e0] bg-white px-3 py-3 shadow-[0_2px_8px_rgba(0,0,0,0.04)] cursor-pointer hover:border-[#f58a2d]/40 transition-colors"
+              onClick={() => setSelectedMonth(month)}
+            >
               <p className="mb-2 text-center text-[12px] font-bold tracking-[-0.01em] text-[#2f2f2d] capitalize">
                 {format(month, 'MMMM', { locale: da })}
               </p>
@@ -239,6 +255,173 @@ export function Aarskalender() {
           })}
         </div>
       )}
+
+      {/* Month detail Sheet */}
+      <Sheet open={!!selectedMonth} onOpenChange={(open) => { if (!open) setSelectedMonth(null); }}>
+        <SheetContent side="bottom" className="rounded-t-[28px] bg-[#f7f6f2] max-h-[85vh] overflow-y-auto">
+          {selectedMonth && (() => {
+            const monthDays = eachDayOfInterval({ start: startOfMonth(selectedMonth), end: endOfMonth(selectedMonth) });
+            const firstDayJsDetail = getDay(startOfMonth(selectedMonth));
+            const firstDayDetail = firstDayJsDetail === 0 ? 6 : firstDayJsDetail - 1;
+
+            return (
+              <>
+                <SheetHeader className="flex-row items-center justify-between pb-2">
+                  <SheetTitle className="text-[1.1rem] font-bold tracking-[-0.02em] text-[#2f2f2d] capitalize">
+                    {format(selectedMonth, 'MMMM yyyy', { locale: da })}
+                  </SheetTitle>
+                  <button
+                    onClick={() => setSelectedMonth(null)}
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-[#ecebe5] text-[#5f5d56] hover:bg-[#e0deda]"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </SheetHeader>
+
+                <div className="px-4 pb-6">
+                  {/* Weekday headers */}
+                  <div className="mb-2 grid grid-cols-7 gap-1">
+                    {['M', 'T', 'O', 'T', 'F', 'L', 'S'].map((d, i) => (
+                      <div key={i} className="text-center text-[11px] font-semibold text-[#78766d]">{d}</div>
+                    ))}
+                  </div>
+
+                  {/* Full month grid */}
+                  <div className="grid grid-cols-7 gap-1">
+                    {/* Empty cells for offset */}
+                    {Array.from({ length: firstDayDetail }).map((_, i) => (
+                      <div key={`detail-empty-${i}`} className="h-10" />
+                    ))}
+                    {monthDays.map(day => {
+                      const holiday = isHoliday(day);
+                      const dayColor = holiday ? holidayColor : getDayColor(day);
+                      const todayDay = isToday(day);
+                      const dayEvents = events.filter(e => isSameDay(new Date(e.startDate), day));
+
+                      return (
+                        <button
+                          key={day.toISOString()}
+                          onClick={() => setQuickAddDate(day)}
+                          className={cn(
+                            'relative flex h-10 w-full flex-col items-center justify-center rounded-lg text-[13px] font-medium transition-colors hover:opacity-80',
+                            dayColor || 'bg-[#f0efe8]',
+                            todayDay && 'ring-1 ring-[#f58a2d] ring-offset-1',
+                          )}
+                        >
+                          <span className={cn(dayColor ? 'text-[#2f2f2d]' : 'text-[#78766d]')}>
+                            {format(day, 'd')}
+                          </span>
+                          {dayEvents.length > 0 && (
+                            <div className="flex gap-0.5 mt-0.5">
+                              {dayEvents.slice(0, 3).map((_ev, idx) => (
+                                <div key={idx} className="h-1 w-1 rounded-full bg-[#f58a2d]" />
+                              ))}
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Events list for selected month */}
+                  {(() => {
+                    const monthEvents = events.filter(e => {
+                      const eDate = new Date(e.startDate);
+                      return eDate.getMonth() === selectedMonth.getMonth() && eDate.getFullYear() === selectedMonth.getFullYear();
+                    });
+                    if (monthEvents.length === 0) return null;
+                    return (
+                      <div className="mt-4 space-y-2">
+                        <h3 className="text-[13px] font-semibold text-[#2f2f2d]">Begivenheder denne måned</h3>
+                        {monthEvents.map(ev => (
+                          <div key={ev.id} className="flex items-center gap-3 rounded-xl border border-[#e8e7e0] bg-white px-3 py-2 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+                            <div className="h-2 w-2 rounded-full bg-[#f58a2d] flex-shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[13px] font-medium text-[#2f2f2d] truncate">{ev.title}</p>
+                              <p className="text-[11px] text-[#78766d]">
+                                {format(new Date(ev.startDate), 'd. MMM', { locale: da })} &middot; {ev.type}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()}
+                </div>
+              </>
+            );
+          })()}
+        </SheetContent>
+      </Sheet>
+
+      {/* Quick-add event Dialog */}
+      <Dialog open={!!quickAddDate} onOpenChange={(open) => { if (!open) { setQuickAddDate(null); setNewEventTitle(''); setNewEventType('personal'); } }}>
+        <DialogContent className="rounded-2xl border border-[#e8e7e0] bg-[#f7f6f2] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <DialogHeader>
+            <DialogTitle className="text-[1rem] font-bold text-[#2f2f2d]">
+              Tilføj begivenhed
+            </DialogTitle>
+            {quickAddDate && (
+              <p className="text-[13px] text-[#78766d]">
+                {format(quickAddDate, 'd. MMMM yyyy', { locale: da })}
+              </p>
+            )}
+          </DialogHeader>
+
+          <div className="space-y-4 pt-2">
+            <div className="space-y-2">
+              <Label htmlFor="event-title" className="text-[13px] font-medium text-[#2f2f2d]">Titel</Label>
+              <Input
+                id="event-title"
+                placeholder="Begivenhedens navn..."
+                value={newEventTitle}
+                onChange={(e) => setNewEventTitle(e.target.value)}
+                className="rounded-xl border-[#e8e7e0] bg-white text-[#2f2f2d] placeholder:text-[#b0aea6]"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="event-type" className="text-[13px] font-medium text-[#2f2f2d]">Type</Label>
+              <Select value={newEventType} onValueChange={(val) => setNewEventType(val as EventType)}>
+                <SelectTrigger className="rounded-xl border-[#e8e7e0] bg-white text-[#2f2f2d]">
+                  <SelectValue placeholder="Vælg type" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl border-[#e8e7e0] bg-white">
+                  <SelectItem value="school">Skole</SelectItem>
+                  <SelectItem value="activity">Aktivitet</SelectItem>
+                  <SelectItem value="work">Arbejde</SelectItem>
+                  <SelectItem value="personal">Personlig</SelectItem>
+                  <SelectItem value="appointment">Aftale</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button
+              onClick={() => {
+                if (!quickAddDate || !newEventTitle.trim() || !currentUser) return;
+                const dateStr = format(quickAddDate, 'yyyy-MM-dd');
+                addEvent({
+                  id: eventId(),
+                  title: newEventTitle.trim(),
+                  startDate: `${dateStr}T09:00:00`,
+                  endDate: `${dateStr}T10:00:00`,
+                  type: newEventType,
+                  createdBy: currentUser.id,
+                  childId: currentChild?.id,
+                });
+                setNewEventTitle('');
+                setNewEventType('personal');
+                setQuickAddDate(null);
+              }}
+              disabled={!newEventTitle.trim()}
+              className="w-full rounded-xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a] disabled:opacity-50"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Gem begivenhed
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -213,7 +213,7 @@ export function Borneoverblik() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-2 gap-0">
           <TabsTrigger value="milestones" className="flex items-center gap-2">
             <Calendar className="w-4 h-4" />
             Milepæle

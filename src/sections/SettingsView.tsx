@@ -339,13 +339,18 @@ export function SettingsView() {
       </motion.div>
 
       <Tabs defaultValue="profile" className="space-y-4">
-        <TabsList className="flex w-full justify-start overflow-x-auto rounded-2xl p-1.5">
-          <TabsTrigger value="profile" className="flex-none min-w-[92px]">Konto</TabsTrigger>
-          <TabsTrigger value="family" className="flex-none min-w-[92px]">Familie</TabsTrigger>
-          <TabsTrigger value="subscription" className="flex-none min-w-[126px]">Abonnement</TabsTrigger>
-          <TabsTrigger value="payments" className="flex-none min-w-[108px]">Betaling</TabsTrigger>
-          <TabsTrigger value="members" className="flex-none min-w-[120px]">Medlemmer</TabsTrigger>
-        </TabsList>
+        <div className="relative">
+          <TabsList className="flex w-full justify-start gap-0 overflow-x-auto rounded-2xl p-1 scrollbar-hide">
+            <TabsTrigger value="profile" className="flex-none min-w-[80px]">Konto</TabsTrigger>
+            <TabsTrigger value="family" className="flex-none min-w-[80px]">Familie</TabsTrigger>
+            <TabsTrigger value="subscription" className="flex-none min-w-[110px]">Abonnement</TabsTrigger>
+            <TabsTrigger value="payments" className="flex-none min-w-[95px]">Betaling</TabsTrigger>
+            <TabsTrigger value="members" className="flex-none min-w-[105px]">Medlemmer</TabsTrigger>
+          </TabsList>
+          {/* Scroll indicator */}
+          <div className="pointer-events-none absolute right-0 top-0 h-full w-8 rounded-r-2xl bg-gradient-to-l from-[#ecebe5] to-transparent" />
+        </div>
+        <p className="text-[11px] text-[#9b9a93] text-center -mt-1">← Swipe for flere indstillinger →</p>
 
         <TabsContent value="profile" className="space-y-4">
           {/* Avatar section */}

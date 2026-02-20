@@ -51,6 +51,8 @@ export interface Child {
   medications?: string[];
   emergencyContacts?: EmergencyContact[];
   institutions?: string[]; // Institution IDs
+  institutionName?: string;
+  institutionType?: 'vuggestue' | 'børnehave' | 'skole' | 'sfo' | 'none';
   custodyPlanId?: string;
 }
 
@@ -446,6 +448,7 @@ export interface Message {
   threadId: string;
   attachments?: Attachment[];
   readBy: string[];
+  deletedBy?: string[];
 }
 
 export interface Attachment {
@@ -464,6 +467,7 @@ export interface MessageThread {
   unreadCount: number;
   createdAt: string;
   isProfessionalThread?: boolean;
+  deletedBy?: string[];
 }
 
 // Milestone types

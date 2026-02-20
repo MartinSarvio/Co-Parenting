@@ -1,0 +1,391 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Users & Authentication ───────────────────────────────
+
+model User {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  passwordHash      String
+  name              String
+  avatar            String?
+  color             String   @default("warm") // warm | cool | neutral
+  phone             String?
+  role              String   @default("parent") // parent | guardian | professional | family_member
+  professionalType  String?  // caseworker | family_counselor | lawyer | mediator
+  organization      String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  householdMembers  HouseholdMember[]
+  childrenAsParent1 Child[]           @relation("Parent1")
+  childrenAsParent2 Child[]           @relation("Parent2")
+  messagesSent      Message[]
+  tasksCreated      Task[]            @relation("TaskCreator")
+  tasksAssigned     Task[]            @relation("TaskAssignee")
+  eventsCreated     CalendarEvent[]
+  expensesPaid      Expense[]
+  documents         Document[]
+  photos            FamilyPhoto[]
+  diaryEntries      DiaryEntry[]
+  decisions         DecisionLog[]     @relation("DecisionProposer")
+}
+
+// ─── Household ────────────────────────────────────────────
+
+model Household {
+  id          String   @id @default(cuid())
+  name        String
+  familyMode  String   @default("co_parenting") // co_parenting | together | blended | single_parent
+  caseNumber  String?  // Official case number from authorities
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  members       HouseholdMember[]
+  children      Child[]
+  custodyPlans  CustodyPlan[]
+  institutions  Institution[]
+}
+
+model HouseholdMember {
+  id          String    @id @default(cuid())
+  userId      String
+  householdId String
+  role        String    @default("parent") // parent | guardian | professional
+  joinedAt    DateTime  @default(now())
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, householdId])
+}
+
+// ─── Children ─────────────────────────────────────────────
+
+model Child {
+  id              String   @id @default(cuid())
+  name            String
+  birthDate       DateTime
+  avatar          String?
+  parent1Id       String
+  parent2Id       String
+  householdId     String
+  institutionName String?
+  institutionType String?  // vuggestue | børnehave | skole | sfo
+  allergies       String[] @default([])
+  medications     String[] @default([])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  parent1       User          @relation("Parent1", fields: [parent1Id], references: [id])
+  parent2       User          @relation("Parent2", fields: [parent2Id], references: [id])
+  household     Household     @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  custodyPlans  CustodyPlan[]
+  events        CalendarEvent[]
+  milestones    Milestone[]
+  photos        FamilyPhoto[]
+  diaryEntries  DiaryEntry[]
+  decisions     DecisionLog[]
+}
+
+// ─── Institution ──────────────────────────────────────────
+
+model Institution {
+  id            String   @id @default(cuid())
+  name          String
+  type          String   // daycare | school | after_school | other
+  address       String?
+  phone         String?
+  email         String?
+  contactPerson String?
+  openingHours  String?
+  householdId   String
+  createdAt     DateTime @default(now())
+
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+}
+
+// ─── Custody Plan ─────────────────────────────────────────
+
+model CustodyPlan {
+  id          String   @id @default(cuid())
+  name        String
+  pattern     String   // 7/7 | 10/4 | 14/0 | custom | alternating | weekday-weekend
+  startDate   DateTime
+  childId     String
+  householdId String
+  swapDay     Int      @default(4)
+  swapTime    String   @default("18:00")
+  parent1Days Int[]    @default([])
+  parent2Days Int[]    @default([])
+
+  // JSON fields for complex configs
+  weeklySchedule   Json?
+  customWeekConfig Json?
+  customSchedule   Json?
+  holidays         Json?
+  specialDays      Json?
+
+  // Agreement details
+  agreementDate      DateTime?
+  agreementValidUntil DateTime?
+  agreementText      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  child     Child     @relation(fields: [childId], references: [id], onDelete: Cascade)
+  household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+}
+
+// ─── Calendar Events ──────────────────────────────────────
+
+model CalendarEvent {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  type        String   // school | activity | work | personal | handover | appointment | meeting
+  childId     String?
+  createdBy   String
+  location    String?
+  assignedTo  String[] @default([])
+  isRecurring Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  child   Child? @relation(fields: [childId], references: [id])
+  creator User   @relation(fields: [createdBy], references: [id])
+}
+
+// ─── Tasks ────────────────────────────────────────────────
+
+model Task {
+  id            String    @id @default(cuid())
+  title         String
+  description   String?
+  assignedTo    String
+  createdBy     String
+  deadline      DateTime?
+  completed     Boolean   @default(false)
+  completedAt   DateTime?
+  category      String    @default("general") // general | shopping | child | handover | cleaning
+  isRecurring   Boolean   @default(false)
+  plannedWeekday Int?
+  area          String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  creator  User @relation("TaskCreator", fields: [createdBy], references: [id])
+  assignee User @relation("TaskAssignee", fields: [assignedTo], references: [id])
+}
+
+// ─── Shopping Items ───────────────────────────────────────
+
+model ShoppingItem {
+  id           String    @id @default(cuid())
+  name         String
+  quantity     String?
+  purchased    Boolean   @default(false)
+  purchasedBy  String?
+  purchasedAt  DateTime?
+  addedBy      String
+  category     String?
+  priority     String    @default("normal") // low | normal | high
+  createdAt    DateTime  @default(now())
+}
+
+// ─── Meal Plans ───────────────────────────────────────────
+
+model MealPlan {
+  id         String   @id @default(cuid())
+  date       String   // YYYY-MM-DD
+  mealType   String   // breakfast | lunch | dinner | snack
+  title      String
+  notes      String?
+  createdBy  String
+  recipe     Json?    // { name, ingredients[], instructions }
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ─── Messages / Communication ─────────────────────────────
+
+model MessageThread {
+  id           String    @id @default(cuid())
+  title        String
+  participants String[]
+  childId      String?
+  unreadCount  Int       @default(0)
+  deletedBy    String[]  @default([])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  messages Message[]
+}
+
+model Message {
+  id          String    @id @default(cuid())
+  content     String
+  senderId    String
+  threadId    String
+  readBy      String[]  @default([])
+  deletedBy   String[]  @default([])
+  attachments Json?     // [{ id, type, url, name }]
+  createdAt   DateTime  @default(now())
+
+  sender User          @relation(fields: [senderId], references: [id])
+  thread MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+}
+
+// ─── Expenses ─────────────────────────────────────────────
+
+model Expense {
+  id            String    @id @default(cuid())
+  title         String
+  description   String?
+  amount        Float
+  currency      String    @default("DKK")
+  category      String    // institution | medical | clothing | activities | school | food | transport | other
+  paidBy        String
+  splitWith     String[]  @default([])
+  splitAmounts  Json      @default("{}")
+  splitType     String    @default("equal")
+  date          DateTime
+  status        String    @default("pending") // pending | approved | paid | disputed
+  receiptUrl    String?
+  approvedBy    String[]  @default([])
+  isRecurring   Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  payer User @relation(fields: [paidBy], references: [id])
+}
+
+// ─── Documents ────────────────────────────────────────────
+
+model Document {
+  id           String   @id @default(cuid())
+  title        String
+  type         String   // contract | medical | school | insurance | other | meeting_minutes | court_order
+  url          String
+  uploadedBy   String
+  sharedWith   String[] @default([])
+  isOfficial   Boolean  @default(false)
+  validFrom    DateTime?
+  validUntil   DateTime?
+  createdAt    DateTime @default(now())
+
+  uploader User @relation(fields: [uploadedBy], references: [id])
+}
+
+// ─── Milestones ───────────────────────────────────────────
+
+model Milestone {
+  id          String   @id @default(cuid())
+  childId     String
+  title       String
+  description String?
+  date        DateTime
+  category    String   // health | school | development | social
+  addedBy     String
+  photos      String[] @default([])
+  createdAt   DateTime @default(now())
+
+  child Child @relation(fields: [childId], references: [id], onDelete: Cascade)
+}
+
+// ─── Photos ───────────────────────────────────────────────
+
+model FamilyPhoto {
+  id       String   @id @default(cuid())
+  childId  String
+  url      String
+  caption  String?
+  takenAt  DateTime
+  addedBy  String
+  addedAt  DateTime @default(now())
+
+  child Child @relation(fields: [childId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [addedBy], references: [id])
+}
+
+// ─── Diary ────────────────────────────────────────────────
+
+model DiaryEntry {
+  id        String   @id @default(cuid())
+  childId   String
+  date      DateTime
+  mood      String   // happy | neutral | tired | sad | anxious
+  sleep     String   // good | okay | poor
+  appetite  String   // good | okay | poor
+  note      String?
+  writtenBy String
+  createdAt DateTime @default(now())
+
+  child Child @relation(fields: [childId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [writtenBy], references: [id])
+}
+
+// ─── Decision Log ─────────────────────────────────────────
+
+model DecisionLog {
+  id          String    @id @default(cuid())
+  childId     String?
+  title       String
+  description String
+  category    String    // school | health | activity | travel | finance | other
+  decidedAt   DateTime
+  proposedBy  String
+  approvedBy  String[]  @default([])
+  status      String    @default("proposed") // proposed | approved | rejected
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  child    Child? @relation(fields: [childId], references: [id])
+  proposer User   @relation("DecisionProposer", fields: [proposedBy], references: [id])
+}
+
+// ─── Meeting Minutes ──────────────────────────────────────
+
+model MeetingMinutes {
+  id          String   @id @default(cuid())
+  title       String
+  date        DateTime
+  location    String?
+  agenda      String?
+  decisions   Json?    // Decision[]
+  agreements  Json?    // Agreement[]
+  nextSteps   Json?    // NextStep[]
+  writtenBy   String
+  approvedBy  String[] @default([])
+  status      String   @default("draft") // draft | pending_approval | approved
+  isOfficial  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ─── Key Dates ────────────────────────────────────────────
+
+model KeyDate {
+  id                String   @id @default(cuid())
+  childId           String?
+  title             String
+  date              DateTime
+  type              String   // birthday | vaccination | school | appointment | anniversary | other
+  recurrence        String   @default("once") // once | yearly
+  reminderDaysBefore Int     @default(7)
+  notes             String?
+  addedBy           String
+  createdAt         DateTime @default(now())
+}

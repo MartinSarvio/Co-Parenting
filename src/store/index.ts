@@ -116,6 +116,8 @@ interface AppStore {
   deleteMealPlan: (id: string) => void;
   addMessage: (message: Message) => void;
   addThread: (thread: MessageThread) => void;
+  deleteMessage: (messageId: string, userId: string) => void;
+  deleteThread: (threadId: string, userId: string) => void;
   addMilestone: (milestone: Milestone) => void;
   addDocument: (document: Document) => void;
   
@@ -350,6 +352,20 @@ export const useAppStore = create<AppStore>()(
       
       addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
       addThread: (thread) => set((state) => ({ threads: [...state.threads, thread] })),
+      deleteMessage: (messageId, userId) => set((state) => ({
+        messages: state.messages.map(m =>
+          m.id === messageId
+            ? { ...m, deletedBy: [...(m.deletedBy || []), userId] }
+            : m
+        ),
+      })),
+      deleteThread: (threadId, userId) => set((state) => ({
+        threads: state.threads.map(t =>
+          t.id === threadId
+            ? { ...t, deletedBy: [...(t.deletedBy || []), userId] }
+            : t
+        ),
+      })),
       addMilestone: (milestone) => set((state) => ({ 
         milestones: [...state.milestones, milestone] 
       })),

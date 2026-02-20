@@ -7,15 +7,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Send, 
-  Plus, 
-  ChevronLeft, 
+import {
+  Send,
+  Plus,
+  ChevronLeft,
   MoreVertical,
   Image as ImageIcon,
   FileText,
   CheckCheck,
-  Check
+  Check,
+  Trash2,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, parseISO, isToday, isYesterday } from 'date-fns';
@@ -31,7 +32,8 @@ export function Kommunikation() {
     messages, 
     threads, 
     addMessage,
-    addThread
+    addThread,
+    deleteThread,
   } = useAppStore();
   
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
@@ -47,7 +49,8 @@ export function Kommunikation() {
   const otherParent = users.find(u => u.id !== currentUser?.id);
   
   const selectedThread = threads.find(t => t.id === selectedThreadId);
-  const threadMessages = messages.filter(m => m.threadId === selectedThreadId)
+  const threadMessages = messages
+    .filter(m => m.threadId === selectedThreadId && !m.deletedBy?.includes(currentUser?.id || ''))
     .sort((a, b) => parseISO(a.timestamp).getTime() - parseISO(b.timestamp).getTime());
 
   // Scroll to bottom on new messages
@@ -228,9 +231,9 @@ export function Kommunikation() {
           transition={{ delay: 0.1 }}
           className="space-y-3"
         >
-          {threads.map((thread, index) => {
+          {threads.filter(t => !t.deletedBy?.includes(currentUser?.id || '')).map((thread, index) => {
             const lastMessage = messages
-              .filter(m => m.threadId === thread.id)
+              .filter(m => m.threadId === thread.id && !m.deletedBy?.includes(currentUser?.id || ''))
               .sort((a, b) => parseISO(b.timestamp).getTime() - parseISO(a.timestamp).getTime())[0];
             
             return (
@@ -269,11 +272,25 @@ export function Kommunikation() {
                           <p className="text-sm text-slate-400 mt-1">Ingen beskeder endnu</p>
                         )}
                       </div>
-                      {thread.unreadCount > 0 && (
-                        <Badge className="bg-[#2f2f2f] text-white">
-                          {thread.unreadCount}
-                        </Badge>
-                      )}
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {thread.unreadCount > 0 && (
+                          <Badge className="bg-[#2f2f2f] text-white">
+                            {thread.unreadCount}
+                          </Badge>
+                        )}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (currentUser) {
+                              deleteThread(thread.id, currentUser.id);
+                              toast.success('Samtale skjult for dig');
+                            }
+                          }}
+                          className="p-1.5 rounded-full text-[#c5c4be] hover:text-[#ef4444] hover:bg-red-50 transition-colors"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
