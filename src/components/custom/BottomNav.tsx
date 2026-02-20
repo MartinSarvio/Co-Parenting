@@ -178,7 +178,7 @@ export function BottomNav() {
             <div className="px-3 pb-1 shrink-0">
               <GlobalSearch variant="inline" />
             </div>
-            <nav aria-label="Yderligere menupunkter" className="flex-1 min-h-0 overflow-y-auto">
+            <nav aria-label="Yderligere menupunkter" className="flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-y">
               <div className="space-y-2 px-3 pb-[calc(env(safe-area-inset-bottom,0px)+24px)]">
                 {moreNavItems.map((item) => {
                   const Icon = item.icon;
