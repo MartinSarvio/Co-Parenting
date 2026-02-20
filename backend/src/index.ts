@@ -97,7 +97,7 @@ app.use('/api/admin', adminRouter);
 // Error handler
 app.use(errorHandler);
 
-app.listen(PORT, () => {
+app.listen(Number(PORT), '0.0.0.0', () => {
   console.log(`🚀 Co-Parenting API running on port ${PORT}`);
   console.log(`   Health: http://localhost:${PORT}/health`);
   console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
