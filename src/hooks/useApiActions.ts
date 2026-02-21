@@ -20,6 +20,10 @@ import {
   mapThread,
   mapMessage,
   mapChild,
+  mapDiaryEntry,
+  mapKeyDate,
+  mapDecisionLog,
+  mapMilestone,
 } from '@/lib/mappers';
 import type {
   ApiCalendarEvent,
@@ -30,8 +34,12 @@ import type {
   ApiThread,
   ApiMessage,
   ApiChild,
+  ApiDiaryEntry,
+  ApiKeyDate,
+  ApiDecisionLog,
+  ApiMilestone,
 } from '@/lib/mappers';
-import type { CalendarEvent, Task, Expense, MealPlan, Child } from '@/types';
+import type { CalendarEvent, Task, Expense, MealPlan, Child, DiaryEntry, KeyDate, DecisionLog, Milestone } from '@/types';
 import { toast } from 'sonner';
 
 function handleError(err: unknown, fallbackMsg: string) {
@@ -381,6 +389,146 @@ export function useApiActions() {
     [store],
   );
 
+  // ── Diary Entries ─────────────────────────────────────────
+
+  const createDiaryEntry = useCallback(
+    async (data: Omit<DiaryEntry, 'id' | 'createdAt' | 'writtenBy'>) => {
+      try {
+        const raw = await api.post<ApiDiaryEntry>('/api/diary', data);
+        const entry = mapDiaryEntry(raw);
+        store.addDiaryEntry(entry);
+        return entry;
+      } catch (err) {
+        handleError(err, 'Kunne ikke oprette dagbogsindlæg');
+        return null;
+      }
+    },
+    [store],
+  );
+
+  const updateDiaryEntry = useCallback(
+    async (id: string, data: Partial<DiaryEntry>) => {
+      store.updateDiaryEntry(id, data);
+      try {
+        await api.patch(`/api/diary/${id}`, data);
+      } catch (err) {
+        handleError(err, 'Kunne ikke opdatere dagbogsindlæg');
+      }
+    },
+    [store],
+  );
+
+  const deleteDiaryEntry = useCallback(
+    async (id: string) => {
+      store.deleteDiaryEntry(id);
+      try {
+        await api.delete(`/api/diary/${id}`);
+      } catch (err) {
+        handleError(err, 'Kunne ikke slette dagbogsindlæg');
+      }
+    },
+    [store],
+  );
+
+  // ── Key Dates ───────────────────────────────────────────
+
+  const createKeyDate = useCallback(
+    async (data: Omit<KeyDate, 'id' | 'createdAt' | 'addedBy'>) => {
+      try {
+        const raw = await api.post<ApiKeyDate>('/api/key-dates', data);
+        const keyDate = mapKeyDate(raw);
+        store.addKeyDate(keyDate);
+        return keyDate;
+      } catch (err) {
+        handleError(err, 'Kunne ikke oprette vigtig dato');
+        return null;
+      }
+    },
+    [store],
+  );
+
+  const updateKeyDate = useCallback(
+    async (id: string, data: Partial<KeyDate>) => {
+      store.updateKeyDate(id, data);
+      try {
+        await api.patch(`/api/key-dates/${id}`, data);
+      } catch (err) {
+        handleError(err, 'Kunne ikke opdatere vigtig dato');
+      }
+    },
+    [store],
+  );
+
+  const deleteKeyDate = useCallback(
+    async (id: string) => {
+      store.deleteKeyDate(id);
+      try {
+        await api.delete(`/api/key-dates/${id}`);
+      } catch (err) {
+        handleError(err, 'Kunne ikke slette vigtig dato');
+      }
+    },
+    [store],
+  );
+
+  // ── Decisions ───────────────────────────────────────────
+
+  const createDecision = useCallback(
+    async (data: Omit<DecisionLog, 'id' | 'createdAt' | 'proposedBy'>) => {
+      try {
+        const raw = await api.post<ApiDecisionLog>('/api/decisions', data);
+        const decision = mapDecisionLog(raw);
+        store.addDecision(decision);
+        return decision;
+      } catch (err) {
+        handleError(err, 'Kunne ikke oprette beslutning');
+        return null;
+      }
+    },
+    [store],
+  );
+
+  const updateDecision = useCallback(
+    async (id: string, data: Partial<DecisionLog>) => {
+      store.updateDecision(id, data);
+      try {
+        await api.patch(`/api/decisions/${id}`, data);
+      } catch (err) {
+        handleError(err, 'Kunne ikke opdatere beslutning');
+      }
+    },
+    [store],
+  );
+
+  const deleteDecision = useCallback(
+    async (id: string) => {
+      store.deleteDecision(id);
+      try {
+        await api.delete(`/api/decisions/${id}`);
+      } catch (err) {
+        handleError(err, 'Kunne ikke slette beslutning');
+      }
+    },
+    [store],
+  );
+
+  // ── Milestones ──────────────────────────────────────────
+
+  const createMilestone = useCallback(
+    async (data: Omit<Milestone, 'id'>) => {
+      try {
+        const raw = await api.post<ApiMilestone>('/api/milestones', data);
+        const milestone = mapMilestone(raw);
+        store.addMilestone(milestone);
+        return milestone;
+      } catch (err) {
+        handleError(err, 'Kunne ikke oprette milepæl');
+        return null;
+      }
+    },
+    [store],
+  );
+
   return {
     // Events
     createEvent,
@@ -410,5 +558,19 @@ export function useApiActions() {
     createChild,
     updateChild,
     deleteChild,
+    // Diary
+    createDiaryEntry,
+    updateDiaryEntry,
+    deleteDiaryEntry,
+    // Key Dates
+    createKeyDate,
+    updateKeyDate,
+    deleteKeyDate,
+    // Decisions
+    createDecision,
+    updateDecision,
+    deleteDecision,
+    // Milestones
+    createMilestone,
   };
 }

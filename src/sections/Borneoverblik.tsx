@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useAppStore } from '@/store';
 import { useApiActions } from '@/hooks/useApiActions';
-import { milestoneId } from '@/lib/id';
 import { cn, formatDate, getDocumentTypeLabel } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -50,9 +49,8 @@ export function Borneoverblik() {
     children,
     milestones,
     documents,
-    addMilestone,
   } = useAppStore();
-  const { createDocument } = useApiActions();
+  const { createDocument, createMilestone } = useApiActions();
   
   const [activeTab, setActiveTab] = useState('milestones');
   const [isAddMilestoneOpen, setIsAddMilestoneOpen] = useState(false);
@@ -94,17 +92,17 @@ export function Borneoverblik() {
     return `${years} år og ${months} måneder`;
   };
 
-  const handleAddMilestone = () => {
+  const handleAddMilestone = async () => {
     if (!newMilestone.title || !newMilestone.date || !currentChild) return;
-    
-    addMilestone({
-      id: milestoneId(),
+
+    await createMilestone({
       childId: currentChild.id,
       title: newMilestone.title,
       description: newMilestone.description,
       date: newMilestone.date,
       category: newMilestone.category,
-      addedBy: currentUser?.id || 'u1',
+      addedBy: currentUser?.id || '',
+      photos: [],
     });
     
     setIsAddMilestoneOpen(false);

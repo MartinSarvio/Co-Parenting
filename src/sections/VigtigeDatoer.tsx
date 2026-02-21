@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAppStore } from '@/store';
-import { generateId } from '@/lib/id';
+import { useApiActions } from '@/hooks/useApiActions';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { da } from 'date-fns/locale';
 import { Plus, CalendarHeart, Trash2, Bell } from 'lucide-react';
@@ -68,7 +68,8 @@ function nextOccurrence(dateStr: string, recurrence: Recurrence): Date {
 }
 
 export function VigtigeDatoer() {
-  const { currentUser, keyDates, addKeyDate, deleteKeyDate, children } = useAppStore();
+  const { currentUser, keyDates, children } = useAppStore();
+  const { createKeyDate, deleteKeyDate } = useApiActions();
   const [addOpen, setAddOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
@@ -86,10 +87,9 @@ export function VigtigeDatoer() {
     })
     .sort((a, b) => daysUntil(a.date, a.recurrence) - daysUntil(b.date, b.recurrence));
 
-  function handleAdd() {
+  async function handleAdd() {
     if (!currentUser || !title.trim() || !date) return;
-    addKeyDate({
-      id: generateId('kd'),
+    await createKeyDate({
       childId: childId && childId !== 'none' ? childId : undefined,
       title: title.trim(),
       date,
@@ -97,8 +97,6 @@ export function VigtigeDatoer() {
       recurrence,
       reminderDaysBefore: parseInt(reminderDays) || 3,
       notes: notes.trim() || undefined,
-      addedBy: currentUser.id,
-      createdAt: new Date().toISOString(),
     });
     setAddOpen(false);
     setTitle('');

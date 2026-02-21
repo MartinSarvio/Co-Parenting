@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAppStore } from '@/store';
+import { useApiActions } from '@/hooks/useApiActions';
 import { useFamilyContext } from '@/hooks/useFamilyContext';
-import { generateId } from '@/lib/id';
 import { format } from 'date-fns';
 import { da } from 'date-fns/locale';
 import { Plus, BookOpen, Smile, Meh, Frown, Zap, Moon } from 'lucide-react';
@@ -59,7 +59,8 @@ function QualityPicker({ label, value, onChange }: { label: string; value: Quali
 }
 
 export function Dagbog() {
-  const { currentUser, diaryEntries, addDiaryEntry, children, currentChildId } = useAppStore();
+  const { currentUser, diaryEntries, children, currentChildId } = useAppStore();
+  const { createDiaryEntry } = useApiActions();
   const { currentChild } = useFamilyContext();
   const [addOpen, setAddOpen] = useState(false);
   const [mood, setMood] = useState<Mood>('neutral');
@@ -73,18 +74,15 @@ export function Dagbog() {
     .filter(e => e.childId === (childForDiary?.id ?? ''))
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-  function handleAdd() {
+  async function handleAdd() {
     if (!currentUser || !childForDiary) return;
-    addDiaryEntry({
-      id: generateId('diary'),
+    await createDiaryEntry({
       childId: childForDiary.id,
       date: new Date().toISOString(),
       mood,
       sleep,
       appetite,
       note: note.trim() || undefined,
-      writtenBy: currentUser.id,
-      createdAt: new Date().toISOString(),
     });
     setAddOpen(false);
     setMood('neutral');

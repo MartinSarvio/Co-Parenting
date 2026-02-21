@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAppStore } from '@/store';
-import { generateId } from '@/lib/id';
+import { useApiActions } from '@/hooks/useApiActions';
 import { format } from 'date-fns';
 import { da } from 'date-fns/locale';
 import { Plus, ClipboardList, Check, X, Clock } from 'lucide-react';
@@ -44,7 +44,8 @@ function statusBadge(status: DecisionStatus) {
 }
 
 export function Beslutningslog() {
-  const { currentUser, decisions, addDecision, approveDecision, rejectDecision, deleteDecision, users, children } = useAppStore();
+  const { currentUser, decisions, approveDecision, rejectDecision, users, children } = useAppStore();
+  const { createDecision, deleteDecision } = useApiActions();
   const [addOpen, setAddOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -59,22 +60,19 @@ export function Beslutningslog() {
     .filter(d => filterStatus === 'all' || d.status === filterStatus)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-  function handleAdd() {
+  async function handleAdd() {
     if (!currentUser || !title.trim() || !description.trim()) return;
-    addDecision({
-      id: generateId('dec'),
+    await createDecision({
       childId: childId && childId !== 'none' ? childId : undefined,
       title: title.trim(),
       description: description.trim(),
       category,
       decidedAt: new Date().toISOString(),
-      proposedBy: currentUser.id,
       approvedBy: [],
       status: 'proposed',
       validFrom: validFrom || undefined,
       validUntil: validUntil || undefined,
       notes: notes.trim() || undefined,
-      createdAt: new Date().toISOString(),
     });
     setAddOpen(false);
     setTitle('');
