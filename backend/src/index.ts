@@ -31,9 +31,10 @@ const PORT = process.env.PORT || 3000;
 // Security middleware
 app.use(helmet());
 
-// CORS — allow multiple origins (Railway prod + local dev)
+// CORS — allow multiple origins (Railway prod + local dev + Vercel)
 const allowedOrigins = [
   process.env.FRONTEND_URL,
+  'https://co-parenting-snowy.vercel.app',
   'http://localhost:5173',
   'http://localhost:4173',
 ].filter(Boolean) as string[];
@@ -44,7 +45,9 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error(`Origin ${origin} not allowed by CORS`));
+      // Log but don't crash — just reject the request
+      console.log(`CORS blocked origin: ${origin}`);
+      callback(null, false);
     }
   },
   credentials: true,
