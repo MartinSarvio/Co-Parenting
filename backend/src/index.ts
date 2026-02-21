@@ -41,6 +41,9 @@ const allowedOrigins = [
   'https://co-parenting-snowy.vercel.app',
   'http://localhost:5173',
   'http://localhost:4173',
+  'capacitor://localhost',   // iOS Capacitor native app
+  'ionic://localhost',       // Alternative Capacitor scheme
+  'http://localhost',        // Android Capacitor
 ].filter(Boolean) as string[];
 
 app.use(cors({

@@ -7,6 +7,7 @@ import { ErrorBoundary } from '@/components/custom/ErrorBoundary';
 import { getToken } from '@/lib/api';
 import { fetchMe } from '@/lib/auth';
 import { loadInitialData } from '@/lib/dataSync';
+import { initPushNotifications } from '@/lib/pushNotifications';
 import './App.css';
 
 const OnboardingFlow = lazy(() =>
@@ -123,6 +124,9 @@ function App() {
       }
 
       setAuthenticated(true);
+
+      // Initialize push notifications (non-blocking)
+      initPushNotifications().catch(console.warn);
     } catch {
       // Token invalid/expired — clear and show login
       logout();

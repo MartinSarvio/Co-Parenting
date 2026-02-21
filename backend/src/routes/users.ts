@@ -118,3 +118,34 @@ usersRouter.patch('/:id', async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: 'Kunne ikke opdatere bruger' });
   }
 });
+
+// POST /device-token - Register push notification device token
+usersRouter.post('/device-token', async (req: AuthRequest, res: Response) => {
+  try {
+    const { token, platform } = req.body;
+
+    if (!token || !platform) {
+      res.status(400).json({ error: 'Token and platform required' });
+      return;
+    }
+
+    await prisma.deviceToken.upsert({
+      where: { token },
+      create: {
+        userId: req.userId!,
+        token,
+        platform,
+      },
+      update: {
+        userId: req.userId!,
+        platform,
+        updatedAt: new Date(),
+      },
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error registering device token:', error);
+    res.status(500).json({ error: 'Kunne ikke registrere device token' });
+  }
+});

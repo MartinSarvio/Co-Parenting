@@ -30,3 +30,8 @@ dev-dist/
 
 # Zip archives
 *.zip
+
+# iOS (Capacitor)
+ios/App/Pods/
+ios/App/App/public/
+ios/App/output/
