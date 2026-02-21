@@ -28,8 +28,12 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Security middleware
-app.use(helmet());
+// Security middleware — relaxed for cross-origin API usage
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+  crossOriginOpenerPolicy: { policy: 'unsafe-none' },
+  contentSecurityPolicy: false, // API-only server, no HTML to protect
+}));
 
 // CORS — allow multiple origins (Railway prod + local dev + Vercel)
 const allowedOrigins = [
