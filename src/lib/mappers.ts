@@ -514,6 +514,7 @@ export interface ApiDecisionLog {
   validFrom?: string | null;
   validUntil?: string | null;
   notes?: string | null;
+  documentIds?: string[] | null;
   createdAt: string;
 }
 
@@ -531,6 +532,7 @@ export function mapDecisionLog(raw: ApiDecisionLog): DecisionLog {
     validFrom: raw.validFrom ? toDateString(raw.validFrom) : undefined,
     validUntil: raw.validUntil ? toDateString(raw.validUntil) : undefined,
     notes: raw.notes ?? undefined,
+    documentIds: raw.documentIds ?? [],
     createdAt: toISOString(raw.createdAt),
   };
 }

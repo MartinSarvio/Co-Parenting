@@ -3,7 +3,7 @@ import { useAppStore } from '@/store';
 import { useApiActions } from '@/hooks/useApiActions';
 import { format } from 'date-fns';
 import { da } from 'date-fns/locale';
-import { Plus, ClipboardList, Check, X, Clock } from 'lucide-react';
+import { Plus, ClipboardList, Check, X, Clock, FileText, Paperclip, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -44,7 +44,7 @@ function statusBadge(status: DecisionStatus) {
 }
 
 export function Beslutningslog() {
-  const { currentUser, decisions, approveDecision, rejectDecision, users, children } = useAppStore();
+  const { currentUser, decisions, approveDecision, rejectDecision, users, children, documents } = useAppStore();
   const { createDecision, deleteDecision } = useApiActions();
   const [addOpen, setAddOpen] = useState(false);
   const [title, setTitle] = useState('');
@@ -54,7 +54,12 @@ export function Beslutningslog() {
   const [validFrom, setValidFrom] = useState('');
   const [validUntil, setValidUntil] = useState('');
   const [notes, setNotes] = useState('');
+  const [selectedDocIds, setSelectedDocIds] = useState<string[]>([]);
   const [filterStatus, setFilterStatus] = useState<DecisionStatus | 'all'>('all');
+
+  // Co-parent detektion
+  const otherParent = users.find(u => u.role === 'parent' && u.id !== currentUser?.id);
+  const hasCoParentOnApp = !!otherParent && otherParent.id !== '__parent2__';
 
   const filtered = decisions
     .filter(d => filterStatus === 'all' || d.status === filterStatus)
@@ -73,6 +78,7 @@ export function Beslutningslog() {
       validFrom: validFrom || undefined,
       validUntil: validUntil || undefined,
       notes: notes.trim() || undefined,
+      documentIds: selectedDocIds.length > 0 ? selectedDocIds : undefined,
     });
     setAddOpen(false);
     setTitle('');
@@ -82,6 +88,7 @@ export function Beslutningslog() {
     setValidFrom('');
     setValidUntil('');
     setNotes('');
+    setSelectedDocIds([]);
     toast.success('Beslutning tilføjet');
   }
 
@@ -178,11 +185,36 @@ export function Beslutningslog() {
                     <div className="mt-2 flex items-center gap-3 text-[11px] text-[#78766d]">
                       <span>Foreslået af {proposer?.name ?? 'ukendt'}</span>
                       <span>{format(new Date(decision.createdAt), 'd. MMM yyyy', { locale: da })}</span>
+                      {hasCoParentOnApp && decision.status === 'proposed' && (
+                        <span className="inline-flex items-center gap-1 text-[11px] text-[#4caf50]">
+                          <Send className="h-3 w-3" />
+                          Sendt til {otherParent?.name}
+                        </span>
+                      )}
+                      {!hasCoParentOnApp && decision.status === 'proposed' && (
+                        <span className="text-[11px] text-[#b0ada4] italic">
+                          Co-parent ikke tilknyttet
+                        </span>
+                      )}
                     </div>
                     {(decision.validFrom || decision.validUntil) && (
                       <div className="mt-1 text-[11px] text-[#78766d]">
                         Gyldig: {decision.validFrom ? format(new Date(decision.validFrom), 'd. MMM yyyy', { locale: da }) : '—'}
                         {decision.validUntil ? ` → ${format(new Date(decision.validUntil), 'd. MMM yyyy', { locale: da })}` : ''}
+                      </div>
+                    )}
+                    {decision.documentIds && decision.documentIds.length > 0 && (
+                      <div className="mt-1.5 flex flex-wrap gap-1">
+                        {decision.documentIds.map(docId => {
+                          const doc = documents.find(d => d.id === docId);
+                          if (!doc) return null;
+                          return (
+                            <span key={docId} className="inline-flex items-center gap-1 rounded-md bg-[#f2f1ed] px-2 py-0.5 text-[11px] text-[#5f5d56]">
+                              <Paperclip className="h-3 w-3" />
+                              {doc.title}
+                            </span>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -318,6 +350,48 @@ export function Beslutningslog() {
                 className="min-h-[50px] resize-none rounded-xl border-[#d8d7cf] bg-white text-sm"
               />
             </div>
+
+            {/* Vedhæft dokumenter */}
+            {documents.length > 0 && (
+              <div className="space-y-1">
+                <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Vedhæft dokumenter</Label>
+                <div className="flex flex-wrap gap-1.5">
+                  {documents.map(doc => {
+                    const isSelected = selectedDocIds.includes(doc.id);
+                    return (
+                      <button
+                        key={doc.id}
+                        type="button"
+                        onClick={() => setSelectedDocIds(prev =>
+                          isSelected ? prev.filter(id => id !== doc.id) : [...prev, doc.id]
+                        )}
+                        className={cn(
+                          "flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-medium transition-all",
+                          isSelected
+                            ? "bg-[#fff2e6] border border-[#f3c59d] text-[#cc6f1f]"
+                            : "bg-[#f2f1ed] border border-transparent text-[#5f5d56] hover:bg-[#eae8e2]"
+                        )}
+                      >
+                        <FileText className="h-3 w-3" />
+                        {doc.title}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Co-parent status */}
+            {hasCoParentOnApp ? (
+              <p className="flex items-center gap-1.5 text-[12px] text-[#4caf50]">
+                <Send className="h-3.5 w-3.5" />
+                Beslutningen sendes automatisk til {otherParent?.name}
+              </p>
+            ) : (
+              <p className="text-[12px] text-[#b0ada4] italic">
+                Co-parent ikke tilknyttet — beslutningen gemmes kun lokalt
+              </p>
+            )}
 
             <div className="flex gap-2 pt-1">
               <Button variant="outline" className="flex-1 rounded-2xl border-[#d8d7cf]" onClick={() => setAddOpen(false)}>

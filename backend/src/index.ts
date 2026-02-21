@@ -20,6 +20,7 @@ import { diaryRouter } from './routes/diary';
 import { milestonesRouter } from './routes/milestones';
 import { custodyPlansRouter } from './routes/custodyPlans';
 import { adminRouter } from './routes/admin';
+import { stripeRouter } from './routes/stripe';
 import { errorHandler } from './middleware/errorHandler';
 import { authenticate } from './middleware/auth';
 
@@ -69,6 +70,9 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+// Stripe webhook needs raw body — must be registered BEFORE express.json()
+app.use('/api/stripe/webhook', express.raw({ type: 'application/json' }));
+
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
 
@@ -100,6 +104,9 @@ app.use('/api/key-dates', authenticate, keyDatesRouter);
 app.use('/api/diary', authenticate, diaryRouter);
 app.use('/api/milestones', authenticate, milestonesRouter);
 app.use('/api/custody-plans', authenticate, custodyPlansRouter);
+
+// Stripe routes (webhook is public, checkout/portal/status are protected inside the router)
+app.use('/api/stripe', stripeRouter);
 
 // Admin routes (mixed: /promote uses ADMIN_SECRET, others use JWT+isAdmin)
 app.use('/api/admin', adminRouter);

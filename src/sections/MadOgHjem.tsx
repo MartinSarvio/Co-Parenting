@@ -3,6 +3,8 @@ import { addDays, format, isToday, isTomorrow, parseISO, setDay, startOfToday } 
 import { da } from 'date-fns/locale';
 import { motion } from 'framer-motion';
 import {
+  Baby,
+  Bell,
   Camera,
   CalendarDays,
   CheckCircle2,
@@ -35,7 +37,7 @@ import { cn, getMealTypeLabel } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+// Tabs replaced by underline-style tabs
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -1687,42 +1689,59 @@ export function MadOgHjem() {
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1 className="text-2xl font-semibold text-[#2f2f2d]">Mad & Hjem</h1>
-        <p className="text-[#75736b]">Madplan, indkøb og rengøring</p>
+        <h1 className="text-2xl font-semibold text-[#2f2f2d]">Mad & Indkøb</h1>
+        <p className="text-[#75736b]">Madplan, indkøbsliste og opskrifter</p>
       </motion.div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="flex h-auto w-full overflow-x-auto scrollbar-hide">
-          <TabsTrigger value="meal-plan" className="flex shrink-0 items-center gap-1.5 px-4 py-2 text-sm">
-            <UtensilsCrossed className="h-4 w-4 shrink-0" />
-            Madplan
-          </TabsTrigger>
-          <TabsTrigger value="shopping" className="flex shrink-0 items-center gap-1.5 px-4 py-2 text-sm">
-            <ShoppingCart className="h-4 w-4 shrink-0" />
-            Indkøb
-          </TabsTrigger>
-          <TabsTrigger value="cleaning" className="flex shrink-0 items-center gap-1.5 px-4 py-2 text-sm">
-            <Home className="h-4 w-4 shrink-0" />
-            Rengøring
-          </TabsTrigger>
-          <TabsTrigger value="ideas" className="flex shrink-0 items-center gap-1.5 px-4 py-2 text-sm">
-            <Lightbulb className="h-4 w-4 shrink-0" />
-            Flere ting
-          </TabsTrigger>
-        </TabsList>
+      {/* Underline-style Tabs */}
+      <div className="sticky top-0 z-10 bg-[#faf9f6] pb-0">
+        <div className="flex items-center border-b border-[#e5e3dc] overflow-x-auto scrollbar-hide">
+          {[
+            { value: 'meal-plan', label: 'Madplan' },
+            { value: 'shopping', label: 'Indkøb' },
+            { value: 'ideas', label: 'Flere ting' },
+          ].map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => setActiveTab(tab.value)}
+              className={cn(
+                'relative flex-1 py-3 text-center text-[14px] font-semibold transition-colors whitespace-nowrap',
+                activeTab === tab.value ? 'text-[#2f2f2d]' : 'text-[#b0ada4]'
+              )}
+            >
+              {tab.label}
+              {activeTab === tab.value && (
+                <motion.div
+                  layoutId="madhjem-underline"
+                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#2f2f2d] rounded-full"
+                  transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
 
-        <TabsContent value="meal-plan" className="space-y-4">
-          <div className="flex flex-wrap gap-2">
-            <Button variant="outline" onClick={() => setRecipeBrowserOpen(true)}>
-              <BookOpen className="mr-2 h-4 w-4" />
-              Opskrifter ({recipes.length})
-            </Button>
+      {activeTab === 'meal-plan' && (
+        <div className="space-y-4">
+          <div className="grid grid-cols-3 gap-2">
+            <button
+              onClick={() => setRecipeBrowserOpen(true)}
+              className="flex items-center gap-2 rounded-2xl border-2 border-[#e5e3dc] bg-white px-3 py-2.5 text-left transition-all active:scale-[0.97] hover:border-[#cccbc3]"
+            >
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#f2f1ed]">
+                <BookOpen className="h-3.5 w-3.5 text-[#7a786f]" />
+              </div>
+              <span className="text-[12px] font-semibold text-[#4a4945] leading-tight">Opskrifter</span>
+            </button>
             <Dialog open={isAddMealOpen} onOpenChange={setIsAddMealOpen}>
               <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Tilføj ret
-                </Button>
+                <button className="flex items-center gap-2 rounded-2xl border-2 border-[#f3c59d] bg-[#fff2e6] px-3 py-2.5 text-left shadow-[0_2px_12px_rgba(245,138,45,0.12)] transition-all active:scale-[0.97]">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#f58a2d]">
+                    <Plus className="h-3.5 w-3.5 text-white" />
+                  </div>
+                  <span className="text-[12px] font-bold text-[#bf6722] leading-tight">Tilføj ret</span>
+                </button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -1808,10 +1827,15 @@ export function MadOgHjem() {
               </DialogContent>
             </Dialog>
 
-            <Button variant="outline" onClick={handleGenerateShoppingFromWeek}>
-              <ShoppingCart className="mr-2 h-4 w-4" />
-              Generer indkøb fra uge
-            </Button>
+            <button
+              onClick={handleGenerateShoppingFromWeek}
+              className="flex items-center gap-2 rounded-2xl border-2 border-[#e5e3dc] bg-white px-3 py-2.5 text-left transition-all active:scale-[0.97] hover:border-[#cccbc3]"
+            >
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#f2f1ed]">
+                <ShoppingCart className="h-3.5 w-3.5 text-[#7a786f]" />
+              </div>
+              <span className="text-[12px] font-semibold text-[#4a4945] leading-tight">Generer indkøb</span>
+            </button>
           </div>
 
           <div className="grid gap-3">
@@ -2115,9 +2139,11 @@ export function MadOgHjem() {
               })()}
             </SheetContent>
           </Sheet>
-        </TabsContent>
+        </div>
+      )}
 
-        <TabsContent value="shopping" className="space-y-4">
+      {activeTab === 'shopping' && (
+        <div className="space-y-4">
           {/* Sub-tabs: Køleskab / Indkøbsliste */}
           <div className="flex rounded-xl border border-[#d8d7cf] bg-[#ecebe5] p-1">
             <button
@@ -2227,13 +2253,17 @@ export function MadOgHjem() {
           )}
 
           {shoppingSubTab === 'indkobsliste' && (<>
-          <div className="flex flex-wrap gap-2">
+
+          {/* ── Action cards ── */}
+          <div className="grid grid-cols-2 gap-2.5">
             <Dialog open={isAddShoppingOpen} onOpenChange={setIsAddShoppingOpen}>
               <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Tilføj vare
-                </Button>
+                <button className="flex items-center gap-2.5 rounded-2xl border-2 border-[#f3c59d] bg-[#fff2e6] p-3 text-left shadow-[0_2px_12px_rgba(245,138,45,0.12)] transition-all active:scale-[0.98]">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f58a2d]">
+                    <Plus className="h-4 w-4 text-white" />
+                  </div>
+                  <span className="text-[13px] font-bold text-[#bf6722]">Tilføj vare</span>
+                </button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -2329,10 +2359,12 @@ export function MadOgHjem() {
               }}
             >
               <DialogTrigger asChild>
-                <Button variant="outline" disabled={!canUseScanner} onClick={openScanDialog}>
-                  <ScanLine className="mr-2 h-4 w-4" />
-                  Scan vare
-                </Button>
+                <button disabled={!canUseScanner} onClick={openScanDialog} className="flex items-center gap-2.5 rounded-2xl border-2 border-[#e5e3dc] bg-white p-3 text-left transition-all hover:border-[#cccbc3] active:scale-[0.98] disabled:opacity-50">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f0efe8]">
+                    <ScanLine className="h-4 w-4 text-[#75736b]" />
+                  </div>
+                  <span className="text-[13px] font-bold text-[#2f2f2d]">Scan vare</span>
+                </button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
@@ -2442,78 +2474,87 @@ export function MadOgHjem() {
               </DialogContent>
             </Dialog>
 
-            <Button variant="outline" onClick={handleGenerateShoppingFromWeek}>
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Udfyld fra madplan
-            </Button>
-            <Button
-              variant="outline"
+            <button onClick={handleGenerateShoppingFromWeek} className="flex items-center gap-2.5 rounded-2xl border-2 border-[#e5e3dc] bg-white p-3 text-left transition-all hover:border-[#cccbc3] active:scale-[0.98]">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f0efe8]">
+                <RefreshCw className="h-4 w-4 text-[#75736b]" />
+              </div>
+              <span className="text-[13px] font-bold text-[#2f2f2d]">Fra madplan</span>
+            </button>
+            <button
               onClick={async () => {
                 await rehydrateSharedState();
                 toast.success('Synkroniseret');
               }}
+              className="flex items-center gap-2.5 rounded-2xl border-2 border-[#e5e3dc] bg-white p-3 text-left transition-all hover:border-[#cccbc3] active:scale-[0.98]"
             >
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Synk nu
-            </Button>
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f0efe8]">
+                <RefreshCw className="h-4 w-4 text-[#75736b]" />
+              </div>
+              <span className="text-[13px] font-bold text-[#2f2f2d]">Synk nu</span>
+            </button>
           </div>
 
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            <button
-              type="button"
-              onClick={() => setShoppingFilterDate('all')}
-              className={cn(
-                'shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium whitespace-nowrap',
-                shoppingFilterDate === 'all'
-                  ? 'border-slate-800 bg-slate-800 text-white'
-                  : 'border-slate-200 bg-white text-slate-600'
-              )}
-            >
-              Alle dage
-            </button>
-            {weekDates.map((date) => (
+          {/* ── Day filter pills ── */}
+          <div className="rounded-2xl border border-[#e5e3dc] bg-white p-3.5 space-y-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Vis efter dag</p>
+            <div className="flex gap-2 overflow-x-auto pb-0.5">
               <button
-                key={date}
                 type="button"
-                onClick={() => setShoppingFilterDate(date)}
+                onClick={() => setShoppingFilterDate('all')}
                 className={cn(
-                  'shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium whitespace-nowrap',
-                  shoppingFilterDate === date
-                    ? 'border-slate-800 bg-slate-800 text-white'
-                    : 'border-slate-200 bg-white text-slate-600'
+                  'shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-all whitespace-nowrap',
+                  shoppingFilterDate === 'all'
+                    ? 'bg-[#2f2f2f] text-white shadow-[0_2px_8px_rgba(0,0,0,0.12)]'
+                    : 'border border-[#e5e3dc] bg-[#faf9f6] text-[#75736b] hover:border-[#cccbc3]'
                 )}
               >
-                {format(parseISO(date), 'EEE d/M', { locale: da })}
+                Alle
               </button>
-            ))}
-            <button
-              type="button"
-              onClick={() => setShoppingFilterDate('unscheduled')}
-              className={cn(
-                'shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium whitespace-nowrap',
-                shoppingFilterDate === 'unscheduled'
-                  ? 'border-slate-800 bg-slate-800 text-white'
-                  : 'border-slate-200 bg-white text-slate-600'
-              )}
-            >
-              Uden dag
-            </button>
+              {weekDates.map((date) => (
+                <button
+                  key={date}
+                  type="button"
+                  onClick={() => setShoppingFilterDate(date)}
+                  className={cn(
+                    'shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-all whitespace-nowrap',
+                    shoppingFilterDate === date
+                      ? 'bg-[#f58a2d] text-white shadow-[0_2px_8px_rgba(245,138,45,0.25)]'
+                      : 'border border-[#e5e3dc] bg-[#faf9f6] text-[#75736b] hover:border-[#cccbc3]'
+                  )}
+                >
+                  {format(parseISO(date), 'EEE d/M', { locale: da })}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => setShoppingFilterDate('unscheduled')}
+                className={cn(
+                  'shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-all whitespace-nowrap',
+                  shoppingFilterDate === 'unscheduled'
+                    ? 'bg-[#2f2f2f] text-white shadow-[0_2px_8px_rgba(0,0,0,0.12)]'
+                    : 'border border-[#e5e3dc] bg-[#faf9f6] text-[#75736b] hover:border-[#cccbc3]'
+                )}
+              >
+                Uden dag
+              </button>
+            </div>
           </div>
 
+          {/* ── Count + bulk actions ── */}
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-sm font-medium text-[#5f5d56]">
-              {visiblePendingShopping.length} vare(r) i visning
+            <p className="text-sm font-semibold text-[#2f2f2d]">
+              {visiblePendingShopping.length} vare{visiblePendingShopping.length !== 1 ? 'r' : ''}
             </p>
             <div className="flex flex-wrap items-center gap-2">
               {visiblePendingShopping.length > 1 && (
-                <Button size="sm" onClick={markAllVisibleShoppingPurchased}>
-                  Afkryds alle viste
-                </Button>
+                <button onClick={markAllVisibleShoppingPurchased} className="rounded-full bg-[#2f2f2f] px-3 py-1.5 text-xs font-medium text-white transition-all hover:bg-[#1a1a1a]">
+                  Afkryds alle
+                </button>
               )}
               {purchasedShopping.length > 0 && (
-                <Button variant="outline" size="sm" onClick={resetPurchasedShoppingItems}>
+                <button onClick={resetPurchasedShoppingItems} className="rounded-full border border-[#e5e3dc] px-3 py-1.5 text-xs font-medium text-[#75736b] transition-all hover:border-[#cccbc3]">
                   Nulstil købte
-                </Button>
+                </button>
               )}
             </div>
           </div>
@@ -2633,187 +2674,11 @@ export function MadOgHjem() {
             </Card>
           ) : null}
           </>)}
-        </TabsContent>
+        </div>
+      )}
 
-        <TabsContent value="cleaning" className="space-y-4">
-          <Card className="border-[#d8d7cf] bg-[#f8f7f3]">
-            <CardContent className="flex items-center justify-between py-4">
-              <div>
-                <p className="text-sm text-[#75736b]">Status denne uge</p>
-                <p className="text-lg font-semibold text-[#2f2f2d]">
-                  {completedCleaning}/{cleaningTasks.length} opgaver fuldført
-                </p>
-              </div>
-              <Badge variant="outline" className="border-[#d8d7cf] text-[#5f5c53]">
-                <CalendarDays className="mr-1 h-3.5 w-3.5" />
-                Rengøringsplan
-              </Badge>
-            </CardContent>
-          </Card>
-
-          <div className="flex flex-wrap gap-2">
-            <Dialog open={isAddCleaningOpen} onOpenChange={setIsAddCleaningOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Ny pligt
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Tilføj huslig pligt</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4 pt-2">
-                  <div className="space-y-2">
-                    <Label>Opgave</Label>
-                    <Input
-                      value={newCleaning.title}
-                      onChange={(e) => setNewCleaning((prev) => ({ ...prev, title: e.target.value }))}
-                      placeholder="Fx vask gulv i køkken"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Område</Label>
-                    <Input
-                      value={newCleaning.area}
-                      onChange={(e) => setNewCleaning((prev) => ({ ...prev, area: e.target.value }))}
-                      placeholder="Fx køkken"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <Label>Ansvarlig</Label>
-                      <Select
-                        value={newCleaning.assignedTo}
-                        onValueChange={(value) => setNewCleaning((prev) => ({ ...prev, assignedTo: value }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Vælg person" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {users.map((user) => (
-                            <SelectItem key={user.id} value={user.id}>
-                              {user.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Dag</Label>
-                      <Select
-                        value={newCleaning.weekday}
-                        onValueChange={(value) => setNewCleaning((prev) => ({ ...prev, weekday: value }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {weekdays.map((day, index) => (
-                            <SelectItem key={day} value={String(index)}>
-                              {day}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Hyppighed</Label>
-                    <Select
-                      value={newCleaning.recurringPattern}
-                      onValueChange={(value) => setNewCleaning((prev) => ({ ...prev, recurringPattern: value }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="weekly">Hver uge</SelectItem>
-                        <SelectItem value="biweekly">Hver 2. uge</SelectItem>
-                        <SelectItem value="monthly">Månedlig</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Button className="w-full" onClick={handleAddCleaningTask}>
-                    Tilføj pligt
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-
-            {cleaningTemplates.map((template) => (
-              <Button
-                key={template.title}
-                variant="outline"
-                size="sm"
-                onClick={() => addTemplateCleaningTask(template)}
-              >
-                <Plus className="mr-1 h-3.5 w-3.5" />
-                {template.title}
-              </Button>
-            ))}
-          </div>
-
-          {cleaningByWeekday.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-[#d8d7cf] bg-[#faf9f6] py-8 text-center text-sm text-[#78766d]">
-              Ingen rengøringsplan endnu. Tilføj første huslige pligt.
-            </div>
-          ) : (
-            <div className="space-y-5">
-              {cleaningByWeekday.map(([weekdayIndex, dayTasks]) => (
-                <div key={weekdayIndex}>
-                  {/* Weekday header directly in background */}
-                  <p className="mb-2 text-[13px] font-bold uppercase tracking-[0.06em] text-[#78766d]">
-                    {weekdays[Number(weekdayIndex)]}
-                  </p>
-                  <div className="space-y-2">
-                    {dayTasks.map((task) => (
-                      <div key={task.id} className="flex items-center gap-3 rounded-2xl border border-[#e8e7e0] bg-white px-3 py-3">
-                        <Checkbox
-                          checked={task.completed}
-                          onCheckedChange={(checked) => {
-                            void updateTask(task.id, {
-                              completed: checked as boolean,
-                              completedAt: checked ? new Date().toISOString() : undefined
-                            });
-                          }}
-                          className="h-5 w-5 shrink-0 rounded-md"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className={cn(
-                            'text-[14px] font-medium text-[#2f2f2d]',
-                            task.completed && 'line-through text-[#9b9a93]'
-                          )}>
-                            {task.title}
-                          </p>
-                          <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                            {task.area && (
-                              <span className="text-[11px] text-[#78766d]">{task.area}</span>
-                            )}
-                            {task.area && <span className="text-[11px] text-[#d0cec5]">·</span>}
-                            <span className="text-[11px] text-[#78766d]">{getRecurringLabel(task.recurringPattern)}</span>
-                            <span className="text-[11px] text-[#d0cec5]">·</span>
-                            <span className="text-[11px] text-[#78766d]">
-                              {users.find((user) => user.id === task.assignedTo)?.name || 'Ukendt'}
-                            </span>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => void deleteTask(task.id)}
-                          className="shrink-0 p-1.5 text-[#c5c4be] hover:text-[#ef4444] transition-colors"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="ideas" className="space-y-4">
+      {activeTab === 'ideas' && (
+        <div className="space-y-4">
           <Card className="border-[#f3c59d] bg-[#fff2e6]">
             <CardContent className="py-4">
               <h3 className="font-semibold text-[#2f2f2d]">Flere ting jeg anbefaler at tilføje</h3>
@@ -2823,151 +2688,166 @@ export function MadOgHjem() {
             </CardContent>
           </Card>
 
-          <div className="space-y-3">
-            <Card className="border-[#d8d7cf] bg-[#f8f7f3]">
-              <CardContent className="py-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-medium text-slate-900">Opsæt påmindelser</p>
-                    <p className="text-sm text-slate-600">
-                      Opretter faste notifikationer og rutiner til madplan, indkøb og rengøring.
-                    </p>
-                  </div>
-                  <Button size="sm" onClick={setupHomeReminders}>
-                    Aktiver
-                  </Button>
+          <div className="space-y-4">
+            {/* ─── Opsæt påmindelser ─── */}
+            <div className="rounded-2xl border-2 border-[#e5e3dc] bg-white p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fff2e6]">
+                  <Bell className="h-[18px] w-[18px] text-[#f58a2d]" />
                 </div>
-              </CardContent>
-            </Card>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[14px] font-semibold text-[#2f2f2d]">Opsæt påmindelser</p>
+                  <p className="text-[11px] text-[#9a978f]">Faste notifikationer til madplan, indkøb og rengøring.</p>
+                </div>
+                <button
+                  onClick={setupHomeReminders}
+                  className="shrink-0 rounded-xl bg-[#f58a2d] px-4 py-2 text-[12px] font-bold text-white transition-all active:scale-[0.96]"
+                >
+                  Aktiver
+                </button>
+              </div>
+            </div>
 
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">Uge-skabeloner</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 pt-0">
+            {/* ─── Uge-skabeloner ─── */}
+            <div className="rounded-2xl border-2 border-[#e5e3dc] bg-white overflow-hidden">
+              <div className="px-4 pt-4 pb-2">
+                <p className="text-[15px] font-bold text-[#2f2f2d]">Uge-skabeloner</p>
+              </div>
+              <div className="divide-y divide-[#eeedea]">
                 {weekTemplates.map((template) => (
-                  <div key={template.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-3">
-                    <div>
-                      <p className="font-medium text-slate-900">{template.name}</p>
-                      <p className="text-sm text-slate-500">{template.description}</p>
+                  <div key={template.id} className="flex items-center gap-3.5 px-4 py-3.5">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f2f1ed]">
+                      <CalendarDays className="h-[18px] w-[18px] text-[#7a786f]" />
                     </div>
-                    <Button size="sm" variant="outline" onClick={() => applyWeekTemplate(template.id)}>
-                      Brug skabelon
-                    </Button>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[14px] font-semibold text-[#2f2f2d]">{template.name}</p>
+                      <p className="text-[11px] text-[#9a978f] truncate">{template.description}</p>
+                    </div>
+                    <button
+                      onClick={() => applyWeekTemplate(template.id)}
+                      className="shrink-0 rounded-xl border-2 border-[#e5e3dc] bg-white px-3.5 py-1.5 text-[12px] font-semibold text-[#4a4945] transition-all active:scale-[0.96] hover:border-[#cccbc3]"
+                    >
+                      Brug
+                    </button>
                   </div>
                 ))}
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card className="border-[#d8d7cf]">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">Auto-planlæg uge (regelbaseret)</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 pt-0">
-                <div className="space-y-2">
-                  <Label>Favoritter (kommasepareret)</Label>
+            {/* ─── Auto-planlæg uge (regelbaseret) ─── */}
+            <div className="rounded-2xl border-2 border-[#e5e3dc] bg-white overflow-hidden">
+              <div className="px-4 pt-4 pb-1">
+                <p className="text-[15px] font-bold text-[#2f2f2d]">Auto-planlæg uge</p>
+                <p className="text-[11px] text-[#9a978f] mt-0.5">Regelbaseret madplan-generator</p>
+              </div>
+              <div className="px-4 py-3 space-y-3">
+                <div className="space-y-1.5">
+                  <p className="text-[12px] font-semibold text-[#78766d]">Favoritter (kommasepareret)</p>
                   <Input
                     value={autoPlannerSettings.favoriteKeywords}
                     onChange={(e) => setAutoPlannerSettings((prev) => ({ ...prev, favoriteKeywords: e.target.value }))}
                     placeholder="fx pasta, frikadeller, kylling"
+                    className="rounded-xl border-[#e5e3dc] bg-[#faf9f6] text-[13px] placeholder:text-[#c5c4be]"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Undgå ingredienser (kommasepareret)</Label>
+                <div className="space-y-1.5">
+                  <p className="text-[12px] font-semibold text-[#78766d]">Undgå ingredienser (kommasepareret)</p>
                   <Input
                     value={autoPlannerSettings.avoidIngredients}
                     onChange={(e) => setAutoPlannerSettings((prev) => ({ ...prev, avoidIngredients: e.target.value }))}
                     placeholder="fx nødder, svampe"
+                    className="rounded-xl border-[#e5e3dc] bg-[#faf9f6] text-[13px] placeholder:text-[#c5c4be]"
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm text-slate-700">
+                <div className="space-y-2.5 pt-1">
+                  <label className="flex items-center gap-3 text-[13px] text-[#4a4945]">
                     <Checkbox
                       checked={autoPlannerSettings.childFriendly}
                       onCheckedChange={(checked) => setAutoPlannerSettings((prev) => ({ ...prev, childFriendly: checked as boolean }))}
+                      className="h-5 w-5 rounded-lg border-[#d8d7cf] data-[state=checked]:bg-[#2f2f2d] data-[state=checked]:border-[#2f2f2d]"
                     />
                     Prioritér børnevenlige retter
                   </label>
-                  <label className="flex items-center gap-2 text-sm text-slate-700">
+                  <label className="flex items-center gap-3 text-[13px] text-[#4a4945]">
                     <Checkbox
                       checked={autoPlannerSettings.replaceExisting}
                       onCheckedChange={(checked) => setAutoPlannerSettings((prev) => ({ ...prev, replaceExisting: checked as boolean }))}
+                      className="h-5 w-5 rounded-lg border-[#d8d7cf] data-[state=checked]:bg-[#2f2f2d] data-[state=checked]:border-[#2f2f2d]"
                     />
                     Erstat eksisterende middage i denne uge
                   </label>
-                  <label className="flex items-center gap-2 text-sm text-slate-700">
+                  <label className="flex items-center gap-3 text-[13px] text-[#4a4945]">
                     <Checkbox
                       checked={autoPlannerSettings.useChildAllergies}
                       onCheckedChange={(checked) => setAutoPlannerSettings((prev) => ({ ...prev, useChildAllergies: checked as boolean }))}
+                      className="h-5 w-5 rounded-lg border-[#d8d7cf] data-[state=checked]:bg-[#2f2f2d] data-[state=checked]:border-[#2f2f2d]"
                     />
                     Tag hensyn til barnets allergier
                   </label>
                   {autoPlannerSettings.useChildAllergies && (
-                    <p className="text-xs text-slate-500">
+                    <p className="text-[11px] text-[#b98b5a] pl-8">
                       Aktive allergier: {currentChild?.allergies?.length ? currentChild.allergies.join(', ') : 'Ingen registreret'}
                     </p>
                   )}
                 </div>
 
-                <Button className="w-full" onClick={generateAutoWeekPlan}>
-                  <RefreshCw className="mr-2 h-4 w-4" />
+                <button
+                  onClick={generateAutoWeekPlan}
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#f58a2d] px-4 py-3 text-[14px] font-bold text-white shadow-[0_2px_12px_rgba(245,138,45,0.25)] transition-all active:scale-[0.98]"
+                >
+                  <RefreshCw className="h-4 w-4" />
                   Generer ugeplan automatisk
-                </Button>
-                <p className="text-xs text-slate-500">
+                </button>
+                <p className="text-[11px] text-[#9a978f] text-center">
                   Planneren vælger 7 middage ud fra dine regler og opretter dem i madplanen.
                 </p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
-            <Card className="bg-slate-50/70">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">Ekstra hurtigtilvalg</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2 pt-0">
-                <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-3 py-3">
-                  <div>
-                    <p className="font-medium text-slate-900">Ugentlig familie check-in</p>
-                    <p className="text-sm text-slate-500">Automatisk møde i kalenderen hver søndag aften.</p>
-                  </div>
-                  <Button size="sm" onClick={() => applyIdea('weekly-check-in')}>Tilføj</Button>
-                </div>
-
-                <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-3 py-3">
-                  <div>
-                    <p className="font-medium text-slate-900">Fast madplan-rutine</p>
-                    <p className="text-sm text-slate-500">Gentagende opgave, så I husker næste uges måltider.</p>
-                  </div>
-                  <Button size="sm" onClick={() => applyIdea('meal-routine')}>Tilføj</Button>
-                </div>
-
-                <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-3 py-3">
-                  <div>
-                    <p className="font-medium text-slate-900">Basis-indkøbsliste</p>
-                    <p className="text-sm text-slate-500">Fyld listen med faste basisvarer med ét klik.</p>
-                  </div>
-                  <Button size="sm" onClick={() => applyIdea('starter-shopping')}>Tilføj</Button>
-                </div>
-
-                <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-3 py-3">
-                  <div>
-                    <p className="font-medium text-slate-900">Månedlig dybderengøring</p>
-                    <p className="text-sm text-slate-500">Fast plan for de tungere huslige opgaver.</p>
-                  </div>
-                  <Button size="sm" onClick={() => applyIdea('monthly-deep-clean')}>Tilføj</Button>
-                </div>
-              </CardContent>
-            </Card>
+            {/* ─── Ekstra hurtigtilvalg ─── */}
+            <div className="rounded-2xl border-2 border-[#e5e3dc] bg-white overflow-hidden">
+              <div className="px-4 pt-4 pb-2">
+                <p className="text-[15px] font-bold text-[#2f2f2d]">Ekstra hurtigtilvalg</p>
+              </div>
+              <div className="divide-y divide-[#eeedea]">
+                {[
+                  { id: 'weekly-check-in', title: 'Ugentlig familie check-in', desc: 'Automatisk møde i kalenderen hver søndag aften.', icon: CalendarDays },
+                  { id: 'meal-routine', title: 'Fast madplan-rutine', desc: 'Gentagende opgave, så I husker næste uges måltider.', icon: Repeat2 },
+                  { id: 'starter-shopping', title: 'Basis-indkøbsliste', desc: 'Fyld listen med faste basisvarer med ét klik.', icon: ShoppingCart },
+                  { id: 'monthly-deep-clean', title: 'Månedlig dybderengøring', desc: 'Fast plan for de tungere huslige opgaver.', icon: Home },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={item.id} className="flex items-center gap-3.5 px-4 py-3.5">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f2f1ed]">
+                        <Icon className="h-[18px] w-[18px] text-[#7a786f]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[14px] font-semibold text-[#2f2f2d]">{item.title}</p>
+                        <p className="text-[11px] text-[#9a978f] leading-snug">{item.desc}</p>
+                      </div>
+                      <button
+                        onClick={() => applyIdea(item.id)}
+                        className="shrink-0 rounded-xl bg-[#f58a2d] px-3.5 py-1.5 text-[12px] font-bold text-white transition-all active:scale-[0.96]"
+                      >
+                        Tilføj
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
 
       {/* Recipe Browser Sheet */}
       <Sheet open={recipeBrowserOpen} onOpenChange={setRecipeBrowserOpen}>
         <SheetContent side="bottom" className="h-[85vh] rounded-t-3xl bg-[#faf9f6]">
           <SheetHeader>
-            <SheetTitle className="text-[1rem] text-[#2f2f2d]">Opskrifter ({filteredRecipes.length})</SheetTitle>
+            <SheetTitle className="text-[1rem] text-[#2f2f2d]">Opskrifter</SheetTitle>
           </SheetHeader>
           <div className="space-y-3 pb-2">
             <div className="flex gap-2">
@@ -3021,7 +2901,9 @@ export function MadOgHjem() {
                   <div className="flex items-center gap-2">
                     <p className="text-[13px] font-semibold text-[#2f2f2d]">{recipe.name}</p>
                     {recipe.childFriendly && (
-                      <span className="rounded-md bg-[#fff2e6] px-1.5 py-0.5 text-[10px] font-semibold text-[#cc6f1f]">👶</span>
+                      <span className="inline-flex items-center gap-0.5 rounded-md bg-[#fff2e6] px-1.5 py-0.5 text-[10px] font-semibold text-[#cc6f1f]">
+                        <Baby className="h-3 w-3" /> Børnevenlig
+                      </span>
                     )}
                     {recipe.isUserRecipe && (
                       <span className="rounded-md bg-[#e8f4fd] px-1.5 py-0.5 text-[10px] font-semibold text-[#4a90d9]">Din</span>
@@ -3032,7 +2914,10 @@ export function MadOgHjem() {
                   </div>
                   <p className="mt-0.5 text-[11px] text-[#78766d] line-clamp-1">{recipe.description}</p>
                   <div className="mt-1 flex items-center gap-2 text-[10px] text-[#78766d]">
-                    <span>{recipe.difficulty === 'easy' ? '🟢 Nem' : recipe.difficulty === 'medium' ? '🟡 Medium' : '🔴 Svær'}</span>
+                    <span className="flex items-center gap-1">
+                      <span className={cn("h-2 w-2 rounded-full", recipe.difficulty === 'easy' ? "bg-[#4caf50]" : recipe.difficulty === 'medium' ? "bg-[#f5a623]" : "bg-[#e53935]")} />
+                      {recipe.difficulty === 'easy' ? 'Nem' : recipe.difficulty === 'medium' ? 'Medium' : 'Svær'}
+                    </span>
                     <span>·</span>
                     <span>{recipe.prepTime + recipe.cookTime} min</span>
                     <span>·</span>

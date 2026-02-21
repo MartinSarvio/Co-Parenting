@@ -38,6 +38,7 @@ model User {
   diaryEntries      DiaryEntry[]
   decisions         DecisionLog[]     @relation("DecisionProposer")
   deviceTokens      DeviceToken[]
+  stripeSubscription StripeSubscription?
 }
 
 // ─── Device Tokens (Push Notifications) ──────────────────
@@ -390,6 +391,25 @@ model MeetingMinutes {
   isOfficial  Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+// ─── Stripe Subscriptions ────────────────────────────────
+
+model StripeSubscription {
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  stripePriceId        String?
+  plan                 String    @default("free") // free | family_plus | single_parent_plus
+  status               String    @default("inactive") // active | inactive | trialing | past_due | canceled
+  billingInterval      String    @default("monthly") // monthly | annual
+  currentPeriodEnd     DateTime?
+  cancelAtPeriodEnd    Boolean   @default(false)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // ─── Key Dates ────────────────────────────────────────────

@@ -41,6 +41,11 @@ import {
   Lock,
   Share2,
   Users,
+  Menu,
+  ListFilter,
+  BookOpen,
+  FileText,
+  ShoppingBag,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, isSameDay, parseISO, addMonths, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from 'date-fns';
@@ -285,6 +290,16 @@ export function Kalender() {
   const [colorEditCategory, setColorEditCategory] = useState<string | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [allUpcomingOpen, setAllUpcomingOpen] = useState(false);
+  const [calendarTab, setCalendarTab] = useState<'filter' | 'colors' | 'sync'>('filter');
+  const [calSidePanelOpen, setCalSidePanelOpen] = useState(false);
+  const [shareCalendarOpen, setShareCalendarOpen] = useState(false);
+  const [templateFormOpen, setTemplateFormOpen] = useState(false);
+  const [newSideTemplate, setNewSideTemplate] = useState({ title: '', type: 'school' as EventType, duration: 60, location: '', notes: '' });
+  const [connectDiaryOpen, setConnectDiaryOpen] = useState(false);
+  const [connectMealsOpen, setConnectMealsOpen] = useState(false);
+  const [diaryCalendarId, setDiaryCalendarId] = useState<string>('main');
+  const [mealsCalendarId, setMealsCalendarId] = useState<string>('main');
+  const [calFilterMode, setCalFilterMode] = useState<'all' | 'mine' | string>('all');
   const [eventDetailOpen, setEventDetailOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [templateUseOpen, setTemplateUseOpen] = useState(false);
@@ -619,328 +634,676 @@ export function Kalender() {
 
   return (
     <div className="space-y-4 p-1">
+      {/* ─── Side panel (slides from left) ─── */}
+      <AnimatePresence>
+        {calSidePanelOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-[60] bg-black/30"
+              onClick={() => setCalSidePanelOpen(false)}
+            />
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+              className="fixed inset-y-0 left-0 z-[70] w-[280px] bg-white shadow-[4px_0_24px_rgba(0,0,0,0.1)] flex flex-col"
+              style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+            >
+              <div className="flex items-center justify-between px-5 py-4 border-b border-[#eeedea]">
+                <h2 className="text-[17px] font-bold text-[#2f2f2d]">Kalender</h2>
+                <button
+                  onClick={() => setCalSidePanelOpen(false)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56]"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto py-2">
+                {/* Del Kalender */}
+                <div className="px-5 py-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#9a978f] mb-2">Deling</p>
+                </div>
+                <button
+                  onClick={() => { setShareCalendarOpen(true); setCalSidePanelOpen(false); }}
+                  className="flex w-full items-center gap-3.5 px-5 py-3 text-left hover:bg-[#faf9f6] transition-colors"
+                >
+                  <div className={cn('flex h-9 w-9 items-center justify-center rounded-xl', isSharingAccepted || isTogether ? 'bg-[#fff2e6]' : 'bg-[#f2f1ed]')}>
+                    <Share2 className={cn('h-[18px] w-[18px]', isSharingAccepted || isTogether ? 'text-[#f58a2d]' : 'text-[#7a786f]')} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[14px] font-semibold text-[#4a4945]">Del kalender</p>
+                    <p className="text-[11px] text-[#9a978f]">
+                      {isSharingAccepted || isTogether ? 'Kalender deles' : isSharingPending ? 'Afventer accept' : 'Del med co-parent'}
+                    </p>
+                  </div>
+                  {isSharingPending && <div className="h-2 w-2 rounded-full bg-[#f58a2d] shrink-0" />}
+                  {(isSharingAccepted || isTogether) && <div className="h-2 w-2 rounded-full bg-[#4caf50] shrink-0" />}
+                </button>
+
+                <div className="my-2 mx-5 border-t border-[#eeedea]" />
+
+                {/* Relaterede sider */}
+                <div className="px-5 py-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#9a978f] mb-2">Relateret</p>
+                </div>
+                {[
+                  { label: 'Aftale-skabeloner', desc: 'Opret genbrugelige aftaletyper', icon: LayoutTemplate, action: () => { setTemplateFormOpen(true); setCalSidePanelOpen(false); } },
+                  { label: 'Samværsplan', desc: 'Afleveringsplan & regler', icon: BookOpen, action: () => setCalSidePanelOpen(false) },
+                  { label: 'Dagbog', desc: 'Forbind til kalender', icon: FileText, action: () => { setConnectDiaryOpen(true); setCalSidePanelOpen(false); } },
+                  { label: 'Indkøb & måltider', desc: 'Forbind til kalender', icon: ShoppingBag, action: () => { setConnectMealsOpen(true); setCalSidePanelOpen(false); } },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={item.label}
+                      onClick={item.action}
+                      className="flex w-full items-center gap-3.5 px-5 py-3 text-left hover:bg-[#faf9f6] transition-colors"
+                    >
+                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f2f1ed]">
+                        <Icon className="h-[18px] w-[18px] text-[#7a786f]" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[14px] font-semibold text-[#4a4945]">{item.label}</p>
+                        <p className="text-[11px] text-[#9a978f] truncate">{item.desc}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+
+                <div className="my-2 mx-5 border-t border-[#eeedea]" />
+
+                {/* Person filter / calendar view mode — compact dropdown */}
+                <div className="px-5 py-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#9a978f] mb-2">Vis aftaler fra</p>
+                  <Select
+                    value={personFilter || 'all'}
+                    onValueChange={(v: string) => {
+                      setPersonFilter(v === 'all' ? null : v);
+                      setCalFilterMode(v);
+                      setCalSidePanelOpen(false);
+                    }}
+                  >
+                    <SelectTrigger className="h-9 rounded-xl border-[#e5e3dc] bg-white text-[13px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">
+                        <span className="flex items-center gap-2">
+                          <span className="h-2.5 w-2.5 rounded-full bg-[#8b8677] shrink-0" />
+                          Alle kalendere
+                        </span>
+                      </SelectItem>
+                      <SelectItem value={currentUser?.id || 'me'}>
+                        <span className="flex items-center gap-2">
+                          <span className="h-2.5 w-2.5 rounded-full bg-[#2f2f2f] shrink-0" />
+                          {currentUser?.name || 'Mig'} (min)
+                        </span>
+                      </SelectItem>
+                      {warmParent && canSeePartnerEvents && (
+                        <SelectItem value={warmParent.id}>
+                          <span className="flex items-center gap-2">
+                            <span className="h-2.5 w-2.5 rounded-full bg-[#f58a2d] shrink-0" />
+                            {warmParent.name}
+                          </span>
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* ─── Del Kalender popup ─── */}
+      <Dialog open={shareCalendarOpen} onOpenChange={setShareCalendarOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Del kalender</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <p className="text-[13px] text-[#75736b]">
+              Del din kalender med din co-parent, så I begge kan se hinandens aftaler og begivenheder.
+            </p>
+
+            {isSharingAccepted || isTogether ? (
+              <div className="rounded-2xl border-2 border-[#c8e6c9] bg-[#e8f5e9] p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#4caf50]">
+                    <Share2 className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-[14px] font-semibold text-[#2e7d32]">Kalender deles aktivt</p>
+                    <p className="text-[11px] text-[#558b2f]">
+                      {warmParent?.name || 'Forælder 2'} kan se dine aftaler
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="rounded-2xl border-2 border-[#e5e3dc] bg-white p-4">
+                  <div className="flex items-center gap-3.5">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f2f1ed]">
+                      <Users className="h-5 w-5 text-[#7a786f]" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-[14px] font-semibold text-[#2f2f2d]">Co-parent kalender</p>
+                      <p className="text-[11px] text-[#9a978f]">
+                        {warmParent?.name || 'Forælder 2'}{warmParent?.email ? ` · ${warmParent.email}` : ''}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                {isSharingPending ? (
+                  <div className="rounded-xl bg-[#fff6ef] p-3 text-center">
+                    <p className="text-[13px] text-[#b96424] font-medium">Afventer accept fra partner</p>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      if (currentUser) {
+                        requestCalendarSharing(currentUser.id);
+                        toast.success('Anmodning om kalenderdeling sendt');
+                        setShareCalendarOpen(false);
+                      }
+                    }}
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#f58a2d] px-4 py-3 text-[14px] font-bold text-white shadow-[0_2px_12px_rgba(245,138,45,0.25)] transition-all active:scale-[0.98]"
+                  >
+                    <Share2 className="h-4 w-4" />
+                    Send delingsanmodning
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ─── Aftale-skabeloner popup ─── */}
+      <Dialog open={templateFormOpen} onOpenChange={setTemplateFormOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Ny aftale-skabelon</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <p className="text-[13px] text-[#75736b]">
+              Opret en genbrugelig skabelon til hurtige aftaler.
+            </p>
+            <div className="space-y-1.5">
+              <Label className="text-[12px] font-semibold text-[#78766d]">Titel</Label>
+              <Input
+                value={newSideTemplate.title}
+                onChange={(e) => setNewSideTemplate(prev => ({ ...prev, title: e.target.value }))}
+                placeholder="Fx Lægebesøg, SFO-hentning"
+                className="rounded-xl border-[#e5e3dc] bg-[#faf9f6] text-[13px]"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[12px] font-semibold text-[#78766d]">Type</Label>
+              <Select
+                value={newSideTemplate.type}
+                onValueChange={(v) => setNewSideTemplate(prev => ({ ...prev, type: v as EventType }))}
+              >
+                <SelectTrigger className="rounded-xl border-[#e5e3dc]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="school">Skole</SelectItem>
+                  <SelectItem value="medical">Læge</SelectItem>
+                  <SelectItem value="activity">Aktivitet</SelectItem>
+                  <SelectItem value="handover">Aflevering</SelectItem>
+                  <SelectItem value="birthday">Fødselsdag</SelectItem>
+                  <SelectItem value="other">Andet</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-[12px] font-semibold text-[#78766d]">Varighed (min.)</Label>
+                <Input
+                  type="number"
+                  value={newSideTemplate.duration}
+                  onChange={(e) => setNewSideTemplate(prev => ({ ...prev, duration: Number(e.target.value) }))}
+                  className="rounded-xl border-[#e5e3dc] bg-[#faf9f6] text-[13px]"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[12px] font-semibold text-[#78766d]">Sted</Label>
+                <Input
+                  value={newSideTemplate.location}
+                  onChange={(e) => setNewSideTemplate(prev => ({ ...prev, location: e.target.value }))}
+                  placeholder="Valgfrit"
+                  className="rounded-xl border-[#e5e3dc] bg-[#faf9f6] text-[13px]"
+                />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[12px] font-semibold text-[#78766d]">Noter</Label>
+              <Input
+                value={newSideTemplate.notes}
+                onChange={(e) => setNewSideTemplate(prev => ({ ...prev, notes: e.target.value }))}
+                placeholder="Valgfri bemærkninger"
+                className="rounded-xl border-[#e5e3dc] bg-[#faf9f6] text-[13px]"
+              />
+            </div>
+            <button
+              onClick={() => {
+                if (!newSideTemplate.title.trim()) { toast.error('Tilføj en titel'); return; }
+                toast.success(`Skabelon "${newSideTemplate.title}" oprettet`);
+                setNewSideTemplate({ title: '', type: 'school', duration: 60, location: '', notes: '' });
+                setTemplateFormOpen(false);
+              }}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#f58a2d] px-4 py-3 text-[14px] font-bold text-white shadow-[0_2px_12px_rgba(245,138,45,0.25)] transition-all active:scale-[0.98]"
+            >
+              Gem skabelon
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ─── Dagbog → Forbind til kalender popup ─── */}
+      <Dialog open={connectDiaryOpen} onOpenChange={setConnectDiaryOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Forbind dagbog til kalender</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <p className="text-[13px] text-[#75736b]">
+              Vælg hvilken kalender dagbogsnotater skal vises i.
+            </p>
+            <div className="space-y-2">
+              {[
+                { id: 'main', label: 'Hovedkalender', desc: 'Din primære kalender' },
+                { id: 'shared', label: 'Delt kalender', desc: 'Synlig for begge forældre' },
+                { id: 'none', label: 'Ingen', desc: 'Dagbog vises ikke i kalender' },
+              ].map((cal) => (
+                <button
+                  key={cal.id}
+                  onClick={() => setDiaryCalendarId(cal.id)}
+                  className={cn(
+                    'flex w-full items-center gap-3.5 rounded-2xl border-2 px-4 py-3 text-left transition-all',
+                    diaryCalendarId === cal.id
+                      ? 'border-[#f3c59d] bg-[#fff2e6]'
+                      : 'border-[#e5e3dc] bg-white hover:border-[#cccbc3]'
+                  )}
+                >
+                  <div className={cn(
+                    'flex h-9 w-9 items-center justify-center rounded-xl',
+                    diaryCalendarId === cal.id ? 'bg-[#f58a2d]' : 'bg-[#f2f1ed]'
+                  )}>
+                    <FileText className={cn('h-[18px] w-[18px]', diaryCalendarId === cal.id ? 'text-white' : 'text-[#7a786f]')} />
+                  </div>
+                  <div className="flex-1">
+                    <p className={cn('text-[14px] font-semibold', diaryCalendarId === cal.id ? 'text-[#bf6722]' : 'text-[#2f2f2d]')}>{cal.label}</p>
+                    <p className="text-[11px] text-[#9a978f]">{cal.desc}</p>
+                  </div>
+                  {diaryCalendarId === cal.id && <div className="h-2 w-2 rounded-full bg-[#f58a2d] shrink-0" />}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => {
+                toast.success(`Dagbog forbundet til ${diaryCalendarId === 'main' ? 'hovedkalender' : diaryCalendarId === 'shared' ? 'delt kalender' : 'ingen kalender'}`);
+                setConnectDiaryOpen(false);
+              }}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#f58a2d] px-4 py-3 text-[14px] font-bold text-white shadow-[0_2px_12px_rgba(245,138,45,0.25)] transition-all active:scale-[0.98]"
+            >
+              Gem forbindelse
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ─── Indkøb & Måltider → Forbind til kalender popup ─── */}
+      <Dialog open={connectMealsOpen} onOpenChange={setConnectMealsOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Forbind måltider til kalender</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <p className="text-[13px] text-[#75736b]">
+              Vælg hvilken kalender madplan og indkøb skal synkroniseres med.
+            </p>
+            <div className="space-y-2">
+              {[
+                { id: 'main', label: 'Hovedkalender', desc: 'Måltider vises i din kalender' },
+                { id: 'shared', label: 'Delt kalender', desc: 'Synlig for begge forældre' },
+                { id: 'none', label: 'Ingen', desc: 'Måltider vises ikke i kalender' },
+              ].map((cal) => (
+                <button
+                  key={cal.id}
+                  onClick={() => setMealsCalendarId(cal.id)}
+                  className={cn(
+                    'flex w-full items-center gap-3.5 rounded-2xl border-2 px-4 py-3 text-left transition-all',
+                    mealsCalendarId === cal.id
+                      ? 'border-[#f3c59d] bg-[#fff2e6]'
+                      : 'border-[#e5e3dc] bg-white hover:border-[#cccbc3]'
+                  )}
+                >
+                  <div className={cn(
+                    'flex h-9 w-9 items-center justify-center rounded-xl',
+                    mealsCalendarId === cal.id ? 'bg-[#f58a2d]' : 'bg-[#f2f1ed]'
+                  )}>
+                    <ShoppingBag className={cn('h-[18px] w-[18px]', mealsCalendarId === cal.id ? 'text-white' : 'text-[#7a786f]')} />
+                  </div>
+                  <div className="flex-1">
+                    <p className={cn('text-[14px] font-semibold', mealsCalendarId === cal.id ? 'text-[#bf6722]' : 'text-[#2f2f2d]')}>{cal.label}</p>
+                    <p className="text-[11px] text-[#9a978f]">{cal.desc}</p>
+                  </div>
+                  {mealsCalendarId === cal.id && <div className="h-2 w-2 rounded-full bg-[#f58a2d] shrink-0" />}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => {
+                toast.success(`Måltider forbundet til ${mealsCalendarId === 'main' ? 'hovedkalender' : mealsCalendarId === 'shared' ? 'delt kalender' : 'ingen kalender'}`);
+                setConnectMealsOpen(false);
+              }}
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#f58a2d] px-4 py-3 text-[14px] font-bold text-white shadow-[0_2px_12px_rgba(245,138,45,0.25)] transition-all active:scale-[0.98]"
+            >
+              Gem forbindelse
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+        className="flex items-center justify-between"
       >
         <div>
           <h1 className="text-[1.3rem] font-semibold leading-tight text-[#2f2f2d]">Fælles kalender</h1>
           <p className="text-xs text-[#75736b]">Koordiner aktiviteter og aftaler</p>
         </div>
-        <div className="flex w-full items-center gap-2 sm:w-auto">
-          <Dialog open={isSourceDialogOpen} onOpenChange={setIsSourceDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="h-10 flex-1 sm:flex-none">
-                <CloudDownload className="w-4 h-4 mr-2" />
-                Synk kalender
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
-              <DialogHeader>
-                <DialogTitle>Eksterne kalenderkilder</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 pt-4">
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label>Navn</Label>
-                    <Input
-                      value={newCalendarSource.name}
-                      onChange={(e) => setNewCalendarSource((prev) => ({ ...prev, name: e.target.value }))}
-                      placeholder="Fx Arbejdskalender"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Type</Label>
-                    <Select
-                      value={newCalendarSource.type}
-                      onValueChange={(value: CalendarSourceType) => setNewCalendarSource((prev) => ({ ...prev, type: value }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="work">Arbejde</SelectItem>
-                        <SelectItem value="personal">Privat</SelectItem>
-                        <SelectItem value="school">Skole</SelectItem>
-                        <SelectItem value="other">Andet</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+          <DialogTrigger asChild>
+            <Button className="h-10 bg-[#f58a2d] text-white hover:bg-[#e47921]">
+              <Plus className="w-4 h-4 mr-2" />
+              Ny aftale
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Tilføj ny aftale</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <Label>Titel</Label>
+                <Input
+                  value={newEvent.title}
+                  onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
+                  placeholder="F.eks. Fodboldtræning"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Type</Label>
+                <Select
+                  value={newEvent.type}
+                  onValueChange={(v) => setNewEvent({...newEvent, type: v})}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {eventTypes.filter(t => t.value !== 'all').map(type => (
+                      <SelectItem key={type.value} value={type.value}>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getEventInlineColor(type.value) }} />
+                          {type.label}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>iCal URL (ICS)</Label>
+                  <Label>Start</Label>
                   <Input
-                    value={newCalendarSource.url}
-                    onChange={(e) => setNewCalendarSource((prev) => ({ ...prev, url: e.target.value }))}
-                    placeholder="https://.../calendar.ics"
+                    type="datetime-local"
+                    value={newEvent.startDate}
+                    onChange={(e) => setNewEvent({...newEvent, startDate: e.target.value})}
                   />
-                  <p className="text-xs text-slate-500">
-                    Brug en iCal/ICS-link fra fx Google, Outlook eller din arbejdskalender.
-                  </p>
                 </div>
-
                 <div className="space-y-2">
-                  <label className="flex items-center gap-2 text-sm text-slate-700">
-                    <Checkbox
-                      checked={newCalendarSource.enabled}
-                      onCheckedChange={(checked) => setNewCalendarSource((prev) => ({ ...prev, enabled: checked as boolean }))}
-                    />
-                    Kilde aktiv
-                  </label>
-                  <label className="flex items-center gap-2 text-sm text-slate-700">
-                    <Checkbox
-                      checked={newCalendarSource.autoSync}
-                      onCheckedChange={(checked) => setNewCalendarSource((prev) => ({ ...prev, autoSync: checked as boolean }))}
-                    />
-                    Automatisk synkronisering (hvert 5. minut)
-                  </label>
-                </div>
-
-                <Button onClick={addCalendarSource} className="w-full">
-                  <Link2 className="w-4 h-4 mr-2" />
-                  Tilføj kalenderkilde
-                </Button>
-
-                <div className="space-y-2">
-                  {calendarSources.length === 0 && (
-                    <p className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-3 text-sm text-slate-500">
-                      Ingen kalenderkilder endnu.
-                    </p>
-                  )}
-                  {calendarSources.map((source) => (
-                    <div key={source.id} className="rounded-xl border border-slate-200 bg-white p-3">
-                      <div className="flex items-center justify-between gap-3">
-                        <div>
-                          <p className="font-medium text-slate-900">{source.name}</p>
-                          <p className="text-xs text-slate-500">
-                            {source.type === 'work' ? 'Arbejde' : source.type === 'personal' ? 'Privat' : source.type === 'school' ? 'Skole' : 'Andet'}
-                            {source.lastSyncedAt
-                              ? ` · synk: ${format(parseISO(source.lastSyncedAt), 'dd/MM HH:mm', { locale: da })}`
-                              : ' · ikke synkroniseret endnu'}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Button
-                            size="icon-sm"
-                            variant="ghost"
-                            onClick={() => {
-                              void syncCalendarSource(source);
-                            }}
-                          >
-                            {syncingSourceId === source.id ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : (
-                              <RefreshCw className="w-4 h-4" />
-                            )}
-                          </Button>
-                          <Button
-                            size="icon-sm"
-                            variant="ghost"
-                            className="text-[#d37628] hover:text-[#b7621b]"
-                            onClick={() => removeCalendarSource(source.id)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="mt-2 flex items-center gap-4 text-xs text-slate-600">
-                        <label className="flex items-center gap-1.5">
-                          <Checkbox
-                            checked={source.enabled}
-                            onCheckedChange={(checked) => {
-                              updateCalendarSources(
-                                calendarSources.map((item) =>
-                                  item.id === source.id ? { ...item, enabled: checked as boolean } : item
-                                )
-                              );
-                            }}
-                          />
-                          Aktiv
-                        </label>
-                        <label className="flex items-center gap-1.5">
-                          <Checkbox
-                            checked={source.autoSync}
-                            onCheckedChange={(checked) => {
-                              updateCalendarSources(
-                                calendarSources.map((item) =>
-                                  item.id === source.id ? { ...item, autoSync: checked as boolean } : item
-                                )
-                              );
-                            }}
-                          />
-                          Auto-sync
-                        </label>
-                      </div>
-                    </div>
-                  ))}
+                  <Label>Slut</Label>
+                  <Input
+                    type="datetime-local"
+                    value={newEvent.endDate}
+                    onChange={(e) => setNewEvent({...newEvent, endDate: e.target.value})}
+                  />
                 </div>
               </div>
-            </DialogContent>
-          </Dialog>
-
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="h-10 flex-1 bg-[#f58a2d] text-white hover:bg-[#e47921] sm:flex-none">
-                <Plus className="w-4 h-4 mr-2" />
-                Ny aftale
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Tilføj ny aftale</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4 pt-4">
-                <div className="space-y-2">
-                  <Label>Titel</Label>
-                  <Input
-                    value={newEvent.title}
-                    onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
-                    placeholder="F.eks. Fodboldtræning"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Type</Label>
-                  <Select
-                    value={newEvent.type}
-                    onValueChange={(v) => setNewEvent({...newEvent, type: v})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {eventTypes.filter(t => t.value !== 'all').map(type => (
-                        <SelectItem key={type.value} value={type.value}>
-                          <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getEventInlineColor(type.value) }} />
-                            {type.label}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Start</Label>
-                    <Input
-                      type="datetime-local"
-                      value={newEvent.startDate}
-                      onChange={(e) => setNewEvent({...newEvent, startDate: e.target.value})}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Slut</Label>
-                    <Input
-                      type="datetime-local"
-                      value={newEvent.endDate}
-                      onChange={(e) => setNewEvent({...newEvent, endDate: e.target.value})}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Sted</Label>
-                  <Input
-                    value={newEvent.location}
-                    onChange={(e) => setNewEvent({...newEvent, location: e.target.value})}
-                    placeholder="F.eks. Idrætshallen"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Beskrivelse</Label>
-                  <Input
-                    value={newEvent.description}
-                    onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
-                    placeholder="Valgfri beskrivelse"
-                  />
-                </div>
-                <Button onClick={handleAddEvent} className="w-full">
-                  Tilføj aftale
-                </Button>
+              <div className="space-y-2">
+                <Label>Sted</Label>
+                <Input
+                  value={newEvent.location}
+                  onChange={(e) => setNewEvent({...newEvent, location: e.target.value})}
+                  placeholder="F.eks. Idrætshallen"
+                />
               </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </motion.div>
-
-      {/* Person filter dropdown + calendar sharing gate */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.08 }}
-        className="flex items-center gap-2"
-      >
-        <Select
-          value={personFilter ?? 'all'}
-          onValueChange={(v) => setPersonFilter(v === 'all' ? null : v)}
-        >
-          <SelectTrigger className="h-10 flex-1 rounded-xl border-[#d8d7cf] bg-white text-sm font-medium text-[#2f2f2d]">
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-[#78766d]" />
-              <SelectValue placeholder="Alle personer" />
+              <div className="space-y-2">
+                <Label>Beskrivelse</Label>
+                <Input
+                  value={newEvent.description}
+                  onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
+                  placeholder="Valgfri beskrivelse"
+                />
+              </div>
+              <Button onClick={handleAddEvent} className="w-full">
+                Tilføj aftale
+              </Button>
             </div>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">
-              <div className="flex items-center gap-2">
-                <span className="h-3 w-3 rounded-full bg-[#8b8677]" />
-                Alle
-              </div>
-            </SelectItem>
-            {coolParent && (
-              <SelectItem value={coolParent.id}>
-                <div className="flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-full bg-[#2f2f2f]" />
-                  {coolParent.name}
-                </div>
-              </SelectItem>
-            )}
-            {warmParent && canSeePartnerEvents && (
-              <SelectItem value={warmParent.id}>
-                <div className="flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-full bg-[#f58a2d]" />
-                  {warmParent.name}
-                </div>
-              </SelectItem>
-            )}
-          </SelectContent>
-        </Select>
-
-        {/* Calendar sharing prompt for separated families */}
-        {!isTogether && !isSharingAccepted && (
-          <button
-            onClick={() => {
-              if (!isSharingPending && currentUser) {
-                requestCalendarSharing(currentUser.id);
-                toast.info('Anmodning om kalenderdeling sendt til din partner');
-              }
-            }}
-            className={cn(
-              "flex h-10 items-center gap-1.5 rounded-xl border px-3 text-xs font-semibold transition-colors whitespace-nowrap",
-              isSharingPending
-                ? "border-[#f3c59d] bg-[#fff8f0] text-[#cc6f1f]"
-                : "border-[#d8d7cf] bg-white text-[#78766d] hover:bg-[#faf9f6]"
-            )}
-            title={isSharingPending ? 'Afventer accept fra partner' : 'Anmod om kalenderdeling'}
-          >
-            {isSharingPending ? (
-              <>
-                <Clock className="h-3.5 w-3.5" />
-                Afventer
-              </>
-            ) : (
-              <>
-                <Share2 className="h-3.5 w-3.5" />
-                Del kalender
-              </>
-            )}
-          </button>
-        )}
+          </DialogContent>
+        </Dialog>
       </motion.div>
 
-      {/* Calendar sharing invitation banner (if pending and current user didn't request) */}
+      {/* Threads-style tab bar: Alle | Farver | Synk | ≡ */}
+      <div className="sticky top-0 z-10 bg-[#faf9f6] pb-0">
+        <div className="flex items-center border-b border-[#e5e3dc]">
+          {[
+            { value: 'filter' as const, label: 'Alle' },
+            { value: 'colors' as const, label: 'Farver' },
+            { value: 'sync' as const, label: 'Synk' },
+          ].map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => setCalendarTab(tab.value)}
+              className={cn(
+                'relative flex-1 py-3 text-center text-[14px] font-semibold transition-colors',
+                calendarTab === tab.value ? 'text-[#2f2f2d]' : 'text-[#b0ada4]'
+              )}
+            >
+              {tab.label}
+              {calendarTab === tab.value && (
+                <motion.div
+                  layoutId="calendar-underline"
+                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#2f2f2d] rounded-full"
+                  transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                />
+              )}
+            </button>
+          ))}
+          {/* Hamburger */}
+          <button
+            onClick={() => setCalSidePanelOpen(true)}
+            className="flex items-center justify-center w-11 py-3 text-[#7a786f] hover:text-[#2f2f2d] transition-colors"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+
+      {/* Tab content: Alle (category filter) */}
+      {calendarTab === 'filter' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
+          <div className="relative">
+            <button
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              className="flex w-full items-center justify-between rounded-xl border border-[#d8d7cf] bg-white px-3 py-2.5 text-sm font-medium text-[#2f2f2d] hover:bg-[#faf9f6] transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                {(() => {
+                  const activeType = eventTypes.find(t => t.value === filter);
+                  if (!activeType) return null;
+                  const FilterIcon = activeType.icon;
+                  return (
+                    <>
+                      <span className="w-3 h-3 rounded-full" style={{ backgroundColor: filter === 'all' ? '#8b8677' : getCustomEventColor(filter) }} />
+                      <FilterIcon className="h-4 w-4 text-[#78766d]" />
+                      {activeType.label}
+                    </>
+                  );
+                })()}
+              </span>
+              <ChevronDown className={cn("h-4 w-4 text-[#78766d] transition-transform", isFilterOpen && "rotate-180")} />
+            </button>
+            {isFilterOpen && (
+              <div className="absolute z-20 mt-1 w-full rounded-xl border border-[#d8d7cf] bg-white py-1 shadow-lg">
+                {eventTypes.map(type => {
+                  const TypeIcon = type.icon;
+                  return (
+                    <button
+                      key={type.value}
+                      onClick={() => { setFilter(type.value); setIsFilterOpen(false); }}
+                      className={cn(
+                        "flex w-full items-center gap-2.5 px-3 py-2 text-sm transition-colors",
+                        filter === type.value ? "bg-[#f0efe8] font-semibold text-[#2f2f2d]" : "text-[#4a4945] hover:bg-[#faf9f6]"
+                      )}
+                    >
+                      <span className="w-3 h-3 rounded-full" style={{ backgroundColor: type.value === 'all' ? '#8b8677' : getCustomEventColor(type.value) }} />
+                      <TypeIcon className="h-4 w-4" />
+                      {type.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Tab content: Farver (color customization inline) */}
+      {calendarTab === 'colors' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-1">
+          {eventTypes.filter(t => t.value !== 'all').map(type => {
+            const TypeIcon = type.icon;
+            const currentColor = getCustomEventColor(type.value);
+            return (
+              <button
+                key={type.value}
+                onClick={() => { setColorEditCategory(type.value); setIsColorDialogOpen(true); }}
+                className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition-colors hover:bg-[#f0efe8]"
+              >
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl" style={{ backgroundColor: currentColor + '22' }}>
+                  <TypeIcon className="h-4 w-4" style={{ color: currentColor }} />
+                </div>
+                <span className="flex-1 text-sm font-medium text-[#2f2f2d]">{type.label}</span>
+                <div className="h-5 w-5 rounded-full border border-[#e0dfd8]" style={{ backgroundColor: currentColor }} />
+                <ChevronRight className="h-4 w-4 text-[#a3a299]" />
+              </button>
+            );
+          })}
+          <button
+            onClick={() => { toast.success('Farver gemt'); }}
+            className="mt-2 w-full rounded-xl border border-[#d8d7cf] bg-[#2f2f2f] py-2 text-center text-[12px] font-semibold text-white hover:bg-[#1a1a1a] transition-colors"
+          >
+            Gem farver
+          </button>
+        </motion.div>
+      )}
+
+      {/* Tab content: Synk (calendar sources inline) */}
+      {calendarTab === 'sync' && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
+          <button
+            onClick={() => setIsSourceDialogOpen(true)}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#d8d7cf] bg-white px-4 py-3 text-[13px] font-semibold text-[#5f5d56] hover:border-[#f58a2d] hover:bg-[#fff8f0] transition-colors"
+          >
+            <CloudDownload className="h-4 w-4" />
+            Tilføj kalenderkilde
+          </button>
+
+          {calendarSources.length === 0 ? (
+            <p className="rounded-xl border border-dashed border-[#d8d7cf] bg-[#faf9f6] p-4 text-center text-[12px] text-[#78766d]">
+              Ingen kalenderkilder endnu. Tilføj en iCal/ICS-kilde fra Google, Outlook eller din arbejdskalender.
+            </p>
+          ) : (
+            calendarSources.map((source) => (
+              <div key={source.id} className="rounded-2xl border border-[#e8e7e0] bg-white p-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-[13px] font-semibold text-[#2f2f2d]">{source.name}</p>
+                    <p className="text-[11px] text-[#78766d]">
+                      {source.type === 'work' ? 'Arbejde' : source.type === 'personal' ? 'Privat' : source.type === 'school' ? 'Skole' : 'Andet'}
+                      {source.lastSyncedAt
+                        ? ` · synk: ${format(parseISO(source.lastSyncedAt), 'dd/MM HH:mm', { locale: da })}`
+                        : ' · ikke synkroniseret endnu'}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => void syncCalendarSource(source)}
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-[#78766d] hover:bg-[#f0efe8]"
+                    >
+                      {syncingSourceId === source.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <RefreshCw className="w-4 h-4" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => removeCalendarSource(source.id)}
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-[#c8c6bc] hover:text-rose-500 hover:bg-rose-50"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                <div className="mt-2 flex items-center gap-4 text-xs text-[#78766d]">
+                  <label className="flex items-center gap-1.5">
+                    <Checkbox
+                      checked={source.enabled}
+                      onCheckedChange={(checked) => {
+                        updateCalendarSources(
+                          calendarSources.map((item) =>
+                            item.id === source.id ? { ...item, enabled: checked as boolean } : item
+                          )
+                        );
+                      }}
+                    />
+                    Aktiv
+                  </label>
+                  <label className="flex items-center gap-1.5">
+                    <Checkbox
+                      checked={source.autoSync}
+                      onCheckedChange={(checked) => {
+                        updateCalendarSources(
+                          calendarSources.map((item) =>
+                            item.id === source.id ? { ...item, autoSync: checked as boolean } : item
+                          )
+                        );
+                      }}
+                    />
+                    Auto-sync
+                  </label>
+                </div>
+              </div>
+            ))
+          )}
+        </motion.div>
+      )}
+
+      {/* Calendar sharing invitation banner */}
       {!isTogether && isSharingPending && calendarSharing?.requestedBy !== currentUser?.id && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -1012,66 +1375,6 @@ export function Kalender() {
             <ChevronRight className="w-5 h-5" />
           </Button>
         </div>
-      </motion.div>
-
-      {/* Filter dropdown + Palette button */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
-        className="flex items-center gap-2"
-      >
-        <div className="relative flex-1">
-          <button
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-            className="flex w-full items-center justify-between rounded-xl border border-[#d8d7cf] bg-white px-3 py-2.5 text-sm font-medium text-[#2f2f2d] hover:bg-[#faf9f6] transition-colors"
-          >
-            <span className="flex items-center gap-2">
-              {(() => {
-                const activeType = eventTypes.find(t => t.value === filter);
-                if (!activeType) return null;
-                const Icon = activeType.icon;
-                return (
-                  <>
-                    <span className="w-3 h-3 rounded-full" style={{ backgroundColor: filter === 'all' ? '#8b8677' : getCustomEventColor(filter) }} />
-                    <Icon className="h-4 w-4 text-[#78766d]" />
-                    {activeType.label}
-                  </>
-                );
-              })()}
-            </span>
-            <ChevronDown className={cn("h-4 w-4 text-[#78766d] transition-transform", isFilterOpen && "rotate-180")} />
-          </button>
-          {isFilterOpen && (
-            <div className="absolute z-20 mt-1 w-full rounded-xl border border-[#d8d7cf] bg-white py-1 shadow-lg">
-              {eventTypes.map(type => {
-                const Icon = type.icon;
-                return (
-                  <button
-                    key={type.value}
-                    onClick={() => { setFilter(type.value); setIsFilterOpen(false); }}
-                    className={cn(
-                      "flex w-full items-center gap-2.5 px-3 py-2 text-sm transition-colors",
-                      filter === type.value ? "bg-[#f0efe8] font-semibold text-[#2f2f2d]" : "text-[#4a4945] hover:bg-[#faf9f6]"
-                    )}
-                  >
-                    <span className="w-3 h-3 rounded-full" style={{ backgroundColor: type.value === 'all' ? '#8b8677' : getCustomEventColor(type.value) }} />
-                    <Icon className="h-4 w-4" />
-                    {type.label}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        <button
-          onClick={() => setIsColorDialogOpen(true)}
-          className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#d8d7cf] bg-white text-[#78766d] hover:bg-[#faf9f6] transition-colors"
-          title="Tilpas farver"
-        >
-          <Palette className="h-4 w-4" />
-        </button>
       </motion.div>
 
       {/* Calendar Grid */}
@@ -1462,6 +1765,75 @@ export function Kalender() {
         </DialogContent>
       </Dialog>
 
+      {/* Calendar Source Dialog */}
+      <Dialog open={isSourceDialogOpen} onOpenChange={setIsSourceDialogOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Tilføj kalenderkilde</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Navn</Label>
+                <Input
+                  value={newCalendarSource.name}
+                  onChange={(e) => setNewCalendarSource((prev) => ({ ...prev, name: e.target.value }))}
+                  placeholder="Fx Arbejdskalender"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Type</Label>
+                <Select
+                  value={newCalendarSource.type}
+                  onValueChange={(value: CalendarSourceType) => setNewCalendarSource((prev) => ({ ...prev, type: value }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="work">Arbejde</SelectItem>
+                    <SelectItem value="personal">Privat</SelectItem>
+                    <SelectItem value="school">Skole</SelectItem>
+                    <SelectItem value="other">Andet</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>iCal URL (ICS)</Label>
+              <Input
+                value={newCalendarSource.url}
+                onChange={(e) => setNewCalendarSource((prev) => ({ ...prev, url: e.target.value }))}
+                placeholder="https://.../calendar.ics"
+              />
+              <p className="text-xs text-[#78766d]">
+                Brug en iCal/ICS-link fra fx Google, Outlook eller din arbejdskalender.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <label className="flex items-center gap-2 text-sm text-[#4a4945]">
+                <Checkbox
+                  checked={newCalendarSource.enabled}
+                  onCheckedChange={(checked) => setNewCalendarSource((prev) => ({ ...prev, enabled: checked as boolean }))}
+                />
+                Kilde aktiv
+              </label>
+              <label className="flex items-center gap-2 text-sm text-[#4a4945]">
+                <Checkbox
+                  checked={newCalendarSource.autoSync}
+                  onCheckedChange={(checked) => setNewCalendarSource((prev) => ({ ...prev, autoSync: checked as boolean }))}
+                />
+                Automatisk synkronisering (hvert 5. minut)
+              </label>
+            </div>
+            <Button onClick={addCalendarSource} className="w-full">
+              <Link2 className="w-4 h-4 mr-2" />
+              Tilføj kalenderkilde
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Color Configuration Dialog */}
       <Dialog open={isColorDialogOpen} onOpenChange={(open) => { setIsColorDialogOpen(open); if (!open) setColorEditCategory(null); }}>
         <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
@@ -1504,15 +1876,15 @@ export function Kalender() {
                 <Button
                   variant="outline"
                   className="flex-1 rounded-2xl border-[#d8d7cf] text-[12px]"
-                  onClick={() => { resetCalendarColorPreferences(); toast.success('Farver nulstillet'); }}
+                  onClick={() => setIsColorDialogOpen(false)}
                 >
-                  Nulstil alle farver
+                  Annuller
                 </Button>
                 <Button
                   className="flex-1 rounded-2xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a] text-[12px]"
-                  onClick={() => setIsColorDialogOpen(false)}
+                  onClick={() => { toast.success('Farver gemt'); setIsColorDialogOpen(false); }}
                 >
-                  Færdig
+                  Gem farver
                 </Button>
               </div>
             </div>

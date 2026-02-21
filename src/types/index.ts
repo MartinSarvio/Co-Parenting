@@ -110,7 +110,7 @@ export interface CalendarSource {
 }
 
 // Custody plan types - Enhanced with flexible configuration
-export type CustodyPattern = '7/7' | '10/4' | '14/0' | 'custom' | 'alternating' | 'weekday-weekend';
+export type CustodyPattern = '7/7' | '10/4' | '14/0' | 'custom' | 'alternating' | 'weekday-weekend' | 'supervised' | 'supervised_limited';
 
 export interface CustodyPlan {
   id: string;
@@ -134,7 +134,20 @@ export interface CustodyPlan {
   customWeekConfig?: CustomWeekConfig;
   
   customSchedule?: CustodyDay[];
-  
+
+  // Supervised visitation settings
+  supervisedConfig?: {
+    frequencyWeeks: number;      // every X weeks
+    durationHours: number;       // how many hours per visit
+    location: string;            // e.g., "offentligt sted", address
+    locationType: 'public' | 'home' | 'institution' | 'other';
+    supervisorRequired: boolean;
+    supervisorName?: string;
+    specificDays?: number[];     // weekdays (0-6)
+    startTime?: string;          // e.g., "10:00"
+    notes?: string;
+  };
+
   // Special arrangements
   holidays?: HolidayArrangement[];
   specialDays?: SpecialDay[];
@@ -608,6 +621,7 @@ export interface DecisionLog {
   validFrom?: string;
   validUntil?: string;
   notes?: string;
+  documentIds?: string[];
   createdAt: string;
 }
 

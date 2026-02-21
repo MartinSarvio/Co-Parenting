@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { requestNotificationPermission, scheduleAllHandoverReminders } from '@/lib/notifications';
 import { paymentAccountId, userId as generateUserId } from '@/lib/id';
 import {
@@ -10,6 +10,7 @@ import {
   Check,
   CreditCard,
   Link2,
+  Menu,
   Moon,
   Save,
   ShieldCheck,
@@ -17,7 +18,15 @@ import {
   SunMoon,
   Upload,
   UserPlus,
-  X as XIcon
+  X as XIcon,
+  ChevronRight,
+  Eye,
+  Home,
+  MessageSquare,
+  Heart,
+  Star,
+  Send,
+  ArrowRight,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTheme } from 'next-themes';
@@ -28,7 +37,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
@@ -36,8 +45,11 @@ import { getPlanFeatures, getSubscriptionPlan, normalizeSubscription } from '@/l
 import type { BillingModel, FamilyMemberRole, HouseholdMode, SubscriptionPlan } from '@/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Users, Trash2 } from 'lucide-react';
+import { Users, Trash2, Receipt, ShieldAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { api } from '@/lib/api';
+import { startCheckout, openBillingPortal, fetchStripeStatus, PLAN_PRICES } from '@/lib/stripe';
+import type { StripePlan } from '@/lib/stripe';
 import { AdminPanel } from '@/sections/AdminPanel';
 
 const AVATAR_PRESETS = [
@@ -57,6 +69,20 @@ const familyModeLabels: Record<HouseholdMode, string> = {
   blended: 'Bonusfamilie',
   single_parent: 'Enlig forsørger'
 };
+
+/** Calculate age from a date string (YYYY-MM-DD) */
+function calculateAge(birthDateStr: string): number | null {
+  if (!birthDateStr) return null;
+  const birth = new Date(birthDateStr);
+  if (isNaN(birth.getTime())) return null;
+  const today = new Date();
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  return age;
+}
 
 export function SettingsView() {
   const { theme, setTheme } = useTheme();
@@ -82,7 +108,12 @@ export function SettingsView() {
   const [profileDraft, setProfileDraft] = useState({
     name: currentUser?.name || '',
     email: currentUser?.email || '',
-    phone: currentUser?.phone || ''
+    phone: currentUser?.phone || '',
+    birthDate: (currentUser as any)?.birthDate || '',
+    address: (currentUser as any)?.address || '',
+    zipCode: (currentUser as any)?.zipCode || '',
+    city: (currentUser as any)?.city || '',
+    country: (currentUser as any)?.country || 'Danmark',
   });
   const [avatarDialogOpen, setAvatarDialogOpen] = useState(false);
   const avatarFileRef = useRef<HTMLInputElement>(null);
@@ -111,6 +142,14 @@ export function SettingsView() {
     return Notification.permission;
   });
   const [handoverReminderMinutes, setHandoverReminderMinutes] = useState(30);
+  const [activeSettingsTab, setActiveSettingsTab] = useState('profile');
+  const [sidePanelOpen, setSidePanelOpen] = useState(false);
+  const [feedbackDraft, setFeedbackDraft] = useState({
+    rating: 0,
+    category: 'general',
+    message: '',
+  });
+  const [partnerInviteEmail, setPartnerInviteEmail] = useState('');
 
   useEffect(() => {
     if (typeof Notification !== 'undefined') {
@@ -144,11 +183,19 @@ export function SettingsView() {
 
   const handleSaveProfile = () => {
     if (!currentUser) return;
-    updateUser(currentUser.id, {
+    const profileData = {
       name: profileDraft.name.trim(),
       email: profileDraft.email.trim(),
-      phone: profileDraft.phone.trim() || undefined
-    });
+      phone: profileDraft.phone.trim() || undefined,
+      birthDate: profileDraft.birthDate || undefined,
+      address: profileDraft.address.trim() || undefined,
+      zipCode: profileDraft.zipCode.trim() || undefined,
+      city: profileDraft.city.trim() || undefined,
+      country: profileDraft.country.trim() || undefined,
+    };
+    updateUser(currentUser.id, profileData as any);
+    // Persist profile to server
+    api.patch(`/api/users/${currentUser.id}`, profileData).catch(() => {});
     toast.success('Profil gemt');
   };
 
@@ -156,6 +203,8 @@ export function SettingsView() {
     if (!currentUser) return;
     const url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}`;
     updateUser(currentUser.id, { avatar: url });
+    // Persist avatar to server
+    api.patch(`/api/users/${currentUser.id}`, { avatar: url }).catch(() => {});
     setAvatarDialogOpen(false);
     toast.success('Avatar opdateret');
   };
@@ -195,18 +244,70 @@ export function SettingsView() {
     toast.success(`Familiemode sat til ${familyModeLabels[mode]}`);
   };
 
-  const handlePlanChange = (nextPlan: SubscriptionPlan) => {
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+
+  const handlePlanChange = async (nextPlan: SubscriptionPlan) => {
     if (!household) return;
-    setHousehold({
-      ...household,
-      subscription: {
-        ...subscription,
-        plan: nextPlan,
-        billingModel: household.familyMode === 'together' ? 'shared' : subscription.billingModel
-      }
-    });
-    toast.success(`Abonnement opdateret til ${subscriptionPlanLabels[nextPlan]}`);
+
+    // Downgrade to free — update locally (Stripe cancellation handled via portal)
+    if (nextPlan === 'free') {
+      setHousehold({
+        ...household,
+        subscription: { ...subscription, plan: 'free' }
+      });
+      toast.success('Plan sat til Gratis');
+      return;
+    }
+
+    // Upgrade to paid plan — redirect to Stripe Checkout
+    setCheckoutLoading(true);
+    try {
+      await startCheckout(nextPlan as StripePlan, 'monthly');
+      // User is redirected to Stripe — this code won't run
+    } catch (err) {
+      console.error('Stripe checkout error:', err);
+      toast.error('Kunne ikke starte betaling. Prøv igen.');
+      setCheckoutLoading(false);
+    }
   };
+
+  // Open billing portal for managing existing subscription
+  const handleManageSubscription = async () => {
+    try {
+      await openBillingPortal();
+    } catch {
+      toast.error('Kunne ikke åbne abonnementsstyring');
+    }
+  };
+
+  // Sync subscription status from Stripe on mount + after redirect
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const stripeResult = params.get('stripe');
+
+    if (stripeResult === 'success') {
+      toast.success('Betaling gennemført! Dit abonnement er nu aktivt.');
+      // Clean URL
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (stripeResult === 'cancel') {
+      toast.info('Betaling annulleret');
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+
+    // Fetch real subscription status from Stripe
+    fetchStripeStatus().then((status) => {
+      if (status.stripeActive && household && status.plan !== 'free') {
+        setHousehold({
+          ...household,
+          subscription: {
+            ...subscription,
+            plan: status.plan as SubscriptionPlan,
+            status: 'active',
+          }
+        });
+      }
+    }).catch(() => { /* ignore — fallback to local state */ });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleAddPaymentAccount = () => {
     if (!currentUser) return;
@@ -335,18 +436,139 @@ export function SettingsView() {
         <h1 className="text-2xl font-semibold text-[#2f2f2d]">Indstillinger</h1>
       </motion.div>
 
-      <Tabs defaultValue="profile" className="space-y-4">
-        <div className="sticky top-0 z-10 bg-[#faf9f6] pb-2 pt-1 -mx-1 px-1">
-          <TabsList className="flex w-full justify-start gap-0 overflow-x-auto rounded-2xl p-1 scrollbar-hide">
-            <TabsTrigger value="profile" className="flex-none min-w-[80px]">Konto</TabsTrigger>
-            <TabsTrigger value="family" className="flex-none min-w-[80px]">Familie</TabsTrigger>
-            <TabsTrigger value="subscription" className="flex-none min-w-[110px]">Abonnement</TabsTrigger>
-            <TabsTrigger value="payments" className="flex-none min-w-[95px]">Betaling</TabsTrigger>
-            <TabsTrigger value="members" className="flex-none min-w-[105px]">Medlemmer</TabsTrigger>
-            {currentUser?.isAdmin && (
-              <TabsTrigger value="admin" className="flex-none min-w-[80px]">Admin</TabsTrigger>
-            )}
-          </TabsList>
+      {/* ─── Side panel (slides from left) ─── */}
+      <AnimatePresence>
+        {sidePanelOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-[60] bg-black/30"
+              onClick={() => setSidePanelOpen(false)}
+            />
+            {/* Panel */}
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+              className="fixed inset-y-0 left-0 z-[70] w-[280px] bg-white shadow-[4px_0_24px_rgba(0,0,0,0.1)] flex flex-col"
+              style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+            >
+              {/* Panel header */}
+              <div className="flex items-center justify-between px-5 py-4 border-b border-[#eeedea]">
+                <h2 className="text-[17px] font-bold text-[#2f2f2d]">Mere</h2>
+                <button
+                  onClick={() => setSidePanelOpen(false)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56]"
+                >
+                  <XIcon className="h-4 w-4" />
+                </button>
+              </div>
+
+              {/* Panel items */}
+              <div className="flex-1 overflow-y-auto py-2">
+                {[
+                  { value: 'notifications', label: 'Notifikationer', icon: Bell, desc: 'Push & påmindelser' },
+                  { value: 'familytype', label: 'Familietype', icon: Home, desc: 'Samboende, skilt, enlig' },
+                  { value: 'appearance', label: 'Visning', icon: Eye, desc: 'Tema & professionel visning', adminOnly: false },
+                  null, // divider
+                  { value: 'payments', label: 'Betaling', icon: CreditCard, desc: 'Betalingskonti' },
+                  { value: 'members', label: 'Medlemmer', icon: Users, desc: 'Familiemedlemmer' },
+                  null, // divider
+                  { value: 'feedback', label: 'Feedback', icon: MessageSquare, desc: 'Giv os feedback' },
+                  ...(currentUser?.isAdmin
+                    ? [
+                        null, // divider
+                        { value: 'admin', label: 'Admin', icon: ShieldAlert, desc: 'Administration', adminOnly: true },
+                      ]
+                    : []),
+                ].map((item, idx) => {
+                  if (item === null) {
+                    return <div key={`div-${idx}`} className="my-2 mx-5 border-t border-[#eeedea]" />;
+                  }
+                  const Icon = item.icon;
+                  const isActive = activeSettingsTab === item.value;
+                  return (
+                    <button
+                      key={item.value}
+                      onClick={() => {
+                        setActiveSettingsTab(item.value);
+                        setSidePanelOpen(false);
+                      }}
+                      className={cn(
+                        'flex w-full items-center gap-3.5 px-5 py-3 text-left transition-colors',
+                        isActive
+                          ? 'bg-[#f7f6f2]'
+                          : 'hover:bg-[#faf9f6]'
+                      )}
+                    >
+                      <div className={cn(
+                        'flex h-9 w-9 items-center justify-center rounded-xl',
+                        isActive ? 'bg-[#fff2e6]' : 'bg-[#f2f1ed]'
+                      )}>
+                        <Icon className={cn('h-[18px] w-[18px]', isActive ? 'text-[#f58a2d]' : 'text-[#7a786f]')} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className={cn('text-[14px] font-semibold', isActive ? 'text-[#2f2f2d]' : 'text-[#4a4945]')}>
+                          {item.label}
+                        </p>
+                        <p className="text-[11px] text-[#9a978f] truncate">{item.desc}</p>
+                      </div>
+                      {isActive && (
+                        <div className="h-2 w-2 rounded-full bg-[#f58a2d] shrink-0" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="space-y-4">
+        {/* Threads-style tab bar: Konto | Familie | Abonnement | ≡ */}
+        <div className="sticky top-0 z-10 bg-[#faf9f6] pb-0 pt-1">
+          <div className="flex items-center border-b border-[#e5e3dc]">
+            {/* Main tabs: Konto + Familie + Abonnement */}
+            {[
+              { value: 'profile', label: 'Konto' },
+              { value: 'family', label: 'Familie' },
+              { value: 'subscription', label: 'Abonnement' },
+            ].map((tab) => (
+              <button
+                key={tab.value}
+                onClick={() => setActiveSettingsTab(tab.value)}
+                className={cn(
+                  'relative flex-1 py-3 text-center text-[14px] font-semibold transition-colors',
+                  activeSettingsTab === tab.value
+                    ? 'text-[#2f2f2d]'
+                    : 'text-[#b0ada4]'
+                )}
+              >
+                {tab.label}
+                {activeSettingsTab === tab.value && (
+                  <motion.div
+                    layoutId="settings-underline"
+                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#2f2f2d] rounded-full"
+                    transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                  />
+                )}
+              </button>
+            ))}
+
+            {/* Hamburger icon (right side) */}
+            <button
+              onClick={() => setSidePanelOpen(true)}
+              className="flex items-center justify-center w-11 py-3 text-[#7a786f] hover:text-[#2f2f2d] transition-colors"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         <TabsContent value="profile" className="space-y-4">
@@ -463,6 +685,63 @@ export function SettingsView() {
                   placeholder="+45 ..."
                 />
               </div>
+              <div className="space-y-2">
+                <Label>Fødselsdato</Label>
+                <Input
+                  type="date"
+                  value={profileDraft.birthDate}
+                  onChange={(e) => setProfileDraft((prev) => ({ ...prev, birthDate: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Alder</Label>
+                <Input
+                  readOnly
+                  disabled
+                  value={
+                    profileDraft.birthDate
+                      ? (calculateAge(profileDraft.birthDate) !== null
+                          ? `${calculateAge(profileDraft.birthDate)} år`
+                          : '')
+                      : ''
+                  }
+                  placeholder="Beregnes automatisk fra fødselsdato"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Adresse</Label>
+                <Input
+                  value={profileDraft.address}
+                  onChange={(e) => setProfileDraft((prev) => ({ ...prev, address: e.target.value }))}
+                  placeholder="Gadenavn og nr."
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Postnummer</Label>
+                  <Input
+                    value={profileDraft.zipCode}
+                    onChange={(e) => setProfileDraft((prev) => ({ ...prev, zipCode: e.target.value }))}
+                    placeholder="F.eks. 2100"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>By</Label>
+                  <Input
+                    value={profileDraft.city}
+                    onChange={(e) => setProfileDraft((prev) => ({ ...prev, city: e.target.value }))}
+                    placeholder="F.eks. København"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Land</Label>
+                <Input
+                  value={profileDraft.country}
+                  onChange={(e) => setProfileDraft((prev) => ({ ...prev, country: e.target.value }))}
+                  placeholder="Danmark"
+                />
+              </div>
               <Button onClick={handleSaveProfile} className="w-full">
                 <Save className="mr-2 h-4 w-4" />
                 Gem profil
@@ -470,157 +749,94 @@ export function SettingsView() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Visning</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 pt-0">
-              {/* Dark mode toggle */}
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-[#2f2f2d] dark:text-slate-200">Farvetema</p>
-                <div className="flex gap-2">
-                  {([
-                    { value: 'light', label: 'Lys', Icon: Sun },
-                    { value: 'system', label: 'Auto', Icon: SunMoon },
-                    { value: 'dark', label: 'Mørk', Icon: Moon },
-                  ] as const).map(({ value, label, Icon }) => (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => setTheme(value)}
-                      aria-pressed={theme === value}
-                      className={`flex flex-1 flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-colors ${
-                        theme === value
-                          ? 'border-orange-400 bg-orange-50 text-orange-700 dark:border-orange-400 dark:bg-orange-950 dark:text-orange-300'
-                          : 'border-[#d8d7cf] bg-[#faf9f6] text-[#75736b] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400'
-                      }`}
-                    >
-                      <Icon className="h-4 w-4" />
-                      {label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between rounded-xl border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
-                <div>
-                  <p className="text-sm font-medium text-[#2f2f2d] dark:text-slate-200">Professionel visning</p>
-                  <p className="text-xs text-[#75736b] dark:text-slate-400">
-                    {allowProfessionalTools ? 'Kan slås til/fra' : 'Skjult i samboende mode'}
-                  </p>
-                </div>
-                <Switch
-                  checked={isProfessionalView && allowProfessionalTools}
-                  disabled={!allowProfessionalTools}
-                  onCheckedChange={(value) => setProfessionalView(value)}
-                />
-              </div>
-              <div className="rounded-xl border border-[#d8d7cf] bg-[#f8f7f3] p-3">
-                <p className="text-sm text-[#4d4a43]">
-                  Aktuel familietype: <strong>{familyModeLabels[currentMode]}</strong>
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Bell className="h-4 w-4" />
-                Push-notifikationer
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 pt-0">
-              <p className="text-xs text-[#75736b] dark:text-slate-400">
-                Modtag en notifikation inden aflevering. Kræver at appen er åben i browseren.
-              </p>
-              {notifPermission === 'granted' ? (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between rounded-xl border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
-                    <p className="text-sm font-medium text-[#2f2f2d] dark:text-slate-200">Notifikationer aktiveret</p>
-                    <BadgeCheck className="h-4 w-4 text-green-600" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="reminder-minutes">Påmind mig (minutter før aflevering)</Label>
-                    <Select
-                      value={String(handoverReminderMinutes)}
-                      onValueChange={(v) => setHandoverReminderMinutes(Number(v))}
-                    >
-                      <SelectTrigger id="reminder-minutes">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="15">15 minutter</SelectItem>
-                        <SelectItem value="30">30 minutter</SelectItem>
-                        <SelectItem value="60">1 time</SelectItem>
-                        <SelectItem value="120">2 timer</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Button
-                    className="w-full"
-                    onClick={() => {
-                      const handoverEvents = events.filter(e => e.type === 'handover');
-                      scheduleAllHandoverReminders(handoverEvents, handoverReminderMinutes);
-                      toast.success(`Påmindelser planlagt ${handoverReminderMinutes} min. før aflevering`);
-                    }}
-                  >
-                    <Bell className="mr-2 h-4 w-4" />
-                    Planlæg påmindelser
-                  </Button>
-                </div>
-              ) : notifPermission === 'denied' ? (
-                <div className="rounded-xl border border-[#f3c59d] bg-[#fff6ef] p-3">
-                  <p className="text-sm text-[#b96424]">
-                    Notifikationer er blokeret af browseren. Tillad dem i browserens indstillinger og genindlæs siden.
-                  </p>
-                </div>
-              ) : (
-                <Button
-                  className="w-full"
-                  onClick={async () => {
-                    const granted = await requestNotificationPermission();
-                    setNotifPermission(granted ? 'granted' : 'denied');
-                    if (granted) {
-                      toast.success('Notifikationer aktiveret!');
-                    } else {
-                      toast.error('Notifikationer afvist af browseren');
-                    }
-                  }}
-                >
-                  <Bell className="mr-2 h-4 w-4" />
-                  Aktiver notifikationer
-                </Button>
-              )}
-            </CardContent>
-          </Card>
         </TabsContent>
 
         <TabsContent value="family" className="space-y-4">
+          {/* Quick link to family type setting */}
+          <button
+            onClick={() => setActiveSettingsTab('familytype')}
+            className="flex w-full items-center justify-between rounded-2xl border border-[#e5e3dc] bg-white px-4 py-3 text-left transition-colors hover:bg-[#faf9f6]"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f2f1ed]">
+                <Home className="h-[18px] w-[18px] text-[#7a786f]" />
+              </div>
+              <div>
+                <p className="text-[14px] font-semibold text-[#2f2f2d]">{familyModeLabels[currentMode]}</p>
+                <p className="text-[11px] text-[#9a978f]">Tryk for at ændre familietype</p>
+              </div>
+            </div>
+            <ChevronRight className="h-4 w-4 text-[#b0ada4]" />
+          </button>
+
+          {/* Samboende / Co-parenting section */}
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-base">Familiemode</CardTitle>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Heart className="h-4 w-4" />
+                {isTogetherMode ? 'Samboende' : 'Co-parenting'}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 pt-0">
-              <div className="space-y-2">
-                <Label>Vælg mode</Label>
-                <Select value={currentMode} onValueChange={(value: HouseholdMode) => handleFamilyModeChange(value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="together">Samboende familie</SelectItem>
-                    <SelectItem value="co_parenting">Skilt / Co-parenting</SelectItem>
-                    <SelectItem value="blended">Bonusfamilie</SelectItem>
-                    <SelectItem value="single_parent">Enlig forsørger</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="rounded-xl border border-[#d8d7cf] bg-[#f8f7f3] p-3 text-sm text-[#55524a]">
-                {isTogetherMode
-                  ? 'Samboende familier deler ét abonnement.'
-                  : 'Skilte familier bruger separate abonnementer.'}
-              </div>
+              {(() => {
+                // Find partner: other parent in household
+                const partnerUser = users.find(u =>
+                  u.role === 'parent' && u.id !== currentUser?.id
+                );
+                if (partnerUser) {
+                  return (
+                    <div className="flex items-center gap-3 rounded-xl border border-[#e5e3dc] bg-white p-3">
+                      <Avatar className="h-10 w-10 border border-white shadow-sm">
+                        <AvatarImage src={partnerUser.avatar} />
+                        <AvatarFallback className="bg-[#ecebe5] text-[#4a4945] text-sm">
+                          {partnerUser.name[0]}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-[#2f2f2d]">{partnerUser.name}</p>
+                        <p className="text-xs text-[#75736b]">{partnerUser.email}</p>
+                      </div>
+                      <Badge variant="outline" className="text-xs border-green-300 text-green-700 bg-green-50">
+                        Tilknyttet
+                      </Badge>
+                    </div>
+                  );
+                }
+                return (
+                  <div className="space-y-3">
+                    <div className="rounded-xl border border-dashed border-[#d8d7cf] bg-[#f8f7f3] p-4 text-center">
+                      <Users className="h-8 w-8 text-[#b0ada4] mx-auto mb-2" />
+                      <p className="text-sm text-[#75736b]">
+                        {isTogetherMode
+                          ? 'Ingen samboende tilknyttet endnu.'
+                          : 'Ingen medforælder tilknyttet endnu.'}
+                      </p>
+                      <p className="text-xs text-[#9a978f] mt-1">
+                        Inviter {isTogetherMode ? 'din samboende' : 'din medforælder'} til appen
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Input
+                        value={partnerInviteEmail}
+                        onChange={(e) => setPartnerInviteEmail(e.target.value)}
+                        placeholder="Email på medforælder"
+                        className="flex-1 rounded-xl border-[#d8d7cf]"
+                      />
+                      <Button
+                        className="rounded-xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+                        disabled={!partnerInviteEmail.trim() || !partnerInviteEmail.includes('@')}
+                        onClick={() => {
+                          toast.success(`Invitation sendt til ${partnerInviteEmail}`);
+                          setPartnerInviteEmail('');
+                        }}
+                      >
+                        <Send className="h-4 w-4 mr-1" />
+                        Inviter
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })()}
             </CardContent>
           </Card>
 
@@ -839,6 +1055,47 @@ export function SettingsView() {
               </button>
             );
           })}
+
+          {/* "Skift plan" CTA for free users */}
+          {plan === 'free' && (
+            <div className="rounded-2xl border-2 border-dashed border-[#f3c59d] bg-[#fff8f0] p-5 text-center">
+              <Star className="h-8 w-8 text-[#f58a2d] mx-auto mb-2" />
+              <p className="text-base font-bold text-[#2f2f2d]">Opgrader din plan</p>
+              <p className="text-sm text-[#78766d] mt-1 mb-4">
+                Få adgang til flere børn, udgiftsmodul, indkøbsscanner og meget mere.
+              </p>
+              <Button
+                className="rounded-2xl bg-[#f58a2d] text-white hover:bg-[#e47921] px-8"
+                disabled={checkoutLoading}
+                onClick={() => handlePlanChange('family_plus')}
+              >
+                {checkoutLoading ? (
+                  <span className="animate-spin h-4 w-4 mr-2 border-2 border-white border-t-transparent rounded-full" />
+                ) : (
+                  <ArrowRight className="h-4 w-4 mr-2" />
+                )}
+                {checkoutLoading ? 'Åbner betaling...' : 'Skift plan'}
+              </Button>
+            </div>
+          )}
+
+          {/* Administrer abonnement — for paid users */}
+          {plan !== 'free' && (
+            <div className="rounded-2xl border-2 border-[#e0dfd8] bg-white p-5 text-center space-y-3">
+              <p className="text-sm font-semibold text-[#2f2f2d]">Administrer dit abonnement</p>
+              <p className="text-xs text-[#78766d]">
+                Ændr betalingsmetode, se fakturaer eller annuller dit abonnement.
+              </p>
+              <Button
+                variant="outline"
+                className="rounded-2xl border-[#d8d7cf] text-[13px]"
+                onClick={handleManageSubscription}
+              >
+                <CreditCard className="h-4 w-4 mr-2" />
+                Åbn abonnementsstyring
+              </Button>
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="payments" className="space-y-4">
@@ -1011,6 +1268,327 @@ export function SettingsView() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* ─── Notifikationer (fra sidepanel) ─── */}
+        <TabsContent value="notifications" className="space-y-0">
+          {/* Push-notifikationer status */}
+          <div className="px-1 pt-2 pb-3">
+            <p className="text-xs text-[#75736b]">
+              Modtag notifikationer om afleveringer, beskeder og opdateringer.
+            </p>
+          </div>
+
+          {notifPermission === 'granted' ? (
+            <div className="space-y-3 mb-4">
+              <div className="flex items-center justify-between px-1 py-2">
+                <p className="text-sm font-medium text-[#2f2f2d]">Push-notifikationer</p>
+                <BadgeCheck className="h-4 w-4 text-green-600" />
+              </div>
+              <div className="space-y-1.5 px-1">
+                <Label htmlFor="reminder-minutes" className="text-xs text-[#75736b]">Påmind mig (minutter før aflevering)</Label>
+                <Select
+                  value={String(handoverReminderMinutes)}
+                  onValueChange={(v) => setHandoverReminderMinutes(Number(v))}
+                >
+                  <SelectTrigger id="reminder-minutes" className="rounded-xl border-[#d8d7cf]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="15">15 minutter</SelectItem>
+                    <SelectItem value="30">30 minutter</SelectItem>
+                    <SelectItem value="60">1 time</SelectItem>
+                    <SelectItem value="120">2 timer</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button
+                className="w-full rounded-2xl"
+                onClick={() => {
+                  const handoverEvents = events.filter(e => e.type === 'handover');
+                  scheduleAllHandoverReminders(handoverEvents, handoverReminderMinutes);
+                  toast.success(`Påmindelser planlagt ${handoverReminderMinutes} min. før aflevering`);
+                }}
+              >
+                <Bell className="mr-2 h-4 w-4" />
+                Planlæg påmindelser
+              </Button>
+            </div>
+          ) : notifPermission === 'denied' ? (
+            <div className="rounded-xl bg-[#fff6ef] p-3 mb-4">
+              <p className="text-sm text-[#b96424]">
+                Notifikationer er blokeret. Tillad dem i enhedens indstillinger.
+              </p>
+            </div>
+          ) : (
+            <Button
+              className="w-full rounded-2xl mb-4"
+              onClick={async () => {
+                const granted = await requestNotificationPermission();
+                setNotifPermission(granted ? 'granted' : 'denied');
+                if (granted) {
+                  toast.success('Notifikationer aktiveret!');
+                } else {
+                  toast.error('Notifikationer afvist');
+                }
+              }}
+            >
+              <Bell className="mr-2 h-4 w-4" />
+              Aktiver notifikationer
+            </Button>
+          )}
+
+          {/* Notifikationscenter — clean rows without Card wrappers */}
+          <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2">Notifikationstyper</p>
+          <div className="divide-y divide-[#e5e3dc]">
+            <div className="flex items-center justify-between py-3 px-1">
+              <div>
+                <p className="text-sm font-medium text-[#2f2f2d]">Afleveringspåmindelser</p>
+                <p className="text-xs text-[#75736b]">Før hver aflevering</p>
+              </div>
+              <Switch defaultChecked />
+            </div>
+            <div className="flex items-center justify-between py-3 px-1">
+              <div>
+                <p className="text-sm font-medium text-[#2f2f2d]">Nye beskeder</p>
+                <p className="text-xs text-[#75736b]">Dagbog, beslutninger</p>
+              </div>
+              <Switch defaultChecked />
+            </div>
+            <div className="flex items-center justify-between py-3 px-1">
+              <div>
+                <p className="text-sm font-medium text-[#2f2f2d]">Udgifter & betalinger</p>
+                <p className="text-xs text-[#75736b]">Anmodninger og godkendelser</p>
+              </div>
+              <Switch defaultChecked />
+            </div>
+            <div className="flex items-center justify-between py-3 px-1">
+              <div>
+                <p className="text-sm font-medium text-[#2f2f2d]">Kalenderopdateringer</p>
+                <p className="text-xs text-[#75736b]">Nye begivenheder & ændringer</p>
+              </div>
+              <Switch defaultChecked />
+            </div>
+            <div className="flex items-center justify-between py-3 px-1">
+              <div>
+                <p className="text-sm font-medium text-[#2f2f2d]">Opgaver</p>
+                <p className="text-xs text-[#75736b]">Tildelte og forfaldne</p>
+              </div>
+              <Switch defaultChecked />
+            </div>
+          </div>
+
+          {/* ─── Påmindelser ─── */}
+          <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2 pt-5">Påmindelser</p>
+          <div className="divide-y divide-[#e5e3dc]">
+            <div className="flex items-center justify-between py-3 px-1">
+              <div>
+                <p className="text-sm font-medium text-[#2f2f2d]">Madplan</p>
+                <p className="text-xs text-[#75736b]">Daglig påmindelse om aftensmad</p>
+              </div>
+              <Switch defaultChecked />
+            </div>
+            <div className="flex items-center justify-between py-3 px-1">
+              <div>
+                <p className="text-sm font-medium text-[#2f2f2d]">Indkøb</p>
+                <p className="text-xs text-[#75736b]">Ugentlig indkøbspåmindelse</p>
+              </div>
+              <Switch defaultChecked />
+            </div>
+            <div className="flex items-center justify-between py-3 px-1">
+              <div>
+                <p className="text-sm font-medium text-[#2f2f2d]">Rengøring</p>
+                <p className="text-xs text-[#75736b]">Påmindelser om rengøringsopgaver</p>
+              </div>
+              <Switch defaultChecked />
+            </div>
+          </div>
+        </TabsContent>
+
+        {/* ─── Familietype (fra sidepanel) ─── */}
+        <TabsContent value="familytype" className="space-y-4">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Home className="h-4 w-4" />
+                Familietype
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 pt-0">
+              <div className="space-y-2">
+                <Label>Vælg familietype</Label>
+                <Select value={currentMode} onValueChange={(value: HouseholdMode) => handleFamilyModeChange(value)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="together">Samboende familie</SelectItem>
+                    <SelectItem value="co_parenting">Skilt / Co-parenting</SelectItem>
+                    <SelectItem value="blended">Bonusfamilie</SelectItem>
+                    <SelectItem value="single_parent">Enlig forsørger</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="rounded-xl border border-[#d8d7cf] bg-[#f8f7f3] p-3 text-sm text-[#55524a]">
+                {isTogetherMode
+                  ? 'Samboende familier deler ét abonnement og ser alt sammen.'
+                  : isSingleParentMode
+                    ? 'Enlig forsørger har adgang til dokumentation og advokatværktøj.'
+                    : 'Skilte familier bruger separate abonnementer og kan dele udvalgt data.'}
+              </div>
+              <div className="rounded-xl border border-[#f58a2d]/20 bg-[#fff8f0] p-3">
+                <p className="text-sm font-medium text-[#b96424]">
+                  Aktuel: {familyModeLabels[currentMode]}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* ─── Feedback (fra sidepanel) ─── */}
+        <TabsContent value="feedback" className="space-y-4">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <MessageSquare className="h-4 w-4" />
+                Feedback
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-0">
+              <p className="text-sm text-[#75736b]">
+                Vi vil gerne høre din mening! Hjælp os med at forbedre appen.
+              </p>
+
+              {/* Star rating */}
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold uppercase tracking-[0.05em] text-[#78766d]">
+                  Hvor tilfreds er du?
+                </Label>
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setFeedbackDraft(prev => ({ ...prev, rating: star }))}
+                      className="p-1 transition-transform hover:scale-110"
+                    >
+                      <Star
+                        className={cn(
+                          'h-8 w-8 transition-colors',
+                          star <= feedbackDraft.rating
+                            ? 'fill-[#f58a2d] text-[#f58a2d]'
+                            : 'text-[#d8d7cf]'
+                        )}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Category */}
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold uppercase tracking-[0.05em] text-[#78766d]">
+                  Kategori
+                </Label>
+                <Select
+                  value={feedbackDraft.category}
+                  onValueChange={(v) => setFeedbackDraft(prev => ({ ...prev, category: v }))}
+                >
+                  <SelectTrigger className="rounded-xl border-[#d8d7cf]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="general">Generelt</SelectItem>
+                    <SelectItem value="bug">Fejl / Bug</SelectItem>
+                    <SelectItem value="feature">Ny funktion</SelectItem>
+                    <SelectItem value="design">Design / Brugervenlighed</SelectItem>
+                    <SelectItem value="calendar">Kalender / Samvær</SelectItem>
+                    <SelectItem value="expenses">Udgifter / Økonomi</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Message */}
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold uppercase tracking-[0.05em] text-[#78766d]">
+                  Din besked
+                </Label>
+                <Textarea
+                  value={feedbackDraft.message}
+                  onChange={(e) => setFeedbackDraft(prev => ({ ...prev, message: e.target.value }))}
+                  placeholder="Fortæl os hvad du synes, eller hvad vi kan forbedre..."
+                  rows={5}
+                  className="rounded-xl border-[#d8d7cf]"
+                />
+              </div>
+
+              <Button
+                className="w-full rounded-2xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+                disabled={!feedbackDraft.message.trim() || feedbackDraft.rating === 0}
+                onClick={() => {
+                  toast.success('Tak for din feedback! Vi sætter stor pris på det.');
+                  setFeedbackDraft({ rating: 0, category: 'general', message: '' });
+                }}
+              >
+                <Send className="mr-2 h-4 w-4" />
+                Send feedback
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* ─── Visning (fra sidepanel) ─── */}
+        <TabsContent value="appearance" className="space-y-4">
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Eye className="h-4 w-4" />
+                Visning
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 pt-0">
+              {/* Dark mode toggle */}
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-[#2f2f2d] dark:text-slate-200">Farvetema</p>
+                <div className="flex gap-2">
+                  {([
+                    { value: 'light', label: 'Lys', Icon: Sun },
+                    { value: 'system', label: 'Auto', Icon: SunMoon },
+                    { value: 'dark', label: 'Mørk', Icon: Moon },
+                  ] as const).map(({ value, label, Icon }) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setTheme(value)}
+                      aria-pressed={theme === value}
+                      className={`flex flex-1 flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-colors ${
+                        theme === value
+                          ? 'border-orange-400 bg-orange-50 text-orange-700 dark:border-orange-400 dark:bg-orange-950 dark:text-orange-300'
+                          : 'border-[#d8d7cf] bg-[#faf9f6] text-[#75736b] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400'
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between rounded-xl border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
+                <div>
+                  <p className="text-sm font-medium text-[#2f2f2d] dark:text-slate-200">Professionel visning</p>
+                  <p className="text-xs text-[#75736b] dark:text-slate-400">
+                    {allowProfessionalTools ? 'Kan slås til/fra' : 'Skjult i samboende mode'}
+                  </p>
+                </div>
+                <Switch
+                  checked={isProfessionalView && allowProfessionalTools}
+                  disabled={!allowProfessionalTools}
+                  onCheckedChange={(value) => setProfessionalView(value)}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
 
       {/* Family Member Dialog */}
@@ -1088,4 +1666,3 @@ export function SettingsView() {
     </div>
   );
 }
-
