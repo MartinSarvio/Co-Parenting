@@ -11,6 +11,7 @@ export interface User {
   color: 'warm' | 'cool' | 'neutral';
   phone?: string;
   role: UserRole;
+  isAdmin?: boolean;
   professionalType?: ProfessionalType;
   organization?: string;
   canAccessCases?: string[]; // IDs of households they can access

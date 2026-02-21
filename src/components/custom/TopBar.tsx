@@ -83,7 +83,7 @@ export function TopBar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="relative flex h-10 w-10 items-center justify-center rounded-full border border-[#d7d5ce] bg-[#faf9f6] text-[#4a4944] transition-colors hover:bg-[#f1f0ea]"
+                className="relative flex h-11 w-11 items-center justify-center rounded-full border border-[#d7d5ce] bg-[#faf9f6] text-[#4a4944] transition-colors hover:bg-[#f1f0ea]"
                 aria-label={unreadNotifications > 0 ? `${unreadNotifications} ulæste notifikationer` : 'Notifikationer'}
               >
                 <Bell className="h-5 w-5" aria-hidden="true" />
@@ -92,7 +92,7 @@ export function TopBar() {
                 )}
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-72 bg-white border-[#d8d7cf]">
+            <DropdownMenuContent align="end" className="w-64 max-w-[calc(100vw-2rem)] bg-white border-[#d8d7cf]">
               <DropdownMenuLabel>Notifikationer</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {unreadNotifications === 0 ? (
@@ -113,7 +113,7 @@ export function TopBar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-[#d7d5ce] bg-[#faf9f6] transition-colors hover:bg-[#f1f0ea]"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-[#d7d5ce] bg-[#faf9f6] transition-colors hover:bg-[#f1f0ea]"
                 aria-label={`Brugermenu for ${currentUser?.name ?? 'bruger'}`}
               >
                 <Avatar className="h-8 w-8 border border-white shadow-sm">

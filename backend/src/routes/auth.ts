@@ -99,6 +99,7 @@ authRouter.post('/login', async (req: Request, res: Response) => {
         avatar: user.avatar,
         role: user.role,
         color: user.color,
+        isAdmin: user.isAdmin,
       },
       token,
     });

@@ -51,6 +51,7 @@ export interface ApiUser {
   phone?: string | null;
   professionalType?: string | null;
   organization?: string | null;
+  isAdmin?: boolean;
   createdAt?: string;
 }
 
@@ -63,6 +64,7 @@ export function mapUser(raw: ApiUser): User {
     color: (raw.color as User['color']) || 'warm',
     phone: raw.phone ?? undefined,
     role: (raw.role as User['role']) || 'parent',
+    isAdmin: raw.isAdmin ?? false,
     professionalType: raw.professionalType as User['professionalType'],
     organization: raw.organization ?? undefined,
   };

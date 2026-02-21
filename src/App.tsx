@@ -15,6 +15,9 @@ const OnboardingFlow = lazy(() =>
 const LoginScreen = lazy(() =>
   import('@/sections/LoginScreen').then((module) => ({ default: module.LoginScreen }))
 );
+const HouseholdSetup = lazy(() =>
+  import('@/sections/HouseholdSetup').then((module) => ({ default: module.HouseholdSetup }))
+);
 const Dashboard = lazy(() =>
   import('@/sections/Dashboard').then((module) => ({ default: module.Dashboard }))
 );
@@ -157,6 +160,23 @@ function App() {
             ) : (
               <OnboardingFlow onSwitchToLogin={() => setAuthScreen('login')} />
             )}
+          </Suspense>
+        </ErrorBoundary>
+        <Toaster position="top-center" />
+      </>
+    );
+  }
+
+  // User is authenticated but has no household — show setup
+  if (!household) {
+    return (
+      <>
+        <ErrorBoundary sectionName="Husstandsopsætning">
+          <Suspense fallback={<SectionLoading />}>
+            <HouseholdSetup onComplete={() => {
+              // Force re-render by touching a harmless state
+              // household is now set in the store, component will re-render
+            }} />
           </Suspense>
         </ErrorBoundary>
         <Toaster position="top-center" />

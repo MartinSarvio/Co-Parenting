@@ -38,6 +38,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Users, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { AdminPanel } from '@/sections/AdminPanel';
 
 const AVATAR_PRESETS = [
   'Maria', 'Anders', 'Sofie', 'Lars', 'Emma', 'Mikkel',
@@ -342,6 +343,9 @@ export function SettingsView() {
             <TabsTrigger value="subscription" className="flex-none min-w-[110px]">Abonnement</TabsTrigger>
             <TabsTrigger value="payments" className="flex-none min-w-[95px]">Betaling</TabsTrigger>
             <TabsTrigger value="members" className="flex-none min-w-[105px]">Medlemmer</TabsTrigger>
+            {currentUser?.isAdmin && (
+              <TabsTrigger value="admin" className="flex-none min-w-[80px]">Admin</TabsTrigger>
+            )}
           </TabsList>
         </div>
 
@@ -927,6 +931,12 @@ export function SettingsView() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        {currentUser?.isAdmin && (
+          <TabsContent value="admin" className="space-y-4">
+            <AdminPanel />
+          </TabsContent>
+        )}
 
         <TabsContent value="members" className="space-y-4">
           <Card>

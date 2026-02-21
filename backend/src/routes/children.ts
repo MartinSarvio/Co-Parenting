@@ -46,8 +46,8 @@ childrenRouter.post('/', async (req: AuthRequest, res: Response) => {
       medications,
     } = req.body;
 
-    if (!name || !birthDate || !parent1Id || !parent2Id || !householdId) {
-      res.status(400).json({ error: 'Navn, fødselsdato, forældre og husstand er påkrævet' });
+    if (!name || !birthDate || !parent1Id || !householdId) {
+      res.status(400).json({ error: 'Navn, fødselsdato, forælder og husstand er påkrævet' });
       return;
     }
 
@@ -69,7 +69,7 @@ childrenRouter.post('/', async (req: AuthRequest, res: Response) => {
         birthDate: new Date(birthDate),
         avatar,
         parent1Id,
-        parent2Id,
+        parent2Id: parent2Id || parent1Id,
         householdId,
         institutionName,
         institutionType,

@@ -69,13 +69,12 @@ export function ChildManagement() {
     }
 
     const parent1 = parents[0]?.id || '';
-    const parent2 = parents[1]?.id || parents[0]?.id || '';
 
     await createChild({
       name: newChild.name,
       birthDate: newChild.birthDate,
       parent1Id: newChild.parent1Id || parent1,
-      parent2Id: newChild.parent2Id || parent2,
+      ...(newChild.parent2Id ? { parent2Id: newChild.parent2Id } : {}),
       householdId: household?.id || '',
       allergies: newChild.allergies ? newChild.allergies.split(',').map(s => s.trim()) : [],
       medications: newChild.medications ? newChild.medications.split(',').map(s => s.trim()) : [],
@@ -180,14 +179,14 @@ export function ChildManagement() {
               {canAddChild ? 'Tilføj' : 'Maks nået'}
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-md max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Tilføj nyt barn</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 pt-4">
               <div className="space-y-2">
                 <Label>Navn</Label>
-                <Input 
+                <Input
                   value={newChild.name}
                   onChange={(e) => setNewChild({...newChild, name: e.target.value})}
                   placeholder="F.eks. Emma"
@@ -195,16 +194,16 @@ export function ChildManagement() {
               </div>
               <div className="space-y-2">
                 <Label>Fødselsdato</Label>
-                <Input 
+                <Input
                   type="date"
                   value={newChild.birthDate}
                   onChange={(e) => setNewChild({...newChild, birthDate: e.target.value})}
                 />
               </div>
               <div className="space-y-2">
-                <Label>Far/Forælder 1</Label>
-                <Select 
-                  value={newChild.parent1Id} 
+                <Label>Forælder 1</Label>
+                <Select
+                  value={newChild.parent1Id}
                   onValueChange={(v) => setNewChild({...newChild, parent1Id: v})}
                 >
                   <SelectTrigger>
@@ -218,15 +217,16 @@ export function ChildManagement() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Mor/Forælder 2</Label>
-                <Select 
-                  value={newChild.parent2Id} 
+                <Label>Forælder 2 <span className="text-xs text-slate-400 font-normal">(valgfrit)</span></Label>
+                <Select
+                  value={newChild.parent2Id}
                   onValueChange={(v) => setNewChild({...newChild, parent2Id: v})}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Vælg forælder" />
+                    <SelectValue placeholder="Ingen valgt" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="">Ingen</SelectItem>
                     {parents.map(p => (
                       <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
                     ))}
@@ -362,7 +362,7 @@ export function ChildManagement() {
                         <div className="flex items-center gap-2 mt-2">
                           <span className="text-xs text-slate-500">Forældre:</span>
                           <div className="flex -space-x-1">
-                            {[parent1, parent2].filter(Boolean).map((p, i) => (
+                            {[parent1, parent2].filter((p, i, arr) => p && (i === 0 || p.id !== arr[0]?.id)).map((p, i) => (
                               <Avatar key={i} className="w-5 h-5 border border-white">
                                 <AvatarImage src={p?.avatar} />
                                 <AvatarFallback className="text-[8px]">{p?.name[0]}</AvatarFallback>
@@ -456,7 +456,7 @@ export function ChildManagement() {
 
       {/* Edit Dialog */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Rediger barn</DialogTitle>
           </DialogHeader>

@@ -453,11 +453,18 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
                     <MessageCircle className="w-5 h-5 text-[#f58a2d] mt-0.5" />
                     <div className="text-sm text-[#9a622f]">
                       <p className="font-medium mb-1">Hvad sker der nu?</p>
-                      <p>Den anden forælder skal først oprette en konto. Derefter kan de inviteres til husstanden. Du kan springe dette over.</p>
+                      <p>Den anden forælder skal først oprette en konto. Derefter kan de inviteres til husstanden.</p>
                     </div>
                   </div>
                 </CardContent>
               </Card>
+              <Button
+                variant="ghost"
+                onClick={() => setStep(5)}
+                className="w-full text-slate-500"
+              >
+                Spring over — jeg er alene
+              </Button>
             </div>
           </motion.div>
         );

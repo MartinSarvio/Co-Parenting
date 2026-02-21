@@ -343,7 +343,7 @@ export function useApiActions() {
   // ── Children ────────────────────────────────────────────
 
   const createChild = useCallback(
-    async (data: { name: string; birthDate: string; parent1Id: string; parent2Id: string; householdId: string; allergies?: string[]; medications?: string[] }) => {
+    async (data: { name: string; birthDate: string; parent1Id: string; parent2Id?: string; householdId: string; allergies?: string[]; medications?: string[] }) => {
       try {
         const raw = await api.post<ApiChild>('/api/children', data);
         const child = mapChild(raw);
