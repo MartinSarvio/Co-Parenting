@@ -28,9 +28,10 @@ function generateToken(userId: string, role: string): string {
 authRouter.post('/register', async (req: Request, res: Response) => {
   try {
     const data = registerSchema.parse(req.body);
+    const emailLower = data.email.toLowerCase().trim();
 
     // Check if email already exists
-    const existing = await prisma.user.findUnique({ where: { email: data.email } });
+    const existing = await prisma.user.findUnique({ where: { email: emailLower } });
     if (existing) {
       res.status(409).json({ error: 'Email er allerede registreret' });
       return;
@@ -42,7 +43,7 @@ authRouter.post('/register', async (req: Request, res: Response) => {
     // Create user
     const user = await prisma.user.create({
       data: {
-        email: data.email,
+        email: emailLower,
         passwordHash,
         name: data.name,
         role: data.role,
@@ -76,8 +77,9 @@ authRouter.post('/register', async (req: Request, res: Response) => {
 authRouter.post('/login', async (req: Request, res: Response) => {
   try {
     const data = loginSchema.parse(req.body);
+    const emailLower = data.email.toLowerCase().trim();
 
-    const user = await prisma.user.findUnique({ where: { email: data.email } });
+    const user = await prisma.user.findUnique({ where: { email: emailLower } });
     if (!user) {
       res.status(401).json({ error: 'Forkert email eller adgangskode' });
       return;
