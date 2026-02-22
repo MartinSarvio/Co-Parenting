@@ -1449,43 +1449,46 @@ export function SettingsView() {
         </TabsContent>
 
         {/* ─── Familietype (fra sidepanel) ─── */}
-        <TabsContent value="familytype" className="space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Home className="h-4 w-4" />
-                Familietype
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 pt-0">
-              <div className="space-y-2">
-                <Label>Vælg familietype</Label>
-                <Select value={currentMode} onValueChange={(value: HouseholdMode) => handleFamilyModeChange(value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="together">Samboende familie</SelectItem>
-                    <SelectItem value="co_parenting">Skilt / Co-parenting</SelectItem>
-                    <SelectItem value="blended">Bonusfamilie</SelectItem>
-                    <SelectItem value="single_parent">Enlig forsørger</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="rounded-xl border border-[#d8d7cf] bg-[#f8f7f3] p-3 text-sm text-[#55524a]">
-                {isTogetherMode
-                  ? 'Samboende familier deler ét abonnement og ser alt sammen.'
-                  : isSingleParentMode
-                    ? 'Enlig forsørger har adgang til dokumentation og advokatværktøj.'
-                    : 'Skilte familier bruger separate abonnementer og kan dele udvalgt data.'}
-              </div>
-              <div className="rounded-xl border border-[#f58a2d]/20 bg-[#fff8f0] p-3">
-                <p className="text-sm font-medium text-[#b96424]">
-                  Aktuel: {familyModeLabels[currentMode]}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="familytype" className="space-y-0">
+          <div className="px-1 pt-2 pb-4">
+            <p className="text-xs text-[#75736b]">
+              Vælg den familietype der passer bedst til jeres situation.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {([
+              { value: 'together' as HouseholdMode, label: 'Samboende familie', desc: 'Deler ét abonnement og ser alt sammen', icon: '🏠' },
+              { value: 'co_parenting' as HouseholdMode, label: 'Skilt / Co-parenting', desc: 'Separate abonnementer, deler udvalgt data', icon: '🤝' },
+              { value: 'blended' as HouseholdMode, label: 'Bonusfamilie', desc: 'Udvidet familie med fælles overblik', icon: '👨‍👩‍👧‍👦' },
+              { value: 'single_parent' as HouseholdMode, label: 'Enlig forsørger', desc: 'Dokumentation og advokatværktøj', icon: '💪' },
+            ]).map((option) => (
+              <button
+                key={option.value}
+                onClick={() => handleFamilyModeChange(option.value)}
+                className={cn(
+                  "flex w-full items-center gap-3.5 rounded-2xl border-2 p-4 text-left transition-all active:scale-[0.98]",
+                  currentMode === option.value
+                    ? "border-[#f58a2d] bg-[#fff8f0]"
+                    : "border-[#e5e3dc] bg-white hover:border-[#d8d7cf]"
+                )}
+              >
+                <span className="text-xl">{option.icon}</span>
+                <div className="flex-1 min-w-0">
+                  <p className={cn(
+                    "text-[14px] font-semibold",
+                    currentMode === option.value ? "text-[#b96424]" : "text-[#2f2f2d]"
+                  )}>{option.label}</p>
+                  <p className="text-[11px] text-[#9a978f] mt-0.5">{option.desc}</p>
+                </div>
+                {currentMode === option.value && (
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#f58a2d]">
+                    <Check className="h-3.5 w-3.5 text-white" />
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
         </TabsContent>
 
         {/* ─── Feedback (fra sidepanel) ─── */}

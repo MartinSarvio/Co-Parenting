@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { addDays, format, isToday, isTomorrow, parseISO, setDay, startOfToday } from 'date-fns';
 import { da } from 'date-fns/locale';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Baby,
   Bell,
@@ -28,6 +28,8 @@ import {
   Minus,
   Share2,
   Timer,
+  ArrowLeft,
+  Search,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAppStore } from '@/store';
@@ -2678,52 +2680,42 @@ export function MadOgHjem() {
       )}
 
       {activeTab === 'ideas' && (
-        <div className="space-y-4">
-          <Card className="border-[#f3c59d] bg-[#fff2e6]">
-            <CardContent className="py-4">
-              <h3 className="font-semibold text-[#2f2f2d]">Flere ting jeg anbefaler at tilføje</h3>
-              <p className="mt-1 text-sm text-[#946539]">
-                Nu med 1-klik påmindelser, uge-skabeloner og auto-plan.
-              </p>
-            </CardContent>
-          </Card>
+        <div className="space-y-5">
 
-          <div className="space-y-4">
-            {/* ─── Uge-skabeloner ─── */}
-            <div className="rounded-2xl border-2 border-[#e5e3dc] bg-white overflow-hidden">
-              <div className="px-4 pt-4 pb-2">
-                <p className="text-[15px] font-bold text-[#2f2f2d]">Uge-skabeloner</p>
-              </div>
-              <div className="divide-y divide-[#eeedea]">
-                {weekTemplates.map((template) => (
-                  <div key={template.id} className="flex items-center gap-3.5 px-4 py-3.5">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f2f1ed]">
-                      <CalendarDays className="h-[18px] w-[18px] text-[#7a786f]" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[14px] font-semibold text-[#2f2f2d]">{template.name}</p>
-                      <p className="text-[11px] text-[#9a978f] truncate">{template.description}</p>
-                    </div>
-                    <button
-                      onClick={() => applyWeekTemplate(template.id)}
-                      className="shrink-0 rounded-xl border-2 border-[#e5e3dc] bg-white px-3.5 py-1.5 text-[12px] font-semibold text-[#4a4945] transition-all active:scale-[0.96] hover:border-[#cccbc3]"
-                    >
-                      Brug
-                    </button>
+          {/* ─── Uge-skabeloner ─── */}
+          <div>
+            <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] mb-2">Uge-skabeloner</p>
+            <div className="space-y-2">
+              {weekTemplates.map((template) => (
+                <div key={template.id} className="flex items-center gap-3.5 rounded-2xl border-2 border-[#e5e3dc] bg-white px-4 py-3.5">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#f2f1ed]">
+                    <CalendarDays className="h-5 w-5 text-[#7a786f]" />
                   </div>
-                ))}
-              </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[14px] font-semibold text-[#2f2f2d]">{template.name}</p>
+                    <p className="text-[11px] text-[#9a978f] mt-0.5 line-clamp-1">{template.description}</p>
+                  </div>
+                  <button
+                    onClick={() => applyWeekTemplate(template.id)}
+                    className="shrink-0 rounded-xl border-2 border-[#e5e3dc] bg-white px-4 py-2 text-[12px] font-semibold text-[#4a4945] transition-all active:scale-[0.96] hover:border-[#cccbc3]"
+                  >
+                    Brug
+                  </button>
+                </div>
+              ))}
             </div>
+          </div>
 
-            {/* ─── Auto-planlæg uge (regelbaseret) ─── */}
+          {/* ─── Auto-planlæg uge (regelbaseret) ─── */}
+          <div>
+            <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] mb-2">Auto-planlæg uge</p>
             <div className="rounded-2xl border-2 border-[#e5e3dc] bg-white overflow-hidden">
               <div className="px-4 pt-4 pb-1">
-                <p className="text-[15px] font-bold text-[#2f2f2d]">Auto-planlæg uge</p>
-                <p className="text-[11px] text-[#9a978f] mt-0.5">Regelbaseret madplan-generator</p>
+                <p className="text-[11px] text-[#9a978f]">Regelbaseret madplan-generator</p>
               </div>
               <div className="px-4 py-3 space-y-3">
                 <div className="space-y-1.5">
-                  <p className="text-[12px] font-semibold text-[#78766d]">Favoritter (kommasepareret)</p>
+                  <p className="text-[12px] font-semibold text-[#5f5d56]">Favoritter (kommasepareret)</p>
                   <Input
                     value={autoPlannerSettings.favoriteKeywords}
                     onChange={(e) => setAutoPlannerSettings((prev) => ({ ...prev, favoriteKeywords: e.target.value }))}
@@ -2733,7 +2725,7 @@ export function MadOgHjem() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <p className="text-[12px] font-semibold text-[#78766d]">Undgå ingredienser (kommasepareret)</p>
+                  <p className="text-[12px] font-semibold text-[#5f5d56]">Undgå ingredienser (kommasepareret)</p>
                   <Input
                     value={autoPlannerSettings.avoidIngredients}
                     onChange={(e) => setAutoPlannerSettings((prev) => ({ ...prev, avoidIngredients: e.target.value }))}
@@ -2742,8 +2734,8 @@ export function MadOgHjem() {
                   />
                 </div>
 
-                <div className="space-y-2.5 pt-1">
-                  <label className="flex items-center gap-3 text-[13px] text-[#4a4945]">
+                <div className="space-y-3 pt-1">
+                  <label className="flex items-center gap-3 rounded-xl bg-[#faf9f6] px-3 py-2.5 text-[13px] text-[#2f2f2d]">
                     <Checkbox
                       checked={autoPlannerSettings.childFriendly}
                       onCheckedChange={(checked) => setAutoPlannerSettings((prev) => ({ ...prev, childFriendly: checked as boolean }))}
@@ -2751,7 +2743,7 @@ export function MadOgHjem() {
                     />
                     Prioritér børnevenlige retter
                   </label>
-                  <label className="flex items-center gap-3 text-[13px] text-[#4a4945]">
+                  <label className="flex items-center gap-3 rounded-xl bg-[#faf9f6] px-3 py-2.5 text-[13px] text-[#2f2f2d]">
                     <Checkbox
                       checked={autoPlannerSettings.replaceExisting}
                       onCheckedChange={(checked) => setAutoPlannerSettings((prev) => ({ ...prev, replaceExisting: checked as boolean }))}
@@ -2759,7 +2751,7 @@ export function MadOgHjem() {
                     />
                     Erstat eksisterende middage i denne uge
                   </label>
-                  <label className="flex items-center gap-3 text-[13px] text-[#4a4945]">
+                  <label className="flex items-center gap-3 rounded-xl bg-[#faf9f6] px-3 py-2.5 text-[13px] text-[#2f2f2d]">
                     <Checkbox
                       checked={autoPlannerSettings.useChildAllergies}
                       onCheckedChange={(checked) => setAutoPlannerSettings((prev) => ({ ...prev, useChildAllergies: checked as boolean }))}
@@ -2776,154 +2768,191 @@ export function MadOgHjem() {
 
                 <button
                   onClick={generateAutoWeekPlan}
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#f58a2d] px-4 py-3 text-[14px] font-bold text-white shadow-[0_2px_12px_rgba(245,138,45,0.25)] transition-all active:scale-[0.98]"
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#f58a2d] px-4 py-3.5 text-[14px] font-bold text-white shadow-[0_2px_12px_rgba(245,138,45,0.25)] transition-all active:scale-[0.98]"
                 >
                   <RefreshCw className="h-4 w-4" />
                   Generer ugeplan automatisk
                 </button>
-                <p className="text-[11px] text-[#9a978f] text-center">
+                <p className="text-[11px] text-[#9a978f] text-center pb-1">
                   Planneren vælger 7 middage ud fra dine regler og opretter dem i madplanen.
                 </p>
               </div>
             </div>
+          </div>
 
-            {/* ─── Ekstra hurtigtilvalg ─── */}
-            <div className="rounded-2xl border-2 border-[#e5e3dc] bg-white overflow-hidden">
-              <div className="px-4 pt-4 pb-2">
-                <p className="text-[15px] font-bold text-[#2f2f2d]">Ekstra hurtigtilvalg</p>
-              </div>
-              <div className="divide-y divide-[#eeedea]">
-                {[
-                  { id: 'weekly-check-in', title: 'Ugentlig familie check-in', desc: 'Automatisk møde i kalenderen hver søndag aften.', icon: CalendarDays },
-                  { id: 'meal-routine', title: 'Fast madplan-rutine', desc: 'Gentagende opgave, så I husker næste uges måltider.', icon: Repeat2 },
-                  { id: 'starter-shopping', title: 'Basis-indkøbsliste', desc: 'Fyld listen med faste basisvarer med ét klik.', icon: ShoppingCart },
-                  { id: 'monthly-deep-clean', title: 'Månedlig dybderengøring', desc: 'Fast plan for de tungere huslige opgaver.', icon: Home },
-                ].map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <div key={item.id} className="flex items-center gap-3.5 px-4 py-3.5">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f2f1ed]">
-                        <Icon className="h-[18px] w-[18px] text-[#7a786f]" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[14px] font-semibold text-[#2f2f2d]">{item.title}</p>
-                        <p className="text-[11px] text-[#9a978f] leading-snug">{item.desc}</p>
-                      </div>
-                      <button
-                        onClick={() => applyIdea(item.id)}
-                        className="shrink-0 rounded-xl bg-[#f58a2d] px-3.5 py-1.5 text-[12px] font-bold text-white transition-all active:scale-[0.96]"
-                      >
-                        Tilføj
-                      </button>
+          {/* ─── Ekstra hurtigtilvalg ─── */}
+          <div>
+            <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] mb-2">Hurtigtilvalg</p>
+            <div className="space-y-2">
+              {[
+                { id: 'weekly-check-in', title: 'Ugentlig familie check-in', desc: 'Automatisk møde i kalenderen hver søndag aften.', icon: CalendarDays },
+                { id: 'meal-routine', title: 'Fast madplan-rutine', desc: 'Gentagende opgave, så I husker næste uges måltider.', icon: Repeat2 },
+                { id: 'starter-shopping', title: 'Basis-indkøbsliste', desc: 'Fyld listen med faste basisvarer med ét klik.', icon: ShoppingCart },
+                { id: 'monthly-deep-clean', title: 'Månedlig dybderengøring', desc: 'Fast plan for de tungere huslige opgaver.', icon: Home },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.id} className="flex items-center gap-3.5 rounded-2xl border-2 border-[#e5e3dc] bg-white px-4 py-3.5">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#fff2e6]">
+                      <Icon className="h-5 w-5 text-[#f58a2d]" />
                     </div>
-                  );
-                })}
-              </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[14px] font-semibold text-[#2f2f2d]">{item.title}</p>
+                      <p className="text-[11px] text-[#9a978f] leading-snug mt-0.5">{item.desc}</p>
+                    </div>
+                    <button
+                      onClick={() => applyIdea(item.id)}
+                      className="shrink-0 rounded-xl bg-[#f58a2d] px-4 py-2 text-[12px] font-bold text-white transition-all active:scale-[0.96]"
+                    >
+                      Tilføj
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
       )}
 
-      {/* Recipe Browser Sheet */}
-      <Sheet open={recipeBrowserOpen} onOpenChange={setRecipeBrowserOpen}>
-        <SheetContent side="bottom" className="h-[85vh] rounded-t-3xl bg-[#faf9f6]">
-          <SheetHeader>
-            <SheetTitle className="text-[1rem] text-[#2f2f2d]">Opskrifter</SheetTitle>
-          </SheetHeader>
-          <div className="space-y-3 pb-2">
-            <div className="flex gap-2">
-              <Input
-                value={recipeSearch}
-                onChange={e => setRecipeSearch(e.target.value)}
-                placeholder="Søg opskrift..."
-                className="flex-1 rounded-xl border-[#d8d7cf] bg-white"
-              />
-              <Button
-                size="sm"
-                className="shrink-0 rounded-xl bg-[#f58a2d] text-white hover:bg-[#e47921]"
-                onClick={() => setCreateRecipeOpen(true)}
-              >
-                <Plus className="mr-1 h-4 w-4" />
-                Ny
-              </Button>
-            </div>
-            <div className="flex gap-1.5 overflow-x-auto pb-1">
-              <button
-                onClick={() => setRecipeCategory('Alle')}
-                className={cn(
-                  "shrink-0 rounded-full px-3 py-1 text-xs font-semibold transition-all",
-                  recipeCategory === 'Alle' ? "bg-[#2f2f2f] text-white" : "bg-[#ecebe5] text-[#5f5d56]"
-                )}
-              >
-                Alle
-              </button>
-              {recipeCategories.map((cat: string) => (
+      {/* Recipe Browser — Full-screen page */}
+      <AnimatePresence>
+        {recipeBrowserOpen && (
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            className="fixed inset-0 z-50 bg-[#faf9f6] overflow-hidden flex flex-col"
+            style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+          >
+            {/* Header */}
+            <div className="shrink-0 px-4 pt-3 pb-2">
+              <div className="flex items-center gap-3 mb-4">
                 <button
-                  key={cat}
-                  onClick={() => setRecipeCategory(cat)}
+                  onClick={() => setRecipeBrowserOpen(false)}
+                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f2f1ed] transition-all active:scale-[0.92]"
+                >
+                  <ArrowLeft className="h-[18px] w-[18px] text-[#2f2f2d]" />
+                </button>
+                <h1 className="text-[20px] font-bold tracking-[-0.02em] text-[#2f2f2d]">Opskrifter</h1>
+                <div className="flex-1" />
+                <button
+                  onClick={() => setCreateRecipeOpen(true)}
+                  className="flex items-center gap-1.5 rounded-xl bg-[#f58a2d] px-3.5 py-2 text-[13px] font-bold text-white transition-all active:scale-[0.96]"
+                >
+                  <Plus className="h-4 w-4" />
+                  Ny
+                </button>
+              </div>
+
+              {/* Search */}
+              <div className="relative mb-3">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#b0ada4]" />
+                <Input
+                  value={recipeSearch}
+                  onChange={e => setRecipeSearch(e.target.value)}
+                  placeholder="Søg opskrift..."
+                  className="pl-9 rounded-xl border-[#e5e3dc] bg-white text-[14px]"
+                />
+              </div>
+
+              {/* Category filter pills */}
+              <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4">
+                <button
+                  onClick={() => setRecipeCategory('Alle')}
                   className={cn(
-                    "shrink-0 rounded-full px-3 py-1 text-xs font-semibold transition-all",
-                    recipeCategory === cat ? "bg-[#2f2f2f] text-white" : "bg-[#ecebe5] text-[#5f5d56]"
+                    "shrink-0 rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition-all",
+                    recipeCategory === 'Alle' ? "bg-[#2f2f2f] text-white" : "bg-[#f2f1ed] text-[#5f5d56]"
                   )}
                 >
-                  {cat}
+                  Alle
                 </button>
-              ))}
+                {recipeCategories.map((cat: string) => (
+                  <button
+                    key={cat}
+                    onClick={() => setRecipeCategory(cat)}
+                    className={cn(
+                      "shrink-0 rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition-all",
+                      recipeCategory === cat ? "bg-[#2f2f2f] text-white" : "bg-[#f2f1ed] text-[#5f5d56]"
+                    )}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-          <div className="overflow-y-auto space-y-2 pb-8">
-            {filteredRecipes.map((recipe: Recipe) => (
-              <button
-                key={recipe.id}
-                onClick={() => { setSelectedRecipe(recipe); setRecipeServings(recipe.servings); }}
-                className="flex w-full items-center gap-3 rounded-xl border border-[#e8e7e0] bg-white px-3 py-3 text-left hover:bg-[#faf9f6] transition-colors"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="text-[13px] font-semibold text-[#2f2f2d]">{recipe.name}</p>
-                    {recipe.childFriendly && (
-                      <span className="inline-flex items-center gap-0.5 rounded-md bg-[#fff2e6] px-1.5 py-0.5 text-[10px] font-semibold text-[#cc6f1f]">
-                        <Baby className="h-3 w-3" /> Børnevenlig
-                      </span>
-                    )}
-                    {recipe.isUserRecipe && (
-                      <span className="rounded-md bg-[#e8f4fd] px-1.5 py-0.5 text-[10px] font-semibold text-[#4a90d9]">Din</span>
-                    )}
-                    {recipe.isShared && (
-                      <Share2 className="h-3 w-3 text-[#22c55e]" />
-                    )}
-                  </div>
-                  <p className="mt-0.5 text-[11px] text-[#78766d] line-clamp-1">{recipe.description}</p>
-                  <div className="mt-1 flex items-center gap-2 text-[10px] text-[#78766d]">
-                    <span className="flex items-center gap-1">
-                      <span className={cn("h-2 w-2 rounded-full", recipe.difficulty === 'easy' ? "bg-[#4caf50]" : recipe.difficulty === 'medium' ? "bg-[#f5a623]" : "bg-[#e53935]")} />
-                      {recipe.difficulty === 'easy' ? 'Nem' : recipe.difficulty === 'medium' ? 'Medium' : 'Svær'}
-                    </span>
-                    <span>·</span>
-                    <span>{recipe.prepTime + recipe.cookTime} min</span>
-                    <span>·</span>
-                    <span>{recipe.servings} pers.</span>
-                    <span>·</span>
-                    <span>{recipe.nutrition.kcal} kcal</span>
-                  </div>
-                </div>
-                <ChevronRight className="h-4 w-4 text-[#c8c6bc] shrink-0" />
-              </button>
-            ))}
-            {filteredRecipes.length === 0 && (
-              <p className="py-8 text-center text-[12px] text-[#78766d]">Ingen opskrifter fundet</p>
-            )}
-          </div>
-        </SheetContent>
-      </Sheet>
 
-      {/* Create Recipe Sheet */}
-      <Sheet open={createRecipeOpen} onOpenChange={setCreateRecipeOpen}>
-        <SheetContent side="bottom" className="h-[90vh] rounded-t-3xl bg-[#faf9f6]">
-          <SheetHeader>
-            <SheetTitle className="text-[1rem] text-[#2f2f2d]">Opret ny opskrift</SheetTitle>
-          </SheetHeader>
-          <div className="overflow-y-auto space-y-4 pb-8">
+            {/* Recipe list */}
+            <div className="flex-1 overflow-y-auto px-4 pb-8">
+              <div className="space-y-2 pt-2">
+                {filteredRecipes.map((recipe: Recipe) => (
+                  <button
+                    key={recipe.id}
+                    onClick={() => { setSelectedRecipe(recipe); setRecipeServings(recipe.servings); }}
+                    className="flex w-full items-center gap-3 rounded-2xl border-2 border-[#e5e3dc] bg-white px-4 py-3.5 text-left transition-all active:scale-[0.98] hover:border-[#d8d7cf]"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-[14px] font-semibold text-[#2f2f2d]">{recipe.name}</p>
+                        {recipe.childFriendly && (
+                          <span className="inline-flex items-center gap-0.5 rounded-lg bg-[#fff2e6] border border-[#f3c59d] px-1.5 py-0.5 text-[10px] font-semibold text-[#cc6f1f]">
+                            <Baby className="h-3 w-3" /> Børnevenlig
+                          </span>
+                        )}
+                        {recipe.isUserRecipe && (
+                          <span className="rounded-lg bg-[#e8f4fd] border border-[#b3d4f0] px-1.5 py-0.5 text-[10px] font-semibold text-[#4a90d9]">Din</span>
+                        )}
+                      </div>
+                      <p className="mt-1 text-[12px] text-[#78766d] line-clamp-1">{recipe.description}</p>
+                      <div className="mt-1.5 flex items-center gap-2 text-[11px] text-[#9a978f]">
+                        <span className="flex items-center gap-1">
+                          <span className={cn("h-2 w-2 rounded-full", recipe.difficulty === 'easy' ? "bg-[#4caf50]" : recipe.difficulty === 'medium' ? "bg-[#f5a623]" : "bg-[#e53935]")} />
+                          {recipe.difficulty === 'easy' ? 'Nem' : recipe.difficulty === 'medium' ? 'Medium' : 'Svær'}
+                        </span>
+                        <span>·</span>
+                        <span>{recipe.prepTime + recipe.cookTime} min</span>
+                        <span>·</span>
+                        <span>{recipe.servings} pers.</span>
+                        <span>·</span>
+                        <span>{recipe.nutrition.kcal} kcal</span>
+                      </div>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-[#c8c6bc] shrink-0" />
+                  </button>
+                ))}
+                {filteredRecipes.length === 0 && (
+                  <div className="py-12 text-center">
+                    <BookOpen className="mx-auto h-8 w-8 text-[#d8d7cf] mb-2" />
+                    <p className="text-[13px] text-[#9a978f]">Ingen opskrifter fundet</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Create Recipe — Full-screen page */}
+      <AnimatePresence>
+        {createRecipeOpen && (
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            className="fixed inset-0 z-[60] bg-[#faf9f6] overflow-hidden flex flex-col"
+            style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+          >
+            <div className="shrink-0 px-4 pt-3 pb-3 flex items-center gap-3">
+              <button
+                onClick={() => setCreateRecipeOpen(false)}
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f2f1ed] transition-all active:scale-[0.92]"
+              >
+                <ArrowLeft className="h-[18px] w-[18px] text-[#2f2f2d]" />
+              </button>
+              <h1 className="text-[20px] font-bold tracking-[-0.02em] text-[#2f2f2d]">Opret ny opskrift</h1>
+            </div>
+          <div className="flex-1 overflow-y-auto px-4 space-y-4 pb-8">
             <div className="space-y-2">
               <Label className="text-[12px] font-semibold text-[#78766d]">Navn</Label>
               <Input
@@ -3068,52 +3097,69 @@ export function MadOgHjem() {
               Gem opskrift
             </Button>
           </div>
-        </SheetContent>
-      </Sheet>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Recipe Detail Dialog */}
-      <Dialog open={!!selectedRecipe} onOpenChange={(open) => { if (!open) setSelectedRecipe(null); }}>
-        <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
-          {selectedRecipe && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="text-[1.1rem] tracking-[-0.01em] text-[#2f2f2d]">{selectedRecipe.name}</DialogTitle>
-              </DialogHeader>
+      {/* Recipe Detail — Full-screen page */}
+      <AnimatePresence>
+        {selectedRecipe && (
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            className="fixed inset-0 z-[55] bg-[#faf9f6] overflow-hidden flex flex-col"
+            style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+          >
+            {/* Header */}
+            <div className="shrink-0 px-4 pt-3 pb-3 flex items-center gap-3">
+              <button
+                onClick={() => setSelectedRecipe(null)}
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f2f1ed] transition-all active:scale-[0.92]"
+              >
+                <ArrowLeft className="h-[18px] w-[18px] text-[#2f2f2d]" />
+              </button>
+              <h1 className="text-[20px] font-bold tracking-[-0.02em] text-[#2f2f2d] truncate">{selectedRecipe.name}</h1>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto px-4 pb-8">
               <div className="space-y-4">
-                <p className="text-[12px] text-[#4a4945]">{selectedRecipe.description}</p>
+                <p className="text-[13px] text-[#4a4945] leading-relaxed">{selectedRecipe.description}</p>
 
                 {/* Nutrition bar */}
-                <div className="flex gap-2">
+                <div className="grid grid-cols-4 gap-2">
                   {[
                     { label: 'Kcal', val: Math.round(selectedRecipe.nutrition.kcal * recipeServings / selectedRecipe.servings), color: 'bg-[#f58a2d]' },
                     { label: 'Protein', val: `${Math.round(selectedRecipe.nutrition.protein * recipeServings / selectedRecipe.servings)}g`, color: 'bg-[#4a90d9]' },
                     { label: 'Kulhydrat', val: `${Math.round(selectedRecipe.nutrition.carbs * recipeServings / selectedRecipe.servings)}g`, color: 'bg-[#22c55e]' },
                     { label: 'Fedt', val: `${Math.round(selectedRecipe.nutrition.fat * recipeServings / selectedRecipe.servings)}g`, color: 'bg-[#ef4444]' },
                   ].map(n => (
-                    <div key={n.label} className="flex-1 rounded-lg border border-[#e8e7e0] bg-white p-2 text-center">
-                      <div className={cn("mx-auto mb-1 h-1 w-8 rounded-full", n.color)} />
-                      <p className="text-[13px] font-bold text-[#2f2f2d]">{n.val}</p>
-                      <p className="text-[10px] text-[#78766d]">{n.label}</p>
+                    <div key={n.label} className="rounded-2xl border-2 border-[#e5e3dc] bg-white p-3 text-center">
+                      <div className={cn("mx-auto mb-1.5 h-1.5 w-10 rounded-full", n.color)} />
+                      <p className="text-[14px] font-bold text-[#2f2f2d]">{n.val}</p>
+                      <p className="text-[10px] text-[#9a978f]">{n.label}</p>
                     </div>
                   ))}
                 </div>
 
                 {/* Serving adjuster */}
-                <div className="flex items-center justify-between rounded-xl border border-[#e8e7e0] bg-white px-3 py-2">
-                  <span className="text-[12px] font-semibold text-[#2f2f2d]">Portioner</span>
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center justify-between rounded-2xl border-2 border-[#e5e3dc] bg-white px-4 py-3">
+                  <span className="text-[13px] font-semibold text-[#2f2f2d]">Portioner</span>
+                  <div className="flex items-center gap-3">
                     <button
                       onClick={() => setRecipeServings(Math.max(1, recipeServings - 1))}
-                      className="flex h-7 w-7 items-center justify-center rounded-full bg-[#ecebe5] text-[#5f5d56] hover:bg-[#e0deda]"
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56] active:scale-[0.92]"
                     >
-                      <Minus className="h-3.5 w-3.5" />
+                      <Minus className="h-4 w-4" />
                     </button>
-                    <span className="w-6 text-center text-sm font-bold text-[#2f2f2d]">{recipeServings}</span>
+                    <span className="w-6 text-center text-[15px] font-bold text-[#2f2f2d]">{recipeServings}</span>
                     <button
                       onClick={() => setRecipeServings(Math.min(20, recipeServings + 1))}
-                      className="flex h-7 w-7 items-center justify-center rounded-full bg-[#ecebe5] text-[#5f5d56] hover:bg-[#e0deda]"
+                      className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56] active:scale-[0.92]"
                     >
-                      <Plus className="h-3.5 w-3.5" />
+                      <Plus className="h-4 w-4" />
                     </button>
                   </div>
                 </div>
@@ -3121,14 +3167,14 @@ export function MadOgHjem() {
                 {/* Ingredients */}
                 <div>
                   <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Ingredienser</p>
-                  <div className="rounded-xl border border-[#e8e7e0] bg-white p-3 space-y-1.5">
+                  <div className="rounded-2xl border-2 border-[#e5e3dc] bg-white p-4 space-y-2">
                     {selectedRecipe.ingredients.map((ing, i) => {
                       const scale = recipeServings / selectedRecipe.servings;
                       const amount = Math.round(ing.amount * scale * 10) / 10;
                       return (
-                        <div key={i} className="flex justify-between text-[12px]">
+                        <div key={i} className="flex justify-between text-[13px]">
                           <span className="text-[#2f2f2d]">{ing.name}</span>
-                          <span className="text-[#78766d] font-medium">{amount} {ing.unit}</span>
+                          <span className="text-[#9a978f] font-medium">{amount} {ing.unit}</span>
                         </div>
                       );
                     })}
@@ -3138,17 +3184,19 @@ export function MadOgHjem() {
                 {/* Steps */}
                 <div>
                   <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Tilberedning</p>
-                  <div className="space-y-2">
+                  <div className="space-y-2.5">
                     {selectedRecipe.steps.map(step => (
-                      <div key={step.step} className="rounded-xl border border-[#e8e7e0] bg-white px-3 py-2.5">
-                        <div className="flex items-start gap-2.5">
-                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#f58a2d] text-[11px] font-bold text-white">
+                      <div key={step.step} className="rounded-2xl border-2 border-[#e5e3dc] bg-white px-4 py-3">
+                        <div className="flex items-start gap-3">
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#f58a2d] text-[12px] font-bold text-white">
                             {step.step}
                           </span>
-                          <div>
-                            <p className="text-[12px] text-[#2f2f2d] leading-relaxed">{step.description}</p>
+                          <div className="pt-0.5">
+                            <p className="text-[13px] text-[#2f2f2d] leading-relaxed">{step.description}</p>
                             {step.duration && (
-                              <p className="mt-0.5 text-[10px] text-[#78766d]">⏱ {step.duration} min</p>
+                              <p className="mt-1 text-[11px] text-[#9a978f] flex items-center gap-1">
+                                <Timer className="h-3 w-3" /> {step.duration} min
+                              </p>
                             )}
                           </div>
                         </div>
@@ -3158,9 +3206,10 @@ export function MadOgHjem() {
                 </div>
 
                 {/* Add to meal plan button */}
-                <Button
-                  className="w-full rounded-2xl bg-[#f58a2d] text-white hover:bg-[#e47921]"
+                <button
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#f58a2d] px-4 py-3.5 text-[14px] font-bold text-white shadow-[0_2px_12px_rgba(245,138,45,0.25)] transition-all active:scale-[0.98]"
                   onClick={() => {
+                    if (!selectedRecipe) return;
                     setNewMeal((prev) => ({
                       ...prev,
                       title: selectedRecipe.name,
@@ -3178,14 +3227,14 @@ export function MadOgHjem() {
                     toast.success('Opskrift tilføjet til madplan');
                   }}
                 >
-                  <ChefHat className="mr-2 h-4 w-4" />
+                  <ChefHat className="h-4 w-4" />
                   Tilføj til madplan
-                </Button>
+                </button>
               </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
