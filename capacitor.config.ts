@@ -5,8 +5,9 @@ const config: CapacitorConfig = {
   appName: 'Hverdag',
   webDir: 'dist',
   ios: {
-    contentInset: 'automatic',
+    contentInset: 'always',
     backgroundColor: '#f2f1ed',
+    allowsLinkPreview: false,
   },
   server: {
     allowNavigation: ['sa.up.railway.app'],

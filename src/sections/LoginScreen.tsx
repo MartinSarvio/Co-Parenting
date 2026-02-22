@@ -1,25 +1,44 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/input';
-import { Mail, Lock, Loader2 } from 'lucide-react';
+import { Mail, Lock, Loader2, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { loginUser } from '@/lib/auth';
 import { loadInitialData } from '@/lib/dataSync';
 import { useAppStore } from '@/store';
 import { ApiError } from '@/lib/api';
 import { RibbonBanner } from '@/components/custom/RibbonBanner';
-import { initPushNotifications } from '@/lib/pushNotifications';
+// Push notifications temporarily disabled — plugin incompatible with Capacitor 8.1
+// import { initPushNotifications } from '@/lib/pushNotifications';
 
 interface LoginScreenProps {
   onSwitchToRegister: () => void;
 }
 
+const SAVED_CREDENTIALS_KEY = 'hverdag-saved-credentials';
+
 export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const { setCurrentUser, setAuthenticated, hydrateFromServer } = useAppStore();
+
+  // Load saved credentials on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(SAVED_CREDENTIALS_KEY);
+      if (saved) {
+        const { email: savedEmail, password: savedPassword } = JSON.parse(saved);
+        setEmail(savedEmail || '');
+        setPassword(savedPassword || '');
+        setRememberMe(true);
+      }
+    } catch {
+      // Ignore parse errors
+    }
+  }, []);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -44,9 +63,16 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
         }
       }
 
+      // Save or clear credentials based on "Husk mig"
+      if (rememberMe) {
+        localStorage.setItem(SAVED_CREDENTIALS_KEY, JSON.stringify({ email, password }));
+      } else {
+        localStorage.removeItem(SAVED_CREDENTIALS_KEY);
+      }
+
       setAuthenticated(true);
       toast.success(`Velkommen, ${user.name}!`);
-      initPushNotifications().catch(console.warn);
+      // initPushNotifications().catch(console.warn);
     } catch (err) {
       if (err instanceof ApiError) {
         toast.error(err.message);
@@ -117,6 +143,28 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
                   onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
                 />
               </div>
+
+              {/* Remember me */}
+              <button
+                type="button"
+                onClick={() => {
+                  const next = !rememberMe;
+                  setRememberMe(next);
+                  if (!next) localStorage.removeItem(SAVED_CREDENTIALS_KEY);
+                }}
+                className="flex items-center gap-2.5 py-1 -mt-0.5"
+              >
+                <div
+                  className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all duration-150 ${
+                    rememberMe
+                      ? 'bg-[#f58a2d] border-[#f58a2d]'
+                      : 'bg-white/80 border-[#d5d3cc]'
+                  }`}
+                >
+                  {rememberMe && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
+                </div>
+                <span className="text-[13px] text-[#7a776f]">Husk mig</span>
+              </button>
 
               {/* Login button */}
               <button

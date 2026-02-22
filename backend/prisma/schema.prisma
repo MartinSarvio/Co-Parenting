@@ -24,11 +24,6 @@ model User {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
-  // GDPR — soft-delete & anonymization
-  deletedAt         DateTime? // Null = active, set = soft-deleted
-  anonymizedAt      DateTime? // When personal data was anonymized
-  deletionReason    String?   // "self_request" | "admin_request" | "gdpr_request"
-
   // Relations
   householdMembers  HouseholdMember[]
   childrenAsParent1 Child[]           @relation("Parent1")

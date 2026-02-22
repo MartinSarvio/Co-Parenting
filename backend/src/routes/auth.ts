@@ -91,12 +91,6 @@ authRouter.post('/login', async (req: Request, res: Response) => {
       return;
     }
 
-    // Block login for soft-deleted accounts
-    if (user.deletedAt) {
-      res.status(403).json({ error: 'Denne konto er slettet. Kontakt support hvis du mener det er en fejl.' });
-      return;
-    }
-
     const validPassword = await bcrypt.compare(data.password, user.passwordHash);
     if (!validPassword) {
       res.status(401).json({ error: 'Forkert email eller adgangskode' });
@@ -166,8 +160,7 @@ authRouter.get('/me', async (req: Request, res: Response) => {
 });
 
 // DELETE /api/auth/account
-// Self-service account deletion (GDPR Art. 17 — ret til sletning)
-// User requests their own account to be soft-deleted and anonymized
+// Self-service account deletion
 authRouter.delete('/account', async (req: Request, res: Response) => {
   const authHeader = req.headers.authorization;
   if (!authHeader?.startsWith('Bearer ')) {
@@ -185,21 +178,14 @@ authRouter.delete('/account', async (req: Request, res: Response) => {
       return;
     }
 
-    if (user.deletedAt) {
-      res.status(400).json({ error: 'Konto er allerede slettet' });
-      return;
-    }
+    // Remove device tokens
+    await prisma.deviceToken.deleteMany({ where: { userId: user.id } });
 
-    const now = new Date();
+    // Anonymize personal data
     const anonymizedEmail = `deleted-${user.id}@anonymized.local`;
-
-    // Soft-delete + anonymize personal data
     await prisma.user.update({
       where: { id: user.id },
       data: {
-        deletedAt: now,
-        anonymizedAt: now,
-        deletionReason: 'self_request',
         email: anonymizedEmail,
         name: 'Slettet bruger',
         passwordHash: 'DELETED',
@@ -210,17 +196,7 @@ authRouter.delete('/account', async (req: Request, res: Response) => {
       },
     });
 
-    // Remove device tokens
-    await prisma.deviceToken.deleteMany({ where: { userId: user.id } });
-
-    res.json({
-      message: 'Din konto er slettet og dine persondata er anonymiseret.',
-      gdpr: {
-        deletedAt: now.toISOString(),
-        anonymized: true,
-        retention: 'Anonymiserede poster opbevares i op til 5 år jf. dansk bogføringslov (§10 i bogføringsloven). Herefter slettes de permanent.',
-      },
-    });
+    res.json({ message: 'Din konto er slettet og dine persondata er anonymiseret.' });
   } catch {
     res.status(401).json({ error: 'Ugyldig token' });
   }
