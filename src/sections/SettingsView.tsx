@@ -245,21 +245,33 @@ export function SettingsView() {
   };
 
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [hasStripeCustomer, setHasStripeCustomer] = useState(false);
 
   const handlePlanChange = async (nextPlan: SubscriptionPlan) => {
     if (!household) return;
 
-    // Downgrade to free — update locally (Stripe cancellation handled via portal)
+    // Already on this plan — no action needed
+    if (nextPlan === plan) return;
+
+    // Downgrade to free — if they have Stripe, open portal; otherwise just update locally
     if (nextPlan === 'free') {
-      setHousehold({
-        ...household,
-        subscription: { ...subscription, plan: 'free' }
-      });
-      toast.success('Plan sat til Gratis');
+      if (hasStripeCustomer) {
+        try {
+          await openBillingPortal();
+        } catch {
+          toast.error('Kunne ikke åbne abonnementsstyring');
+        }
+      } else {
+        setHousehold({
+          ...household,
+          subscription: { ...subscription, plan: 'free' }
+        });
+        toast.success('Plan sat til Gratis');
+      }
       return;
     }
 
-    // Upgrade to paid plan — redirect to Stripe Checkout
+    // Upgrade/switch to paid plan — redirect to Stripe Checkout
     setCheckoutLoading(true);
     try {
       await startCheckout(nextPlan as StripePlan, 'monthly');
@@ -287,7 +299,6 @@ export function SettingsView() {
 
     if (stripeResult === 'success') {
       toast.success('Betaling gennemført! Dit abonnement er nu aktivt.');
-      // Clean URL
       window.history.replaceState({}, '', window.location.pathname);
     } else if (stripeResult === 'cancel') {
       toast.info('Betaling annulleret');
@@ -296,15 +307,18 @@ export function SettingsView() {
 
     // Fetch real subscription status from Stripe
     fetchStripeStatus().then((status) => {
-      if (status.stripeActive && household && status.plan !== 'free') {
-        setHousehold({
-          ...household,
-          subscription: {
-            ...subscription,
-            plan: status.plan as SubscriptionPlan,
-            status: 'active',
-          }
-        });
+      if (status.stripeActive) {
+        setHasStripeCustomer(true);
+        if (household && status.plan !== 'free') {
+          setHousehold({
+            ...household,
+            subscription: {
+              ...subscription,
+              plan: status.plan as SubscriptionPlan,
+              status: 'active',
+            }
+          });
+        }
       }
     }).catch(() => { /* ignore — fallback to local state */ });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -1007,12 +1021,14 @@ export function SettingsView() {
               <button
                 key={planCard.id}
                 type="button"
+                disabled={checkoutLoading}
                 onClick={() => handlePlanChange(planCard.id)}
                 className={cn(
                   'relative w-full rounded-2xl border-2 p-4 text-left transition-all',
                   isActive
                     ? 'border-[#f58a2d] bg-[#fff8f0] shadow-[0_2px_12px_rgba(245,138,45,0.12)]'
-                    : 'border-[#e0dfd8] bg-white hover:border-[#cccbc3]'
+                    : 'border-[#e0dfd8] bg-white hover:border-[#cccbc3]',
+                  checkoutLoading && 'opacity-60 pointer-events-none'
                 )}
               >
                 {planCard.badge && (
@@ -1079,8 +1095,8 @@ export function SettingsView() {
             </div>
           )}
 
-          {/* Administrer abonnement — for paid users */}
-          {plan !== 'free' && (
+          {/* Administrer abonnement — only when user has real Stripe subscription */}
+          {hasStripeCustomer && (
             <div className="rounded-2xl border-2 border-[#e0dfd8] bg-white p-5 text-center space-y-3">
               <p className="text-sm font-semibold text-[#2f2f2d]">Administrer dit abonnement</p>
               <p className="text-xs text-[#78766d]">
