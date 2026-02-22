@@ -30,6 +30,16 @@ import {
   Timer,
   ArrowLeft,
   Search,
+  Soup,
+  Salad,
+  Cookie,
+  Sandwich,
+  Coffee,
+  Beef,
+  CakeSlice,
+  Leaf,
+  LayoutGrid,
+  type LucideIcon,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAppStore } from '@/store';
@@ -50,6 +60,20 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { shoppingItemId, notificationId } from '@/lib/id';
 import { recipes, recipeCategories } from '@/data/recipes';
 import type { Recipe } from '@/types';
+
+// Category → Lucide icon map for recipe browser
+const recipeCategoryIcons: Record<string, LucideIcon> = {
+  Alle: LayoutGrid,
+  Aftensmad: UtensilsCrossed,
+  Frokost: Sandwich,
+  Morgenmad: Coffee,
+  Snacks: Cookie,
+  Bagværk: CakeSlice,
+  Supper: Soup,
+  Salater: Salad,
+  Grill: Beef,
+  Dessert: CakeSlice,
+};
 
 type MealSuggestion = {
   title: string;
@@ -2856,29 +2880,25 @@ export function MadOgHjem() {
                 />
               </div>
 
-              {/* Category filter pills */}
+              {/* Category filter pills with icons */}
               <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4">
-                <button
-                  onClick={() => setRecipeCategory('Alle')}
-                  className={cn(
-                    "shrink-0 rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition-all",
-                    recipeCategory === 'Alle' ? "bg-[#2f2f2f] text-white" : "bg-[#f2f1ed] text-[#5f5d56]"
-                  )}
-                >
-                  Alle
-                </button>
-                {recipeCategories.map((cat: string) => (
-                  <button
-                    key={cat}
-                    onClick={() => setRecipeCategory(cat)}
-                    className={cn(
-                      "shrink-0 rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition-all",
-                      recipeCategory === cat ? "bg-[#2f2f2f] text-white" : "bg-[#f2f1ed] text-[#5f5d56]"
-                    )}
-                  >
-                    {cat}
-                  </button>
-                ))}
+                {['Alle', ...recipeCategories].map((cat: string) => {
+                  const CatIcon = recipeCategoryIcons[cat] || UtensilsCrossed;
+                  const isActive = recipeCategory === cat;
+                  return (
+                    <button
+                      key={cat}
+                      onClick={() => setRecipeCategory(cat)}
+                      className={cn(
+                        "shrink-0 flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition-all",
+                        isActive ? "bg-[#2f2f2f] text-white" : "bg-[#f2f1ed] text-[#5f5d56]"
+                      )}
+                    >
+                      <CatIcon className="h-3.5 w-3.5" />
+                      {cat}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

@@ -272,11 +272,22 @@ export function SettingsView() {
     // Paid plan — redirect to Stripe Checkout
     setCheckoutLoading(true);
     try {
+      const token = localStorage.getItem('auth-token');
+      if (!token) {
+        toast.error('Du skal være logget ind for at opgradere');
+        setCheckoutLoading(false);
+        return;
+      }
       await startCheckout(nextPlan as StripePlan, 'monthly');
       // User is redirected to Stripe — this code won't run
-    } catch (err) {
+    } catch (err: any) {
       console.error('Stripe checkout error:', err);
-      toast.error('Kunne ikke starte betaling. Prøv igen.');
+      const msg = err?.message || 'Ukendt fejl';
+      if (msg.includes('401') || msg.includes('udløbet')) {
+        toast.error('Din session er udløbet — log ind igen');
+      } else {
+        toast.error(`Betaling fejlede: ${msg}`);
+      }
       setCheckoutLoading(false);
     }
   };
@@ -1112,95 +1123,113 @@ export function SettingsView() {
           )}
         </TabsContent>
 
-        <TabsContent value="payments" className="space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <CreditCard className="h-4 w-4" />
-                Betalingskonti
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 pt-0">
+        <TabsContent value="payments" className="space-y-0">
+          <div className="px-1 pt-2 pb-4">
+            <p className="text-xs text-[#75736b]">
+              Tilføj betalingsmetoder til udgiftsdeling mellem forældre.
+            </p>
+          </div>
 
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                <Select
-                  value={paymentDraft.provider}
-                  onValueChange={(value) => setPaymentDraft((prev) => ({ ...prev, provider: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="mobilepay">MobilePay</SelectItem>
-                    <SelectItem value="bank">Bankkonto</SelectItem>
-                    <SelectItem value="card">Kort</SelectItem>
-                    <SelectItem value="other">Andet</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Input
-                  value={paymentDraft.accountLabel}
-                  onChange={(e) => setPaymentDraft((prev) => ({ ...prev, accountLabel: e.target.value }))}
-                  placeholder="Kontonavn"
-                />
-                <Input
-                  value={paymentDraft.accountHandle}
-                  onChange={(e) => setPaymentDraft((prev) => ({ ...prev, accountHandle: e.target.value }))}
-                  placeholder="Kontonr./link"
-                />
-              </div>
-              <Button
-                className="w-full"
-                variant="outline"
-                disabled={!features.inAppPayments}
-                onClick={handleAddPaymentAccount}
-              >
-                Tilføj konto
-              </Button>
-
-              <div className="space-y-2">
-                {myPaymentAccounts.length === 0 ? (
-                  <p className="rounded-xl border border-dashed border-[#d8d7cf] bg-[#f8f7f3] p-3 text-sm text-[#75736b]">
-                    Ingen betalingskonti tilføjet endnu.
-                  </p>
-                ) : (
-                  myPaymentAccounts.map((account) => (
-                    <div key={account.id} className="flex items-center justify-between rounded-xl border border-[#d8d7cf] bg-[#faf9f6] p-3">
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium">{account.accountLabel}</p>
-                        <p className="truncate text-xs text-[#75736b]">{account.accountHandle}</p>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant={account.isPrimary ? 'secondary' : 'outline'}
-                        onClick={() => handleSetPrimaryPayment(account.id)}
-                      >
-                        {account.isPrimary ? 'Primær' : 'Sæt primær'}
-                      </Button>
+          {/* Eksisterende konti */}
+          {myPaymentAccounts.length > 0 && (
+            <div className="space-y-2 mb-4">
+              {myPaymentAccounts.map((account) => (
+                <div key={account.id} className="flex items-center justify-between rounded-2xl border-2 border-[#e5e3dc] bg-white px-4 py-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f2f1ed]">
+                      <CreditCard className="h-4 w-4 text-[#7a786f]" />
                     </div>
-                  ))
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                    <div className="min-w-0">
+                      <p className="truncate text-[13px] font-semibold text-[#2f2f2d]">{account.accountLabel}</p>
+                      <p className="truncate text-[11px] text-[#9a978f]">{account.accountHandle}</p>
+                    </div>
+                  </div>
+                  {account.isPrimary ? (
+                    <span className="shrink-0 rounded-lg bg-[#fff2e6] border border-[#f3c59d] px-2.5 py-1 text-[11px] font-semibold text-[#cc6f1f]">Primær</span>
+                  ) : (
+                    <button
+                      onClick={() => handleSetPrimaryPayment(account.id)}
+                      className="shrink-0 rounded-lg border-2 border-[#e5e3dc] px-2.5 py-1 text-[11px] font-semibold text-[#5f5d56] transition-all active:scale-[0.96]"
+                    >
+                      Sæt primær
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Briefcase className="h-4 w-4" />
-                Abonnementsmodel
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 pt-0">
-              <p className="text-sm text-[#56534b]">
-                {isTogetherMode
-                  ? 'Samboende: abonnement deles automatisk.'
-                  : 'Skilt/co-parenting: separat abonnement pr. bruger.'}
+          {/* Tilføj ny konto */}
+          <div className="rounded-2xl border-2 border-[#e5e3dc] bg-white p-4 space-y-3">
+            <p className="text-[13px] font-semibold text-[#2f2f2d]">Tilføj betalingskonto</p>
+            <Select
+              value={paymentDraft.provider}
+              onValueChange={(value) => setPaymentDraft((prev) => ({ ...prev, provider: value }))}
+            >
+              <SelectTrigger className="rounded-xl border-[#e5e3dc]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="mobilepay">MobilePay</SelectItem>
+                <SelectItem value="bank">Bankkonto</SelectItem>
+                <SelectItem value="card">Kort</SelectItem>
+                <SelectItem value="other">Andet</SelectItem>
+              </SelectContent>
+            </Select>
+            <Input
+              value={paymentDraft.accountLabel}
+              onChange={(e) => setPaymentDraft((prev) => ({ ...prev, accountLabel: e.target.value }))}
+              placeholder="Kontonavn (fx 'Min MobilePay')"
+              className="rounded-xl border-[#e5e3dc]"
+            />
+            <Input
+              value={paymentDraft.accountHandle}
+              onChange={(e) => setPaymentDraft((prev) => ({ ...prev, accountHandle: e.target.value }))}
+              placeholder="Telefonnr. eller kontonummer"
+              className="rounded-xl border-[#e5e3dc]"
+            />
+            <button
+              onClick={handleAddPaymentAccount}
+              disabled={!features.inAppPayments}
+              className={cn(
+                "w-full rounded-xl py-2.5 text-[13px] font-semibold transition-all active:scale-[0.98]",
+                features.inAppPayments
+                  ? "bg-[#2f2f2f] text-white"
+                  : "bg-[#e5e3dc] text-[#9a978f]"
+              )}
+            >
+              Tilføj konto
+            </button>
+            {!features.inAppPayments && (
+              <p className="text-[11px] text-[#b98b5a] text-center">
+                Opgrader til Family Plus for betalingsfunktioner
               </p>
-              <Badge variant="outline">
-                {isTogetherMode ? 'Delt abonnement' : 'Separat abonnement'}
-              </Badge>
-            </CardContent>
-          </Card>
+            )}
+          </div>
+
+          {myPaymentAccounts.length === 0 && (
+            <div className="mt-3 rounded-2xl border-2 border-dashed border-[#e5e3dc] bg-[#faf9f6] p-4 text-center">
+              <CreditCard className="mx-auto h-6 w-6 text-[#d8d7cf] mb-1.5" />
+              <p className="text-[12px] text-[#9a978f]">Ingen betalingskonti tilføjet endnu</p>
+            </div>
+          )}
+
+          {/* Abonnementsmodel info */}
+          <div className="mt-4 rounded-2xl border-2 border-[#e5e3dc] bg-white px-4 py-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[13px] font-semibold text-[#2f2f2d]">Abonnementsmodel</p>
+                <p className="text-[11px] text-[#9a978f] mt-0.5">
+                  {isTogetherMode
+                    ? 'Samboende: abonnement deles automatisk'
+                    : 'Skilt/co-parenting: separat abonnement pr. bruger'}
+                </p>
+              </div>
+              <span className="shrink-0 rounded-lg bg-[#f2f1ed] px-2.5 py-1 text-[11px] font-semibold text-[#5f5d56]">
+                {isTogetherMode ? 'Delt' : 'Separat'}
+              </span>
+            </div>
+          </div>
         </TabsContent>
 
         {currentUser?.isAdmin && (
