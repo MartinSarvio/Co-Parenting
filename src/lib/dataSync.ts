@@ -53,7 +53,7 @@ import type {
 export interface InitialData {
   users: User[];
   household: Household | null;
-  children: Child[];
+  children?: Child[]; // undefined = API fejlede, bevar eksisterende data
   events: CalendarEvent[];
   tasks: Task[];
   expenses: Expense[];
@@ -78,7 +78,7 @@ export async function loadInitialData(): Promise<InitialData> {
 
   // Hent resten parallelt
   const [
-    childrenRaw,
+    childrenResult,
     eventsRaw,
     tasksRaw,
     expensesRaw,
@@ -90,7 +90,7 @@ export async function loadInitialData(): Promise<InitialData> {
     diaryRaw,
     milestonesRaw,
   ] = await Promise.all([
-    api.get<ApiChild[]>('/api/children').catch(() => [] as ApiChild[]),
+    api.get<ApiChild[]>('/api/children').catch(() => null), // null = fejl (bevar eksisterende)
     api.get<ApiCalendarEvent[]>('/api/events').catch(() => [] as ApiCalendarEvent[]),
     api.get<ApiTask[]>('/api/tasks').catch(() => [] as ApiTask[]),
     api.get<ApiExpense[]>('/api/expenses').catch(() => [] as ApiExpense[]),
@@ -106,7 +106,9 @@ export async function loadInitialData(): Promise<InitialData> {
   return {
     users,
     household,
-    children: childrenRaw.map(mapChild),
+    // Hvis childrenResult er null (API-fejl), sættes children til undefined
+    // så hydrateFromServer bevarer eksisterende børn i stedet for at nulstille
+    children: childrenResult !== null ? childrenResult.map(mapChild) : undefined,
     events: eventsRaw.map(mapEvent),
     tasks: tasksRaw.map(mapTask),
     expenses: expensesRaw.map(mapExpense),

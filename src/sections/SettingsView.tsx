@@ -38,7 +38,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
-import { Switch } from '@/components/ui/switch';
+import { IOSSwitch } from '@/components/ui/ios-switch';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { getPlanFeatures, getSubscriptionPlan, normalizeSubscription } from '@/lib/subscription';
@@ -150,7 +150,7 @@ export function SettingsView() {
     message: '',
   });
   const [partnerInviteEmail, setPartnerInviteEmail] = useState('');
-  const [homeRemindersActive, setHomeRemindersActive] = useState(false);
+  const [homeRemindersActive] = useState(false);
 
   useEffect(() => {
     if (typeof Notification !== 'undefined') {
@@ -877,7 +877,7 @@ export function SettingsView() {
                     <p className="text-sm font-medium">Dokumentationsarkiv</p>
                     <p className="text-xs text-[#75736b]">Gem kvitteringer og beviser centralt</p>
                   </div>
-                  <Switch
+                  <IOSSwitch
                     checked={Boolean(household?.singleParentSupport?.evidenceVaultEnabled)}
                     disabled={!features.singleParentEvidence}
                     onCheckedChange={(value) => handleUpdateSingleParentSetting('evidenceVaultEnabled', value)}
@@ -888,7 +888,7 @@ export function SettingsView() {
                     <p className="text-sm font-medium">Auto-arkiver kvitteringer</p>
                     <p className="text-xs text-[#75736b]">Udgiftskvitteringer samles automatisk</p>
                   </div>
-                  <Switch
+                  <IOSSwitch
                     checked={Boolean(household?.singleParentSupport?.autoArchiveReceipts)}
                     disabled={!features.singleParentEvidence}
                     onCheckedChange={(value) => handleUpdateSingleParentSetting('autoArchiveReceipts', value)}
@@ -1388,65 +1388,35 @@ export function SettingsView() {
                 <p className="text-sm font-medium text-[#2f2f2d]">Afleveringspåmindelser</p>
                 <p className="text-xs text-[#75736b]">Før hver aflevering</p>
               </div>
-              <Switch defaultChecked />
+              <IOSSwitch defaultChecked />
             </div>
             <div className="flex items-center justify-between py-3 px-1">
               <div>
                 <p className="text-sm font-medium text-[#2f2f2d]">Nye beskeder</p>
                 <p className="text-xs text-[#75736b]">Dagbog, beslutninger</p>
               </div>
-              <Switch defaultChecked />
+              <IOSSwitch defaultChecked />
             </div>
             <div className="flex items-center justify-between py-3 px-1">
               <div>
                 <p className="text-sm font-medium text-[#2f2f2d]">Udgifter & betalinger</p>
                 <p className="text-xs text-[#75736b]">Anmodninger og godkendelser</p>
               </div>
-              <Switch defaultChecked />
+              <IOSSwitch defaultChecked />
             </div>
             <div className="flex items-center justify-between py-3 px-1">
               <div>
                 <p className="text-sm font-medium text-[#2f2f2d]">Kalenderopdateringer</p>
                 <p className="text-xs text-[#75736b]">Nye begivenheder & ændringer</p>
               </div>
-              <Switch defaultChecked />
+              <IOSSwitch defaultChecked />
             </div>
             <div className="flex items-center justify-between py-3 px-1">
               <div>
                 <p className="text-sm font-medium text-[#2f2f2d]">Opgaver</p>
                 <p className="text-xs text-[#75736b]">Tildelte og forfaldne</p>
               </div>
-              <Switch defaultChecked />
-            </div>
-          </div>
-
-          {/* ─── Opsæt påmindelser ─── */}
-          <div className="mt-4 mb-2">
-            <div className="rounded-2xl border-2 border-[#e5e3dc] bg-white p-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fff2e6]">
-                  <Bell className="h-[18px] w-[18px] text-[#f58a2d]" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-semibold text-[#2f2f2d]">Opsæt påmindelser</p>
-                  <p className="text-[11px] text-[#9a978f]">Faste notifikationer til madplan, indkøb og rengøring.</p>
-                </div>
-                <button
-                  onClick={() => {
-                    setHomeRemindersActive(true);
-                    toast.success('Påmindelser aktiveret for madplan, indkøb og rengøring');
-                  }}
-                  disabled={homeRemindersActive}
-                  className={cn(
-                    "shrink-0 rounded-xl px-4 py-2 text-[12px] font-bold transition-all active:scale-[0.96]",
-                    homeRemindersActive
-                      ? "bg-[#e5e3dc] text-[#9a978f]"
-                      : "bg-[#f58a2d] text-white"
-                  )}
-                >
-                  {homeRemindersActive ? 'Aktiveret' : 'Aktiver'}
-                </button>
-              </div>
+              <IOSSwitch defaultChecked />
             </div>
           </div>
 
@@ -1458,21 +1428,21 @@ export function SettingsView() {
                 <p className="text-sm font-medium text-[#2f2f2d]">Madplan</p>
                 <p className="text-xs text-[#75736b]">Daglig påmindelse om aftensmad</p>
               </div>
-              <Switch checked={homeRemindersActive ? true : undefined} defaultChecked />
+              <IOSSwitch checked={homeRemindersActive ? true : undefined} defaultChecked />
             </div>
             <div className="flex items-center justify-between py-3 px-1">
               <div>
                 <p className="text-sm font-medium text-[#2f2f2d]">Indkøb</p>
                 <p className="text-xs text-[#75736b]">Ugentlig indkøbspåmindelse</p>
               </div>
-              <Switch checked={homeRemindersActive ? true : undefined} defaultChecked />
+              <IOSSwitch checked={homeRemindersActive ? true : undefined} defaultChecked />
             </div>
             <div className="flex items-center justify-between py-3 px-1">
               <div>
                 <p className="text-sm font-medium text-[#2f2f2d]">Rengøring</p>
                 <p className="text-xs text-[#75736b]">Påmindelser om rengøringsopgaver</p>
               </div>
-              <Switch checked={homeRemindersActive ? true : undefined} defaultChecked />
+              <IOSSwitch checked={homeRemindersActive ? true : undefined} defaultChecked />
             </div>
           </div>
         </TabsContent>
@@ -1656,7 +1626,7 @@ export function SettingsView() {
                     {allowProfessionalTools ? 'Kan slås til/fra' : 'Skjult i samboende mode'}
                   </p>
                 </div>
-                <Switch
+                <IOSSwitch
                   checked={isProfessionalView && allowProfessionalTools}
                   disabled={!allowProfessionalTools}
                   onCheckedChange={(value) => setProfessionalView(value)}

@@ -147,6 +147,18 @@ childrenRouter.delete('/:id', async (req: AuthRequest, res: Response) => {
       return;
     }
 
+    // Verify user belongs to the child's household before allowing delete
+    const membership = await prisma.householdMember.findUnique({
+      where: {
+        userId_householdId: { userId: req.userId!, householdId: existing.householdId },
+      },
+    });
+
+    if (!membership) {
+      res.status(403).json({ error: 'Du har ikke adgang til at slette dette barn' });
+      return;
+    }
+
     await prisma.child.delete({
       where: { id: req.params.id as string },
     });

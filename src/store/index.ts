@@ -568,7 +568,7 @@ export const useAppStore = create<AppStore>()(
         keyDates: data.keyDates ?? state.keyDates,
         diaryEntries: data.diaryEntries ?? state.diaryEntries,
         milestones: data.milestones ?? state.milestones,
-        currentChildId: data.children && data.children.length > 0
+        currentChildId: data.children !== undefined && data.children.length > 0
           ? (state.currentChildId && data.children.some(c => c.id === state.currentChildId)
               ? state.currentChildId
               : data.children[0].id)
