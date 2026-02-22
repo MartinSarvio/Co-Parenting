@@ -76,10 +76,13 @@ adminRouter.get('/users', authenticate, async (req: Request & { user?: { userId:
         role: true,
         isAdmin: true,
         createdAt: true,
+        deletedAt: true,
+        deletionReason: true,
       },
       orderBy: { createdAt: 'asc' },
     });
-    res.json({ users });
+    // Return all users but mark deleted ones clearly
+    res.json({ users: users.map(u => ({ ...u, isDeleted: !!u.deletedAt })) });
   });
 });
 
@@ -166,7 +169,7 @@ adminRouter.post('/make-admin', authenticate, async (req: Request & { user?: { u
 
 // DELETE /api/admin/users/:id
 // Requires: JWT auth + isAdmin = true
-// Deletes a user by ID
+// GDPR-compliant soft-delete: anonymizes personal data, keeps record for legal retention
 adminRouter.delete('/users/:id', authenticate, async (req: Request & { user?: { userId: string; role: string } }, res: Response) => {
   await requireAdmin(req as Request & { user?: { userId: string; role: string } }, res, async () => {
     const { id } = req.params;
@@ -183,7 +186,76 @@ adminRouter.delete('/users/:id', authenticate, async (req: Request & { user?: { 
       return;
     }
 
-    await prisma.user.delete({ where: { id: id as string } });
-    res.json({ message: `Bruger ${user.name} slettet` });
+    if (user.deletedAt) {
+      res.status(400).json({ error: 'Bruger er allerede slettet' });
+      return;
+    }
+
+    const now = new Date();
+    const anonymizedEmail = `deleted-${id}@anonymized.local`;
+
+    // Soft-delete: anonymize personal data, mark as deleted
+    await prisma.user.update({
+      where: { id: id as string },
+      data: {
+        deletedAt: now,
+        anonymizedAt: now,
+        deletionReason: 'admin_request',
+        email: anonymizedEmail,
+        name: 'Slettet bruger',
+        passwordHash: 'DELETED',
+        avatar: null,
+        phone: null,
+        professionalType: null,
+        organization: null,
+      },
+    });
+
+    // Remove device tokens (no retention needed)
+    await prisma.deviceToken.deleteMany({ where: { userId: id as string } });
+
+    res.json({
+      message: `Bruger ${user.name} er slettet og anonymiseret (GDPR)`,
+      gdpr: {
+        deletedAt: now.toISOString(),
+        anonymized: true,
+        dataRetained: 'Anonymiserede poster beholdes i 5 år jf. dansk bogføringslov',
+      },
+    });
+  });
+});
+
+// POST /api/admin/users/:id/restore
+// Requires: JWT auth + isAdmin = true
+// Restores a soft-deleted user (only if within retention period)
+adminRouter.post('/users/:id/restore', authenticate, async (req: Request & { user?: { userId: string; role: string } }, res: Response) => {
+  await requireAdmin(req as Request & { user?: { userId: string; role: string } }, res, async () => {
+    const { id } = req.params;
+
+    const user = await prisma.user.findUnique({ where: { id: id as string } });
+    if (!user) {
+      res.status(404).json({ error: 'Bruger ikke fundet' });
+      return;
+    }
+
+    if (!user.deletedAt) {
+      res.status(400).json({ error: 'Bruger er ikke slettet' });
+      return;
+    }
+
+    // Can only restore if anonymized (personal data is gone)
+    if (user.anonymizedAt) {
+      res.status(400).json({
+        error: 'Bruger er anonymiseret og kan ikke gendannes. Persondata er permanent fjernet.',
+      });
+      return;
+    }
+
+    await prisma.user.update({
+      where: { id: id as string },
+      data: { deletedAt: null, deletionReason: null },
+    });
+
+    res.json({ message: 'Bruger gendannet' });
   });
 });

@@ -91,6 +91,12 @@ authRouter.post('/login', async (req: Request, res: Response) => {
       return;
     }
 
+    // Block login for soft-deleted accounts
+    if (user.deletedAt) {
+      res.status(403).json({ error: 'Denne konto er slettet. Kontakt support hvis du mener det er en fejl.' });
+      return;
+    }
+
     const validPassword = await bcrypt.compare(data.password, user.passwordHash);
     if (!validPassword) {
       res.status(401).json({ error: 'Forkert email eller adgangskode' });
@@ -154,6 +160,67 @@ authRouter.get('/me', async (req: Request, res: Response) => {
     }
 
     res.json({ user });
+  } catch {
+    res.status(401).json({ error: 'Ugyldig token' });
+  }
+});
+
+// DELETE /api/auth/account
+// Self-service account deletion (GDPR Art. 17 — ret til sletning)
+// User requests their own account to be soft-deleted and anonymized
+authRouter.delete('/account', async (req: Request, res: Response) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith('Bearer ')) {
+    res.status(401).json({ error: 'Ikke logget ind' });
+    return;
+  }
+
+  try {
+    const secret = process.env.JWT_SECRET || 'fallback-secret';
+    const payload = jwt.verify(authHeader.split(' ')[1], secret) as { userId: string };
+
+    const user = await prisma.user.findUnique({ where: { id: payload.userId } });
+    if (!user) {
+      res.status(404).json({ error: 'Bruger ikke fundet' });
+      return;
+    }
+
+    if (user.deletedAt) {
+      res.status(400).json({ error: 'Konto er allerede slettet' });
+      return;
+    }
+
+    const now = new Date();
+    const anonymizedEmail = `deleted-${user.id}@anonymized.local`;
+
+    // Soft-delete + anonymize personal data
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        deletedAt: now,
+        anonymizedAt: now,
+        deletionReason: 'self_request',
+        email: anonymizedEmail,
+        name: 'Slettet bruger',
+        passwordHash: 'DELETED',
+        avatar: null,
+        phone: null,
+        professionalType: null,
+        organization: null,
+      },
+    });
+
+    // Remove device tokens
+    await prisma.deviceToken.deleteMany({ where: { userId: user.id } });
+
+    res.json({
+      message: 'Din konto er slettet og dine persondata er anonymiseret.',
+      gdpr: {
+        deletedAt: now.toISOString(),
+        anonymized: true,
+        retention: 'Anonymiserede poster opbevares i op til 5 år jf. dansk bogføringslov (§10 i bogføringsloven). Herefter slettes de permanent.',
+      },
+    });
   } catch {
     res.status(401).json({ error: 'Ugyldig token' });
   }

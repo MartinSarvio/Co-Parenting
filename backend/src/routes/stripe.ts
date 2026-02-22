@@ -102,9 +102,15 @@ router.post('/checkout', authenticate, async (req: AuthRequest, res: Response) =
     });
 
     res.json({ url: session.url });
-  } catch (err) {
+  } catch (err: any) {
     console.error('Stripe checkout error:', err);
-    res.status(500).json({ error: 'Kunne ikke oprette betalingssession' });
+    // Return actual error detail so frontend can display it
+    const detail = err?.message || 'Ukendt fejl';
+    if (err?.type?.startsWith('Stripe')) {
+      res.status(502).json({ error: `Stripe-fejl: ${detail}` });
+    } else {
+      res.status(500).json({ error: `Kunne ikke oprette betalingssession: ${detail}` });
+    }
   }
 });
 
