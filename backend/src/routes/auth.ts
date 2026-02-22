@@ -40,6 +40,10 @@ authRouter.post('/register', async (req: Request, res: Response) => {
     // Hash password
     const passwordHash = await bcrypt.hash(data.password, 12);
 
+    // First user in the system becomes admin automatically
+    const userCount = await prisma.user.count();
+    const isFirstUser = userCount === 0;
+
     // Create user
     const user = await prisma.user.create({
       data: {
@@ -48,6 +52,7 @@ authRouter.post('/register', async (req: Request, res: Response) => {
         name: data.name,
         role: data.role,
         color: data.color,
+        isAdmin: isFirstUser,
         avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.name)}`,
       },
       select: {
@@ -57,6 +62,7 @@ authRouter.post('/register', async (req: Request, res: Response) => {
         avatar: true,
         role: true,
         color: true,
+        isAdmin: true,
         createdAt: true,
       },
     });
