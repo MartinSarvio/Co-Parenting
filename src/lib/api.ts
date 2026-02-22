@@ -57,10 +57,18 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     throw new ApiError(0, 'Ingen forbindelse til serveren');
   }
 
-  // Session expired → clear locally
+  // 401 — only clear token for authenticated endpoints, not login/register
   if (res.status === 401) {
-    clearToken();
-    throw new ApiError(401, 'Session udløbet — log ind igen');
+    const isAuthEndpoint = path.includes('/auth/login') || path.includes('/auth/register');
+    if (!isAuthEndpoint) {
+      clearToken();
+    }
+    // Parse the actual error message from backend
+    const errData = await res.json().catch(() => null);
+    const errMsg = (errData && typeof errData === 'object' && 'error' in errData)
+      ? (errData as { error: string }).error
+      : (isAuthEndpoint ? 'Forkert email eller adgangskode' : 'Session udløbet — log ind igen');
+    throw new ApiError(401, errMsg);
   }
 
   // 204 No Content (DELETE responses)

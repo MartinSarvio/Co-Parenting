@@ -29,21 +29,23 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
 
     setIsLoading(true);
     try {
-      const { user } = await loginUser({ email, password });
+      const { user, token } = await loginUser({ email, password });
       setCurrentUser(user);
 
-      // Load all data from server
+      // Load initial data — if this fails, restore the token since login itself succeeded
       try {
         const data = await loadInitialData();
         hydrateFromServer(data);
       } catch {
-        console.warn('Kunne ikke hente data fra server');
+        console.warn('Kunne ikke hente data fra server — fortsætter alligevel');
+        // Restore token in case loadInitialData cleared it on a 401
+        if (token && !localStorage.getItem('auth-token')) {
+          localStorage.setItem('auth-token', token);
+        }
       }
 
       setAuthenticated(true);
       toast.success(`Velkommen, ${user.name}!`);
-
-      // Initialize push notifications (non-blocking)
       initPushNotifications().catch(console.warn);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -57,117 +59,100 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
   };
 
   return (
-    <div className="min-h-[100svh] flex flex-col relative overflow-hidden bg-[#f6f4ef]">
-      {/* Ribbon banner — top section */}
-      <div className="relative flex-shrink-0" style={{ height: '46svh' }}>
+    <div className="fixed inset-0 flex flex-col overflow-hidden">
+      {/* Ribbon banner — fills entire background */}
+      <div className="absolute inset-0">
         <RibbonBanner />
-
-        {/* Gradient fade at bottom for smooth transition */}
-        <div
-          className="absolute bottom-0 left-0 right-0 h-28 pointer-events-none"
-          style={{
-            background: 'linear-gradient(to top, #f6f4ef 0%, #f6f4ef88 40%, transparent 100%)',
-          }}
-        />
       </div>
 
-      {/* Login card — slides up from bottom */}
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.25, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-        className="flex-1 -mt-8 relative z-10"
-      >
-        <div
-          className="bg-white rounded-t-[2rem] shadow-[0_-4px_30px_rgba(0,0,0,0.06)] px-6 pt-8 min-h-full"
-          style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 32px)' }}
+      {/* Content overlay — centered */}
+      <div className="relative z-10 flex items-center justify-center h-full px-6">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full max-w-sm"
         >
-          {/* App branding */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.45 }}
-            className="text-center mb-8"
+          <div
+            className="bg-white/95 backdrop-blur-xl rounded-3xl px-6 py-8 shadow-[0_8px_40px_rgba(0,0,0,0.12)]"
           >
-            <h1 className="text-[1.75rem] font-bold text-[#2f2f2d] tracking-tight">
-              Hverdag
-            </h1>
-            <p className="text-sm text-[#8a877f] mt-1">
-              Koordiner hverdagen sammen
-            </p>
-          </motion.div>
-
-          {/* Form */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.55 }}
-            className="space-y-4 max-w-sm mx-auto"
-          >
-            {/* Email */}
-            <div className="relative">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#b5b2a8]" />
-              <Input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="din@email.dk"
-                className="h-[52px] pl-11 text-base bg-[#f9f8f5] border-[#e8e6df] rounded-2xl placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
-                disabled={isLoading}
-                onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-                autoCapitalize="none"
-                autoCorrect="off"
-              />
+            {/* App branding */}
+            <div className="text-center mb-7">
+              <h1 className="text-[2rem] font-bold text-[#2f2f2d] tracking-tight">
+                Hverdag
+              </h1>
+              <p className="text-[0.85rem] text-[#9a978f] mt-1">
+                Koordiner hverdagen sammen
+              </p>
             </div>
 
-            {/* Password */}
-            <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#b5b2a8]" />
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Adgangskode"
-                className="h-[52px] pl-11 text-base bg-[#f9f8f5] border-[#e8e6df] rounded-2xl placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
-                disabled={isLoading}
-                onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-              />
-            </div>
+            {/* Form */}
+            <div className="space-y-3">
+              {/* Email */}
+              <div className="relative">
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#b5b2a8] z-10" />
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="din@email.dk"
+                  className="h-[50px] pl-11 text-[15px] bg-white/80 border-[#e5e3dc] rounded-xl placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
+                  disabled={isLoading}
+                  onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                />
+              </div>
 
-            {/* Login button */}
-            <button
-              onClick={handleLogin}
-              disabled={isLoading}
-              className="w-full h-[52px] rounded-2xl text-white font-semibold text-[1.05rem] tracking-[-0.01em] transition-all duration-200 disabled:opacity-60 active:scale-[0.98]"
-              style={{
-                background: 'linear-gradient(135deg, #f7a95c 0%, #f58a2d 50%, #e8773f 100%)',
-                boxShadow: '0 8px 24px rgba(245, 138, 45, 0.3), 0 2px 8px rgba(245, 138, 45, 0.15)',
-              }}
-            >
-              {isLoading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Logger ind...
-                </span>
-              ) : (
-                'Log ind'
-              )}
-            </button>
+              {/* Password */}
+              <div className="relative">
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#b5b2a8] z-10" />
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Adgangskode"
+                  className="h-[50px] pl-11 text-[15px] bg-white/80 border-[#e5e3dc] rounded-xl placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
+                  disabled={isLoading}
+                  onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+                />
+              </div>
 
-            {/* Register link */}
-            <div className="text-center pt-2">
+              {/* Login button */}
               <button
-                onClick={onSwitchToRegister}
+                onClick={handleLogin}
                 disabled={isLoading}
-                className="text-sm text-[#8a877f] hover:text-[#f58a2d] transition-colors duration-200"
+                className="w-full h-[50px] rounded-xl text-white font-semibold text-[1rem] tracking-[-0.01em] transition-all duration-200 disabled:opacity-60 active:scale-[0.98]"
+                style={{
+                  background: 'linear-gradient(135deg, #f7a95c 0%, #f58a2d 50%, #e8773f 100%)',
+                  boxShadow: '0 6px 20px rgba(245, 138, 45, 0.35)',
+                }}
               >
-                Har du ikke en konto?{' '}
-                <span className="font-semibold text-[#f58a2d]">Opret konto</span>
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Logger ind...
+                  </span>
+                ) : (
+                  'Log ind'
+                )}
               </button>
+
+              {/* Register link */}
+              <div className="text-center pt-2">
+                <button
+                  onClick={onSwitchToRegister}
+                  disabled={isLoading}
+                  className="text-[13px] text-[#9a978f]"
+                >
+                  Har du ikke en konto?{' '}
+                  <span className="font-semibold text-[#f58a2d]">Opret konto</span>
+                </button>
+              </div>
             </div>
-          </motion.div>
-        </div>
-      </motion.div>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 }

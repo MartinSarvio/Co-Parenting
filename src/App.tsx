@@ -127,9 +127,15 @@ function App() {
 
       // Initialize push notifications (non-blocking)
       initPushNotifications().catch(console.warn);
-    } catch {
-      // Token invalid/expired — clear and show login
-      logout();
+    } catch (err: any) {
+      // Only logout if token is truly invalid (401), not on network errors
+      if (err?.status === 401) {
+        logout();
+      } else {
+        // Network error — keep user logged in with cached data
+        console.warn('Session restore failed (network?):', err?.message);
+        setAuthenticated(true);
+      }
     } finally {
       setIsReady(true);
     }
@@ -239,7 +245,7 @@ function App() {
       case 'opgaver':
         return <ErrorBoundary sectionName="Opgaver"><Opgaver /></ErrorBoundary>;
       case 'mad-hjem':
-        return <ErrorBoundary sectionName="Mad og Hjem"><MadOgHjem /></ErrorBoundary>;
+        return <ErrorBoundary sectionName="Mad og Indkøb"><MadOgHjem /></ErrorBoundary>;
       case 'kommunikation':
         return <ErrorBoundary sectionName="Kommunikation"><Kommunikation /></ErrorBoundary>;
       case 'borneoverblik':
