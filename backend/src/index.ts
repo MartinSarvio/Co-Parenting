@@ -29,6 +29,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Trust proxy (Railway runs behind a reverse proxy)
+app.set('trust proxy', 1);
+
 // Security middleware — relaxed for cross-origin API usage
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
