@@ -2689,25 +2689,6 @@ export function MadOgHjem() {
           </Card>
 
           <div className="space-y-4">
-            {/* ─── Opsæt påmindelser ─── */}
-            <div className="rounded-2xl border-2 border-[#e5e3dc] bg-white p-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fff2e6]">
-                  <Bell className="h-[18px] w-[18px] text-[#f58a2d]" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-semibold text-[#2f2f2d]">Opsæt påmindelser</p>
-                  <p className="text-[11px] text-[#9a978f]">Faste notifikationer til madplan, indkøb og rengøring.</p>
-                </div>
-                <button
-                  onClick={setupHomeReminders}
-                  className="shrink-0 rounded-xl bg-[#f58a2d] px-4 py-2 text-[12px] font-bold text-white transition-all active:scale-[0.96]"
-                >
-                  Aktiver
-                </button>
-              </div>
-            </div>
-
             {/* ─── Uge-skabeloner ─── */}
             <div className="rounded-2xl border-2 border-[#e5e3dc] bg-white overflow-hidden">
               <div className="px-4 pt-4 pb-2">

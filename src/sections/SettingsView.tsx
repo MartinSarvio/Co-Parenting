@@ -150,6 +150,7 @@ export function SettingsView() {
     message: '',
   });
   const [partnerInviteEmail, setPartnerInviteEmail] = useState('');
+  const [homeRemindersActive, setHomeRemindersActive] = useState(false);
 
   useEffect(() => {
     if (typeof Notification !== 'undefined') {
@@ -250,10 +251,7 @@ export function SettingsView() {
   const handlePlanChange = async (nextPlan: SubscriptionPlan) => {
     if (!household) return;
 
-    // Already on this plan — no action needed
-    if (nextPlan === plan) return;
-
-    // Downgrade to free — if they have Stripe, open portal; otherwise just update locally
+    // Free plan — update locally (if they have Stripe customer, open portal to cancel)
     if (nextPlan === 'free') {
       if (hasStripeCustomer) {
         try {
@@ -271,7 +269,7 @@ export function SettingsView() {
       return;
     }
 
-    // Upgrade/switch to paid plan — redirect to Stripe Checkout
+    // Paid plan — redirect to Stripe Checkout
     setCheckoutLoading(true);
     try {
       await startCheckout(nextPlan as StripePlan, 'monthly');
@@ -1393,29 +1391,59 @@ export function SettingsView() {
             </div>
           </div>
 
+          {/* ─── Opsæt påmindelser ─── */}
+          <div className="mt-4 mb-2">
+            <div className="rounded-2xl border-2 border-[#e5e3dc] bg-white p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fff2e6]">
+                  <Bell className="h-[18px] w-[18px] text-[#f58a2d]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[14px] font-semibold text-[#2f2f2d]">Opsæt påmindelser</p>
+                  <p className="text-[11px] text-[#9a978f]">Faste notifikationer til madplan, indkøb og rengøring.</p>
+                </div>
+                <button
+                  onClick={() => {
+                    setHomeRemindersActive(true);
+                    toast.success('Påmindelser aktiveret for madplan, indkøb og rengøring');
+                  }}
+                  disabled={homeRemindersActive}
+                  className={cn(
+                    "shrink-0 rounded-xl px-4 py-2 text-[12px] font-bold transition-all active:scale-[0.96]",
+                    homeRemindersActive
+                      ? "bg-[#e5e3dc] text-[#9a978f]"
+                      : "bg-[#f58a2d] text-white"
+                  )}
+                >
+                  {homeRemindersActive ? 'Aktiveret' : 'Aktiver'}
+                </button>
+              </div>
+            </div>
+          </div>
+
           {/* ─── Påmindelser ─── */}
-          <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2 pt-5">Påmindelser</p>
+          <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2 pt-3">Påmindelser</p>
           <div className="divide-y divide-[#e5e3dc]">
             <div className="flex items-center justify-between py-3 px-1">
               <div>
                 <p className="text-sm font-medium text-[#2f2f2d]">Madplan</p>
                 <p className="text-xs text-[#75736b]">Daglig påmindelse om aftensmad</p>
               </div>
-              <Switch defaultChecked />
+              <Switch checked={homeRemindersActive ? true : undefined} defaultChecked />
             </div>
             <div className="flex items-center justify-between py-3 px-1">
               <div>
                 <p className="text-sm font-medium text-[#2f2f2d]">Indkøb</p>
                 <p className="text-xs text-[#75736b]">Ugentlig indkøbspåmindelse</p>
               </div>
-              <Switch defaultChecked />
+              <Switch checked={homeRemindersActive ? true : undefined} defaultChecked />
             </div>
             <div className="flex items-center justify-between py-3 px-1">
               <div>
                 <p className="text-sm font-medium text-[#2f2f2d]">Rengøring</p>
                 <p className="text-xs text-[#75736b]">Påmindelser om rengøringsopgaver</p>
               </div>
-              <Switch defaultChecked />
+              <Switch checked={homeRemindersActive ? true : undefined} defaultChecked />
             </div>
           </div>
         </TabsContent>
