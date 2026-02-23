@@ -14,10 +14,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Calendar,
-  Settings,
   CheckCircle2,
   X
 } from 'lucide-react';
+import { CustodyConfig } from './CustodyConfig';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   addDays,
@@ -64,7 +64,7 @@ const getParentDayPalette = (color: 'warm' | 'cool' | 'neutral') => {
 };
 
 export function Samversplan() {
-  const { users, children, custodyPlans, currentUser, addNotification, setActiveTab, sideMenuOpen, setSideMenuOpen } = useAppStore();
+  const { users, children, custodyPlans, currentUser, addNotification, sideMenuOpen, setSideMenuOpen } = useAppStore();
   const { createEvent } = useApiActions();
   const custodyPlan = custodyPlans[0];
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -228,7 +228,7 @@ export function Samversplan() {
         </div>
       </motion.div>
 
-      {/* ─── Side panel for Samværsplan settings — portal ─── */}
+      {/* ─── Side panel: CustodyConfig full-screen — portal ─── */}
       {createPortal(
       <AnimatePresence>
         {sideMenuOpen && (
@@ -249,8 +249,8 @@ export function Samversplan() {
               className="fixed inset-y-0 left-0 z-[9999] w-full bg-white flex flex-col"
               style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
             >
-              <div className="flex items-center justify-between px-5 py-4 border-b border-[#eeedea]">
-                <h2 className="text-[17px] font-bold text-[#2f2f2d]">Samværsplan</h2>
+              <div className="flex items-center justify-between px-5 py-3 border-b border-[#eeedea]">
+                <h2 className="text-[17px] font-bold text-[#2f2f2d]">Indstillinger</h2>
                 <button
                   onClick={() => setSideMenuOpen(false)}
                   className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56]"
@@ -258,31 +258,8 @@ export function Samversplan() {
                   <X className="h-4 w-4" />
                 </button>
               </div>
-              <div className="flex-1 overflow-y-auto py-2">
-                <button
-                  onClick={() => { setActiveTab('samversconfig'); setSideMenuOpen(false); }}
-                  className="flex w-full items-center gap-3.5 px-5 py-3 text-left hover:bg-[#faf9f6] transition-colors"
-                >
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f2f1ed]">
-                    <Settings className="h-[18px] w-[18px] text-[#7a786f]" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[14px] font-semibold text-[#4a4945]">Konfigurer samværsplan</p>
-                    <p className="text-[11px] text-[#9a978f]">Skift ordning, ugedage & forældre</p>
-                  </div>
-                </button>
-                <button
-                  onClick={() => setSideMenuOpen(false)}
-                  className="flex w-full items-center gap-3.5 px-5 py-3 text-left hover:bg-[#faf9f6] transition-colors"
-                >
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f2f1ed]">
-                    <Calendar className="h-[18px] w-[18px] text-[#7a786f]" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[14px] font-semibold text-[#4a4945]">Bytteanmodninger</p>
-                    <p className="text-[11px] text-[#9a978f]">Tryk på en dag for at bytte</p>
-                  </div>
-                </button>
+              <div className="flex-1 overflow-y-auto pb-[env(safe-area-inset-bottom,0px)]">
+                <CustodyConfig />
               </div>
             </motion.div>
           </>
