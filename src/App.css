@@ -4,15 +4,16 @@
   max-width: 100%;
   margin: 0;
   padding: 0;
-  min-height: 100svh;
+  min-height: 100%;
   display: flex;
   justify-content: center;
+  background-color: #f2f1ed;
 }
 
 .app-shell {
   width: 100%;
   max-width: 430px;
-  min-height: 100svh;
+  min-height: 100%;
   position: relative;
   background: rgba(245, 244, 239, 0.88);
   border-left: 1px solid rgba(212, 210, 201, 0.7);

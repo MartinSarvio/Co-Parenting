@@ -76,13 +76,10 @@ adminRouter.get('/users', authenticate, async (req: AuthRequest, res: Response) 
         role: true,
         isAdmin: true,
         createdAt: true,
-        deletedAt: true,
-        deletionReason: true,
       },
       orderBy: { createdAt: 'asc' },
     });
-    // Return all users but mark deleted ones clearly
-    res.json({ users: users.map(u => ({ ...u, isDeleted: !!u.deletedAt })) });
+    res.json({ users });
   });
 });
 
@@ -186,21 +183,12 @@ adminRouter.delete('/users/:id', authenticate, async (req: AuthRequest, res: Res
       return;
     }
 
-    if (user.deletedAt) {
-      res.status(400).json({ error: 'Bruger er allerede slettet' });
-      return;
-    }
-
-    const now = new Date();
     const anonymizedEmail = `deleted-${id}@anonymized.local`;
 
-    // Soft-delete: anonymize personal data, mark as deleted
+    // Anonymize personal data
     await prisma.user.update({
       where: { id: id as string },
       data: {
-        deletedAt: now,
-        anonymizedAt: now,
-        deletionReason: 'admin_request',
         email: anonymizedEmail,
         name: 'Slettet bruger',
         passwordHash: 'DELETED',
@@ -211,17 +199,10 @@ adminRouter.delete('/users/:id', authenticate, async (req: AuthRequest, res: Res
       },
     });
 
-    // Remove device tokens (no retention needed)
+    // Remove device tokens
     await prisma.deviceToken.deleteMany({ where: { userId: id as string } });
 
-    res.json({
-      message: `Bruger ${user.name} er slettet og anonymiseret (GDPR)`,
-      gdpr: {
-        deletedAt: now.toISOString(),
-        anonymized: true,
-        dataRetained: 'Anonymiserede poster beholdes i 5 år jf. dansk bogføringslov',
-      },
-    });
+    res.json({ message: `Bruger ${user.name} er slettet og anonymiseret` });
   });
 });
 

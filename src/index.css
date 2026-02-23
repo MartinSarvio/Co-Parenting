@@ -79,6 +79,13 @@
   * {
     @apply border-border;
   }
+  html, body {
+    height: 100%;
+    min-height: 100%;
+    background-color: #f2f1ed;
+    margin: 0;
+    padding: 0;
+  }
   body {
     @apply bg-background text-foreground;
     font-family: "SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", sans-serif;
@@ -87,6 +94,13 @@
       radial-gradient(circle at 12% -8%, rgba(255, 255, 255, 0.82), transparent 38%),
       radial-gradient(circle at 86% 2%, rgba(0, 0, 0, 0.04), transparent 40%);
     background-attachment: fixed;
-    min-height: 100svh;
   }
+}
+
+/* Barcode scanner: make app background transparent so camera shows through */
+body.scanner-active {
+  background: transparent !important;
+}
+body.scanner-active #root {
+  background: transparent !important;
 }

@@ -27,28 +27,28 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }}
       toastOptions={{
         style: {
-          borderRadius: '16px',
-          padding: '12px 16px',
+          borderRadius: '12px',
+          padding: '10px 14px',
           fontSize: '14px',
-          fontWeight: '500',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.12)',
+          fontWeight: '400',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
         },
       }}
       style={
         {
-          "--normal-bg": "#2f2f2d",
-          "--normal-text": "#ffffff",
-          "--normal-border": "transparent",
-          "--border-radius": "16px",
-          "--success-bg": "#2f2f2d",
-          "--success-text": "#ffffff",
-          "--success-border": "transparent",
-          "--error-bg": "#c0392b",
-          "--error-text": "#ffffff",
-          "--error-border": "transparent",
-          "--info-bg": "#2f2f2d",
-          "--info-text": "#ffffff",
-          "--info-border": "transparent",
+          "--normal-bg": "#ffffff",
+          "--normal-text": "#2b2b28",
+          "--normal-border": "#e5e4df",
+          "--border-radius": "12px",
+          "--success-bg": "#ffffff",
+          "--success-text": "#2b2b28",
+          "--success-border": "#e5e4df",
+          "--error-bg": "#fff5f5",
+          "--error-text": "#c0392b",
+          "--error-border": "#f5c6c6",
+          "--info-bg": "#ffffff",
+          "--info-text": "#2b2b28",
+          "--info-border": "#e5e4df",
         } as React.CSSProperties
       }
       {...props}
