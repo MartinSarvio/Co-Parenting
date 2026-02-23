@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { requestNotificationPermission, scheduleAllHandoverReminders } from '@/lib/notifications';
 import { paymentAccountId, userId as generateUserId } from '@/lib/id';
@@ -459,7 +460,8 @@ export function SettingsView() {
         <h1 className="text-2xl font-semibold text-[#2f2f2d]">Indstillinger</h1>
       </motion.div>
 
-      {/* ─── Side panel (slides from left) ─── */}
+      {/* ─── Side panel (slides from left) — portal to escape max-w container ─── */}
+      {createPortal(
       <AnimatePresence>
         {sidePanelOpen && (
           <>
@@ -469,7 +471,7 @@ export function SettingsView() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-[60] bg-black/30"
+              className="fixed inset-0 z-[9998] bg-black/30"
               onClick={() => setSidePanelOpen(false)}
             />
             {/* Panel */}
@@ -478,7 +480,7 @@ export function SettingsView() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-              className="fixed inset-y-0 left-0 z-[70] w-[280px] bg-white shadow-[4px_0_24px_rgba(0,0,0,0.1)] flex flex-col"
+              className="fixed inset-y-0 left-0 z-[9999] w-[280px] bg-white shadow-[4px_0_24px_rgba(0,0,0,0.1)] flex flex-col"
               style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
             >
               {/* Panel header */}
@@ -551,7 +553,9 @@ export function SettingsView() {
             </motion.div>
           </>
         )}
-      </AnimatePresence>
+      </AnimatePresence>,
+      document.body
+      )}
 
       <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="space-y-4">
         {/* Threads-style tab bar: Konto | Familie | Abonnement | ≡ */}
