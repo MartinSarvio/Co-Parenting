@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useAppStore } from '@/store';
 import { useApiActions } from '@/hooks/useApiActions';
 import { calendarSourceId, templateId } from '@/lib/id';
@@ -636,7 +637,8 @@ export function Kalender() {
 
   return (
     <div className="space-y-2 py-1">
-      {/* ─── Side panel (slides from left) ─── */}
+      {/* ─── Side panel (slides from left) — rendered via portal to escape max-w container ─── */}
+      {createPortal(
       <AnimatePresence>
         {calSidePanelOpen && (
           <>
@@ -645,7 +647,7 @@ export function Kalender() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-[60] bg-black/30"
+              className="fixed inset-0 z-[9998] bg-black/30"
               onClick={() => setCalSidePanelOpen(false)}
             />
             <motion.div
@@ -653,7 +655,7 @@ export function Kalender() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-              className="fixed inset-y-0 left-0 z-[70] w-[280px] bg-white shadow-[4px_0_24px_rgba(0,0,0,0.1)] flex flex-col"
+              className="fixed inset-y-0 left-0 z-[9999] w-[280px] bg-white shadow-[4px_0_24px_rgba(0,0,0,0.1)] flex flex-col"
               style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
             >
               <div className="flex items-center justify-between px-5 py-4 border-b border-[#eeedea]">
@@ -761,7 +763,9 @@ export function Kalender() {
             </motion.div>
           </>
         )}
-      </AnimatePresence>
+      </AnimatePresence>,
+      document.body
+      )}
 
       {/* ─── Del Kalender popup ─── */}
       <BottomSheet open={shareCalendarOpen} onOpenChange={setShareCalendarOpen} title="Del kalender">
