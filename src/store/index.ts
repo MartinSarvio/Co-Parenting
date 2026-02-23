@@ -73,13 +73,15 @@ interface AppStore {
   // UI state
   activeTab: string;
   isLoading: boolean;
-  
+  sideMenuOpen: boolean;
+
   // Actions
   setCurrentUser: (user: User | null) => void;
   setAuthenticated: (value: boolean) => void;
   setProfessionalView: (value: boolean) => void;
   setCurrentChildId: (id: string | null) => void;
   setActiveTab: (tab: string) => void;
+  setSideMenuOpen: (value: boolean) => void;
   
   // Child management
   addChild: (child: Child) => void;
@@ -248,7 +250,8 @@ export const useAppStore = create<AppStore>()(
       userRecipes: [],
       activeTab: 'dashboard',
       isLoading: false,
-      
+      sideMenuOpen: false,
+
       // Actions
       setCurrentUser: (user) => set({ currentUser: user }),
       setAuthenticated: (value) => set({ isAuthenticated: value }),
@@ -257,7 +260,8 @@ export const useAppStore = create<AppStore>()(
       })),
       setCurrentChildId: (id) => set({ currentChildId: id }),
       setActiveTab: (tab) => set({ activeTab: tab }),
-      
+      setSideMenuOpen: (value) => set({ sideMenuOpen: value }),
+
       // Child management
       addChild: (child) => set((state) => ({ 
         children: [...state.children, child],

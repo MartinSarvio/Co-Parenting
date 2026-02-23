@@ -95,6 +95,10 @@ decisionsRouter.patch('/:id', async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: 'Beslutning ikke fundet' });
     }
 
+    if (existing.proposedBy !== req.userId) {
+      return res.status(403).json({ error: 'Du har ikke adgang til at ændre denne beslutning' });
+    }
+
     const decision = await prisma.decisionLog.update({
       where: { id },
       data: {
@@ -125,6 +129,10 @@ decisionsRouter.delete('/:id', async (req: AuthRequest, res: Response) => {
 
     if (!existing) {
       return res.status(404).json({ error: 'Beslutning ikke fundet' });
+    }
+
+    if (existing.proposedBy !== req.userId) {
+      return res.status(403).json({ error: 'Du har ikke adgang til at slette denne beslutning' });
     }
 
     await prisma.decisionLog.delete({ where: { id } });

@@ -271,7 +271,7 @@ export function Opgaver() {
   };
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-2 py-1">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}

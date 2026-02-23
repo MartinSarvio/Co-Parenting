@@ -211,11 +211,11 @@ export function ProfessionalDashboard() {
     const notes = caseNotes[selectedCase] || [];
 
     return (
-      <div className="space-y-4 p-4 max-w-lg mx-auto bg-[#faf9f6] min-h-screen">
+      <div className="space-y-2 py-1">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-4"
+          className="space-y-3"
         >
           {/* Back button */}
           <Button
@@ -499,7 +499,7 @@ export function ProfessionalDashboard() {
 
   // Cases list view (main view)
   return (
-    <div className="space-y-4 p-4 max-w-lg mx-auto bg-[#faf9f6] min-h-screen">
+    <div className="space-y-2 py-1">
       {/* Professional Info Card */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}

@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma';
-import { authenticate } from '../middleware/auth';
+import { authenticate, AuthRequest } from '../middleware/auth';
 
 export const adminRouter = Router();
 
@@ -22,8 +22,8 @@ function requireAdminSecret(req: Request, res: Response, next: () => void) {
 }
 
 // Middleware: check user is admin (via JWT + isAdmin flag)
-async function requireAdmin(req: Request & { user?: { userId: string; role: string } }, res: Response, next: () => void) {
-  const userId = req.user?.userId;
+async function requireAdmin(req: AuthRequest, res: Response, next: () => void) {
+  const userId = req.userId;
   if (!userId) {
     res.status(401).json({ error: 'Ikke logget ind' });
     return;
@@ -65,8 +65,8 @@ adminRouter.post('/promote', requireAdminSecret, async (req: Request, res: Respo
 // GET /api/admin/users
 // Requires: JWT auth + isAdmin = true
 // Lists all users
-adminRouter.get('/users', authenticate, async (req: Request & { user?: { userId: string; role: string } }, res: Response) => {
-  await requireAdmin(req as Request & { user?: { userId: string; role: string } }, res, async () => {
+adminRouter.get('/users', authenticate, async (req: AuthRequest, res: Response) => {
+  await requireAdmin(req, res, async () => {
     const users = await prisma.user.findMany({
       select: {
         id: true,
@@ -97,8 +97,8 @@ const createUserSchema = z.object({
 // POST /api/admin/users
 // Requires: JWT auth + isAdmin = true
 // Creates a new user (admin can specify role and isAdmin)
-adminRouter.post('/users', authenticate, async (req: Request & { user?: { userId: string; role: string } }, res: Response) => {
-  await requireAdmin(req as Request & { user?: { userId: string; role: string } }, res, async () => {
+adminRouter.post('/users', authenticate, async (req: AuthRequest, res: Response) => {
+  await requireAdmin(req, res, async () => {
     const parsed = createUserSchema.safeParse(req.body);
     if (!parsed.success) {
       res.status(400).json({ error: parsed.error.errors[0].message });
@@ -142,8 +142,8 @@ adminRouter.post('/users', authenticate, async (req: Request & { user?: { userId
 // POST /api/admin/make-admin
 // Requires: JWT auth + isAdmin = true
 // Promotes another user to admin by email
-adminRouter.post('/make-admin', authenticate, async (req: Request & { user?: { userId: string; role: string } }, res: Response) => {
-  await requireAdmin(req as Request & { user?: { userId: string; role: string } }, res, async () => {
+adminRouter.post('/make-admin', authenticate, async (req: AuthRequest, res: Response) => {
+  await requireAdmin(req, res, async () => {
     const schema = z.object({ email: z.string().email() });
     const parsed = schema.safeParse(req.body);
     if (!parsed.success) {
@@ -170,12 +170,12 @@ adminRouter.post('/make-admin', authenticate, async (req: Request & { user?: { u
 // DELETE /api/admin/users/:id
 // Requires: JWT auth + isAdmin = true
 // GDPR-compliant soft-delete: anonymizes personal data, keeps record for legal retention
-adminRouter.delete('/users/:id', authenticate, async (req: Request & { user?: { userId: string; role: string } }, res: Response) => {
-  await requireAdmin(req as Request & { user?: { userId: string; role: string } }, res, async () => {
+adminRouter.delete('/users/:id', authenticate, async (req: AuthRequest, res: Response) => {
+  await requireAdmin(req, res, async () => {
     const { id } = req.params;
 
     // Prevent self-deletion
-    if (id === req.user?.userId) {
+    if (id === req.userId) {
       res.status(400).json({ error: 'Du kan ikke slette dig selv' });
       return;
     }
@@ -228,8 +228,8 @@ adminRouter.delete('/users/:id', authenticate, async (req: Request & { user?: { 
 // POST /api/admin/users/:id/restore
 // Requires: JWT auth + isAdmin = true
 // Restores a soft-deleted user (only if within retention period)
-adminRouter.post('/users/:id/restore', authenticate, async (req: Request & { user?: { userId: string; role: string } }, res: Response) => {
-  await requireAdmin(req as Request & { user?: { userId: string; role: string } }, res, async () => {
+adminRouter.post('/users/:id/restore', authenticate, async (req: AuthRequest, res: Response) => {
+  await requireAdmin(req, res, async () => {
     const { id } = req.params;
 
     const user = await prisma.user.findUnique({ where: { id: id as string } });

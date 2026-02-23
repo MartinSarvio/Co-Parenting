@@ -75,7 +75,8 @@ authRouter.post('/register', async (req: Request, res: Response) => {
       res.status(400).json({ error: err.errors[0].message });
       return;
     }
-    throw err;
+    console.error('Register error:', err);
+    res.status(500).json({ error: 'Der opstod en fejl. Prøv igen.' });
   }
 });
 
@@ -122,7 +123,8 @@ authRouter.post('/login', async (req: Request, res: Response) => {
       res.status(400).json({ error: err.errors[0].message });
       return;
     }
-    throw err;
+    console.error('Login error:', err);
+    res.status(500).json({ error: 'Der opstod en fejl. Prøv igen.' });
   }
 });
 

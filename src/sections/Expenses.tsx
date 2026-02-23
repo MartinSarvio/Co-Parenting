@@ -547,9 +547,9 @@ export function Expenses() {
 
   if (!canUseExpenses) {
     return (
-      <div className="mx-auto max-w-lg space-y-4 p-4">
+      <div className="space-y-2 py-1">
         <Card className="border-[#f3c59d] bg-[#fff2e6]">
-          <CardContent className="space-y-4 p-5">
+          <CardContent className="space-y-3 p-4">
             <div className="flex items-start gap-3">
               <div className="rounded-xl bg-[#f58a2d] p-2 text-white">
                 <Lock className="h-5 w-5" />
@@ -571,7 +571,7 @@ export function Expenses() {
   }
 
   return (
-    <div className="mx-auto max-w-lg space-y-4 p-4">
+    <div className="space-y-2 py-1">
       <motion.div
         initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}

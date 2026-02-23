@@ -1732,7 +1732,7 @@ export function MadOgHjem() {
   };
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-2 py-1">
       <motion.div
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}

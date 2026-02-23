@@ -63,6 +63,25 @@ childrenRouter.post('/', async (req: AuthRequest, res: Response) => {
       return;
     }
 
+    // Verify parent IDs are valid users in the household
+    const parent1 = await prisma.householdMember.findUnique({
+      where: { userId_householdId: { userId: parent1Id, householdId } },
+    });
+    if (!parent1) {
+      res.status(400).json({ error: 'Forælder 1 er ikke medlem af husstanden' });
+      return;
+    }
+
+    if (parent2Id && parent2Id !== parent1Id) {
+      const parent2 = await prisma.householdMember.findUnique({
+        where: { userId_householdId: { userId: parent2Id, householdId } },
+      });
+      if (!parent2) {
+        res.status(400).json({ error: 'Forælder 2 er ikke medlem af husstanden' });
+        return;
+      }
+    }
+
     const child = await prisma.child.create({
       data: {
         name,

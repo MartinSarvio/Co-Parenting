@@ -122,11 +122,7 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
               <button
                 onClick={handleLogin}
                 disabled={isLoading}
-                className="w-full h-[50px] rounded-xl text-white font-semibold text-[1rem] tracking-[-0.01em] transition-all duration-200 disabled:opacity-60 active:scale-[0.98]"
-                style={{
-                  background: 'linear-gradient(135deg, #f7a95c 0%, #f58a2d 50%, #e8773f 100%)',
-                  boxShadow: '0 6px 20px rgba(245, 138, 45, 0.35)',
-                }}
+                className="w-full h-[50px] rounded-xl text-white font-semibold text-[1rem] tracking-[-0.01em] transition-all duration-200 disabled:opacity-60 active:scale-[0.98] bg-gradient-to-br from-[#f7a95c] via-[#f58a2d] to-[#e8773f] shadow-[0_6px_20px_rgba(245,138,45,0.35)]"
               >
                 {isLoading ? (
                   <span className="flex items-center justify-center gap-2">

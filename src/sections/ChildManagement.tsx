@@ -161,7 +161,7 @@ export function ChildManagement() {
   };
 
   return (
-    <div className="space-y-4 p-4 max-w-lg mx-auto">
+    <div className="space-y-2 py-1">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -196,6 +196,7 @@ export function ChildManagement() {
                 <Label>Fødselsdato</Label>
                 <Input
                   type="date"
+                  max={new Date().toISOString().slice(0, 10)}
                   value={newChild.birthDate}
                   onChange={(e) => setNewChild({...newChild, birthDate: e.target.value})}
                 />
@@ -470,8 +471,9 @@ export function ChildManagement() {
             </div>
             <div className="space-y-2">
               <Label>Fødselsdato</Label>
-              <Input 
+              <Input
                 type="date"
+                max={new Date().toISOString().slice(0, 10)}
                 value={newChild.birthDate}
                 onChange={(e) => setNewChild({...newChild, birthDate: e.target.value})}
               />

@@ -451,7 +451,7 @@ export function SettingsView() {
   };
 
   return (
-    <div className="space-y-4 p-1">
+    <div className="space-y-2 py-1">
       <motion.div
         initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -847,10 +847,19 @@ export function SettingsView() {
                       />
                       <Button
                         className="rounded-xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
-                        disabled={!partnerInviteEmail.trim() || !partnerInviteEmail.includes('@')}
-                        onClick={() => {
-                          toast.success(`Invitation sendt til ${partnerInviteEmail}`);
-                          setPartnerInviteEmail('');
+                        disabled={!partnerInviteEmail.trim() || !partnerInviteEmail.includes('@') || !household?.id}
+                        onClick={async () => {
+                          try {
+                            await api.post(`/api/household/${household!.id}/invite`, {
+                              email: partnerInviteEmail.toLowerCase().trim(),
+                              role: 'parent',
+                            });
+                            toast.success(`Invitation sendt til ${partnerInviteEmail}`);
+                            setPartnerInviteEmail('');
+                          } catch (err: any) {
+                            const msg = err?.response?.data?.error || 'Kunne ikke sende invitation';
+                            toast.error(msg);
+                          }
                         }}
                       >
                         <Send className="h-4 w-4 mr-1" />
@@ -909,10 +918,13 @@ export function SettingsView() {
                       placeholder="Email"
                     />
                   </div>
-                  <Button className="mt-2 w-full" variant="outline" onClick={handleInviteLawyer}>
+                  <Button className="mt-2 w-full" variant="outline" onClick={handleInviteLawyer} disabled={!features.lawyerAccess}>
                     <UserPlus className="mr-2 h-4 w-4" />
                     Tilføj advokatadgang
                   </Button>
+                  {!features.lawyerAccess && (
+                    <p className="text-xs text-[#9a978f] mt-1">Kræver Enlig Plus abonnement</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">

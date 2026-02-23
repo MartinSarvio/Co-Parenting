@@ -80,6 +80,12 @@ export function Kommunikation() {
     const selectedFile = event.target.files?.[0];
     if (!selectedFile || !selectedThreadId) return;
 
+    if (selectedFile.size > 10 * 1024 * 1024) {
+      toast.error('Filen er for stor. Maksimum er 10 MB.');
+      event.target.value = '';
+      return;
+    }
+
     try {
       const dataUrl = await fileToDataUrl(selectedFile);
       const attachment: Attachment = {
@@ -136,7 +142,7 @@ export function Kommunikation() {
   // Thread List View
   if (!selectedThreadId) {
     return (
-      <div className="space-y-4 p-4">
+      <div className="space-y-2 py-1">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

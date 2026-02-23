@@ -1,6 +1,6 @@
 import { useAppStore } from '@/store';
 import { getParentColor } from '@/lib/utils';
-import { Bell, Settings, ChevronDown, Briefcase, User, LogOut } from 'lucide-react';
+import { Bell, Settings, ChevronDown, Briefcase, User, LogOut, Menu } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +13,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { logoutUser } from '@/lib/auth';
 export function TopBar() {
-  const { currentUser, children, notifications, isProfessionalView, setProfessionalView, household, setActiveTab, logout } = useAppStore();
+  const { currentUser, children, notifications, isProfessionalView, setProfessionalView, household, setActiveTab, logout, sideMenuOpen, setSideMenuOpen } = useAppStore();
 
   const unreadNotifications = notifications.filter(n => !n.read).length;
   const currentChild = children[0];
@@ -32,9 +32,13 @@ export function TopBar() {
     <header className="safe-area-pt fixed inset-x-0 top-0 z-50 border-b border-[#d8d7cf] bg-[#f2f1ed]">
       <div className="mx-auto grid w-full max-w-[430px] grid-cols-[auto_1fr_auto] items-center gap-2 px-4 pb-2.5 pt-2">
         <div className="flex min-w-0 items-center gap-1">
-          <span className="truncate text-sm font-semibold text-[#30302d]">
-            {showProfessionalView ? 'Professionel' : 'Hverdag'}
-          </span>
+          <button
+            onClick={() => setSideMenuOpen(!sideMenuOpen)}
+            className="flex items-center justify-center text-[#30302d] hover:text-[#1a1a1a] transition-colors"
+            aria-label="Menu"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
         </div>
 
         <div className="flex min-w-0 justify-center">
