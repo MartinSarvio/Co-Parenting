@@ -284,24 +284,27 @@ export function CustodyConfig() {
               <CardContent className="space-y-2">
                 <div className="space-y-2">
                   <Label>Vælg model</Label>
-                  <Select 
-                    value={config.pattern} 
-                    onValueChange={(v) => setConfig({...config, pattern: v as CustodyPattern})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {patternOptions.map(opt => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          <div>
-                            <p className="font-medium">{opt.label}</p>
-                            <p className="text-xs text-slate-500">{opt.description}</p>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="space-y-2">
+                    {patternOptions.map(opt => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setConfig({...config, pattern: opt.value as CustodyPattern})}
+                        className={cn(
+                          'w-full rounded-xl border px-4 py-3 text-left transition-colors',
+                          config.pattern === opt.value
+                            ? 'border-[#f58a2d] bg-[#fff2e6]'
+                            : 'border-[#d8d7cf] bg-white hover:bg-[#faf9f6]'
+                        )}
+                      >
+                        <p className={cn(
+                          'text-sm font-semibold',
+                          config.pattern === opt.value ? 'text-[#2f2f2d]' : 'text-[#4a4945]'
+                        )}>{opt.label}</p>
+                        <p className="text-xs text-[#78766d]">{opt.description}</p>
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 {config.pattern !== 'custom' && (
