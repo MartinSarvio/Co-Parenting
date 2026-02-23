@@ -89,7 +89,7 @@ export function MeetingMinutesView() {
     const isApproved = minutes.approvedBy?.includes(currentUser?.id || '');
 
     return (
-      <div className="space-y-4 p-4 max-w-lg mx-auto">
+      <div className="space-y-2 p-4 max-w-lg mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -268,7 +268,7 @@ export function MeetingMinutesView() {
 
   // List view
   return (
-    <div className="space-y-4 p-4 max-w-lg mx-auto">
+    <div className="space-y-2 p-4 max-w-lg mx-auto">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -295,7 +295,7 @@ export function MeetingMinutesView() {
               <DialogHeader>
                 <DialogTitle>Opret nyt referat</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4 pt-4">
+              <div className="space-y-2 pt-4">
                 <div className="space-y-2">
                   <Label>Titel</Label>
                   <Input 
@@ -363,7 +363,7 @@ export function MeetingMinutesView() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="space-y-3"
+        className="space-y-2"
       >
         {filteredMinutes.length === 0 ? (
           <div className="text-center py-12">

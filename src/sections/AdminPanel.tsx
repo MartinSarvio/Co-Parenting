@@ -121,7 +121,7 @@ export function AdminPanel() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
@@ -207,7 +207,7 @@ export function AdminPanel() {
           <DialogHeader>
             <DialogTitle className="text-[1rem] text-[#2f2f2d]">Opret ny bruger</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="space-y-1">
               <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Navn</Label>
               <Input

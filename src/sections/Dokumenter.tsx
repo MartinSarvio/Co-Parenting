@@ -149,7 +149,7 @@ export function Dokumenter() {
   };
 
   return (
-    <div className="space-y-2 py-1">
+    <div className="space-y-1.5 py-1">
       <div>
         <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Dokumenter</h1>
         <p className="mt-0.5 text-[13px] text-[#78766d]">
@@ -290,7 +290,7 @@ export function Dokumenter() {
               {selectedTemplate && (() => {
                 const CategoryIcon = getCategoryIcon(selectedTemplate.category);
                 return (
-                  <div className="space-y-4 pt-1">
+                  <div className="space-y-2 pt-1">
                     <div className="flex items-center gap-2">
                       <Badge className="bg-[#f0f7ff] text-[#2563eb]">
                         <CategoryIcon className="mr-1 h-3 w-3" />
@@ -448,7 +448,7 @@ export function Dokumenter() {
                 </SheetTitle>
               </SheetHeader>
               {selectedDocument && (
-                <div className="space-y-4 pt-1">
+                <div className="space-y-2 pt-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge variant="outline" className="border-[#d8d7cf] text-[#5f5d56]">
                       {documentTypeLabels[selectedDocument.type] || selectedDocument.type}
@@ -515,7 +515,7 @@ export function Dokumenter() {
               <DialogHeader>
                 <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Upload dokument</DialogTitle>
               </DialogHeader>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {/* File picker */}
                 <div className="space-y-1">
                   <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Fil</Label>

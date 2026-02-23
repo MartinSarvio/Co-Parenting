@@ -1732,7 +1732,7 @@ export function MadOgHjem() {
   };
 
   return (
-    <div className="space-y-2 py-1">
+    <div className="space-y-1.5 py-1">
       <motion.div
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -1772,7 +1772,7 @@ export function MadOgHjem() {
       </div>
 
       {activeTab === 'meal-plan' && (
-        <div className="space-y-4">
+        <div className="space-y-2">
           <div className="grid grid-cols-3 gap-2">
             <button
               onClick={() => setRecipeBrowserOpen(true)}
@@ -1796,7 +1796,7 @@ export function MadOgHjem() {
                 <DialogHeader>
                   <DialogTitle>Ny ret i madplanen</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4 pt-2">
+                <div className="space-y-2 pt-2">
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
                       <Label>Dag</Label>
@@ -2015,7 +2015,7 @@ export function MadOgHjem() {
                 const progressPercent = richSteps.length > 0 ? Math.round((completedCount / richSteps.length) * 100) : 0;
 
                 return (
-                  <div className="space-y-4 pt-1">
+                  <div className="space-y-2 pt-1">
                     {/* Header badges + time estimate */}
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge variant="outline" className="border-[#e8e7e0] bg-white text-[#4a4944]">
@@ -2077,7 +2077,7 @@ export function MadOgHjem() {
                       <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">
                         Trin-for-trin tilberedning
                       </p>
-                      <div className="space-y-3">
+                      <div className="space-y-2">
                         {richSteps.map((step, index) => {
                           const isCompleted = guideCompletedSteps.has(index);
                           return (
@@ -2192,7 +2192,7 @@ export function MadOgHjem() {
       )}
 
       {activeTab === 'shopping' && (
-        <div className="space-y-4">
+        <div className="space-y-2">
           {/* Sub-tabs: Køleskab / Indkøbsliste */}
           <div className="flex rounded-xl border border-[#d8d7cf] bg-[#ecebe5] p-1">
             <button
@@ -2229,7 +2229,7 @@ export function MadOgHjem() {
                 Køleskabsscanning og madforslag
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 pt-0">
+            <CardContent className="space-y-2 pt-0">
               <div className="flex gap-2">
                 <Input
                   value={fridgeQuickInput}
@@ -2318,7 +2318,7 @@ export function MadOgHjem() {
                 <DialogHeader>
                   <DialogTitle>Ny vare til indkøb</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4 pt-2">
+                <div className="space-y-2 pt-2">
                   <div className="space-y-2">
                     <Label>Vare</Label>
                     <Input
@@ -2419,7 +2419,7 @@ export function MadOgHjem() {
                 <DialogHeader>
                   <DialogTitle>Scan stregkode til indkøbsliste</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-3 pt-2">
+                <div className="space-y-2 pt-2">
                   <div className="overflow-hidden rounded-2xl border border-slate-200 bg-black">
                     <video
                       ref={videoRef}
@@ -2615,7 +2615,7 @@ export function MadOgHjem() {
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {shoppingGroups.map(([dateKey, items]) => (
                 <div key={dateKey}>
                   {/* Date header */}
@@ -2748,7 +2748,7 @@ export function MadOgHjem() {
         ];
 
         return (
-          <div className="space-y-4">
+          <div className="space-y-2">
             {/* View toggle: Mig / Familie */}
             <div className="flex rounded-xl border border-[#d8d7cf] bg-[#ecebe5] p-1">
               <button
@@ -2861,7 +2861,7 @@ export function MadOgHjem() {
             </div>
 
             {/* Måltider */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               {meals.map(meal => {
                 const mealEntries = todayEntries.filter(e => e.meal === meal.key);
                 const mealKcal = mealEntries.reduce((s, e) => s + e.kcal, 0);
@@ -2919,7 +2919,7 @@ export function MadOgHjem() {
                 <DialogHeader>
                   <DialogTitle>Log mad</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-3 pt-2">
+                <div className="space-y-2 pt-2">
                   <div className="space-y-1.5">
                     <Label>Måltid</Label>
                     <Select value={addFoodMeal} onValueChange={setAddFoodMeal}>
@@ -3048,7 +3048,7 @@ export function MadOgHjem() {
               <div className="px-4 pt-4 pb-1">
                 <p className="text-[11px] text-[#9a978f]">Regelbaseret madplan-generator</p>
               </div>
-              <div className="px-4 py-3 space-y-3">
+              <div className="px-4 py-3 space-y-2">
                 <div className="space-y-1.5">
                   <p className="text-[12px] font-semibold text-[#5f5d56]">Favoritter (kommasepareret)</p>
                   <Input
@@ -3069,7 +3069,7 @@ export function MadOgHjem() {
                   />
                 </div>
 
-                <div className="space-y-3 pt-1">
+                <div className="space-y-2 pt-1">
                   <label className="flex items-center gap-3 rounded-xl bg-[#faf9f6] px-3 py-2.5 text-[13px] text-[#2f2f2d]">
                     <Checkbox
                       checked={autoPlannerSettings.childFriendly}
@@ -3283,7 +3283,7 @@ export function MadOgHjem() {
               </button>
               <h1 className="text-[20px] font-bold tracking-[-0.02em] text-[#2f2f2d]">Opret ny opskrift</h1>
             </div>
-          <div className="flex-1 overflow-y-auto px-4 space-y-4 pb-8">
+          <div className="flex-1 overflow-y-auto px-4 space-y-2 pb-8">
             <div className="space-y-2">
               <Label className="text-[12px] font-semibold text-[#78766d]">Navn</Label>
               <Input
@@ -3456,7 +3456,7 @@ export function MadOgHjem() {
 
             {/* Content */}
             <div className="flex-1 overflow-y-auto px-4 pb-8">
-              <div className="space-y-4">
+              <div className="space-y-2">
                 <p className="text-[13px] text-[#4a4945] leading-relaxed">{selectedRecipe.description}</p>
 
                 {/* Nutrition bar */}

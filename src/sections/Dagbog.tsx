@@ -107,7 +107,7 @@ export function Dagbog() {
   }
 
   return (
-    <div className="space-y-2 py-1">
+    <div className="space-y-1.5 py-1">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Dagbog</h1>
@@ -140,7 +140,7 @@ export function Dagbog() {
           </Button>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {entries.map(entry => {
             const moodInfo = getMoodInfo(entry.mood);
             const MoodIcon = moodInfo.icon;
@@ -179,7 +179,7 @@ export function Dagbog() {
           <DialogHeader>
             <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Nyt dagbogsnotat</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-2">
             {/* Mood */}
             <div className="space-y-1.5">
               <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Humør</p>

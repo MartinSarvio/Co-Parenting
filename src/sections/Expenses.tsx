@@ -547,9 +547,9 @@ export function Expenses() {
 
   if (!canUseExpenses) {
     return (
-      <div className="space-y-2 py-1">
+      <div className="space-y-1.5 py-1">
         <Card className="border-[#f3c59d] bg-[#fff2e6]">
-          <CardContent className="space-y-3 p-4">
+          <CardContent className="space-y-2 p-4">
             <div className="flex items-start gap-3">
               <div className="rounded-xl bg-[#f58a2d] p-2 text-white">
                 <Lock className="h-5 w-5" />
@@ -571,7 +571,7 @@ export function Expenses() {
   }
 
   return (
-    <div className="space-y-2 py-1">
+    <div className="space-y-1.5 py-1">
       <motion.div
         initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -635,7 +635,7 @@ export function Expenses() {
               Send / anmod penge
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3 pt-0">
+          <CardContent className="space-y-2 pt-0">
             {!canUsePayments && (
               <p className="rounded-xl border border-[#f3c59d] bg-[#fff2e6] px-3 py-2 text-sm text-[#a7632c]">
                 Denne funktion kræver Family Plus eller Enlig Plus.
@@ -656,7 +656,7 @@ export function Expenses() {
                 <DialogHeader>
                   <DialogTitle>Send eller anmod penge</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4 pt-2">
+                <div className="space-y-2 pt-2">
                   <div className="grid grid-cols-2 gap-2">
                     <Button
                       type="button"
@@ -760,7 +760,7 @@ export function Expenses() {
             <DialogHeader>
               <DialogTitle>Ny udgift</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4 pt-2">
+            <div className="space-y-2 pt-2">
               <div className="space-y-2">
                 <Label>Hvad er der betalt for?</Label>
                 <Input
@@ -991,7 +991,7 @@ export function Expenses() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.15 }}
-        className="space-y-3"
+        className="space-y-2"
       >
         <div className="flex items-center gap-2">
           <div className="flex-1">
@@ -1085,7 +1085,7 @@ export function Expenses() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-4"
+          className="space-y-2"
         >
           {expenses.length === 0 ? (
             <div className="py-10 text-center text-[#75736b]">
@@ -1170,7 +1170,7 @@ export function Expenses() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="space-y-3"
+          className="space-y-2"
         >
           <AnimatePresence>
             {filteredExpenses.length === 0 ? (
@@ -1333,7 +1333,7 @@ export function Expenses() {
                 <SheetHeader className="pb-2">
                   <SheetTitle className="text-left text-lg font-bold text-[#2f2f2d]">{detailExpense.title}</SheetTitle>
                 </SheetHeader>
-                <div className="space-y-4 px-4 pb-8">
+                <div className="space-y-2 px-4 pb-8">
                   {/* Amount + category header */}
                   <div className="flex items-center gap-3">
                     <div className={cn('flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl', cat?.color || 'bg-[#eceae2] text-[#4f4b43]')}>
@@ -1364,7 +1364,7 @@ export function Expenses() {
                   )}
 
                   {/* Payment info */}
-                  <div className="rounded-2xl border border-[#e8e7e0] bg-white p-4 space-y-3">
+                  <div className="rounded-2xl border border-[#e8e7e0] bg-white p-4 space-y-2">
                     <p className="text-xs font-semibold uppercase tracking-wide text-[#9b9a93]">Betalingsdetaljer</p>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-[#78766d]">Betalt af</span>
@@ -1399,7 +1399,7 @@ export function Expenses() {
                   </div>
 
                   {/* Split breakdown */}
-                  <div className="rounded-2xl border border-[#e8e7e0] bg-white p-4 space-y-3">
+                  <div className="rounded-2xl border border-[#e8e7e0] bg-white p-4 space-y-2">
                     <p className="text-xs font-semibold uppercase tracking-wide text-[#9b9a93]">Fordeling</p>
                     {Object.entries(detailExpense.splitAmounts).map(([userId, amount]) => {
                       const user = users.find(u => u.id === userId);
@@ -1488,7 +1488,7 @@ export function Expenses() {
           <DialogHeader>
             <DialogTitle>Anfægt udgift</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3 pt-2">
+          <div className="space-y-2 pt-2">
             <p className="text-sm text-[#75736b]">Beskriv hvorfor du anfægter denne udgift. Den anden forælder vil se din begrundelse.</p>
             <div className="space-y-1.5">
               <Label htmlFor="dispute-reason">Begrundelse</Label>
@@ -1518,7 +1518,7 @@ export function Expenses() {
           <DialogHeader>
             <DialogTitle>Løs tvist</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3 pt-2">
+          <div className="space-y-2 pt-2">
             <p className="text-sm text-[#75736b]">Beskriv hvordan tvisten løses. Udgiften vil blive markeret som godkendt.</p>
             <div className="space-y-1.5">
               <Label htmlFor="resolve-note">Løsning</Label>

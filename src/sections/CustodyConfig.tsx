@@ -175,7 +175,7 @@ export function CustodyConfig() {
 
 
   return (
-    <div className="space-y-4 p-4 max-w-lg mx-auto">
+    <div className="space-y-2 p-4 max-w-lg mx-auto">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -273,7 +273,7 @@ export function CustodyConfig() {
           </TabsList>
 
           {/* General Settings */}
-          <TabsContent value="general" className="space-y-4 mt-4">
+          <TabsContent value="general" className="space-y-2 mt-4">
             <Card className="border-slate-200">
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -281,7 +281,7 @@ export function CustodyConfig() {
                   Samværsmodel
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-2">
                 <div className="space-y-2">
                   <Label>Vælg model</Label>
                   <Select 
@@ -361,7 +361,7 @@ export function CustodyConfig() {
                 )}
 
                 {config.pattern === 'custom' && (
-                  <div className="space-y-4 rounded-xl border border-[#f3c59d] bg-[#fff7f1] p-4">
+                  <div className="space-y-2 rounded-xl border border-[#f3c59d] bg-[#fff7f1] p-4">
                     <div className="space-y-2">
                       <Label>Skiftetype</Label>
                       <Select
@@ -485,7 +485,7 @@ export function CustodyConfig() {
           </TabsContent>
 
           {/* Holidays */}
-          <TabsContent value="holidays" className="space-y-4 mt-4">
+          <TabsContent value="holidays" className="space-y-2 mt-4">
             <Card className="border-slate-200">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
@@ -501,7 +501,7 @@ export function CustodyConfig() {
               </CardHeader>
               <CardContent>
                 {custodyPlan?.holidays && custodyPlan.holidays.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {custodyPlan.holidays.map((holiday: { id: string; name: string; startDate: string; endDate: string; parentId: string }) => (
                       <div 
                         key={holiday.id}
@@ -537,7 +537,7 @@ export function CustodyConfig() {
           </TabsContent>
 
           {/* Special Days */}
-          <TabsContent value="special" className="space-y-4 mt-4">
+          <TabsContent value="special" className="space-y-2 mt-4">
             <Card className="border-slate-200">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
@@ -553,7 +553,7 @@ export function CustodyConfig() {
               </CardHeader>
               <CardContent>
                 {custodyPlan?.specialDays && custodyPlan.specialDays.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {custodyPlan.specialDays.map((day: { id: string; date: string; type: string; description: string; alternateYears?: boolean }) => (
                       <div 
                         key={day.id}

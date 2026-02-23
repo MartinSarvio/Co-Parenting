@@ -77,7 +77,7 @@ export function Fotoalbum() {
   const nextPhoto = () => setLightboxIndex(i => (i !== null ? Math.min(childPhotos.length - 1, i + 1) : null));
 
   return (
-    <div className="space-y-2 py-1">
+    <div className="space-y-1.5 py-1">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Fotoalbum</h1>
@@ -140,7 +140,7 @@ export function Fotoalbum() {
           <DialogHeader>
             <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Tilføj foto</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3">
+          <div className="space-y-2">
             {previewUrl && (
               <div className="relative overflow-hidden rounded-2xl">
                 <img src={previewUrl} alt="Preview" className="max-h-64 w-full object-contain" />

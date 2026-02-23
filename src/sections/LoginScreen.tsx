@@ -113,7 +113,7 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
             </div>
 
             {/* Form */}
-            <div className="space-y-3">
+            <div className="space-y-2">
               {/* Email */}
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#b5b2a8] z-10" />

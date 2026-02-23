@@ -452,7 +452,7 @@ export function SettingsView() {
   };
 
   return (
-    <div className="space-y-2 py-1">
+    <div className="space-y-1.5 py-1">
       <motion.div
         initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -557,7 +557,7 @@ export function SettingsView() {
       document.body
       )}
 
-      <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="space-y-4">
+      <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="space-y-2">
         {/* Threads-style tab bar: Konto | Familie | Abonnement | ≡ */}
         <div className="sticky top-0 z-10 bg-[#faf9f6] pb-0 pt-1">
           <div className="flex items-center border-b border-[#e5e3dc]">
@@ -598,7 +598,7 @@ export function SettingsView() {
           </div>
         </div>
 
-        <TabsContent value="profile" className="space-y-4">
+        <TabsContent value="profile" className="space-y-2">
           {/* Avatar section */}
           <Card>
             <CardContent className="flex flex-col items-center gap-3 py-5">
@@ -631,7 +631,7 @@ export function SettingsView() {
               <DialogHeader>
                 <DialogTitle className="text-[1rem] text-[#2f2f2d]">Vælg profilbillede</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4">
+              <div className="space-y-2">
                 {/* Upload own photo */}
                 <button
                   onClick={() => avatarFileRef.current?.click()}
@@ -689,7 +689,7 @@ export function SettingsView() {
             <CardHeader className="pb-3">
               <CardTitle className="text-base">Min profil</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 pt-0">
+            <CardContent className="space-y-2 pt-0">
               <div className="space-y-2">
                 <Label>Navn</Label>
                 <Input
@@ -778,7 +778,7 @@ export function SettingsView() {
 
         </TabsContent>
 
-        <TabsContent value="family" className="space-y-4">
+        <TabsContent value="family" className="space-y-2">
           {/* Quick link to family type setting */}
           <button
             onClick={() => setActiveSettingsTab('familytype')}
@@ -804,7 +804,7 @@ export function SettingsView() {
                 {isTogetherMode ? 'Samboende' : 'Co-parenting'}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 pt-0">
+            <CardContent className="space-y-2 pt-0">
               {(() => {
                 // Find partner: other parent in household
                 const partnerUser = users.find(u =>
@@ -830,7 +830,7 @@ export function SettingsView() {
                   );
                 }
                 return (
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <div className="rounded-xl border border-dashed border-[#d8d7cf] bg-[#f8f7f3] p-4 text-center">
                       <Users className="h-8 w-8 text-[#b0ada4] mx-auto mb-2" />
                       <p className="text-sm text-[#75736b]">
@@ -884,7 +884,7 @@ export function SettingsView() {
                   Enlig forsørger støtte
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 pt-0">
+              <CardContent className="space-y-2 pt-0">
                 <div className="flex items-center justify-between rounded-xl border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2">
                   <div>
                     <p className="text-sm font-medium">Dokumentationsarkiv</p>
@@ -987,7 +987,7 @@ export function SettingsView() {
           )}
         </TabsContent>
 
-        <TabsContent value="subscription" className="space-y-4">
+        <TabsContent value="subscription" className="space-y-2">
           {/* Plan cards with included features */}
           {([
             {
@@ -1122,7 +1122,7 @@ export function SettingsView() {
 
           {/* Administrer abonnement — only when user has real Stripe subscription */}
           {hasStripeCustomer && (
-            <div className="rounded-2xl border-2 border-[#e0dfd8] bg-white p-5 text-center space-y-3">
+            <div className="rounded-2xl border-2 border-[#e0dfd8] bg-white p-5 text-center space-y-2">
               <p className="text-sm font-semibold text-[#2f2f2d]">Administrer dit abonnement</p>
               <p className="text-xs text-[#78766d]">
                 Ændr betalingsmetode, se fakturaer eller annuller dit abonnement.
@@ -1176,7 +1176,7 @@ export function SettingsView() {
           )}
 
           {/* Tilføj ny konto */}
-          <div className="rounded-2xl border-2 border-[#e5e3dc] bg-white p-4 space-y-3">
+          <div className="rounded-2xl border-2 border-[#e5e3dc] bg-white p-4 space-y-2">
             <p className="text-[13px] font-semibold text-[#2f2f2d]">Tilføj betalingskonto</p>
             <Select
               value={paymentDraft.provider}
@@ -1249,12 +1249,12 @@ export function SettingsView() {
         </TabsContent>
 
         {currentUser?.isAdmin && (
-          <TabsContent value="admin" className="space-y-4">
+          <TabsContent value="admin" className="space-y-2">
             <AdminPanel />
           </TabsContent>
         )}
 
-        <TabsContent value="members" className="space-y-4">
+        <TabsContent value="members" className="space-y-2">
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base">
@@ -1262,7 +1262,7 @@ export function SettingsView() {
                 Familiemedlemmer
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 pt-0">
+            <CardContent className="space-y-2 pt-0">
               {!features.familyMembers ? (
                 <div className="rounded-xl border border-[#f3c59d] bg-[#fff6ef] p-4 text-center">
                   <p className="text-sm font-semibold text-[#b96424]">Opgrader til Family Plus</p>
@@ -1338,7 +1338,7 @@ export function SettingsView() {
           </div>
 
           {notifPermission === 'granted' ? (
-            <div className="space-y-3 mb-4">
+            <div className="space-y-2 mb-4">
               <div className="flex items-center justify-between px-1 py-2">
                 <p className="text-sm font-medium text-[#2f2f2d]">Push-notifikationer</p>
                 <BadgeCheck className="h-4 w-4 text-green-600" />
@@ -1471,7 +1471,7 @@ export function SettingsView() {
             </p>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             {([
               { value: 'together' as HouseholdMode, label: 'Samboende familie', desc: 'Deler ét abonnement og ser alt sammen', icon: '🏠' },
               { value: 'co_parenting' as HouseholdMode, label: 'Skilt / Co-parenting', desc: 'Separate abonnementer, deler udvalgt data', icon: '🤝' },
@@ -1507,7 +1507,7 @@ export function SettingsView() {
         </TabsContent>
 
         {/* ─── Feedback (fra sidepanel) ─── */}
-        <TabsContent value="feedback" className="space-y-4">
+        <TabsContent value="feedback" className="space-y-2">
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base">
@@ -1515,7 +1515,7 @@ export function SettingsView() {
                 Feedback
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 pt-0">
+            <CardContent className="space-y-2 pt-0">
               <p className="text-sm text-[#75736b]">
                 Vi vil gerne høre din mening! Hjælp os med at forbedre appen.
               </p>
@@ -1599,7 +1599,7 @@ export function SettingsView() {
         </TabsContent>
 
         {/* ─── Visning (fra sidepanel) ─── */}
-        <TabsContent value="appearance" className="space-y-4">
+        <TabsContent value="appearance" className="space-y-2">
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-base">
@@ -1607,7 +1607,7 @@ export function SettingsView() {
                 Visning
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 pt-0">
+            <CardContent className="space-y-2 pt-0">
               {/* Dark mode toggle */}
               <div className="space-y-2">
                 <p className="text-sm font-medium text-[#2f2f2d] dark:text-slate-200">Farvetema</p>
@@ -1659,7 +1659,7 @@ export function SettingsView() {
           <DialogHeader>
             <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Tilføj familiemedlem</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="space-y-1">
               <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Navn</Label>
               <Input

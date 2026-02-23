@@ -211,11 +211,11 @@ export function ProfessionalDashboard() {
     const notes = caseNotes[selectedCase] || [];
 
     return (
-      <div className="space-y-2 py-1">
+      <div className="space-y-1.5 py-1">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="space-y-3"
+          className="space-y-2"
         >
           {/* Back button */}
           <Button
@@ -229,7 +229,7 @@ export function ProfessionalDashboard() {
 
           {/* Case Header */}
           <Card className="bg-white border border-[#e8e7e0] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-            <CardContent className="p-5">
+            <CardContent className="p-4">
               <div className="flex items-start justify-between mb-3">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -327,7 +327,7 @@ export function ProfessionalDashboard() {
             <CardHeader className="pb-2 px-5 pt-5">
               <CardTitle className="text-base font-semibold text-[#2f2f2d]">Statusoversigt</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3 px-5 pb-5">
+            <CardContent className="space-y-2 px-5 pb-5">
               <div className="flex items-center justify-between p-3 rounded-xl bg-[#faf9f6]">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-[#ecebe5] flex items-center justify-center">
@@ -460,7 +460,7 @@ export function ProfessionalDashboard() {
                 Interne noter
               </CardTitle>
             </CardHeader>
-            <CardContent className="px-5 pb-5 space-y-3">
+            <CardContent className="px-5 pb-5 space-y-2">
               {/* Existing notes */}
               {notes.length > 0 && (
                 <div className="space-y-2">
@@ -499,7 +499,7 @@ export function ProfessionalDashboard() {
 
   // Cases list view (main view)
   return (
-    <div className="space-y-2 py-1">
+    <div className="space-y-1.5 py-1">
       {/* Professional Info Card */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
@@ -593,7 +593,7 @@ export function ProfessionalDashboard() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.25 }}
-        className="space-y-3"
+        className="space-y-2"
       >
         {filteredCases.map((caseItem, index) => {
           const daysSince = getDaysSinceContact(caseItem.lastContact);

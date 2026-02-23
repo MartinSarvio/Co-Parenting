@@ -142,7 +142,7 @@ export function Kommunikation() {
   // Thread List View
   if (!selectedThreadId) {
     return (
-      <div className="space-y-2 py-1">
+      <div className="space-y-1.5 py-1">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -168,7 +168,7 @@ export function Kommunikation() {
             exit={{ opacity: 0, y: -20 }}
           >
             <Card className="border-[#f3c59d] bg-[#fff2e6]">
-              <CardContent className="p-4 space-y-3">
+              <CardContent className="p-4 space-y-2">
                 <div className="flex flex-wrap gap-2">
                   {threadCategoryTemplates.map((template) => (
                     <button
@@ -223,7 +223,7 @@ export function Kommunikation() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="space-y-3"
+          className="space-y-2"
         >
           {threads.filter(t => !t.deletedBy?.includes(currentUser?.id || '')).map((thread, index) => {
             const lastMessage = messages
@@ -338,7 +338,7 @@ export function Kommunikation() {
       </motion.div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-2">
         <AnimatePresence>
           {threadMessages.map((message, index) => {
             const isCurrentUser = message.senderId === currentUser?.id;

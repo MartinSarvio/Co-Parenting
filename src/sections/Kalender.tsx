@@ -636,7 +636,7 @@ export function Kalender() {
   };
 
   return (
-    <div className="space-y-2 py-1">
+    <div className="space-y-1.5 py-1">
       {/* ─── Side panel (slides from left) — rendered via portal to escape max-w container ─── */}
       {createPortal(
       <AnimatePresence>
@@ -773,7 +773,7 @@ export function Kalender() {
           <DialogHeader>
             <DialogTitle>Del kalender</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 pt-2">
+          <div className="space-y-2 pt-2">
             <p className="text-[13px] text-[#75736b]">
               Del din kalender med din co-parent, så I begge kan se hinandens aftaler og begivenheder.
             </p>
@@ -838,7 +838,7 @@ export function Kalender() {
           <DialogHeader>
             <DialogTitle>Ny aftale-skabelon</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 pt-2">
+          <div className="space-y-2 pt-2">
             <p className="text-[13px] text-[#75736b]">
               Opret en genbrugelig skabelon til hurtige aftaler.
             </p>
@@ -920,7 +920,7 @@ export function Kalender() {
           <DialogHeader>
             <DialogTitle>Forbind dagbog til kalender</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 pt-2">
+          <div className="space-y-2 pt-2">
             <p className="text-[13px] text-[#75736b]">
               Vælg hvilken kalender dagbogsnotater skal vises i.
             </p>
@@ -973,7 +973,7 @@ export function Kalender() {
           <DialogHeader>
             <DialogTitle>Forbind måltider til kalender</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 pt-2">
+          <div className="space-y-2 pt-2">
             <p className="text-[13px] text-[#75736b]">
               Vælg hvilken kalender madplan og indkøb skal synkroniseres med.
             </p>
@@ -1041,7 +1041,7 @@ export function Kalender() {
             <DialogHeader>
               <DialogTitle>Tilføj ny aftale</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4 pt-4">
+            <div className="space-y-2 pt-4">
               <div className="space-y-2">
                 <Label>Titel</Label>
                 <Input
@@ -1223,7 +1223,7 @@ export function Kalender() {
 
       {/* Tab content: Synk (calendar sources inline) */}
       {calendarTab === 'sync' && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
           <button
             onClick={() => setIsSourceDialogOpen(true)}
             className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#d8d7cf] bg-white px-4 py-3 text-[13px] font-semibold text-[#5f5d56] hover:border-[#f58a2d] hover:bg-[#fff8f0] transition-colors"
@@ -1471,7 +1471,7 @@ export function Kalender() {
                 {getEventsForDay(selectedDate).length === 0 ? (
                   <p className="text-center text-slate-400 py-4">Ingen aftaler denne dag</p>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {getEventsForDay(selectedDate).map((event) => (
                       <button
                         key={event.id}
@@ -1624,7 +1624,7 @@ export function Kalender() {
           <DialogHeader>
             <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Ny skabelon</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="space-y-1">
               <Label htmlFor="tpl-title" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Navn</Label>
               <Input
@@ -1714,7 +1714,7 @@ export function Kalender() {
               Brug skabelon: {templateToUse?.title}
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="space-y-1">
               <Label htmlFor="tmpl-start" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Starttidspunkt</Label>
               <Input
@@ -1770,7 +1770,7 @@ export function Kalender() {
           <DialogHeader>
             <DialogTitle>Tilføj kalenderkilde</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 pt-4">
+          <div className="space-y-2 pt-4">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>Navn</Label>
@@ -1894,7 +1894,7 @@ export function Kalender() {
               const Icon = selectedType?.icon ?? Calendar;
               const currentColor = getCustomEventColor(colorEditCategory);
               return (
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {/* Preview */}
                   <div className="flex flex-col items-center gap-2 py-2">
                     <div
@@ -2006,7 +2006,7 @@ export function Kalender() {
             <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Aftaledetaljer</DialogTitle>
           </DialogHeader>
           {selectedEvent && (
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full" style={{ backgroundColor: getCustomEventColor(selectedEvent.type) }} />
                 <p className="text-[15px] font-semibold text-[#2f2f2d]">{selectedEvent.title}</p>

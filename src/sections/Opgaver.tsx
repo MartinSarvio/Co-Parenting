@@ -271,7 +271,7 @@ export function Opgaver() {
   };
 
   return (
-    <div className="space-y-2 py-1">
+    <div className="space-y-1.5 py-1">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -424,7 +424,7 @@ export function Opgaver() {
 
       {/* Tasks Tab */}
       {activeTab === 'tasks' && (
-        <div className="space-y-4 mt-4">
+        <div className="space-y-2 mt-4">
           {/* Active filter chip — shown when not "all" */}
           {filter !== 'all' && (
             <div className="flex items-center gap-2">
@@ -455,7 +455,7 @@ export function Opgaver() {
               <DialogHeader>
                 <DialogTitle>Tilføj ny opgave</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4 pt-4">
+              <div className="space-y-2 pt-4">
                 <div className="space-y-2">
                   <Label>Titel</Label>
                   <Input 
@@ -533,7 +533,7 @@ export function Opgaver() {
             </div>
             {pendingTasks.length === 0 ? (
               <Card className="bg-green-50 border-green-200">
-                <CardContent className="p-6 text-center">
+                <CardContent className="p-4 text-center">
                   <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-2" />
                   <p className="text-green-700 font-medium">Alle opgaver er klaret!</p>
                 </CardContent>
@@ -635,7 +635,7 @@ export function Opgaver() {
 
       {/* Cleaning (Rengøring) Tab */}
       {activeTab === 'cleaning' && (
-        <div className="space-y-4 mt-4">
+        <div className="space-y-2 mt-4">
           {/* ── Status card ── */}
           <div className="rounded-2xl border border-[#e5e3dc] bg-white p-4">
             <div className="flex items-center justify-between">
@@ -680,7 +680,7 @@ export function Opgaver() {
                 <DialogHeader>
                   <DialogTitle>Tilføj huslig pligt</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4 pt-2">
+                <div className="space-y-2 pt-2">
                   <div className="space-y-2">
                     <Label>Opgave</Label>
                     <Input
@@ -833,7 +833,7 @@ export function Opgaver() {
 
       {/* Shopping Tab */}
       {activeTab === 'shopping' && (
-        <div className="space-y-4 mt-4">
+        <div className="space-y-2 mt-4">
           {/* Add Shopping Item */}
           <Dialog open={isAddShoppingOpen} onOpenChange={setIsAddShoppingOpen}>
             <DialogTrigger asChild>
@@ -846,7 +846,7 @@ export function Opgaver() {
               <DialogHeader>
                 <DialogTitle>Tilføj til indkøbslisten</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4 pt-4">
+              <div className="space-y-2 pt-4">
                 <div className="space-y-2">
                   <Label>Vare</Label>
                   <Input 
@@ -907,7 +907,7 @@ export function Opgaver() {
             </div>
             {pendingShopping.length === 0 ? (
               <Card className="bg-green-50 border-green-200">
-                <CardContent className="p-6 text-center">
+                <CardContent className="p-4 text-center">
                   <ShoppingCart className="w-12 h-12 text-green-500 mx-auto mb-2" />
                   <p className="text-green-700 font-medium">Indkøbslisten er tom!</p>
                 </CardContent>

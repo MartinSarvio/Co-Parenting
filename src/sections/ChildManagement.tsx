@@ -161,7 +161,7 @@ export function ChildManagement() {
   };
 
   return (
-    <div className="space-y-2 py-1">
+    <div className="space-y-1.5 py-1">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -183,7 +183,7 @@ export function ChildManagement() {
             <DialogHeader>
               <DialogTitle>Tilføj nyt barn</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4 pt-4">
+            <div className="space-y-2 pt-4">
               <div className="space-y-2">
                 <Label>Navn</Label>
                 <Input
@@ -308,7 +308,7 @@ export function ChildManagement() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="space-y-3"
+        className="space-y-2"
       >
         {children.length === 0 ? (
           <div className="text-center py-12">
@@ -461,7 +461,7 @@ export function ChildManagement() {
           <DialogHeader>
             <DialogTitle>Rediger barn</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 pt-4">
+          <div className="space-y-2 pt-4">
             <div className="space-y-2">
               <Label>Navn</Label>
               <Input 

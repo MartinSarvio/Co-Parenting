@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useAppStore } from '@/store';
 import { useApiActions } from '@/hooks/useApiActions';
 import { notificationId } from '@/lib/id';
@@ -14,9 +15,10 @@ import {
   ChevronRight,
   Calendar,
   Settings,
-  CheckCircle2
+  CheckCircle2,
+  X
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   addDays,
   addMonths,
@@ -62,7 +64,7 @@ const getParentDayPalette = (color: 'warm' | 'cool' | 'neutral') => {
 };
 
 export function Samversplan() {
-  const { users, children, custodyPlans, currentUser, addNotification, setActiveTab } = useAppStore();
+  const { users, children, custodyPlans, currentUser, addNotification, setActiveTab, sideMenuOpen, setSideMenuOpen } = useAppStore();
   const { createEvent } = useApiActions();
   const custodyPlan = custodyPlans[0];
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -212,7 +214,7 @@ export function Samversplan() {
   };
 
   return (
-    <div className="space-y-2 py-1">
+    <div className="space-y-1.5 py-1">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -224,15 +226,70 @@ export function Samversplan() {
             {custodyPlan?.name || 'Ingen plan'}
           </p>
         </div>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setActiveTab('samversconfig')}
-          className="border-[#d9d8d1] bg-[#f8f7f3] hover:bg-[#efeee8]"
-        >
-          <Settings className="h-4 w-4" />
-        </Button>
       </motion.div>
+
+      {/* ─── Side panel for Samværsplan settings — portal ─── */}
+      {createPortal(
+      <AnimatePresence>
+        {sideMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-[9998] bg-black/30"
+              onClick={() => setSideMenuOpen(false)}
+            />
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+              className="fixed inset-y-0 left-0 z-[9999] w-full bg-white flex flex-col"
+              style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+            >
+              <div className="flex items-center justify-between px-5 py-4 border-b border-[#eeedea]">
+                <h2 className="text-[17px] font-bold text-[#2f2f2d]">Samværsplan</h2>
+                <button
+                  onClick={() => setSideMenuOpen(false)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56]"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto py-2">
+                <button
+                  onClick={() => { setActiveTab('samversconfig'); setSideMenuOpen(false); }}
+                  className="flex w-full items-center gap-3.5 px-5 py-3 text-left hover:bg-[#faf9f6] transition-colors"
+                >
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f2f1ed]">
+                    <Settings className="h-[18px] w-[18px] text-[#7a786f]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[14px] font-semibold text-[#4a4945]">Konfigurer samværsplan</p>
+                    <p className="text-[11px] text-[#9a978f]">Skift ordning, ugedage & forældre</p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => setSideMenuOpen(false)}
+                  className="flex w-full items-center gap-3.5 px-5 py-3 text-left hover:bg-[#faf9f6] transition-colors"
+                >
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f2f1ed]">
+                    <Calendar className="h-[18px] w-[18px] text-[#7a786f]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[14px] font-semibold text-[#4a4945]">Bytteanmodninger</p>
+                    <p className="text-[11px] text-[#9a978f]">Tryk på en dag for at bytte</p>
+                  </div>
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>,
+      document.body
+      )}
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -458,7 +515,7 @@ export function Samversplan() {
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="space-y-3">
+            <div className="space-y-2">
               {transitionsInVisibleRange.map(({ day, transition }) => {
                 if (!transition) return null;
                 return (
@@ -502,7 +559,7 @@ export function Samversplan() {
           <DialogHeader>
             <DialogTitle>Anmod om bytte</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3 pt-2">
+          <div className="space-y-2 pt-2">
             <p className="text-sm text-[#5f5c53]">
               {selectedSwapDate
                 ? `Du anmoder om bytte for ${format(selectedSwapDate, 'EEEE d. MMMM', { locale: da })}.`

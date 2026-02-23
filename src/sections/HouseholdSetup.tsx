@@ -127,14 +127,14 @@ export function HouseholdSetup({ onComplete }: HouseholdSetupProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f6f4ef] via-[#f3f1ea] to-[#ece9e0] flex items-center justify-center p-4">
       <Card className="w-full max-w-md shadow-xl">
-        <CardContent className="p-6">
+        <CardContent className="p-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
             {/* Header */}
-            <div className="text-center space-y-3">
+            <div className="text-center space-y-2">
               <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-[#f7a95c] to-[#f58a2d] flex items-center justify-center shadow-lg">
                 <Home className="w-8 h-8 text-white" />
               </div>

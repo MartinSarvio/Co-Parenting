@@ -476,7 +476,7 @@ export function Borneoverblik() {
   }
 
   return (
-    <div className="space-y-2 py-1">
+    <div className="space-y-1.5 py-1">
       {/* Header with child info */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -657,7 +657,7 @@ export function Borneoverblik() {
                       <p className="text-[13px] text-[#9a978f]">{stage.subtitle}</p>
                     </DialogHeader>
 
-                    <div className="space-y-4 pt-2">
+                    <div className="space-y-2 pt-2">
                       {/* Crisis Symptoms */}
                       <div className="rounded-xl bg-[#fef3ee] p-3.5">
                         <div className="mb-2 flex items-center gap-2">
@@ -806,7 +806,7 @@ export function Borneoverblik() {
 
       {/* Milestones Tab */}
       {activeTab === 'milestones' && (
-        <div className="space-y-4 mt-4">
+        <div className="space-y-2 mt-4">
           <div className="flex justify-between items-center">
             <h3 className="text-[15px] font-bold text-[#2f2f2d]">Milepæle & Begivenheder</h3>
             <Dialog open={isAddMilestoneOpen} onOpenChange={setIsAddMilestoneOpen}>
@@ -820,7 +820,7 @@ export function Borneoverblik() {
                 <DialogHeader>
                   <DialogTitle>Tilføj milepæl</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4 pt-4">
+                <div className="space-y-2 pt-4">
                   <div className="space-y-2">
                     <Label>Titel</Label>
                     <Input 
@@ -874,7 +874,7 @@ export function Borneoverblik() {
             </Dialog>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             {milestones
               .filter(m => m.childId === currentChild.id)
               .sort((a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime())
@@ -938,7 +938,7 @@ export function Borneoverblik() {
 
       {/* Documents Tab */}
       {activeTab === 'documents' && (
-        <div className="space-y-4 mt-4">
+        <div className="space-y-2 mt-4">
           <div className="flex justify-between items-center">
             <h3 className="text-[15px] font-bold text-[#2f2f2d]">Dokumenter</h3>
             <Dialog open={isAddDocumentOpen} onOpenChange={setIsAddDocumentOpen}>
@@ -952,7 +952,7 @@ export function Borneoverblik() {
                 <DialogHeader>
                   <DialogTitle>Tilføj dokument</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4 pt-4">
+                <div className="space-y-2 pt-4">
                   <div className="space-y-2">
                     <Label>Titel</Label>
                     <Input 
@@ -998,7 +998,7 @@ export function Borneoverblik() {
             </Dialog>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             {documents
               .filter(d => d.childId === currentChild.id || d.childId === undefined)
               .sort((a, b) => parseISO(b.uploadedAt).getTime() - parseISO(a.uploadedAt).getTime())

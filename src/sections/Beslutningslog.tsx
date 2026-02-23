@@ -104,7 +104,7 @@ export function Beslutningslog() {
   }
 
   return (
-    <div className="space-y-2 py-1">
+    <div className="space-y-1.5 py-1">
       <div className="flex items-center justify-between">
         <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Beslutningslog</h1>
         <Button
@@ -150,7 +150,7 @@ export function Beslutningslog() {
           </Button>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {filtered.map(decision => {
             const badge = statusBadge(decision.status);
             const BadgeIcon = badge.icon;
@@ -262,7 +262,7 @@ export function Beslutningslog() {
           <DialogHeader>
             <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Ny beslutning</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="space-y-1">
               <Label htmlFor="dec-title" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Titel</Label>
               <Input
