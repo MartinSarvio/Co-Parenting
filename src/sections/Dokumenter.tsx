@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef } from 'react';
+import { OverblikSidePanel } from '@/components/custom/OverblikSidePanel';
 import { format, parseISO } from 'date-fns';
 import { da } from 'date-fns/locale';
 import {
@@ -150,6 +151,7 @@ export function Dokumenter() {
 
   return (
     <div className="space-y-1.5 py-1">
+      <OverblikSidePanel />
       <div>
         <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Dokumenter</h1>
         <p className="mt-0.5 text-[13px] text-[#78766d]">

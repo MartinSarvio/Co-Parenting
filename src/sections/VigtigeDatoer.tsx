@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAppStore } from '@/store';
 import { useApiActions } from '@/hooks/useApiActions';
+import { OverblikSidePanel } from '@/components/custom/OverblikSidePanel';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { da } from 'date-fns/locale';
 import { Plus, CalendarHeart, Trash2, Bell } from 'lucide-react';
@@ -111,6 +112,7 @@ export function VigtigeDatoer() {
 
   return (
     <div className="space-y-1.5 py-1">
+      <OverblikSidePanel />
       <div className="flex items-center justify-between">
         <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Vigtige datoer</h1>
         <Button

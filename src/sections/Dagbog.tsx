@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAppStore } from '@/store';
 import { useApiActions } from '@/hooks/useApiActions';
 import { useFamilyContext } from '@/hooks/useFamilyContext';
+import { OverblikSidePanel } from '@/components/custom/OverblikSidePanel';
 import { format } from 'date-fns';
 import { da } from 'date-fns/locale';
 import { Plus, BookOpen, Smile, Meh, Frown, Zap, Moon } from 'lucide-react';
@@ -108,6 +109,7 @@ export function Dagbog() {
 
   return (
     <div className="space-y-1.5 py-1">
+      <OverblikSidePanel />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Dagbog</h1>

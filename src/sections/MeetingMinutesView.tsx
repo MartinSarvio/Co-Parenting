@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAppStore } from '@/store';
+import { OverblikSidePanel } from '@/components/custom/OverblikSidePanel';
 import { meetingMinutesId } from '@/lib/id';
 import { formatDate } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -269,6 +270,7 @@ export function MeetingMinutesView() {
   // List view
   return (
     <div className="space-y-2 p-4 max-w-lg mx-auto">
+      <OverblikSidePanel />
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}

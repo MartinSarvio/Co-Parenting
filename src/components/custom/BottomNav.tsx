@@ -16,11 +16,7 @@ import {
   UtensilsCrossed,
   ChevronRight,
   Camera,
-  BookOpen,
-  CalendarHeart,
-  ClipboardList,
   CalendarRange,
-  FolderOpen,
 } from 'lucide-react';
 import { useAppStore } from '@/store';
 import { cn } from '@/lib/utils';
@@ -60,11 +56,7 @@ export function BottomNav() {
       ];
 
   const newFeatureItems: NavItem[] = [
-    { id: 'dokumenter', label: 'Dokumenter', icon: FolderOpen },
     { id: 'fotoalbum', label: 'Fotoalbum', icon: Camera },
-    { id: 'dagbog', label: 'Dagbog', icon: BookOpen },
-    { id: 'vigtige-datoer', label: 'Datoer', icon: CalendarHeart },
-    { id: 'beslutningslog', label: 'Beslutninger', icon: ClipboardList },
     { id: 'aarskalender', label: 'Årskalender', icon: CalendarRange },
   ];
 
@@ -74,7 +66,6 @@ export function BottomNav() {
         { id: 'expenses', label: 'Udgifter', icon: Receipt },
         { id: 'children', label: 'Børn', icon: Baby },
         { id: 'borneoverblik', label: 'Overblik', icon: UserCircle },
-        { id: 'meeting-minutes', label: 'Referater', icon: FileText },
         ...newFeatureItems,
       ]
     : [
@@ -84,7 +75,6 @@ export function BottomNav() {
         { id: 'expenses', label: 'Udgifter', icon: Receipt },
         { id: 'children', label: 'Børn', icon: Baby },
         { id: 'borneoverblik', label: 'Overblik', icon: UserCircle },
-        { id: 'meeting-minutes', label: 'Referater', icon: FileText },
         ...newFeatureItems,
       ];
 

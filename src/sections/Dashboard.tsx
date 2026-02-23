@@ -1,4 +1,5 @@
 import { useAppStore } from '@/store';
+import { OverblikSidePanel } from '@/components/custom/OverblikSidePanel';
 import { cn, formatRelative, formatTime, getCurrentParentForChild, getNextHandoverDate } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -80,6 +81,7 @@ export function Dashboard() {
 
   return (
     <div className="space-y-1.5 py-1">
+      <OverblikSidePanel />
       {/* Greeting */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
