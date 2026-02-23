@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { BottomSheet } from '@/components/custom/BottomSheet';
 import {
   Users,
   UserPlus,
@@ -202,11 +202,7 @@ export function AdminPanel() {
       </Card>
 
       {/* Create User Dialog */}
-      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
-          <DialogHeader>
-            <DialogTitle className="text-[1rem] text-[#2f2f2d]">Opret ny bruger</DialogTitle>
-          </DialogHeader>
+      <BottomSheet open={createOpen} onOpenChange={setCreateOpen} title="Opret ny bruger">
           <div className="space-y-3">
             <div className="space-y-1">
               <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Navn</Label>
@@ -287,8 +283,7 @@ export function AdminPanel() {
               </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+      </BottomSheet>
     </div>
   );
 }

@@ -9,12 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { BottomSheet } from '@/components/custom/BottomSheet';
 import {
   Select,
   SelectContent,
@@ -194,11 +189,7 @@ export function VigtigeDatoer() {
         </div>
       )}
 
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
-          <DialogHeader>
-            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Tilføj vigtig dato</DialogTitle>
-          </DialogHeader>
+      <BottomSheet open={addOpen} onOpenChange={setAddOpen} title="Tilføj vigtig dato">
           <div className="space-y-3">
             <div className="space-y-1">
               <Label htmlFor="kd-title" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Titel</Label>
@@ -307,8 +298,7 @@ export function VigtigeDatoer() {
               </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+      </BottomSheet>
     </div>
   );
 }

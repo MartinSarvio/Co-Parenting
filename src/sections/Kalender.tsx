@@ -6,7 +6,7 @@ import { cn, formatTime, getEventTypeLabel } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { BottomSheet } from '@/components/custom/BottomSheet';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -764,11 +764,7 @@ export function Kalender() {
       </AnimatePresence>
 
       {/* ─── Del Kalender popup ─── */}
-      <Dialog open={shareCalendarOpen} onOpenChange={setShareCalendarOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Del kalender</DialogTitle>
-          </DialogHeader>
+      <BottomSheet open={shareCalendarOpen} onOpenChange={setShareCalendarOpen} title="Del kalender">
           <div className="space-y-4 pt-2">
             <p className="text-[13px] text-[#75736b]">
               Del din kalender med din co-parent, så I begge kan se hinandens aftaler og begivenheder.
@@ -825,15 +821,10 @@ export function Kalender() {
               </>
             )}
           </div>
-        </DialogContent>
-      </Dialog>
+      </BottomSheet>
 
       {/* ─── Aftale-skabeloner popup ─── */}
-      <Dialog open={templateFormOpen} onOpenChange={setTemplateFormOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Ny aftale-skabelon</DialogTitle>
-          </DialogHeader>
+      <BottomSheet open={templateFormOpen} onOpenChange={setTemplateFormOpen} title="Ny aftale-skabelon">
           <div className="space-y-4 pt-2">
             <p className="text-[13px] text-[#75736b]">
               Opret en genbrugelig skabelon til hurtige aftaler.
@@ -907,15 +898,10 @@ export function Kalender() {
               Gem skabelon
             </button>
           </div>
-        </DialogContent>
-      </Dialog>
+      </BottomSheet>
 
       {/* ─── Dagbog → Forbind til kalender popup ─── */}
-      <Dialog open={connectDiaryOpen} onOpenChange={setConnectDiaryOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Forbind dagbog til kalender</DialogTitle>
-          </DialogHeader>
+      <BottomSheet open={connectDiaryOpen} onOpenChange={setConnectDiaryOpen} title="Forbind dagbog til kalender">
           <div className="space-y-4 pt-2">
             <p className="text-[13px] text-[#75736b]">
               Vælg hvilken kalender dagbogsnotater skal vises i.
@@ -960,15 +946,10 @@ export function Kalender() {
               Gem forbindelse
             </button>
           </div>
-        </DialogContent>
-      </Dialog>
+      </BottomSheet>
 
       {/* ─── Indkøb & Måltider → Forbind til kalender popup ─── */}
-      <Dialog open={connectMealsOpen} onOpenChange={setConnectMealsOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Forbind måltider til kalender</DialogTitle>
-          </DialogHeader>
+      <BottomSheet open={connectMealsOpen} onOpenChange={setConnectMealsOpen} title="Forbind måltider til kalender">
           <div className="space-y-4 pt-2">
             <p className="text-[13px] text-[#75736b]">
               Vælg hvilken kalender madplan og indkøb skal synkroniseres med.
@@ -1013,8 +994,7 @@ export function Kalender() {
               Gem forbindelse
             </button>
           </div>
-        </DialogContent>
-      </Dialog>
+      </BottomSheet>
 
       {/* Header */}
       <motion.div
@@ -1024,89 +1004,11 @@ export function Kalender() {
       >
         <div>
           <h1 className="text-[1.3rem] font-semibold leading-tight text-[#2f2f2d]">Fælles kalender</h1>
-          <p className="text-xs text-[#75736b]">Koordiner aktiviteter og aftaler</p>
         </div>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="h-10 bg-[#f58a2d] text-white hover:bg-[#e47921]">
+        <Button className="h-10 bg-[#f58a2d] text-white hover:bg-[#e47921]" onClick={() => setIsAddDialogOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
               Ny aftale
             </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Tilføj ny aftale</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 pt-4">
-              <div className="space-y-2">
-                <Label>Titel</Label>
-                <Input
-                  value={newEvent.title}
-                  onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
-                  placeholder="F.eks. Fodboldtræning"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Type</Label>
-                <Select
-                  value={newEvent.type}
-                  onValueChange={(v) => setNewEvent({...newEvent, type: v})}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {eventTypes.filter(t => t.value !== 'all').map(type => (
-                      <SelectItem key={type.value} value={type.value}>
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getEventInlineColor(type.value) }} />
-                          {type.label}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Start</Label>
-                  <Input
-                    type="datetime-local"
-                    value={newEvent.startDate}
-                    onChange={(e) => setNewEvent({...newEvent, startDate: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Slut</Label>
-                  <Input
-                    type="datetime-local"
-                    value={newEvent.endDate}
-                    onChange={(e) => setNewEvent({...newEvent, endDate: e.target.value})}
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Sted</Label>
-                <Input
-                  value={newEvent.location}
-                  onChange={(e) => setNewEvent({...newEvent, location: e.target.value})}
-                  placeholder="F.eks. Idrætshallen"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Beskrivelse</Label>
-                <Input
-                  value={newEvent.description}
-                  onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
-                  placeholder="Valgfri beskrivelse"
-                />
-              </div>
-              <Button onClick={handleAddEvent} className="w-full">
-                Tilføj aftale
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
       </motion.div>
 
       {/* Threads-style tab bar: Alle | Farver | Synk */}
@@ -1614,12 +1516,80 @@ export function Kalender() {
         </div>
       </motion.div>
 
+      {/* Add Event BottomSheet */}
+      <BottomSheet open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} title="Tilføj ny aftale">
+        <div className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <Label>Titel</Label>
+                <Input
+                  value={newEvent.title}
+                  onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
+                  placeholder="F.eks. Fodboldtræning"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Type</Label>
+                <Select
+                  value={newEvent.type}
+                  onValueChange={(v) => setNewEvent({...newEvent, type: v})}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {eventTypes.filter(t => t.value !== 'all').map(type => (
+                      <SelectItem key={type.value} value={type.value}>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getEventInlineColor(type.value) }} />
+                          {type.label}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Start</Label>
+                  <Input
+                    type="datetime-local"
+                    value={newEvent.startDate}
+                    onChange={(e) => setNewEvent({...newEvent, startDate: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Slut</Label>
+                  <Input
+                    type="datetime-local"
+                    value={newEvent.endDate}
+                    onChange={(e) => setNewEvent({...newEvent, endDate: e.target.value})}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Sted</Label>
+                <Input
+                  value={newEvent.location}
+                  onChange={(e) => setNewEvent({...newEvent, location: e.target.value})}
+                  placeholder="F.eks. Idrætshallen"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Beskrivelse</Label>
+                <Input
+                  value={newEvent.description}
+                  onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
+                  placeholder="Valgfri beskrivelse"
+                />
+              </div>
+              <Button onClick={handleAddEvent} className="w-full">
+                Tilføj aftale
+              </Button>
+            </div>
+      </BottomSheet>
+
       {/* Template create dialog */}
-      <Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen}>
-        <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
-          <DialogHeader>
-            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Ny skabelon</DialogTitle>
-          </DialogHeader>
+      <BottomSheet open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen} title="Ny skabelon">
           <div className="space-y-3">
             <div className="space-y-1">
               <Label htmlFor="tpl-title" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Navn</Label>
@@ -1699,17 +1669,10 @@ export function Kalender() {
               </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+      </BottomSheet>
 
       {/* Template use configuration dialog */}
-      <Dialog open={templateUseOpen} onOpenChange={setTemplateUseOpen}>
-        <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
-          <DialogHeader>
-            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">
-              Brug skabelon: {templateToUse?.title}
-            </DialogTitle>
-          </DialogHeader>
+      <BottomSheet open={templateUseOpen} onOpenChange={setTemplateUseOpen} title={`Brug skabelon: ${templateToUse?.title ?? ''}`}>
           <div className="space-y-3">
             <div className="space-y-1">
               <Label htmlFor="tmpl-start" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Starttidspunkt</Label>
@@ -1757,15 +1720,10 @@ export function Kalender() {
               </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+      </BottomSheet>
 
       {/* Calendar Source Dialog */}
-      <Dialog open={isSourceDialogOpen} onOpenChange={setIsSourceDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Tilføj kalenderkilde</DialogTitle>
-          </DialogHeader>
+      <BottomSheet open={isSourceDialogOpen} onOpenChange={setIsSourceDialogOpen} title="Tilføj kalenderkilde">
           <div className="space-y-4 pt-4">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-2">
@@ -1826,25 +1784,10 @@ export function Kalender() {
               Tilføj kalenderkilde
             </Button>
           </div>
-        </DialogContent>
-      </Dialog>
+      </BottomSheet>
 
       {/* Color Configuration Dialog */}
-      <Dialog open={isColorDialogOpen} onOpenChange={(open) => { setIsColorDialogOpen(open); if (!open) setColorEditCategory(null); }}>
-        <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
-          <DialogHeader>
-            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">
-              {colorEditCategory ? (
-                <button
-                  onClick={() => setColorEditCategory(null)}
-                  className="flex items-center gap-1.5 text-[1rem] font-semibold text-[#2f2f2d] hover:text-[#f58a2d] transition-colors"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  {eventTypes.find(t => t.value === colorEditCategory)?.label ?? 'Kategori'}
-                </button>
-              ) : 'Tilpas kategorifarver'}
-            </DialogTitle>
-          </DialogHeader>
+      <BottomSheet open={isColorDialogOpen} onOpenChange={(open) => { setIsColorDialogOpen(open); if (!open) setColorEditCategory(null); }} title={colorEditCategory ? (eventTypes.find(t => t.value === colorEditCategory)?.label ?? 'Kategori') : 'Tilpas kategorifarver'}>
 
           {!colorEditCategory ? (
             /* Category list view */
@@ -1940,8 +1883,7 @@ export function Kalender() {
               );
             })()
           )}
-        </DialogContent>
-      </Dialog>
+      </BottomSheet>
 
       {/* All Upcoming Events Sheet */}
       <Sheet open={allUpcomingOpen} onOpenChange={setAllUpcomingOpen}>
@@ -1996,11 +1938,7 @@ export function Kalender() {
       </Sheet>
 
       {/* Event Detail Dialog */}
-      <Dialog open={eventDetailOpen} onOpenChange={setEventDetailOpen}>
-        <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
-          <DialogHeader>
-            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Aftaledetaljer</DialogTitle>
-          </DialogHeader>
+      <BottomSheet open={eventDetailOpen} onOpenChange={setEventDetailOpen} title="Aftaledetaljer">
           {selectedEvent && (
             <div className="space-y-3">
               <div className="flex items-center gap-2">
@@ -2064,8 +2002,7 @@ export function Kalender() {
               </div>
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+      </BottomSheet>
     </div>
   );
 }

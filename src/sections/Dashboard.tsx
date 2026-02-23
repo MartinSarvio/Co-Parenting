@@ -16,6 +16,7 @@ import {
   CheckCircle2,
   UtensilsCrossed,
   Users,
+  ArrowRightLeft,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { parseISO, isToday, isTomorrow, format } from 'date-fns';
@@ -37,22 +38,35 @@ export function Dashboard() {
   const isTogether = household?.familyMode === 'together';
 
   const currentChild = children[0];
-  
+
+  // Stable parent IDs — parent2 must NEVER equal parent1 (use placeholder if no real partner)
+  const myId = currentUser?.id || 'parent1';
+  const rawOtherParentId = currentChild
+    ? (currentChild.parent1Id === currentUser?.id
+        ? currentChild.parent2Id
+        : currentChild.parent2Id === currentUser?.id
+          ? currentChild.parent1Id
+          : currentChild.parent2Id)
+    : undefined;
+  const stableParent2Id = rawOtherParentId && rawOtherParentId !== myId ? rawOtherParentId : '__parent2__';
+  const otherUser = rawOtherParentId
+    ? users.find(u => u.id === rawOtherParentId && u.id !== currentUser?.id)
+    : undefined;
+
   // Get current custody status
-  const currentParentId = custodyPlan && currentChild 
+  const currentParentId = custodyPlan && currentChild
     ? getCurrentParentForChild(
-        currentChild.id, 
-        custodyPlan, 
-        currentChild.parent1Id, 
-        currentChild.parent2Id
+        currentChild.id,
+        custodyPlan,
+        myId,
+        stableParent2Id
       )
     : null;
-  
-  const currentParent = users.find(u => u.id === currentParentId);
-  const isWithCurrentUser = currentParentId === currentUser?.id;
-  
+
+  const isWithCurrentUser = currentParentId === myId;
+
   // Get next handover
-  const nextHandover = custodyPlan 
+  const nextHandover = custodyPlan
     ? getNextHandoverDate(custodyPlan)
     : null;
   
@@ -154,13 +168,14 @@ export function Dashboard() {
                   <div>
                     <p className="mb-1 text-sm text-[#74726a]">{currentChild?.name} er hos</p>
                     <p className="text-2xl font-semibold tracking-[-0.02em] text-[#2f2f2d]">
-                      {isWithCurrentUser ? 'Dig' : currentParent?.name}
+                      {isWithCurrentUser ? 'Dig' : (otherUser?.name || 'Forælder 2')}
                     </p>
                     {nextHandover && (
                       <div className="mt-1 flex items-center gap-1 text-sm text-[#7b796f]">
                         <Clock className="h-4 w-4" />
                         <span>
                           {isWithCurrentUser ? 'Aflevering' : 'Afhentning'} {formatRelative(nextHandover).toLowerCase()}
+                          {custodyPlan?.swapTime && ` kl. ${custodyPlan.swapTime}`}
                         </span>
                       </div>
                     )}
@@ -177,6 +192,37 @@ export function Dashboard() {
           </Card>
         )}
       </motion.div>
+
+      {/* Next handover — prepare early */}
+      {!isTogether && nextHandover && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+        >
+          <button
+            onClick={() => setActiveTab('handover')}
+            className="w-full flex items-center gap-3 rounded-2xl border border-[#e5e3dc] bg-white p-3.5 transition-all hover:bg-[#faf9f6] active:scale-[0.99]"
+          >
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#fff2e6]">
+              <ArrowRightLeft className="h-5 w-5 text-[#f58a2d]" />
+            </div>
+            <div className="flex-1 text-left">
+              <p className="text-sm font-semibold text-[#2f2f2d]">
+                Næste {isWithCurrentUser ? 'aflevering' : 'afhentning'}
+              </p>
+              <p className="text-xs text-[#9e9b93]">
+                {format(nextHandover, 'EEEE d. MMMM', { locale: da })}
+                {custodyPlan?.swapTime && ` kl. ${custodyPlan.swapTime}`}
+              </p>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-semibold text-[#f58a2d]">Forbered</span>
+              <ChevronRight className="h-4 w-4 text-[#d0cfc7]" />
+            </div>
+          </button>
+        </motion.div>
+      )}
 
       {/* Quick Actions */}
       <motion.div

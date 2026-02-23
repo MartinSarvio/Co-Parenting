@@ -598,17 +598,30 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
   };
 
   return (
-    <div className="fixed inset-0 flex flex-col overflow-hidden">
+    <div
+      className="fixed inset-0 flex flex-col"
+      style={{ touchAction: 'none', overscrollBehavior: 'none', overflow: 'hidden' }}
+      onTouchMove={(e) => {
+        const target = e.target as HTMLElement;
+        if (!target.closest('input, textarea, [data-scrollable]')) e.preventDefault();
+      }}
+    >
       {/* RibbonBanner baggrund */}
       <div className="absolute inset-0">
         <RibbonBanner />
       </div>
 
       {/* Content overlay */}
-      <div className="relative z-10 flex flex-col h-full" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
-        <div className="flex-1 overflow-y-auto flex items-center justify-center px-6 py-8">
+      <div
+        className="relative z-10 flex flex-col h-full"
+        style={{
+          paddingTop: 'env(safe-area-inset-top, 0px)',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        }}
+      >
+        <div className="flex-1 overflow-y-auto flex items-center justify-center py-8" style={{ paddingLeft: 'max(env(safe-area-inset-left), 24px)', paddingRight: 'max(env(safe-area-inset-right), 24px)' }} data-scrollable>
           <div className="w-full max-w-sm">
-            <div className="bg-white/95 backdrop-blur-xl rounded-3xl px-6 py-8 shadow-[0_8px_40px_rgba(0,0,0,0.12)]">
+            <div className="bg-white/95 backdrop-blur-xl rounded-3xl px-6 py-7 shadow-[0_8px_40px_rgba(0,0,0,0.12)]">
 
               {/* Progress bar */}
               {step > 0 && (

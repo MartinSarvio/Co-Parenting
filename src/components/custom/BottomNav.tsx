@@ -24,12 +24,10 @@ import {
 } from 'lucide-react';
 import { useAppStore } from '@/store';
 import { cn } from '@/lib/utils';
-import { GlobalSearch } from './GlobalSearch';
+import { X } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
-  SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 
@@ -49,7 +47,7 @@ export function BottomNav() {
     ? [
         { id: 'dashboard', label: 'Oversigt', icon: LayoutDashboard },
         { id: 'kalender', label: 'Kalender', icon: CalendarDays },
-        { id: 'mad-hjem', label: 'Mad & Hjem', icon: UtensilsCrossed },
+        { id: 'mad-hjem', label: 'Mad & Indkøb', icon: UtensilsCrossed },
         { id: 'opgaver', label: 'Opgaver', icon: CheckSquare },
       ]
     : [
@@ -79,7 +77,7 @@ export function BottomNav() {
       ]
     : [
         { id: 'opgaver', label: 'Opgaver', icon: CheckSquare },
-        { id: 'mad-hjem', label: 'Mad & Hjem', icon: UtensilsCrossed },
+        { id: 'mad-hjem', label: 'Mad & Indkøb', icon: UtensilsCrossed },
         { id: 'kommunikation', label: 'Chat', icon: MessageCircle },
         { id: 'expenses', label: 'Udgifter', icon: Receipt },
         { id: 'children', label: 'Børn', icon: Baby },
@@ -171,15 +169,19 @@ export function BottomNav() {
             className="flex max-h-[90vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]"
           >
             <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
-            <SheetHeader className="pb-0 px-2 shrink-0">
-              <SheetTitle className="text-[1.05rem] text-[#2f2f2d]">Menu</SheetTitle>
-            </SheetHeader>
-            {/* Global search at top of menu */}
-            <div className="px-3 pb-1 shrink-0">
-              <GlobalSearch variant="inline" />
+            {/* Header: Menu + X symmetrical */}
+            <div className="flex items-center justify-between px-5 pt-2 pb-3 shrink-0">
+              <h2 className="text-lg font-semibold text-[#2f2f2d]">Menu</h2>
+              <button
+                onClick={() => setMoreOpen(false)}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-[#ecebe5] text-[#5f5d56] hover:bg-[#dddbd3] transition-colors"
+                aria-label="Luk menu"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
             <nav aria-label="Yderligere menupunkter" className="flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-y">
-              <div className="space-y-2 px-3 pb-[calc(env(safe-area-inset-bottom,0px)+24px)]">
+              <div className="px-3 pb-[calc(env(safe-area-inset-bottom,0px)+24px)]">
                 {moreNavItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeTab === item.id;
@@ -194,26 +196,28 @@ export function BottomNav() {
                       aria-label={item.label}
                       aria-current={isActive ? 'page' : undefined}
                       className={cn(
-                        'flex h-14 w-full items-center justify-between rounded-2xl border px-4 text-left transition-colors',
+                        'flex h-12 w-full items-center justify-between rounded-xl px-3 text-left transition-colors',
                         isActive
-                          ? 'border-[#f5bf8f] bg-[#fff2e6] text-[#2f2f2d]'
-                          : 'border-[#d8d7cf] bg-[#faf9f6] text-[#3f3e3a] hover:bg-[#f2f1ec]'
+                          ? 'bg-[#fff2e6] text-[#2f2f2d]'
+                          : 'text-[#3f3e3a] hover:bg-[#f0efea]'
                       )}
                     >
                       <div className="flex min-w-0 items-center gap-3">
                         <div aria-hidden="true" className={cn(
-                          'flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
+                          'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                           isActive ? 'bg-[#f58a2d] text-white' : 'bg-[#ecebe5] text-[#5f5d56]'
                         )}>
-                          <Icon className="h-5 w-5" />
+                          <Icon className="h-[18px] w-[18px]" />
                         </div>
-                        <span className="truncate text-sm font-semibold tracking-[-0.01em]">{item.label}</span>
+                        <span className="truncate text-[15px] font-medium">{item.label}</span>
                       </div>
-                      <ChevronRight aria-hidden="true" className="h-4 w-4 shrink-0 text-[#9d9b93]" />
+                      <ChevronRight aria-hidden="true" className="h-4 w-4 shrink-0 text-[#c0beb6]" />
                     </button>
                   );
                 })}
-                {/* Settings at bottom */}
+                {/* Divider */}
+                <div className="h-px bg-[#e5e3dc] mx-3 my-2" />
+                {/* Settings */}
                 <button
                   onClick={() => {
                     setActiveTab('settings');
@@ -221,22 +225,22 @@ export function BottomNav() {
                   }}
                   aria-label="Indstillinger"
                   className={cn(
-                    'flex h-14 w-full items-center justify-between rounded-2xl border px-4 text-left transition-colors',
+                    'flex h-12 w-full items-center justify-between rounded-xl px-3 text-left transition-colors',
                     activeTab === 'settings'
-                      ? 'border-[#f5bf8f] bg-[#fff2e6] text-[#2f2f2d]'
-                      : 'border-[#d8d7cf] bg-[#faf9f6] text-[#3f3e3a] hover:bg-[#f2f1ec]'
+                      ? 'bg-[#fff2e6] text-[#2f2f2d]'
+                      : 'text-[#3f3e3a] hover:bg-[#f0efea]'
                   )}
                 >
                   <div className="flex min-w-0 items-center gap-3">
                     <div aria-hidden="true" className={cn(
-                      'flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
+                      'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
                       activeTab === 'settings' ? 'bg-[#f58a2d] text-white' : 'bg-[#ecebe5] text-[#5f5d56]'
                     )}>
-                      <Settings className="h-5 w-5" />
+                      <Settings className="h-[18px] w-[18px]" />
                     </div>
-                    <span className="truncate text-sm font-semibold tracking-[-0.01em]">Indstillinger</span>
+                    <span className="truncate text-[15px] font-medium">Indstillinger</span>
                   </div>
-                  <ChevronRight aria-hidden="true" className="h-4 w-4 shrink-0 text-[#9d9b93]" />
+                  <ChevronRight aria-hidden="true" className="h-4 w-4 shrink-0 text-[#c0beb6]" />
                 </button>
               </div>
             </nav>

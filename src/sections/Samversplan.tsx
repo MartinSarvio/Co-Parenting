@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAppStore } from '@/store';
 import { useApiActions } from '@/hooks/useApiActions';
 import { notificationId } from '@/lib/id';
@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { BottomSheet } from '@/components/custom/BottomSheet';
 import { Textarea } from '@/components/ui/textarea';
 import {
   ChevronLeft,
@@ -62,21 +62,64 @@ const getParentDayPalette = (color: 'warm' | 'cool' | 'neutral') => {
 };
 
 export function Samversplan() {
-  const { users, children, custodyPlans, currentUser, addNotification, setActiveTab } = useAppStore();
+  const { users, children, custodyPlans, currentUser, addNotification, setActiveTab, addCustodyPlan } = useAppStore();
   const { createEvent } = useApiActions();
-  const custodyPlan = custodyPlans[0];
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
+
+  // Auto-create a default custody plan if none exists
+  const currentChild0 = children[0];
+  useEffect(() => {
+    if (custodyPlans.length === 0 && currentChild0 && currentUser) {
+      addCustodyPlan({
+        id: `cp-${Date.now()}`,
+        name: '7/7 Ordning',
+        pattern: '7/7',
+        startDate: new Date().toISOString().split('T')[0],
+        swapDay: 4,
+        swapTime: '16:00',
+        parent1Weeks: 1,
+        parent2Weeks: 1,
+        parent1Days: [0, 1, 2, 3, 4, 5, 6],
+        parent2Days: [],
+        childId: currentChild0.id,
+      });
+    }
+  }, [custodyPlans.length, currentChild0, currentUser, addCustodyPlan]);
+
+  const custodyPlan = custodyPlans[0];
   const [isSwapDialogOpen, setIsSwapDialogOpen] = useState(false);
   const [selectedSwapDate, setSelectedSwapDate] = useState<Date | null>(null);
   const [swapReason, setSwapReason] = useState('');
   const [swapRequestedTo, setSwapRequestedTo] = useState('');
 
   const currentChild = children[0];
-  const parent1 = users.find(u => u.id === currentChild?.parent1Id);
-  const parent2 = users.find(u => u.id === currentChild?.parent2Id);
-  const warmParent = [parent1, parent2].find((parent) => parent?.color === 'warm') || parent1 || parent2;
-  const coolParent = [parent1, parent2].find((parent) => parent?.color === 'cool') || parent2 || parent1;
+
+  // Determine "me" vs "other parent" based on the child's parent IDs
+  // Current user (me) = cool (dark/sort), other parent = warm (orange)
+  const meParent = currentUser;
+  const meColor = (currentUser?.color || 'cool') as 'warm' | 'cool';
+  const otherColor: 'warm' | 'cool' = meColor === 'warm' ? 'cool' : 'warm';
+
+  // Find the OTHER parent's ID (not me)
+  const rawOtherParentId = currentChild
+    ? (currentChild.parent1Id === currentUser?.id
+        ? currentChild.parent2Id
+        : currentChild.parent2Id === currentUser?.id
+          ? currentChild.parent1Id
+          : currentChild.parent2Id) // fallback: assume I'm parent1
+    : undefined;
+
+  // CRITICAL: other parent ID must NEVER equal currentUser.id — use stable placeholder
+  const otherParentId = rawOtherParentId && rawOtherParentId !== currentUser?.id
+    ? rawOtherParentId
+    : '__parent2__';
+
+  // Only show a real "other parent" if they are a DIFFERENT user in the system
+  const otherParentUser = rawOtherParentId
+    ? users.find(u => u.id === rawOtherParentId && u.id !== currentUser?.id)
+    : undefined;
+  const otherParent = otherParentUser || null;
 
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
@@ -98,17 +141,35 @@ export function Samversplan() {
       : [custodyPlan?.swapDay ?? 4]
   ), [custodyPlan]);
 
-  const getParentForDay = useCallback((day: Date) => {
+  // Stable IDs for custody calculation — me = my real id, other = guaranteed unique
+  const myId = currentUser?.id || 'parent1';
+  const stableParent2Id = otherParentId; // always unique, '__parent2__' if no real partner
+
+  // Returns the parent for a given day, with `displayColor` based on actual stored color
+  const getParentForDay = useCallback((day: Date): { id: string; name: string; avatar?: string; displayColor: 'warm' | 'cool' } | null => {
     if (!custodyPlan || !currentChild) return null;
     const parentId = getCurrentParentForChild(
       currentChild.id,
       custodyPlan,
-      currentChild.parent1Id,
-      currentChild.parent2Id,
+      myId,
+      stableParent2Id,
       day
     );
-    return users.find(u => u.id === parentId);
-  }, [custodyPlan, currentChild, users]);
+
+    const isMe = parentId === myId;
+
+    if (isMe && currentUser) {
+      return { id: currentUser.id, name: currentUser.name, avatar: currentUser.avatar, displayColor: meColor };
+    }
+
+    // It's the other parent's day
+    if (otherParent) {
+      return { id: otherParent.id, name: otherParent.name, avatar: otherParent.avatar, displayColor: otherColor };
+    }
+
+    // Other parent not registered — show "Forælder 2" placeholder
+    return { id: parentId || '__placeholder__', name: 'Forælder 2', avatar: undefined, displayColor: otherColor };
+  }, [custodyPlan, currentChild, currentUser, otherParent, meColor, otherColor, myId, stableParent2Id]);
 
   const getHandoverTransition = useCallback((day: Date) => {
     const previousParent = getParentForDay(addDays(day, -1));
@@ -240,34 +301,66 @@ export function Samversplan() {
         transition={{ delay: 0.1 }}
         className="grid grid-cols-1 gap-2 sm:grid-cols-2"
       >
-        {warmParent && (
-          <div className="flex items-center gap-2 rounded-xl border border-[#f3c59d] bg-[#fff2e6] px-3 py-2">
+        {/* Current user — uses their actual stored color */}
+        {meParent && (
+          <div className={cn(
+            "flex items-center gap-2 rounded-xl border px-3 py-2",
+            meColor === 'warm'
+              ? "border-[#f3c59d] bg-[#fff2e6]"
+              : "border-[#32302b] bg-[#2f2f2f]"
+          )}>
             <Avatar className="h-7 w-7">
-              <AvatarImage src={warmParent.avatar} />
-              <AvatarFallback className="bg-[#f58a2d] text-xs text-white">
-                {warmParent.name[0]}
+              <AvatarImage src={meParent.avatar} />
+              <AvatarFallback className={cn(
+                "text-xs text-white",
+                meColor === 'warm' ? "bg-[#f58a2d]" : "bg-[#4f4b45]"
+              )}>
+                {meParent.name[0]}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-[#cc6f1f]">{warmParent.name}</p>
-              <p className="text-xs text-[#d0792e]">Orange</p>
+              <p className={cn(
+                "truncate text-sm font-medium",
+                meColor === 'warm' ? "text-[#cc6f1f]" : "text-white"
+              )}>{meParent.name}</p>
+              <p className={cn(
+                "text-xs",
+                meColor === 'warm' ? "text-[#d0792e]" : "text-[#e2e1dc]"
+              )}>Dig</p>
             </div>
           </div>
         )}
-        {coolParent && (
-          <div className="flex items-center gap-2 rounded-xl border border-[#32302b] bg-[#2f2f2f] px-3 py-2">
-            <Avatar className="h-7 w-7">
-              <AvatarImage src={coolParent.avatar} />
-              <AvatarFallback className="bg-[#4f4b45] text-xs text-white">
-                {coolParent.name[0]}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-white">{coolParent.name}</p>
-              <p className="text-xs text-[#e2e1dc]">Sort</p>
-            </div>
+        {/* Other parent — opposite color, or placeholder if not registered */}
+        <div className={cn(
+          "flex items-center gap-2 rounded-xl border px-3 py-2",
+          otherColor === 'warm'
+            ? "border-[#f3c59d] bg-[#fff2e6]"
+            : "border-[#32302b] bg-[#2f2f2f]"
+        )}>
+          <Avatar className="h-7 w-7">
+            {otherParent && <AvatarImage src={otherParent.avatar} />}
+            <AvatarFallback className={cn(
+              "text-xs text-white",
+              otherColor === 'warm' ? "bg-[#f58a2d]" : "bg-[#4f4b45]"
+            )}>
+              {otherParent ? otherParent.name[0] : '?'}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0">
+            <p className={cn(
+              "truncate text-sm font-medium",
+              otherColor === 'warm' ? "text-[#cc6f1f]" : "text-white"
+            )}>
+              {otherParent ? otherParent.name : 'Forælder 2'}
+            </p>
+            <p className={cn(
+              "text-xs",
+              otherColor === 'warm' ? "text-[#d0792e]" : "text-[#e2e1dc]"
+            )}>
+              {otherParent ? 'Forælder 2' : 'Ikke tilknyttet endnu'}
+            </p>
           </div>
-        )}
+        </div>
       </motion.div>
 
       <motion.div
@@ -318,7 +411,7 @@ export function Samversplan() {
                   const parent = getParentForDay(day);
                   const isToday = isSameDay(day, new Date());
                   const isWeekend = index >= 5;
-                  const palette = getParentDayPalette(parent?.color || 'neutral');
+                  const palette = getParentDayPalette(parent?.displayColor || 'neutral');
 
                   return (
                     <div
@@ -402,7 +495,7 @@ export function Samversplan() {
                   }
 
                   const parent = getParentForDay(day);
-                  const palette = getParentDayPalette(parent?.color || 'neutral');
+                  const palette = getParentDayPalette(parent?.displayColor || 'neutral');
                   const isToday = isSameDay(day, new Date());
                   const isCurrentMonthDay = isSameMonth(day, currentDate);
 
@@ -497,11 +590,7 @@ export function Samversplan() {
         </Card>
       </motion.div>
 
-      <Dialog open={isSwapDialogOpen} onOpenChange={setIsSwapDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Anmod om bytte</DialogTitle>
-          </DialogHeader>
+      <BottomSheet open={isSwapDialogOpen} onOpenChange={setIsSwapDialogOpen} title="Anmod om bytte">
           <div className="space-y-3 pt-2">
             <p className="text-sm text-[#5f5c53]">
               {selectedSwapDate
@@ -543,8 +632,7 @@ export function Samversplan() {
               Send bytteanmodning
             </Button>
           </div>
-        </DialogContent>
-      </Dialog>
+      </BottomSheet>
     </div>
   );
 }

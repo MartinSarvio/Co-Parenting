@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { BottomSheet } from '@/components/custom/BottomSheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { 
@@ -277,28 +277,18 @@ export function MeetingMinutesView() {
       >
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Mødereferater</h1>
-          <p className="text-slate-500">
-            {isProfessionalView 
-              ? 'Dokumentation fra samtaler' 
-              : 'Referater fra jeres møder'}
-          </p>
         </div>
         {canCreateMinutes && (
-          <Dialog open={isCreating} onOpenChange={setIsCreating}>
-            <DialogTrigger asChild>
-              <Button className="bg-gradient-to-r from-blue-500 to-indigo-600">
+          <>
+          <Button className="bg-gradient-to-r from-blue-500 to-indigo-600" onClick={() => setIsCreating(true)}>
                 <Plus className="w-4 h-4 mr-1" />
                 Nyt
               </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <DialogTitle>Opret nyt referat</DialogTitle>
-              </DialogHeader>
+          <BottomSheet open={isCreating} onOpenChange={setIsCreating} title="Opret nyt referat">
               <div className="space-y-4 pt-4">
                 <div className="space-y-2">
                   <Label>Titel</Label>
-                  <Input 
+                  <Input
                     value={newMinutes.title}
                     onChange={(e) => setNewMinutes({...newMinutes, title: e.target.value})}
                     placeholder="F.eks. Samværssamtale - August 2024"
@@ -306,7 +296,7 @@ export function MeetingMinutesView() {
                 </div>
                 <div className="space-y-2">
                   <Label>Dato</Label>
-                  <Input 
+                  <Input
                     type="date"
                     value={newMinutes.date}
                     onChange={(e) => setNewMinutes({...newMinutes, date: e.target.value})}
@@ -314,7 +304,7 @@ export function MeetingMinutesView() {
                 </div>
                 <div className="space-y-2">
                   <Label>Sted</Label>
-                  <Input 
+                  <Input
                     value={newMinutes.location}
                     onChange={(e) => setNewMinutes({...newMinutes, location: e.target.value})}
                     placeholder="F.eks. Familierådgivningen"
@@ -322,7 +312,7 @@ export function MeetingMinutesView() {
                 </div>
                 <div className="space-y-2">
                   <Label>Dagsorden</Label>
-                  <Textarea 
+                  <Textarea
                     value={newMinutes.agenda}
                     onChange={(e) => setNewMinutes({...newMinutes, agenda: e.target.value})}
                     placeholder="Hvad skal drøftes på mødet?"
@@ -332,8 +322,8 @@ export function MeetingMinutesView() {
                   Opret referat
                 </Button>
               </div>
-            </DialogContent>
-          </Dialog>
+          </BottomSheet>
+          </>
         )}
       </motion.div>
 

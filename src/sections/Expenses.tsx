@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { BottomSheet } from '@/components/custom/BottomSheet';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
@@ -41,7 +41,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Filter,
-  BarChart3
+  BarChart3,
+  Copy,
+  Smartphone
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
@@ -143,6 +145,7 @@ export function Expenses() {
     household?.singleParentSupport?.autoArchiveReceipts && features.singleParentEvidence
   );
 
+  const [activeTab, setActiveTab] = useState<'balance' | 'expenses' | 'transfers'>('balance');
   const [activeFilter, setActiveFilter] = useState('all');
   const [showStats, setShowStats] = useState(false);
   const [periodYear, setPeriodYear] = useState(new Date().getFullYear());
@@ -164,9 +167,11 @@ export function Expenses() {
   const [disputeReasonInput, setDisputeReasonInput] = useState('');
   const [resolveDialogExpenseId, setResolveDialogExpenseId] = useState<string | null>(null);
   const [resolveNoteInput, setResolveNoteInput] = useState('');
+  const [paymentMethodTransfer, setPaymentMethodTransfer] = useState<MoneyTransfer | null>(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const currentChild = children[0];
-  const parentUsers = users.filter((user) => user.role === 'parent');
+  const parentUsers = useMemo(() => users.filter((user) => user.role === 'parent'), [users]);
 
   const myAccounts = useMemo(() => {
     if (!currentUser) return [];
@@ -196,7 +201,7 @@ export function Expenses() {
       const fallback = parentUsers.find((user) => user.id !== currentUser?.id)?.id || parentUsers[0].id;
       setSplitTargetUserId(fallback);
     }
-  }, [parentUsers, splitTargetUserId, currentUser]);
+  }, [parentUsers, currentUser]);
 
   const filteredExpenses = expenses.filter((expense) => {
     // Period filter
@@ -265,6 +270,19 @@ export function Expenses() {
 
     return userBalance;
   }, [expenses, users]);
+
+  const settlements = useMemo(() => {
+    const result: { fromName: string; toName: string; amount: number }[] = [];
+    const pos = parentUsers.filter(u => (balance[u.id] || 0) > 0);
+    const neg = parentUsers.filter(u => (balance[u.id] || 0) < 0);
+    for (const debtor of neg) {
+      for (const creditor of pos) {
+        const amt = Math.min(Math.abs(balance[debtor.id] || 0), balance[creditor.id] || 0);
+        if (amt > 0) result.push({ fromName: debtor.name, toName: creditor.name, amount: amt });
+      }
+    }
+    return result;
+  }, [balance, parentUsers]);
 
   const transferHistory = useMemo(() => {
     if (!currentUser) return [];
@@ -503,6 +521,11 @@ export function Expenses() {
     setTransferDraft({ peerUserId: '', amount: '', note: '' });
     setIsTransferOpen(false);
     toast.success(transferMode === 'request' ? 'Betalingsanmodning sendt' : 'Betaling markeret som sendt');
+
+    // Show payment method sheet when sending money
+    if (transferMode === 'send') {
+      setPaymentMethodTransfer(transfer);
+    }
   };
 
   const respondToTransfer = (transferId: string, status: 'completed' | 'declined') => {
@@ -511,6 +534,44 @@ export function Expenses() {
       completedAt: status === 'completed' ? new Date().toISOString() : undefined,
     });
     toast.success(status === 'completed' ? 'Betaling bekræftet' : 'Anmodning afvist');
+  };
+
+  const getPartnerPaymentInfo = (userId: string) => {
+    const accounts = paymentAccounts.filter((a) => a.userId === userId);
+    return {
+      mobilepay: accounts.find((a) => a.provider === 'mobilepay'),
+      bank: accounts.find((a) => a.provider === 'bank'),
+      all: accounts,
+    };
+  };
+
+  const buildMobilePayUrl = (phone: string, amount: number, note?: string) => {
+    // Normalize: strip spaces, dashes, +45 prefix
+    const clean = phone.replace(/[\s\-()]/g, '').replace(/^\+?45/, '');
+    const comment = encodeURIComponent(note || '');
+    return `mobilepay://send?phone=${clean}&amount=${amount}&comment=${comment}`;
+  };
+
+  const handleOpenMobilePay = (transfer: MoneyTransfer) => {
+    const recipientId = transfer.toUserId;
+    const info = getPartnerPaymentInfo(recipientId);
+    if (!info.mobilepay) {
+      toast.error('Modtager har ingen MobilePay konto');
+      return;
+    }
+    const url = buildMobilePayUrl(info.mobilepay.accountHandle, transfer.amount, transfer.note);
+    window.open(url, '_blank');
+  };
+
+  const handleCopyToClipboard = async (text: string, fieldName: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedField(fieldName);
+      toast.success('Kopieret');
+      setTimeout(() => setCopiedField(null), 2000);
+    } catch {
+      toast.error('Kunne ikke kopiere');
+    }
   };
 
   const handleApprove = (expenseId: string) => {
@@ -573,32 +634,57 @@ export function Expenses() {
   return (
     <div className="space-y-2 py-1">
       <motion.div
-        initial={{ opacity: 0, y: -16 }}
+        initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center"
       >
-        <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#fff2e6] text-[#f58a2d]">
-          <Receipt className="h-7 w-7" />
-        </div>
         <h1 className="text-2xl font-semibold text-[#2f2f2d]">Udgifter</h1>
-        <p className="text-sm text-[#75736b]">Del faste og uventede udgifter i familien</p>
       </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <Card className="border-[#d8d7cf] bg-[#f8f7f3]">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <ArrowRightLeft className="h-4 w-4 text-[#666359]" />
-              Balance
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 pt-0">
-            {users.map((user) => {
-              const userBalance = balance[user.id] || 0;
-              const isPositive = userBalance > 0;
+      {/* Underline-style Tabs */}
+      <div className="sticky top-0 z-10 bg-[#faf9f6] pb-0">
+        <div className="flex items-center border-b border-[#e5e3dc]">
+          {[
+            { value: 'balance' as const, label: 'Balance' },
+            { value: 'expenses' as const, label: 'Udgifter' },
+            { value: 'transfers' as const, label: 'Send penge' },
+          ].map((tab) => (
+            <button
+              key={tab.value}
+              onClick={() => setActiveTab(tab.value)}
+              className={cn(
+                'relative flex-1 py-3 text-center text-[14px] font-semibold transition-colors',
+                activeTab === tab.value ? 'text-[#2f2f2d]' : 'text-[#b0ada4]'
+              )}
+            >
+              {tab.label}
+              {activeTab === tab.value && (
+                <motion.div
+                  layoutId="expenses-underline"
+                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#2f2f2d] rounded-full"
+                  transition={{ type: 'spring', stiffness: 500, damping: 35 }}
+                />
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ═══ Tab 1: Balance ═══ */}
+      {activeTab === 'balance' && (
+        <div className="space-y-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className="space-y-3">
+              <h3 className="text-base font-semibold text-[#2f2f2d] flex items-center gap-2">
+                <ArrowRightLeft className="h-4 w-4 text-[#666359]" />
+                Balance
+              </h3>
+              <div className="space-y-2">
+                {users.map((user) => {
+                  const userBalance = balance[user.id] || 0;
+                  const isPositive = userBalance > 0;
               return (
                 <div key={user.id} className="flex items-center justify-between rounded-xl border border-[#dfddd6] bg-white p-3">
                   <div className="flex items-center gap-2">
@@ -618,24 +704,49 @@ export function Expenses() {
                   </span>
                 </div>
               );
-            })}
-          </CardContent>
-        </Card>
-      </motion.div>
+                })}
+              </div>
+            </div>
+          </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
-      >
-        <Card className="border-[#d8d7cf] bg-[#faf9f6]">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <CreditCard className="h-4 w-4 text-[#666359]" />
-              Send / anmod penge
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 pt-0">
+          {/* Settlement summary */}
+          {settlements.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+            >
+              <div className="space-y-3">
+                <h3 className="text-base font-semibold text-[#2f2f2d] flex items-center gap-2">
+                  Foreslået afregning
+                </h3>
+                <div className="space-y-2">
+                  {settlements.map((s, i) => (
+                    <div key={i} className="flex items-center justify-between rounded-xl border border-[#e5e3dc] bg-[#faf9f6] p-3">
+                      <p className="text-sm text-[#2f2f2d]">{s.fromName} → {s.toName}</p>
+                      <p className="text-sm font-semibold text-[#f58a2d]">{formatCurrency(s.amount)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </div>
+      )}
+
+      {/* ═══ Tab 3: Send penge ═══ */}
+      {activeTab === 'transfers' && (
+        <div className="space-y-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className="space-y-3">
+              <h3 className="text-base font-semibold text-[#2f2f2d] flex items-center gap-2">
+                <CreditCard className="h-4 w-4 text-[#666359]" />
+                Send / anmod penge
+              </h3>
+              <div className="space-y-3">
             {!canUsePayments && (
               <p className="rounded-xl border border-[#f3c59d] bg-[#fff2e6] px-3 py-2 text-sm text-[#a7632c]">
                 Denne funktion kræver Family Plus eller Enlig Plus.
@@ -646,16 +757,10 @@ export function Expenses() {
               Din primære konto: {myAccounts.find((account) => account.isPrimary)?.accountLabel || 'Ikke sat'}
             </p>
 
-            <Dialog open={isTransferOpen} onOpenChange={setIsTransferOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" className="w-full" disabled={!canUsePayments}>
-                  Opret betaling eller anmodning
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Send eller anmod penge</DialogTitle>
-                </DialogHeader>
+            <Button variant="outline" className="w-full" disabled={!canUsePayments} onClick={() => setIsTransferOpen(true)}>
+              Opret betaling eller anmodning
+            </Button>
+            <BottomSheet open={isTransferOpen} onOpenChange={setIsTransferOpen} title="Send eller anmod penge">
                 <div className="space-y-4 pt-2">
                   <div className="grid grid-cols-2 gap-2">
                     <Button
@@ -714,12 +819,11 @@ export function Expenses() {
                     {transferMode === 'request' ? 'Send anmodning' : 'Registrer sendt betaling'}
                   </Button>
                 </div>
-              </DialogContent>
-            </Dialog>
+            </BottomSheet>
 
             {incomingRequests.length > 0 && (
               <div className="space-y-2">
-                {incomingRequests.slice(0, 2).map((transfer) => {
+                {incomingRequests.map((transfer) => {
                   const sender = users.find((user) => user.id === transfer.fromUserId);
                   return (
                     <div key={transfer.id} className="rounded-xl border border-[#dfddd6] bg-white p-3">
@@ -740,26 +844,75 @@ export function Expenses() {
                 })}
               </div>
             )}
-          </CardContent>
-        </Card>
-      </motion.div>
+              </div>
+            </div>
+          </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-      >
-        <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-          <DialogTrigger asChild>
-            <Button className="w-full">
+          {/* Transfer history (full) */}
+          {transferHistory.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 }}
+            >
+              <div className="space-y-3">
+                <h3 className="text-base font-semibold text-[#2f2f2d] flex items-center gap-2">
+                  Betalingshistorik
+                </h3>
+                <div className="space-y-2">
+                  {transferHistory.map((transfer) => {
+                    const fromUser = users.find((user) => user.id === transfer.fromUserId);
+                    const toUser = users.find((user) => user.id === transfer.toUserId);
+                    return (
+                      <div key={transfer.id} className="rounded-xl border border-[#e0ded7] bg-[#faf9f6] p-2.5">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-sm font-medium text-[#2f2f2d]">
+                            {fromUser?.name} → {toUser?.name}
+                          </p>
+                          <Badge variant="outline">{formatCurrency(transfer.amount)}</Badge>
+                        </div>
+                        <p className="mt-1 text-xs text-[#75736b]">
+                          {transfer.status === 'requested' && 'Anmodet'}
+                          {transfer.status === 'sent' && 'Sendt'}
+                          {transfer.status === 'completed' && 'Gennemført'}
+                          {transfer.status === 'declined' && 'Afvist'}
+                          {' · '}
+                          {formatDate(transfer.createdAt)}
+                        </p>
+                        {transfer.note && <p className="mt-0.5 text-xs text-[#75736b]">{transfer.note}</p>}
+                        {(transfer.status === 'sent' || transfer.status === 'requested') && transfer.fromUserId === currentUser?.id && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="mt-1.5 h-7 px-2 text-xs text-[#b96424] hover:text-[#9a5120] hover:bg-[#fff2e6]"
+                            onClick={() => setPaymentMethodTransfer(transfer)}
+                          >
+                            <Smartphone className="h-3 w-3 mr-1" />
+                            Betal nu
+                          </Button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </div>
+      )}
+
+      {/* ═══ Tab 2: Udgifter ═══ */}
+      {activeTab === 'expenses' && (
+        <div className="space-y-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <Button className="w-full" onClick={() => setIsAddOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               Tilføj udgift
             </Button>
-          </DialogTrigger>
-          <DialogContent className="max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Ny udgift</DialogTitle>
-            </DialogHeader>
+          <BottomSheet open={isAddOpen} onOpenChange={setIsAddOpen} title="Ny udgift">
             <div className="space-y-4 pt-2">
               <div className="space-y-2">
                 <Label>Hvad er der betalt for?</Label>
@@ -982,15 +1135,14 @@ export function Expenses() {
                 Gem udgift
               </Button>
             </div>
-          </DialogContent>
-        </Dialog>
+          </BottomSheet>
       </motion.div>
 
       {/* Filter bar: dropdown + period + stats toggle */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
+        transition={{ delay: 0.05 }}
         className="space-y-3"
       >
         <div className="flex items-center gap-2">
@@ -1251,52 +1403,12 @@ export function Expenses() {
         </motion.div>
       )}
 
-      {transferHistory.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <Card className="border-[#d8d7cf]">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Seneste betalinger</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 pt-0">
-              {transferHistory.slice(0, 5).map((transfer) => {
-                const fromUser = users.find((user) => user.id === transfer.fromUserId);
-                const toUser = users.find((user) => user.id === transfer.toUserId);
-
-                return (
-                  <div key={transfer.id} className="rounded-xl border border-[#e0ded7] bg-[#faf9f6] p-2.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="text-sm font-medium text-[#2f2f2d]">
-                        {fromUser?.name} → {toUser?.name}
-                      </p>
-                      <Badge variant="outline">{formatCurrency(transfer.amount)}</Badge>
-                    </div>
-                    <p className="mt-1 text-xs text-[#75736b]">
-                      {transfer.status === 'requested' && 'Anmodet'}
-                      {transfer.status === 'sent' && 'Sendt'}
-                      {transfer.status === 'completed' && 'Gennemført'}
-                      {transfer.status === 'declined' && 'Afvist'}
-                      {' · '}
-                      {formatDate(transfer.createdAt)}
-                    </p>
-                    {transfer.note && <p className="mt-0.5 text-xs text-[#75736b]">{transfer.note}</p>}
-                  </div>
-                );
-              })}
-            </CardContent>
-          </Card>
-        </motion.div>
-      )}
-
-      {/* Export buttons — bottom of page */}
+      {/* Export buttons */}
       {filteredExpenses.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
+          transition={{ delay: 0.1 }}
           className="flex gap-3 pb-2"
         >
           <Button
@@ -1317,6 +1429,140 @@ export function Expenses() {
           </Button>
         </motion.div>
       )}
+        </div>
+      )}
+
+      {/* Payment method Sheet */}
+      <Sheet open={!!paymentMethodTransfer} onOpenChange={(open) => { if (!open) { setPaymentMethodTransfer(null); setCopiedField(null); } }}>
+        <SheetContent side="bottom" className="rounded-t-[28px] bg-[#faf9f6] max-h-[75vh] overflow-y-auto">
+          {paymentMethodTransfer && (() => {
+            const recipientId = paymentMethodTransfer.toUserId;
+            const recipient = users.find((u) => u.id === recipientId);
+            const info = getPartnerPaymentInfo(recipientId);
+
+            return (
+              <>
+                <SheetHeader className="pb-2">
+                  <SheetTitle className="text-left text-lg font-bold text-[#2f2f2d]">
+                    Betal {formatCurrency(paymentMethodTransfer.amount)}
+                  </SheetTitle>
+                  <p className="text-sm text-[#78766d] text-left">til {recipient?.name || 'partner'}</p>
+                </SheetHeader>
+                <div className="space-y-3 px-4 pb-8">
+                  {/* MobilePay */}
+                  {info.mobilepay && (
+                    <button
+                      onClick={() => handleOpenMobilePay(paymentMethodTransfer)}
+                      className="flex w-full items-center gap-3 rounded-2xl border-2 border-[#5a78ff] bg-[#f0f3ff] p-4 text-left transition-all active:scale-[0.98]"
+                    >
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#5a78ff]">
+                        <Smartphone className="h-5 w-5 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[14px] font-semibold text-[#2f2f2d]">Betal via MobilePay</p>
+                        <p className="text-[11px] text-[#78766d] mt-0.5">{info.mobilepay.accountHandle}</p>
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-[#5a78ff]" />
+                    </button>
+                  )}
+
+                  {/* Bank transfer */}
+                  {info.bank && (
+                    <div className="rounded-2xl border border-[#e5e3dc] bg-white p-4 space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Building2 className="h-4 w-4 text-[#78766d]" />
+                        <p className="text-[14px] font-semibold text-[#2f2f2d]">Bankoverførsel</p>
+                      </div>
+
+                      {/* Parse reg + konto from accountHandle */}
+                      {(() => {
+                        const handle = info.bank!.accountHandle;
+                        // Try to split "RRRR KKKKKKKKKK" or "RRRR-KKKKKKKKKK"
+                        const parts = handle.split(/[\s\-]+/);
+                        const regNr = parts.length >= 2 ? parts[0] : '';
+                        const kontoNr = parts.length >= 2 ? parts.slice(1).join('') : handle;
+
+                        return (
+                          <div className="space-y-2">
+                            {regNr && (
+                              <div className="flex items-center justify-between rounded-xl border border-[#e5e3dc] bg-[#faf9f6] p-3">
+                                <div>
+                                  <p className="text-[11px] text-[#9b9a93] uppercase tracking-wide">Reg. nr.</p>
+                                  <p className="text-sm font-mono font-semibold text-[#2f2f2d]">{regNr}</p>
+                                </div>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  className="h-8 w-8 p-0"
+                                  onClick={() => handleCopyToClipboard(regNr, 'reg')}
+                                >
+                                  <Copy className={cn('h-3.5 w-3.5', copiedField === 'reg' ? 'text-green-600' : 'text-[#78766d]')} />
+                                </Button>
+                              </div>
+                            )}
+                            <div className="flex items-center justify-between rounded-xl border border-[#e5e3dc] bg-[#faf9f6] p-3">
+                              <div>
+                                <p className="text-[11px] text-[#9b9a93] uppercase tracking-wide">Kontonummer</p>
+                                <p className="text-sm font-mono font-semibold text-[#2f2f2d]">{kontoNr}</p>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 w-8 p-0"
+                                onClick={() => handleCopyToClipboard(kontoNr, 'konto')}
+                              >
+                                <Copy className={cn('h-3.5 w-3.5', copiedField === 'konto' ? 'text-green-600' : 'text-[#78766d]')} />
+                              </Button>
+                            </div>
+                            <div className="flex items-center justify-between rounded-xl border border-[#e5e3dc] bg-[#faf9f6] p-3">
+                              <div>
+                                <p className="text-[11px] text-[#9b9a93] uppercase tracking-wide">Beløb</p>
+                                <p className="text-sm font-semibold text-[#2f2f2d]">{formatCurrency(paymentMethodTransfer.amount)}</p>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 w-8 p-0"
+                                onClick={() => handleCopyToClipboard(String(paymentMethodTransfer.amount), 'amount')}
+                              >
+                                <Copy className={cn('h-3.5 w-3.5', copiedField === 'amount' ? 'text-green-600' : 'text-[#78766d]')} />
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })()}
+
+                      {paymentMethodTransfer.note && (
+                        <p className="text-xs text-[#78766d]">Note: {paymentMethodTransfer.note}</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* No payment methods */}
+                  {!info.mobilepay && !info.bank && (
+                    <div className="rounded-2xl border border-[#e5e3dc] bg-[#fff8f0] p-4 text-center">
+                      <p className="text-sm text-[#78766d]">
+                        {recipient?.name || 'Din partner'} har ikke tilføjet betalingsoplysninger endnu.
+                      </p>
+                      <p className="mt-1 text-xs text-[#9b9a93]">
+                        Bed dem om at tilføje MobilePay eller bankkonto i Indstillinger.
+                      </p>
+                    </div>
+                  )}
+
+                  <Button
+                    variant="outline"
+                    className="w-full rounded-2xl border-[#d8d7cf]"
+                    onClick={() => { setPaymentMethodTransfer(null); setCopiedField(null); }}
+                  >
+                    Luk
+                  </Button>
+                </div>
+              </>
+            );
+          })()}
+        </SheetContent>
+      </Sheet>
 
       {/* Expense detail Sheet */}
       <Sheet open={!!detailExpense} onOpenChange={(open) => { if (!open) setDetailExpenseId(null); }}>
@@ -1483,11 +1729,7 @@ export function Expenses() {
       </Sheet>
 
       {/* Dispute reason dialog */}
-      <Dialog open={disputeDialogExpenseId !== null} onOpenChange={(open) => { if (!open) setDisputeDialogExpenseId(null); }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Anfægt udgift</DialogTitle>
-          </DialogHeader>
+      <BottomSheet open={disputeDialogExpenseId !== null} onOpenChange={(open) => { if (!open) setDisputeDialogExpenseId(null); }} title="Anfægt udgift">
           <div className="space-y-3 pt-2">
             <p className="text-sm text-[#75736b]">Beskriv hvorfor du anfægter denne udgift. Den anden forælder vil se din begrundelse.</p>
             <div className="space-y-1.5">
@@ -1509,15 +1751,10 @@ export function Expenses() {
               </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+      </BottomSheet>
 
       {/* Resolve dispute dialog */}
-      <Dialog open={resolveDialogExpenseId !== null} onOpenChange={(open) => { if (!open) setResolveDialogExpenseId(null); }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Løs tvist</DialogTitle>
-          </DialogHeader>
+      <BottomSheet open={resolveDialogExpenseId !== null} onOpenChange={(open) => { if (!open) setResolveDialogExpenseId(null); }} title="Løs tvist">
           <div className="space-y-3 pt-2">
             <p className="text-sm text-[#75736b]">Beskriv hvordan tvisten løses. Udgiften vil blive markeret som godkendt.</p>
             <div className="space-y-1.5">
@@ -1540,8 +1777,7 @@ export function Expenses() {
               </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+      </BottomSheet>
     </div>
   );
 }

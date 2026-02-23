@@ -5,8 +5,8 @@ const config: CapacitorConfig = {
   appName: 'Hverdag',
   webDir: 'dist',
   ios: {
-    contentInset: 'always',
-    backgroundColor: '#f2f1ed',
+    contentInset: 'never',
+    backgroundColor: '#fef8f0',
     allowsLinkPreview: false,
   },
   server: {

@@ -50,7 +50,7 @@ export function TopBar() {
                   aria-label={`Valgt barn: ${currentChild.name}. Klik for at skifte`}
                 >
                   <Avatar className="h-6 w-6 shrink-0">
-                    <AvatarImage src={currentChild.avatar} />
+                    <AvatarImage src={currentChild.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(currentChild.name)}`} />
                     <AvatarFallback className="bg-[#ecebe6] text-xs text-[#4d4c47]">
                       {currentChild.name[0]}
                     </AvatarFallback>
@@ -65,7 +65,7 @@ export function TopBar() {
                 {children.map(child => (
                   <DropdownMenuItem key={child.id} className="flex items-center gap-2">
                     <Avatar className="h-6 w-6">
-                      <AvatarImage src={child.avatar} />
+                      <AvatarImage src={child.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(child.name)}`} />
                       <AvatarFallback className="text-xs">{child.name[0]}</AvatarFallback>
                     </Avatar>
                     {child.name}

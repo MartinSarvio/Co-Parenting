@@ -8,12 +8,7 @@ import { Plus, Trash2, Camera, X, ChevronLeft, ChevronRight } from 'lucide-react
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { BottomSheet } from '@/components/custom/BottomSheet';
 import { cn } from '@/lib/utils';
 
 export function Fotoalbum() {
@@ -134,12 +129,8 @@ export function Fotoalbum() {
         </div>
       )}
 
-      {/* Add photo dialog */}
-      <Dialog open={addDialogOpen} onOpenChange={(o) => { if (!o) { setAddDialogOpen(false); setPreviewUrl(null); setCaption(''); if (fileInputRef.current) fileInputRef.current.value = ''; } }}>
-        <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
-          <DialogHeader>
-            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Tilføj foto</DialogTitle>
-          </DialogHeader>
+      {/* Add photo BottomSheet */}
+      <BottomSheet open={addDialogOpen} onOpenChange={(o) => { if (!o) { setAddDialogOpen(false); setPreviewUrl(null); setCaption(''); if (fileInputRef.current) fileInputRef.current.value = ''; } }} title="Tilføj foto">
           <div className="space-y-3">
             {previewUrl && (
               <div className="relative overflow-hidden rounded-2xl">
@@ -169,8 +160,7 @@ export function Fotoalbum() {
               </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+      </BottomSheet>
 
       {/* Lightbox */}
       {lightboxIndex !== null && childPhotos[lightboxIndex] && (

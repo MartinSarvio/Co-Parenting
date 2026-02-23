@@ -4,10 +4,11 @@ import { BottomNav } from '@/components/custom/BottomNav';
 import { TopBar } from '@/components/custom/TopBar';
 import { Toaster } from '@/components/ui/sonner';
 import { ErrorBoundary } from '@/components/custom/ErrorBoundary';
-import { getToken } from '@/lib/api';
 import { fetchMe } from '@/lib/auth';
 import { loadInitialData } from '@/lib/dataSync';
-import { initPushNotifications } from '@/lib/pushNotifications';
+import { supabase } from '@/lib/supabase';
+// Push notifications temporarily disabled — plugin incompatible with Capacitor 8.1
+// import { initPushNotifications } from '@/lib/pushNotifications';
 import './App.css';
 
 const OnboardingFlow = lazy(() =>
@@ -102,16 +103,16 @@ function App() {
   const canUseProfessionalView = household?.familyMode !== 'together';
   const showProfessionalView = isProfessionalView && canUseProfessionalView;
 
-  // Session restore — check for existing JWT token on mount
+  // Session restore — check for existing Supabase session on mount
   const restoreSession = useCallback(async () => {
-    const token = getToken();
-    if (!token) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
       setIsReady(true);
       return;
     }
 
     try {
-      // Validate token and get user
+      // Validate session and get user profile
       const user = await fetchMe();
       setCurrentUser(user);
 
@@ -124,16 +125,14 @@ function App() {
       }
 
       setAuthenticated(true);
-
-      // Initialize push notifications (non-blocking)
-      initPushNotifications().catch(console.warn);
-    } catch (err: any) {
-      // Only logout if token is truly invalid (401), not on network errors
-      if (err?.status === 401) {
+    } catch (err: unknown) {
+      const apiErr = err as { status?: number; message?: string };
+      // Only logout if session is truly invalid (401), not on network errors
+      if (apiErr?.status === 401) {
         logout();
       } else {
         // Network error — keep user logged in with cached data
-        console.warn('Session restore failed (network?):', err?.message);
+        console.warn('Session restore failed (network?):', apiErr?.message);
         setAuthenticated(true);
       }
     } finally {
@@ -143,7 +142,16 @@ function App() {
 
   useEffect(() => {
     restoreSession();
-  }, [restoreSession]);
+
+    // Listen for auth state changes (login/logout from other tabs)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') {
+        logout();
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [restoreSession, logout]);
 
   if (!isReady) {
     return (

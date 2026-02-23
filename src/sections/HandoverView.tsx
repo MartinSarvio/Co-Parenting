@@ -252,9 +252,6 @@ export function HandoverView() {
         className="text-center"
       >
         <h1 className="text-2xl font-bold text-slate-900">Aflevering</h1>
-        <p className="text-slate-500">
-          {format(parseISO(activeHandover.scheduledDate), 'EEEE d. MMMM', { locale: da })}
-        </p>
       </motion.div>
 
       {/* Parent Transfer Visual */}

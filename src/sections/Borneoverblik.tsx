@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { BottomSheet } from '@/components/custom/BottomSheet';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -619,8 +619,7 @@ export function Borneoverblik() {
       {/* ── Stage Detail Dialog ── */}
       <AnimatePresence>
         {stageDetailOpen && viewingStageIndex !== null && (
-          <Dialog open={stageDetailOpen} onOpenChange={setStageDetailOpen}>
-            <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-md">
+          <BottomSheet open={stageDetailOpen} onOpenChange={setStageDetailOpen} title={developmentStages[viewingStageIndex]?.title ?? 'Udviklingsfase'}>
               {(() => {
                 const stage = developmentStages[viewingStageIndex];
                 if (!stage) return null;
@@ -629,7 +628,7 @@ export function Borneoverblik() {
                 const isCurrent = stageInfo && viewingStageIndex === stageInfo.currentIndex;
                 return (
                   <>
-                    <DialogHeader className="pr-8">
+                    <div className="pr-8">
                       <div className="flex items-center gap-2">
                         {isCurrent && (
                           <span className="rounded-full bg-[#fff2e6] px-2 py-0.5 text-[10px] font-bold text-[#f58a2d]">
@@ -647,15 +646,8 @@ export function Borneoverblik() {
                           </span>
                         )}
                       </div>
-                      <DialogTitle className="flex items-center gap-2 text-left">
-                        {(() => {
-                          const StageIcon = stageIconMap[stage.icon] || Sparkles;
-                          return <StageIcon className="h-5 w-5 shrink-0 text-[#f58a2d]" />;
-                        })()}
-                        <span className="text-[18px] leading-snug">{stage.title}</span>
-                      </DialogTitle>
                       <p className="text-[13px] text-[#9a978f]">{stage.subtitle}</p>
-                    </DialogHeader>
+                    </div>
 
                     <div className="space-y-4 pt-2">
                       {/* Crisis Symptoms */}
@@ -767,8 +759,7 @@ export function Borneoverblik() {
                   </>
                 );
               })()}
-            </DialogContent>
-          </Dialog>
+          </BottomSheet>
         )}
       </AnimatePresence>
 
@@ -809,21 +800,15 @@ export function Borneoverblik() {
         <div className="space-y-4 mt-4">
           <div className="flex justify-between items-center">
             <h3 className="text-[15px] font-bold text-[#2f2f2d]">Milepæle & Begivenheder</h3>
-            <Dialog open={isAddMilestoneOpen} onOpenChange={setIsAddMilestoneOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" variant="outline">
+            <Button size="sm" variant="outline" onClick={() => setIsAddMilestoneOpen(true)}>
                   <Plus className="w-4 h-4 mr-1" />
                   Tilføj
                 </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Tilføj milepæl</DialogTitle>
-                </DialogHeader>
+            <BottomSheet open={isAddMilestoneOpen} onOpenChange={setIsAddMilestoneOpen} title="Tilføj milepæl">
                 <div className="space-y-4 pt-4">
                   <div className="space-y-2">
                     <Label>Titel</Label>
-                    <Input 
+                    <Input
                       value={newMilestone.title}
                       onChange={(e) => setNewMilestone({...newMilestone, title: e.target.value})}
                       placeholder="F.eks. Første skoledag"
@@ -831,7 +816,7 @@ export function Borneoverblik() {
                   </div>
                   <div className="space-y-2">
                     <Label>Beskrivelse (valgfri)</Label>
-                    <Textarea 
+                    <Textarea
                       value={newMilestone.description}
                       onChange={(e) => setNewMilestone({...newMilestone, description: e.target.value})}
                       placeholder="Beskriv begivenheden..."
@@ -839,7 +824,7 @@ export function Borneoverblik() {
                   </div>
                   <div className="space-y-2">
                     <Label>Dato</Label>
-                    <Input 
+                    <Input
                       type="date"
                       value={newMilestone.date}
                       onChange={(e) => setNewMilestone({...newMilestone, date: e.target.value})}
@@ -847,8 +832,8 @@ export function Borneoverblik() {
                   </div>
                   <div className="space-y-2">
                     <Label>Kategori</Label>
-                    <Select 
-                      value={newMilestone.category} 
+                    <Select
+                      value={newMilestone.category}
                       onValueChange={(v) => setNewMilestone({...newMilestone, category: v as Milestone['category']})}
                     >
                       <SelectTrigger>
@@ -870,8 +855,7 @@ export function Borneoverblik() {
                     Tilføj milepæl
                   </Button>
                 </div>
-              </DialogContent>
-            </Dialog>
+            </BottomSheet>
           </div>
 
           <div className="space-y-3">
@@ -941,21 +925,15 @@ export function Borneoverblik() {
         <div className="space-y-4 mt-4">
           <div className="flex justify-between items-center">
             <h3 className="text-[15px] font-bold text-[#2f2f2d]">Dokumenter</h3>
-            <Dialog open={isAddDocumentOpen} onOpenChange={setIsAddDocumentOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" variant="outline">
+            <Button size="sm" variant="outline" onClick={() => setIsAddDocumentOpen(true)}>
                   <Plus className="w-4 h-4 mr-1" />
                   Tilføj
                 </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Tilføj dokument</DialogTitle>
-                </DialogHeader>
+            <BottomSheet open={isAddDocumentOpen} onOpenChange={setIsAddDocumentOpen} title="Tilføj dokument">
                 <div className="space-y-4 pt-4">
                   <div className="space-y-2">
                     <Label>Titel</Label>
-                    <Input 
+                    <Input
                       value={newDocument.title}
                       onChange={(e) => setNewDocument({...newDocument, title: e.target.value})}
                       placeholder="F.eks. Vaccinationskort"
@@ -963,8 +941,8 @@ export function Borneoverblik() {
                   </div>
                   <div className="space-y-2">
                     <Label>Type</Label>
-                    <Select 
-                      value={newDocument.type} 
+                    <Select
+                      value={newDocument.type}
                       onValueChange={(v) => setNewDocument({...newDocument, type: v as DocumentType})}
                     >
                       <SelectTrigger>
@@ -994,8 +972,7 @@ export function Borneoverblik() {
                     Tilføj dokument
                   </Button>
                 </div>
-              </DialogContent>
-            </Dialog>
+            </BottomSheet>
           </div>
 
           <div className="space-y-3">

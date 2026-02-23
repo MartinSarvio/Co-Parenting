@@ -8,12 +8,7 @@ import { Plus, BookOpen, Smile, Meh, Frown, Zap, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { BottomSheet } from '@/components/custom/BottomSheet';
 import { cn } from '@/lib/utils';
 import type { DiaryEntry } from '@/types';
 
@@ -174,11 +169,7 @@ export function Dagbog() {
         </div>
       )}
 
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
-          <DialogHeader>
-            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Nyt dagbogsnotat</DialogTitle>
-          </DialogHeader>
+      <BottomSheet open={addOpen} onOpenChange={setAddOpen} title="Nyt dagbogsnotat">
           <div className="space-y-4">
             {/* Mood */}
             <div className="space-y-1.5">
@@ -228,8 +219,7 @@ export function Dagbog() {
               </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+      </BottomSheet>
     </div>
   );
 }

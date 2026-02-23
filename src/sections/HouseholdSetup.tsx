@@ -3,15 +3,17 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent } from '@/components/ui/card';
-import { Calendar, Clock, Heart, Users, Home, Loader2 } from 'lucide-react';
+import { Calendar, Clock, Heart, Users, Home, Loader2, ChevronLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { api, ApiError } from '@/lib/api';
+import { logoutUser } from '@/lib/auth';
 import { useAppStore } from '@/store';
+import { RibbonBanner } from '@/components/custom/RibbonBanner';
 import type { Household, User } from '@/types';
 
 interface HouseholdSetupProps {
   onComplete: () => void;
+  onBack?: () => void;
 }
 
 type FamilyType = 'co-parents-fixed' | 'co-parents-flex' | 'same-household' | 'blended';
@@ -69,8 +71,8 @@ interface ApiHouseholdResponse {
   children: unknown[];
 }
 
-export function HouseholdSetup({ onComplete }: HouseholdSetupProps) {
-  const { currentUser, setHousehold, hydrateFromServer } = useAppStore();
+export function HouseholdSetup({ onComplete, onBack }: HouseholdSetupProps) {
+  const { currentUser, setHousehold, hydrateFromServer, logout } = useAppStore();
   const [selectedType, setSelectedType] = useState<FamilyType | null>(null);
   const [householdName, setHouseholdName] = useState(`${currentUser?.name || 'Min'}s Familie`);
   const [isLoading, setIsLoading] = useState(false);
@@ -125,81 +127,119 @@ export function HouseholdSetup({ onComplete }: HouseholdSetupProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#f6f4ef] via-[#f3f1ea] to-[#ece9e0] flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-xl">
-        <CardContent className="p-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
-          >
-            {/* Header */}
-            <div className="text-center space-y-3">
-              <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-[#f7a95c] to-[#f58a2d] flex items-center justify-center shadow-lg">
-                <Home className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-slate-900">Opret din husstand</h1>
-                <p className="text-slate-500 text-sm mt-1">
-                  Velkommen, {currentUser?.name}! Vælg din familietype for at komme i gang.
-                </p>
-              </div>
-            </div>
+    <div
+      className="fixed inset-0 flex flex-col"
+      style={{ touchAction: 'none', overscrollBehavior: 'none', overflow: 'hidden' }}
+    >
+      {/* Ribbon banner baggrund */}
+      <div className="absolute inset-0">
+        <RibbonBanner />
+      </div>
 
-            {/* Family type selection */}
-            <div className="space-y-2">
-              {familyTypes.map((type) => (
-                <button
-                  key={type.value}
-                  onClick={() => setSelectedType(type.value)}
-                  className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left ${
-                    selectedType === type.value
-                      ? 'border-[#f7a95c] bg-orange-50 shadow-sm'
-                      : 'border-slate-200 bg-white hover:border-slate-300'
-                  }`}
-                >
-                  <div className={`p-2 rounded-lg ${selectedType === type.value ? 'bg-orange-100 text-orange-600' : 'bg-slate-100 text-slate-500'}`}>
-                    {type.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-medium text-sm text-slate-900">{type.label}</div>
-                    <div className="text-xs text-slate-500">{type.description}</div>
-                  </div>
-                </button>
-              ))}
-            </div>
+      {/* Content overlay */}
+      <div
+        className="relative z-10 flex items-center justify-center h-full"
+        style={{
+          paddingTop: 'env(safe-area-inset-top)',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+          paddingLeft: 'max(env(safe-area-inset-left), 24px)',
+          paddingRight: 'max(env(safe-area-inset-right), 24px)',
+        }}
+      >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full max-w-sm"
+        >
+          <div className="bg-white/95 backdrop-blur-xl rounded-3xl px-6 py-6 shadow-[0_8px_40px_rgba(0,0,0,0.12)]">
+            <div className="space-y-4">
+              {/* Header */}
+              <div className="text-center space-y-2">
+                <div className="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-br from-[#f7a95c] to-[#f58a2d] flex items-center justify-center shadow-lg">
+                  <Home className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-[#2f2f2d]">Opret din husstand</h1>
+                  <p className="text-[#9a978f] text-[13px] mt-1">
+                    Vælg din familietype for at komme i gang.
+                  </p>
+                </div>
+              </div>
 
-            {/* Household name */}
-            <div className="space-y-2">
-              <Label htmlFor="household-name">Husstandens navn</Label>
-              <Input
-                id="household-name"
-                value={householdName}
-                onChange={(e) => setHouseholdName(e.target.value)}
-                placeholder="Fx Jensens Familie"
+              {/* Family type selection */}
+              <div className="space-y-2">
+                {familyTypes.map((type) => (
+                  <button
+                    key={type.value}
+                    onClick={() => setSelectedType(type.value)}
+                    className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left ${
+                      selectedType === type.value
+                        ? 'border-[#f7a95c] bg-[#fff7ef] shadow-sm'
+                        : 'border-[#e5e3dc] bg-white/80 hover:border-[#d5d3cc]'
+                    }`}
+                  >
+                    <div className={`p-2 rounded-lg ${selectedType === type.value ? 'bg-[#fff0e0] text-[#e8773f]' : 'bg-[#f2f1ed] text-[#9a978f]'}`}>
+                      {type.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm text-[#2f2f2d]">{type.label}</div>
+                      <div className="text-xs text-[#9a978f]">{type.description}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {/* Household name */}
+              <div className="space-y-2">
+                <Label htmlFor="household-name" className="text-[#5f5d56]">Husstandens navn</Label>
+                <Input
+                  id="household-name"
+                  value={householdName}
+                  onChange={(e) => setHouseholdName(e.target.value)}
+                  placeholder="Fx Jensens Familie"
+                  disabled={isLoading}
+                  className="h-[50px] text-[15px] bg-white/80 border-[#e5e3dc] rounded-xl placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
+                />
+              </div>
+
+              {/* Create button */}
+              <button
+                onClick={handleCreate}
+                disabled={isLoading || !selectedType}
+                className="w-full h-[48px] rounded-xl text-white font-semibold text-[15px] tracking-[-0.01em] transition-all duration-200 disabled:opacity-60 active:scale-[0.98]"
+                style={{
+                  background: 'linear-gradient(135deg, #f7a95c 0%, #f58a2d 50%, #e8773f 100%)',
+                  boxShadow: '0 6px 20px rgba(245, 138, 45, 0.35)',
+                }}
+              >
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Opretter husstand...
+                  </span>
+                ) : (
+                  'Opret husstand'
+                )}
+              </button>
+
+              {/* Tilbage-knap */}
+              <button
+                onClick={() => {
+                  logoutUser();
+                  logout();
+                  onBack?.();
+                }}
                 disabled={isLoading}
-              />
+                className="w-full flex items-center justify-center gap-1.5 text-[13px] text-[#9a978f] py-1"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+                Tilbage til login
+              </button>
             </div>
-
-            {/* Create button */}
-            <Button
-              onClick={handleCreate}
-              size="lg"
-              className="w-full"
-              disabled={isLoading || !selectedType}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Opretter husstand...
-                </>
-              ) : (
-                'Opret husstand'
-              )}
-            </Button>
-          </motion.div>
-        </CardContent>
-      </Card>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 }

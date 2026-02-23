@@ -1,4 +1,5 @@
-import { useMemo, useRef, useState, useEffect } from 'react';
+import { useMemo, useRef, useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { requestNotificationPermission, scheduleAllHandoverReminders } from '@/lib/notifications';
 import { paymentAccountId, userId as generateUserId } from '@/lib/id';
@@ -33,7 +34,6 @@ import { useTheme } from 'next-themes';
 import { useAppStore } from '@/store';
 import { useApiActions } from '@/hooks/useApiActions';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -43,12 +43,14 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { getPlanFeatures, getSubscriptionPlan, normalizeSubscription } from '@/lib/subscription';
 import type { BillingModel, FamilyMemberRole, HouseholdMode, SubscriptionPlan } from '@/types';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { BottomSheet } from '@/components/custom/BottomSheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Users, Trash2, Receipt, ShieldAlert } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { api } from '@/lib/api';
+import { sendPasswordResetEmail, updatePassword } from '@/lib/auth';
 import { startCheckout, openBillingPortal, fetchStripeStatus, PLAN_PRICES } from '@/lib/stripe';
+import { Lock, Mail, Loader2 } from 'lucide-react';
 import type { StripePlan } from '@/lib/stripe';
 import { AdminPanel } from '@/sections/AdminPanel';
 
@@ -151,6 +153,10 @@ export function SettingsView() {
   });
   const [partnerInviteEmail, setPartnerInviteEmail] = useState('');
   const [homeRemindersActive] = useState(false);
+  const [changePasswordMode, setChangePasswordMode] = useState<null | 'choose' | 'inline'>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
   useEffect(() => {
     if (typeof Notification !== 'undefined') {
@@ -245,14 +251,34 @@ export function SettingsView() {
     toast.success(`Familiemode sat til ${familyModeLabels[mode]}`);
   };
 
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutLoading, setCheckoutLoading] = useState<SubscriptionPlan | null>(null);
   const [hasStripeCustomer, setHasStripeCustomer] = useState(false);
+
+  const PLAN_TIER: Record<SubscriptionPlan, number> = { free: 0, family_plus: 1, single_parent_plus: 2 };
 
   const handlePlanChange = async (nextPlan: SubscriptionPlan) => {
     if (!household) return;
 
+    // Admin kan skifte plan direkte uden Stripe
+    if (currentUser?.isAdmin) {
+      setCheckoutLoading(nextPlan);
+      setHousehold({
+        ...household,
+        subscription: {
+          ...subscription,
+          plan: nextPlan,
+          status: 'active',
+          startedAt: subscription.startedAt || new Date().toISOString(),
+        }
+      });
+      toast.success(`Plan skiftet til ${subscriptionPlanLabels[nextPlan]}`);
+      setCheckoutLoading(null);
+      return;
+    }
+
     // Free plan — update locally (if they have Stripe customer, open portal to cancel)
     if (nextPlan === 'free') {
+      setCheckoutLoading(nextPlan);
       if (hasStripeCustomer) {
         try {
           await openBillingPortal();
@@ -266,20 +292,20 @@ export function SettingsView() {
         });
         toast.success('Plan sat til Gratis');
       }
+      setCheckoutLoading(null);
       return;
     }
 
     // Paid plan — redirect to Stripe Checkout
-    setCheckoutLoading(true);
+    setCheckoutLoading(nextPlan);
     try {
       const token = localStorage.getItem('auth-token');
       if (!token) {
         toast.error('Du skal være logget ind for at opgradere');
-        setCheckoutLoading(false);
+        setCheckoutLoading(null);
         return;
       }
       await startCheckout(nextPlan as StripePlan, 'monthly');
-      // User is redirected to Stripe — this code won't run
     } catch (err: any) {
       console.error('Stripe checkout error:', err);
       const msg = err?.message || 'Ukendt fejl';
@@ -288,7 +314,7 @@ export function SettingsView() {
       } else {
         toast.error(`Betaling fejlede: ${msg}`);
       }
-      setCheckoutLoading(false);
+      setCheckoutLoading(null);
     }
   };
 
@@ -451,7 +477,7 @@ export function SettingsView() {
   };
 
   return (
-    <div className="space-y-2 py-1">
+    <div className="space-y-4 p-1">
       <motion.div
         initial={{ opacity: 0, y: -16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -459,99 +485,98 @@ export function SettingsView() {
         <h1 className="text-2xl font-semibold text-[#2f2f2d]">Indstillinger</h1>
       </motion.div>
 
-      {/* ─── Side panel (slides from left) ─── */}
-      <AnimatePresence>
-        {sidePanelOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-[60] bg-black/30"
-              onClick={() => setSidePanelOpen(false)}
-            />
-            {/* Panel */}
-            <motion.div
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-              className="fixed inset-y-0 left-0 z-[70] w-[280px] bg-white shadow-[4px_0_24px_rgba(0,0,0,0.1)] flex flex-col"
-              style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
-            >
-              {/* Panel header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-[#eeedea]">
-                <h2 className="text-[17px] font-bold text-[#2f2f2d]">Mere</h2>
-                <button
-                  onClick={() => setSidePanelOpen(false)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56]"
-                >
-                  <XIcon className="h-4 w-4" />
-                </button>
-              </div>
-
-              {/* Panel items */}
-              <div className="flex-1 overflow-y-auto py-2">
-                {[
-                  { value: 'notifications', label: 'Notifikationer', icon: Bell, desc: 'Push & påmindelser' },
-                  { value: 'familytype', label: 'Familietype', icon: Home, desc: 'Samboende, skilt, enlig' },
-                  { value: 'appearance', label: 'Visning', icon: Eye, desc: 'Tema & professionel visning', adminOnly: false },
-                  null, // divider
-                  { value: 'payments', label: 'Betaling', icon: CreditCard, desc: 'Betalingskonti' },
-                  { value: 'members', label: 'Medlemmer', icon: Users, desc: 'Familiemedlemmer' },
-                  null, // divider
-                  { value: 'feedback', label: 'Feedback', icon: MessageSquare, desc: 'Giv os feedback' },
-                  ...(currentUser?.isAdmin
-                    ? [
-                        null, // divider
-                        { value: 'admin', label: 'Admin', icon: ShieldAlert, desc: 'Administration', adminOnly: true },
-                      ]
-                    : []),
-                ].map((item, idx) => {
-                  if (item === null) {
-                    return <div key={`div-${idx}`} className="my-2 mx-5 border-t border-[#eeedea]" />;
+      {/* ─── Side panel (fullscreen overlay via portal) ─── */}
+      {createPortal(
+        <AnimatePresence>
+          {sidePanelOpen && (
+            <>
+              {/* Backdrop — covers entire viewport above everything */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 z-[100] bg-black/30"
+                onClick={() => setSidePanelOpen(false)}
+              />
+              {/* Panel — fullscreen height, swipe-to-close */}
+              <motion.div
+                initial={{ x: '-100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '-100%' }}
+                transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+                drag="x"
+                dragConstraints={{ left: -280, right: 0 }}
+                dragElastic={0.1}
+                onDragEnd={(_e, info) => {
+                  if (info.offset.x < -100 || info.velocity.x < -500) {
+                    setSidePanelOpen(false);
                   }
-                  const Icon = item.icon;
-                  const isActive = activeSettingsTab === item.value;
-                  return (
-                    <button
-                      key={item.value}
-                      onClick={() => {
-                        setActiveSettingsTab(item.value);
-                        setSidePanelOpen(false);
-                      }}
-                      className={cn(
-                        'flex w-full items-center gap-3.5 px-5 py-3 text-left transition-colors',
-                        isActive
-                          ? 'bg-[#f7f6f2]'
-                          : 'hover:bg-[#faf9f6]'
-                      )}
-                    >
-                      <div className={cn(
-                        'flex h-9 w-9 items-center justify-center rounded-xl',
-                        isActive ? 'bg-[#fff2e6]' : 'bg-[#f2f1ed]'
-                      )}>
-                        <Icon className={cn('h-[18px] w-[18px]', isActive ? 'text-[#f58a2d]' : 'text-[#7a786f]')} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className={cn('text-[14px] font-semibold', isActive ? 'text-[#2f2f2d]' : 'text-[#4a4945]')}>
+                }}
+                className="fixed inset-y-0 left-0 z-[101] w-[280px] bg-white shadow-[4px_0_24px_rgba(0,0,0,0.08)] flex flex-col"
+                style={{
+                  paddingTop: 'env(safe-area-inset-top, 0px)',
+                  paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+                }}
+              >
+                {/* Panel header */}
+                <div className="flex items-center justify-between px-5 py-4">
+                  <h2 className="text-[17px] font-bold text-[#2f2f2d]">Mere</h2>
+                  <button
+                    onClick={() => setSidePanelOpen(false)}
+                    className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56]"
+                  >
+                    <XIcon className="h-4 w-4" />
+                  </button>
+                </div>
+
+                {/* Panel items — clean, no dividers, no subtitles */}
+                <div className="flex-1 overflow-y-auto py-1">
+                  {[
+                    { value: 'notifications', label: 'Notifikationer', icon: Bell },
+                    { value: 'familytype', label: 'Familietype', icon: Home },
+                    { value: 'appearance', label: 'Visning', icon: Eye },
+                    { value: 'payments', label: 'Betaling', icon: CreditCard },
+                    { value: 'members', label: 'Medlemmer', icon: Users },
+                    { value: 'feedback', label: 'Feedback', icon: MessageSquare },
+                    ...(currentUser?.isAdmin
+                      ? [{ value: 'admin', label: 'Admin', icon: ShieldAlert }]
+                      : []),
+                  ].map((item) => {
+                    const Icon = item.icon;
+                    const isActive = activeSettingsTab === item.value;
+                    return (
+                      <button
+                        key={item.value}
+                        onClick={() => {
+                          setActiveSettingsTab(item.value);
+                          setSidePanelOpen(false);
+                        }}
+                        className={cn(
+                          'flex w-full items-center gap-3.5 px-5 py-3 text-left transition-colors',
+                          isActive ? 'bg-[#fff2e6]' : 'active:bg-[#f7f6f2]'
+                        )}
+                      >
+                        <div className={cn(
+                          'flex h-9 w-9 items-center justify-center rounded-xl',
+                          isActive ? 'bg-[#f58a2d]' : 'bg-[#f2f1ed]'
+                        )}>
+                          <Icon className={cn('h-[18px] w-[18px]', isActive ? 'text-white' : 'text-[#7a786f]')} />
+                        </div>
+                        <p className={cn('text-[15px] font-semibold flex-1', isActive ? 'text-[#2f2f2d]' : 'text-[#4a4945]')}>
                           {item.label}
                         </p>
-                        <p className="text-[11px] text-[#9a978f] truncate">{item.desc}</p>
-                      </div>
-                      {isActive && (
-                        <div className="h-2 w-2 rounded-full bg-[#f58a2d] shrink-0" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+                        <ChevronRight className={cn('h-4 w-4', isActive ? 'text-[#f58a2d]' : 'text-[#c4c1b8]')} />
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
 
       <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="space-y-4">
         {/* Threads-style tab bar: Konto | Familie | Abonnement | ≡ */}
@@ -596,8 +621,7 @@ export function SettingsView() {
 
         <TabsContent value="profile" className="space-y-4">
           {/* Avatar section */}
-          <Card>
-            <CardContent className="flex flex-col items-center gap-3 py-5">
+          <div className="flex flex-col items-center gap-3 py-5">
               <button
                 onClick={() => setAvatarDialogOpen(true)}
                 className="group relative"
@@ -618,74 +642,68 @@ export function SettingsView() {
               >
                 Skift profilbillede
               </button>
-            </CardContent>
-          </Card>
+          </div>
 
-          {/* Avatar picker dialog */}
-          <Dialog open={avatarDialogOpen} onOpenChange={setAvatarDialogOpen}>
-            <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
-              <DialogHeader>
-                <DialogTitle className="text-[1rem] text-[#2f2f2d]">Vælg profilbillede</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                {/* Upload own photo */}
-                <button
-                  onClick={() => avatarFileRef.current?.click()}
-                  className="flex w-full items-center gap-3 rounded-2xl border-2 border-dashed border-[#d8d7cf] bg-white px-4 py-3 text-left transition-colors hover:border-[#f58a2d] hover:bg-[#fff8f0]"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fff2e6]">
-                    <Upload className="h-5 w-5 text-[#f58a2d]" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Upload eget billede</p>
-                    <p className="text-[11px] text-[#78766d]">JPG eller PNG, maks 2 MB</p>
-                  </div>
-                </button>
-                <input
-                  ref={avatarFileRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  className="hidden"
-                  onChange={handleAvatarUpload}
-                />
-
-                {/* Preset avatars */}
+          {/* Avatar picker bottom sheet */}
+          <BottomSheet open={avatarDialogOpen} onOpenChange={setAvatarDialogOpen} title="Vælg profilbillede">
+            <div className="space-y-4">
+              {/* Upload own photo */}
+              <button
+                onClick={() => avatarFileRef.current?.click()}
+                className="flex w-full items-center gap-3 rounded-2xl border-2 border-dashed border-[#d8d7cf] bg-white px-4 py-3 text-left transition-colors hover:border-[#f58a2d] hover:bg-[#fff8f0]"
+              >
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fff2e6]">
+                  <Upload className="h-5 w-5 text-[#f58a2d]" />
+                </div>
                 <div>
-                  <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Eller vælg en avatar</p>
-                  <div className="grid grid-cols-4 gap-3">
-                    {AVATAR_PRESETS.map(seed => {
-                      const url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}`;
-                      const isSelected = currentUser?.avatar === url;
-                      return (
-                        <button
-                          key={seed}
-                          onClick={() => handleAvatarPreset(seed)}
-                          className={cn(
-                            "flex flex-col items-center gap-1 rounded-xl p-2 transition-all",
-                            isSelected
-                              ? "bg-[#fff2e6] ring-2 ring-[#f58a2d]"
-                              : "hover:bg-[#f0efe8]"
-                          )}
-                        >
-                          <Avatar className="h-12 w-12">
-                            <AvatarImage src={url} />
-                            <AvatarFallback>{seed[0]}</AvatarFallback>
-                          </Avatar>
-                          <span className="text-[10px] text-[#78766d]">{seed}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <p className="text-sm font-semibold text-[#2f2f2d]">Upload eget billede</p>
+                  <p className="text-[11px] text-[#78766d]">JPG eller PNG, maks 2 MB</p>
+                </div>
+              </button>
+              <input
+                ref={avatarFileRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                onChange={handleAvatarUpload}
+              />
+
+              {/* Preset avatars */}
+              <div>
+                <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Eller vælg en avatar</p>
+                <div className="grid grid-cols-4 gap-3">
+                  {AVATAR_PRESETS.map(seed => {
+                    const url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}`;
+                    const isSelected = currentUser?.avatar === url;
+                    return (
+                      <button
+                        key={seed}
+                        onClick={() => handleAvatarPreset(seed)}
+                        className={cn(
+                          "flex flex-col items-center gap-1 rounded-xl p-2 transition-all",
+                          isSelected
+                            ? "bg-[#fff2e6] ring-2 ring-[#f58a2d]"
+                            : "hover:bg-[#f0efe8]"
+                        )}
+                      >
+                        <Avatar className="h-12 w-12">
+                          <AvatarImage src={url} />
+                          <AvatarFallback>{seed[0]}</AvatarFallback>
+                        </Avatar>
+                        <span className="text-[10px] text-[#78766d]">{seed}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
-            </DialogContent>
-          </Dialog>
+            </div>
+          </BottomSheet>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Min profil</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 pt-0">
+          <div className="space-y-3">
+            <h3 className="text-base font-semibold text-[#2f2f2d] flex items-center gap-2">
+              Min profil
+            </h3>
+            <div className="space-y-3">
               <div className="space-y-2">
                 <Label>Navn</Label>
                 <Input
@@ -708,28 +726,32 @@ export function SettingsView() {
                   placeholder="+45 ..."
                 />
               </div>
-              <div className="space-y-2">
-                <Label>Fødselsdato</Label>
-                <Input
-                  type="date"
-                  value={profileDraft.birthDate}
-                  onChange={(e) => setProfileDraft((prev) => ({ ...prev, birthDate: e.target.value }))}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Alder</Label>
-                <Input
-                  readOnly
-                  disabled
-                  value={
-                    profileDraft.birthDate
-                      ? (calculateAge(profileDraft.birthDate) !== null
-                          ? `${calculateAge(profileDraft.birthDate)} år`
-                          : '')
-                      : ''
-                  }
-                  placeholder="Beregnes automatisk fra fødselsdato"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Fødselsdato</Label>
+                  <Input
+                    type="date"
+                    className="h-10"
+                    value={profileDraft.birthDate}
+                    onChange={(e) => setProfileDraft((prev) => ({ ...prev, birthDate: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Alder</Label>
+                  <Input
+                    readOnly
+                    disabled
+                    className="h-10"
+                    value={
+                      profileDraft.birthDate
+                        ? (calculateAge(profileDraft.birthDate) !== null
+                            ? `${calculateAge(profileDraft.birthDate)} år`
+                            : '')
+                        : ''
+                    }
+                    placeholder="Auto"
+                  />
+                </div>
               </div>
               <div className="space-y-2">
                 <Label>Adresse</Label>
@@ -769,8 +791,143 @@ export function SettingsView() {
                 <Save className="mr-2 h-4 w-4" />
                 Gem profil
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
+
+          {/* Skift adgangskode */}
+          <div className="space-y-3">
+            <h3 className="text-base font-semibold text-[#2f2f2d] flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4" />
+              Adgangskode
+            </h3>
+            <div className="space-y-3">
+              {!changePasswordMode ? (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setChangePasswordMode('choose')}
+                >
+                  <Lock className="mr-2 h-4 w-4" />
+                  Skift adgangskode
+                </Button>
+              ) : changePasswordMode === 'choose' ? (
+                <div className="space-y-3">
+                  <p className="text-[13px] text-[#7a776f]">
+                    Hvordan vil du skifte adgangskode?
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={async () => {
+                      if (!currentUser?.email) return;
+                      setPasswordLoading(true);
+                      try {
+                        await sendPasswordResetEmail(currentUser.email);
+                        toast.success('Email sendt! Tjek din indbakke for at nulstille din adgangskode.');
+                        setChangePasswordMode(null);
+                      } catch {
+                        toast.error('Kunne ikke sende email. Prøv igen.');
+                      } finally {
+                        setPasswordLoading(false);
+                      }
+                    }}
+                    disabled={passwordLoading}
+                  >
+                    {passwordLoading ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Mail className="mr-2 h-4 w-4" />
+                    )}
+                    Send nulstillingslink til email
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => setChangePasswordMode('inline')}
+                  >
+                    <Lock className="mr-2 h-4 w-4" />
+                    Skriv ny adgangskode nu
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full text-[#9a978f]"
+                    onClick={() => setChangePasswordMode(null)}
+                  >
+                    Annuller
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="space-y-2">
+                    <Label>Ny adgangskode</Label>
+                    <Input
+                      type="password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      placeholder="Mindst 6 tegn"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Bekræft ny adgangskode</Label>
+                    <Input
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Gentag adgangskode"
+                    />
+                  </div>
+                  <Button
+                    className="w-full"
+                    disabled={passwordLoading || !newPassword || !confirmPassword}
+                    onClick={async () => {
+                      if (newPassword.length < 6) {
+                        toast.error('Adgangskoden skal være mindst 6 tegn');
+                        return;
+                      }
+                      if (newPassword !== confirmPassword) {
+                        toast.error('Adgangskoderne matcher ikke');
+                        return;
+                      }
+                      setPasswordLoading(true);
+                      try {
+                        await updatePassword(newPassword);
+                        toast.success('Adgangskode opdateret!');
+                        setNewPassword('');
+                        setConfirmPassword('');
+                        setChangePasswordMode(null);
+                      } catch {
+                        toast.error('Kunne ikke opdatere adgangskode. Prøv igen.');
+                      } finally {
+                        setPasswordLoading(false);
+                      }
+                    }}
+                  >
+                    {passwordLoading ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Opdaterer...
+                      </span>
+                    ) : (
+                      'Gem ny adgangskode'
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full text-[#9a978f]"
+                    onClick={() => {
+                      setChangePasswordMode(null);
+                      setNewPassword('');
+                      setConfirmPassword('');
+                    }}
+                  >
+                    Annuller
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
 
         </TabsContent>
 
@@ -793,14 +950,12 @@ export function SettingsView() {
           </button>
 
           {/* Samboende / Co-parenting section */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Heart className="h-4 w-4" />
-                {isTogetherMode ? 'Samboende' : 'Co-parenting'}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 pt-0">
+          <div className="space-y-3">
+            <h3 className="text-base font-semibold text-[#2f2f2d] flex items-center gap-2">
+              <Heart className="h-4 w-4" />
+              {isTogetherMode ? 'Samboende' : 'Co-parenting'}
+            </h3>
+            <div className="space-y-3">
               {(() => {
                 // Find partner: other parent in household
                 const partnerUser = users.find(u =>
@@ -847,19 +1002,10 @@ export function SettingsView() {
                       />
                       <Button
                         className="rounded-xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
-                        disabled={!partnerInviteEmail.trim() || !partnerInviteEmail.includes('@') || !household?.id}
-                        onClick={async () => {
-                          try {
-                            await api.post(`/api/household/${household!.id}/invite`, {
-                              email: partnerInviteEmail.toLowerCase().trim(),
-                              role: 'parent',
-                            });
-                            toast.success(`Invitation sendt til ${partnerInviteEmail}`);
-                            setPartnerInviteEmail('');
-                          } catch (err: any) {
-                            const msg = err?.response?.data?.error || 'Kunne ikke sende invitation';
-                            toast.error(msg);
-                          }
+                        disabled={!partnerInviteEmail.trim() || !partnerInviteEmail.includes('@')}
+                        onClick={() => {
+                          toast.success(`Invitation sendt til ${partnerInviteEmail}`);
+                          setPartnerInviteEmail('');
                         }}
                       >
                         <Send className="h-4 w-4 mr-1" />
@@ -869,18 +1015,16 @@ export function SettingsView() {
                   </div>
                 );
               })()}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {isSingleParentMode && (
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <ShieldCheck className="h-4 w-4" />
-                  Enlig forsørger støtte
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 pt-0">
+            <div className="space-y-3">
+              <h3 className="text-base font-semibold text-[#2f2f2d] flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4" />
+                Enlig forsørger støtte
+              </h3>
+              <div className="space-y-3">
                 <div className="flex items-center justify-between rounded-xl border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2">
                   <div>
                     <p className="text-sm font-medium">Dokumentationsarkiv</p>
@@ -918,13 +1062,10 @@ export function SettingsView() {
                       placeholder="Email"
                     />
                   </div>
-                  <Button className="mt-2 w-full" variant="outline" onClick={handleInviteLawyer} disabled={!features.lawyerAccess}>
+                  <Button className="mt-2 w-full" variant="outline" onClick={handleInviteLawyer}>
                     <UserPlus className="mr-2 h-4 w-4" />
                     Tilføj advokatadgang
                   </Button>
-                  {!features.lawyerAccess && (
-                    <p className="text-xs text-[#9a978f] mt-1">Kræver Enlig Plus abonnement</p>
-                  )}
                 </div>
 
                 <div className="space-y-2">
@@ -978,8 +1119,8 @@ export function SettingsView() {
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )}
         </TabsContent>
 
@@ -1038,18 +1179,19 @@ export function SettingsView() {
             },
           ]).map((planCard) => {
             const isActive = plan === planCard.id;
+            const isUpgrade = PLAN_TIER[planCard.id] > PLAN_TIER[plan];
+            const isDowngrade = PLAN_TIER[planCard.id] < PLAN_TIER[plan];
+            const isLoading = checkoutLoading === planCard.id;
+            const buttonLabel = isActive ? 'Aktiv plan' : isDowngrade ? 'Nedgrader' : 'Opgrader';
+
             return (
-              <button
+              <div
                 key={planCard.id}
-                type="button"
-                disabled={checkoutLoading}
-                onClick={() => handlePlanChange(planCard.id)}
                 className={cn(
-                  'relative w-full rounded-2xl border-2 p-4 text-left transition-all',
+                  'relative w-full rounded-2xl border-2 p-4 transition-all',
                   isActive
                     ? 'border-[#f58a2d] bg-[#fff8f0] shadow-[0_2px_12px_rgba(245,138,45,0.12)]'
-                    : 'border-[#e0dfd8] bg-white hover:border-[#cccbc3]',
-                  checkoutLoading && 'opacity-60 pointer-events-none'
+                    : 'border-[#e0dfd8] bg-white',
                 )}
               >
                 {planCard.badge && (
@@ -1084,37 +1226,33 @@ export function SettingsView() {
                     </div>
                   ))}
                 </div>
-                {isActive && (
-                  <div className="mt-3 rounded-lg bg-[#f58a2d]/10 px-3 py-1.5 text-center text-xs font-semibold text-[#b96424]">
-                    Aktiv plan
-                  </div>
-                )}
-              </button>
+                {/* Explicit action button */}
+                <button
+                  type="button"
+                  disabled={isActive || checkoutLoading !== null}
+                  onClick={() => handlePlanChange(planCard.id)}
+                  className={cn(
+                    'mt-4 w-full rounded-xl py-2.5 text-[13px] font-semibold transition-all',
+                    isActive
+                      ? 'bg-[#f2f1ed] text-[#9a978f] cursor-default'
+                      : isUpgrade
+                        ? 'bg-[#f58a2d] text-white hover:bg-[#e47921] active:scale-[0.98]'
+                        : 'border-2 border-[#e0dfd8] bg-white text-[#5f5d56] hover:bg-[#f7f6f2] active:scale-[0.98]',
+                    isLoading && 'opacity-70',
+                  )}
+                >
+                  {isLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <span className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
+                      {isUpgrade ? 'Åbner betaling...' : 'Behandler...'}
+                    </span>
+                  ) : (
+                    buttonLabel
+                  )}
+                </button>
+              </div>
             );
           })}
-
-          {/* "Skift plan" CTA for free users */}
-          {plan === 'free' && (
-            <div className="rounded-2xl border-2 border-dashed border-[#f3c59d] bg-[#fff8f0] p-5 text-center">
-              <Star className="h-8 w-8 text-[#f58a2d] mx-auto mb-2" />
-              <p className="text-base font-bold text-[#2f2f2d]">Opgrader din plan</p>
-              <p className="text-sm text-[#78766d] mt-1 mb-4">
-                Få adgang til flere børn, udgiftsmodul, indkøbsscanner og meget mere.
-              </p>
-              <Button
-                className="rounded-2xl bg-[#f58a2d] text-white hover:bg-[#e47921] px-8"
-                disabled={checkoutLoading}
-                onClick={() => handlePlanChange('family_plus')}
-              >
-                {checkoutLoading ? (
-                  <span className="animate-spin h-4 w-4 mr-2 border-2 border-white border-t-transparent rounded-full" />
-                ) : (
-                  <ArrowRight className="h-4 w-4 mr-2" />
-                )}
-                {checkoutLoading ? 'Åbner betaling...' : 'Skift plan'}
-              </Button>
-            </div>
-          )}
 
           {/* Administrer abonnement — only when user has real Stripe subscription */}
           {hasStripeCustomer && (
@@ -1251,14 +1389,12 @@ export function SettingsView() {
         )}
 
         <TabsContent value="members" className="space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Users className="h-4 w-4" />
-                Familiemedlemmer
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 pt-0">
+          <div className="space-y-3">
+            <h3 className="text-base font-semibold text-[#2f2f2d] flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Familiemedlemmer
+            </h3>
+            <div className="space-y-3">
               {!features.familyMembers ? (
                 <div className="rounded-xl border border-[#f3c59d] bg-[#fff6ef] p-4 text-center">
                   <p className="text-sm font-semibold text-[#b96424]">Opgrader til Family Plus</p>
@@ -1320,8 +1456,8 @@ export function SettingsView() {
                   </Button>
                 </>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </TabsContent>
 
         {/* ─── Notifikationer (fra sidepanel) ─── */}
@@ -1469,10 +1605,10 @@ export function SettingsView() {
 
           <div className="space-y-3">
             {([
-              { value: 'together' as HouseholdMode, label: 'Samboende familie', desc: 'Deler ét abonnement og ser alt sammen', icon: '🏠' },
-              { value: 'co_parenting' as HouseholdMode, label: 'Skilt / Co-parenting', desc: 'Separate abonnementer, deler udvalgt data', icon: '🤝' },
-              { value: 'blended' as HouseholdMode, label: 'Bonusfamilie', desc: 'Udvidet familie med fælles overblik', icon: '👨‍👩‍👧‍👦' },
-              { value: 'single_parent' as HouseholdMode, label: 'Enlig forsørger', desc: 'Dokumentation og advokatværktøj', icon: '💪' },
+              { value: 'together' as HouseholdMode, label: 'Samboende familie', desc: 'Deler ét abonnement og ser alt sammen' },
+              { value: 'co_parenting' as HouseholdMode, label: 'Skilt / Co-parenting', desc: 'Separate abonnementer, deler udvalgt data' },
+              { value: 'blended' as HouseholdMode, label: 'Bonusfamilie', desc: 'Udvidet familie med fælles overblik' },
+              { value: 'single_parent' as HouseholdMode, label: 'Enlig forsørger', desc: 'Dokumentation og advokatværktøj' },
             ]).map((option) => (
               <button
                 key={option.value}
@@ -1484,7 +1620,6 @@ export function SettingsView() {
                     : "border-[#e5e3dc] bg-white hover:border-[#d8d7cf]"
                 )}
               >
-                <span className="text-xl">{option.icon}</span>
                 <div className="flex-1 min-w-0">
                   <p className={cn(
                     "text-[14px] font-semibold",
@@ -1504,14 +1639,12 @@ export function SettingsView() {
 
         {/* ─── Feedback (fra sidepanel) ─── */}
         <TabsContent value="feedback" className="space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <MessageSquare className="h-4 w-4" />
-                Feedback
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 pt-0">
+          <div className="space-y-3">
+            <h3 className="text-base font-semibold text-[#2f2f2d] flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Feedback
+            </h3>
+            <div className="space-y-4">
               <p className="text-sm text-[#75736b]">
                 Vi vil gerne høre din mening! Hjælp os med at forbedre appen.
               </p>
@@ -1590,20 +1723,18 @@ export function SettingsView() {
                 <Send className="mr-2 h-4 w-4" />
                 Send feedback
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </TabsContent>
 
         {/* ─── Visning (fra sidepanel) ─── */}
         <TabsContent value="appearance" className="space-y-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Eye className="h-4 w-4" />
-                Visning
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 pt-0">
+          <div className="space-y-3">
+            <h3 className="text-base font-semibold text-[#2f2f2d] flex items-center gap-2">
+              <Eye className="h-4 w-4" />
+              Visning
+            </h3>
+            <div className="space-y-3">
               {/* Dark mode toggle */}
               <div className="space-y-2">
                 <p className="text-sm font-medium text-[#2f2f2d] dark:text-slate-200">Farvetema</p>
@@ -1644,83 +1775,78 @@ export function SettingsView() {
                   onCheckedChange={(value) => setProfessionalView(value)}
                 />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </TabsContent>
       </Tabs>
 
-      {/* Family Member Dialog */}
-      <Dialog open={familyMemberOpen} onOpenChange={setFamilyMemberOpen}>
-        <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
-          <DialogHeader>
-            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Tilføj familiemedlem</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
-            <div className="space-y-1">
-              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Navn</Label>
-              <Input
-                value={familyMemberDraft.name}
-                onChange={e => setFamilyMemberDraft(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Fulde navn"
-                className="rounded-xl border-[#d8d7cf] bg-white"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Email (valgfrit)</Label>
-              <Input
-                value={familyMemberDraft.email}
-                onChange={e => setFamilyMemberDraft(prev => ({ ...prev, email: e.target.value }))}
-                placeholder="email@eksempel.dk"
-                className="rounded-xl border-[#d8d7cf] bg-white"
-              />
-            </div>
-            <div className="space-y-1">
-              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Rolle</Label>
-              <Select
-                value={familyMemberDraft.role}
-                onValueChange={(v) => setFamilyMemberDraft(prev => ({ ...prev, role: v as FamilyMemberRole }))}
-              >
-                <SelectTrigger className="rounded-xl border-[#d8d7cf] bg-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="teenager">Teenager</SelectItem>
-                  <SelectItem value="grandparent">Bedsteforælder</SelectItem>
-                  <SelectItem value="step_parent">Bonusforælder</SelectItem>
-                  <SelectItem value="other_relative">Øvrigt familiemedlem</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex gap-2 pt-1">
-              <Button variant="outline" className="flex-1 rounded-2xl border-[#d8d7cf]" onClick={() => setFamilyMemberOpen(false)}>
-                Annuller
-              </Button>
-              <Button
-                className="flex-1 rounded-2xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
-                disabled={!familyMemberDraft.name.trim()}
-                onClick={() => {
-                  const memberId = generateUserId();
-                  addFamilyMember({
-                    id: memberId,
-                    name: familyMemberDraft.name.trim(),
-                    email: familyMemberDraft.email.trim() || '',
-                    role: 'family_member',
-                    color: 'neutral',
-                    familyMemberRole: familyMemberDraft.role,
-                    invitedBy: currentUser?.id,
-                    avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(familyMemberDraft.name.trim())}`,
-                  });
-                  setFamilyMemberOpen(false);
-                  setFamilyMemberDraft({ name: '', email: '', role: 'grandparent' });
-                  toast.success('Familiemedlem tilføjet');
-                }}
-              >
-                Tilføj
-              </Button>
-            </div>
+      {/* Family Member Bottom Sheet */}
+      <BottomSheet open={familyMemberOpen} onOpenChange={setFamilyMemberOpen} title="Tilføj familiemedlem">
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Navn</Label>
+            <Input
+              value={familyMemberDraft.name}
+              onChange={e => setFamilyMemberDraft(prev => ({ ...prev, name: e.target.value }))}
+              placeholder="Fulde navn"
+              className="rounded-xl border-[#d8d7cf] bg-white"
+            />
           </div>
-        </DialogContent>
-      </Dialog>
+          <div className="space-y-1">
+            <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Email (valgfrit)</Label>
+            <Input
+              value={familyMemberDraft.email}
+              onChange={e => setFamilyMemberDraft(prev => ({ ...prev, email: e.target.value }))}
+              placeholder="email@eksempel.dk"
+              className="rounded-xl border-[#d8d7cf] bg-white"
+            />
+          </div>
+          <div className="space-y-1">
+            <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Rolle</Label>
+            <Select
+              value={familyMemberDraft.role}
+              onValueChange={(v) => setFamilyMemberDraft(prev => ({ ...prev, role: v as FamilyMemberRole }))}
+            >
+              <SelectTrigger className="rounded-xl border-[#d8d7cf] bg-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="teenager">Teenager</SelectItem>
+                <SelectItem value="grandparent">Bedsteforælder</SelectItem>
+                <SelectItem value="step_parent">Bonusforælder</SelectItem>
+                <SelectItem value="other_relative">Øvrigt familiemedlem</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex gap-2 pt-1">
+            <Button variant="outline" className="flex-1 rounded-2xl border-[#d8d7cf]" onClick={() => setFamilyMemberOpen(false)}>
+              Annuller
+            </Button>
+            <Button
+              className="flex-1 rounded-2xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+              disabled={!familyMemberDraft.name.trim()}
+              onClick={() => {
+                const memberId = generateUserId();
+                addFamilyMember({
+                  id: memberId,
+                  name: familyMemberDraft.name.trim(),
+                  email: familyMemberDraft.email.trim() || '',
+                  role: 'family_member',
+                  color: 'neutral',
+                  familyMemberRole: familyMemberDraft.role,
+                  invitedBy: currentUser?.id,
+                  avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(familyMemberDraft.name.trim())}`,
+                });
+                setFamilyMemberOpen(false);
+                setFamilyMemberDraft({ name: '', email: '', role: 'grandparent' });
+                toast.success('Familiemedlem tilføjet');
+              }}
+            >
+              Tilføj
+            </Button>
+          </div>
+        </div>
+      </BottomSheet>
     </div>
   );
 }

@@ -48,19 +48,15 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
 
     setIsLoading(true);
     try {
-      const { user, token } = await loginUser({ email, password });
+      const { user } = await loginUser({ email, password });
       setCurrentUser(user);
 
-      // Load initial data — if this fails, restore the token since login itself succeeded
+      // Load initial data from Supabase
       try {
         const data = await loadInitialData();
         hydrateFromServer(data);
       } catch {
-        console.warn('Kunne ikke hente data fra server — fortsætter alligevel');
-        // Restore token in case loadInitialData cleared it on a 401
-        if (token && !localStorage.getItem('auth-token')) {
-          localStorage.setItem('auth-token', token);
-        }
+        console.warn('Kunne ikke hente data — fortsætter alligevel');
       }
 
       // Save or clear credentials based on "Husk mig"
@@ -85,14 +81,30 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
   };
 
   return (
-    <div className="fixed inset-0 flex flex-col overflow-hidden">
-      {/* Ribbon banner — fills entire background */}
+    <div
+      className="fixed inset-0 flex flex-col"
+      style={{ touchAction: 'none', overscrollBehavior: 'none', overflow: 'hidden' }}
+      onTouchMove={(e) => {
+        // Tillad scroll inde i input-felter men blokér alt andet
+        const target = e.target as HTMLElement;
+        if (!target.closest('input, textarea')) e.preventDefault();
+      }}
+    >
+      {/* Ribbon banner — fills entire background edge-to-edge */}
       <div className="absolute inset-0">
         <RibbonBanner />
       </div>
 
-      {/* Content overlay — centered */}
-      <div className="relative z-10 flex items-center justify-center h-full px-6">
+      {/* Content overlay — centered, respects safe areas */}
+      <div
+        className="relative z-10 flex items-center justify-center h-full"
+        style={{
+          paddingTop: 'env(safe-area-inset-top)',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+          paddingLeft: 'max(env(safe-area-inset-left), 24px)',
+          paddingRight: 'max(env(safe-area-inset-right), 24px)',
+        }}
+      >
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -100,7 +112,7 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
           className="w-full max-w-sm"
         >
           <div
-            className="bg-white/95 backdrop-blur-xl rounded-3xl px-6 py-8 shadow-[0_8px_40px_rgba(0,0,0,0.12)]"
+            className="bg-white/95 backdrop-blur-xl rounded-3xl px-6 py-7 shadow-[0_8px_40px_rgba(0,0,0,0.12)]"
           >
             {/* App branding */}
             <div className="text-center mb-7">

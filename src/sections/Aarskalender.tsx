@@ -11,7 +11,7 @@ import { da } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight, Sun, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { BottomSheet } from '@/components/custom/BottomSheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -350,18 +350,12 @@ export function Aarskalender() {
       </Sheet>
 
       {/* Quick-add event Dialog */}
-      <Dialog open={!!quickAddDate} onOpenChange={(open) => { if (!open) { setQuickAddDate(null); setNewEventTitle(''); setNewEventType('personal'); } }}>
-        <DialogContent className="rounded-2xl border border-[#e8e7e0] bg-[#f7f6f2] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-          <DialogHeader>
-            <DialogTitle className="text-[1rem] font-bold text-[#2f2f2d]">
-              Tilføj begivenhed
-            </DialogTitle>
+      <BottomSheet open={!!quickAddDate} onOpenChange={(open) => { if (!open) { setQuickAddDate(null); setNewEventTitle(''); setNewEventType('personal'); } }} title="Tilføj begivenhed">
             {quickAddDate && (
               <p className="text-[13px] text-[#78766d]">
                 {format(quickAddDate, 'd. MMMM yyyy', { locale: da })}
               </p>
             )}
-          </DialogHeader>
 
           <div className="space-y-4 pt-2">
             <div className="space-y-2">
@@ -414,8 +408,7 @@ export function Aarskalender() {
               Gem begivenhed
             </Button>
           </div>
-        </DialogContent>
-      </Dialog>
+      </BottomSheet>
     </div>
   );
 }

@@ -23,12 +23,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { BottomSheet } from '@/components/custom/BottomSheet';
 import {
   Select,
   SelectContent,
@@ -152,9 +147,6 @@ export function Dokumenter() {
     <div className="space-y-2 py-1">
       <div>
         <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Dokumenter</h1>
-        <p className="mt-0.5 text-[13px] text-[#78766d]">
-          Familieretshuset formularer og jeres underskrevne aftaler
-        </p>
       </div>
 
       {/* Section toggle */}
@@ -510,11 +502,7 @@ export function Dokumenter() {
           </Sheet>
 
           {/* Upload dialog */}
-          <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
-            <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
-              <DialogHeader>
-                <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Upload dokument</DialogTitle>
-              </DialogHeader>
+          <BottomSheet open={uploadDialogOpen} onOpenChange={setUploadDialogOpen} title="Upload dokument">
               <div className="space-y-3">
                 {/* File picker */}
                 <div className="space-y-1">
@@ -603,8 +591,7 @@ export function Dokumenter() {
                   </Button>
                 </div>
               </div>
-            </DialogContent>
-          </Dialog>
+          </BottomSheet>
         </>
       )}
     </div>

@@ -400,6 +400,7 @@ export interface Task {
   recurringPattern?: string;
   plannedWeekday?: number; // 0=Monday, 6=Sunday
   area?: string;
+  createdAt?: string;
 }
 
 // Shopping list types
@@ -451,6 +452,22 @@ export interface MealPlan {
     ingredients: string[];
     instructions: string;
   };
+}
+
+// Per-member override of a shared meal plan suggestion
+export interface MealPlanOverride {
+  id: string;
+  mealPlanId: string;         // references MealPlan.id
+  memberId: string;           // which household member this override belongs to
+  date: string;               // YYYY-MM-DD
+  action: 'accepted' | 'rejected' | 'replaced';
+  // If action === 'replaced', these hold the replacement food logged instead
+  replacementFood?: string;
+  replacementKcal?: number;
+  replacementProtein?: number;
+  replacementCarbs?: number;
+  replacementFat?: number;
+  replacedAt: string;         // ISO datetime
 }
 
 // Message types

@@ -31,6 +31,7 @@ import type {
   CalendarSharing,
   FridgeItem,
   Recipe,
+  MealPlanOverride,
 } from '@/types';
 
 interface AppStore {
@@ -52,6 +53,7 @@ interface AppStore {
   tasks: Task[];
   shoppingItems: ShoppingItem[];
   mealPlans: MealPlan[];
+  mealPlanOverrides: MealPlanOverride[];
   messages: Message[];
   threads: MessageThread[];
   milestones: Milestone[];
@@ -116,6 +118,9 @@ interface AppStore {
   addMealPlan: (mealPlan: MealPlan) => void;
   updateMealPlan: (id: string, mealPlan: Partial<MealPlan>) => void;
   deleteMealPlan: (id: string) => void;
+  addMealPlanOverride: (override: MealPlanOverride) => void;
+  updateMealPlanOverride: (id: string, override: Partial<MealPlanOverride>) => void;
+  deleteMealPlanOverride: (id: string) => void;
   addMessage: (message: Message) => void;
   addThread: (thread: MessageThread) => void;
   deleteMessage: (messageId: string, userId: string) => void;
@@ -231,6 +236,7 @@ export const useAppStore = create<AppStore>()(
       tasks: [],
       shoppingItems: [],
       mealPlans: [],
+      mealPlanOverrides: [],
       messages: [],
       threads: [],
       milestones: [],
@@ -373,7 +379,17 @@ export const useAppStore = create<AppStore>()(
       deleteMealPlan: (id) => set((state) => ({
         mealPlans: state.mealPlans.filter(m => m.id !== id)
       })),
-      
+
+      addMealPlanOverride: (override) => set((state) => ({
+        mealPlanOverrides: [...state.mealPlanOverrides, override]
+      })),
+      updateMealPlanOverride: (id, updated) => set((state) => ({
+        mealPlanOverrides: state.mealPlanOverrides.map(o => o.id === id ? { ...o, ...updated } : o)
+      })),
+      deleteMealPlanOverride: (id) => set((state) => ({
+        mealPlanOverrides: state.mealPlanOverrides.filter(o => o.id !== id)
+      })),
+
       addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
       addThread: (thread) => set((state) => ({ threads: [...state.threads, thread] })),
       deleteMessage: (messageId, userId) => set((state) => ({
@@ -596,6 +612,7 @@ export const useAppStore = create<AppStore>()(
         tasks: [],
         shoppingItems: [],
         mealPlans: [],
+        mealPlanOverrides: [],
         messages: [],
         threads: [],
         milestones: [],
@@ -1059,6 +1076,7 @@ export const useAppStore = create<AppStore>()(
         tasks: state.tasks,
         shoppingItems: state.shoppingItems,
         mealPlans: state.mealPlans,
+        mealPlanOverrides: state.mealPlanOverrides,
         messages: state.messages,
         threads: state.threads,
         milestones: state.milestones,
