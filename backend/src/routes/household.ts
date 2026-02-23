@@ -139,9 +139,10 @@ householdRouter.post('/:id/invite', async (req: AuthRequest, res: Response) => {
       return;
     }
 
-    // Find the user to invite
+    // Find the user to invite (normalize email for case-insensitive lookup)
+    const normalizedEmail = email.toLowerCase().trim();
     const invitedUser = await prisma.user.findUnique({
-      where: { email },
+      where: { email: normalizedEmail },
     });
 
     if (!invitedUser) {

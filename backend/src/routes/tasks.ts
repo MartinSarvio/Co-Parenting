@@ -96,6 +96,11 @@ tasksRouter.patch('/:id', async (req: AuthRequest, res: Response) => {
       return;
     }
 
+    if (existing.createdBy !== req.userId && existing.assignedTo !== req.userId) {
+      res.status(403).json({ error: 'Du har ikke adgang til at ændre denne opgave' });
+      return;
+    }
+
     const {
       title,
       description,
@@ -152,6 +157,11 @@ tasksRouter.delete('/:id', async (req: AuthRequest, res: Response) => {
 
     if (!existing) {
       res.status(404).json({ error: 'Opgave ikke fundet' });
+      return;
+    }
+
+    if (existing.createdBy !== req.userId) {
+      res.status(403).json({ error: 'Du har ikke adgang til at slette denne opgave' });
       return;
     }
 

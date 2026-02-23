@@ -79,12 +79,12 @@ export function Dashboard() {
   };
 
   return (
-    <div className="space-y-4 p-1">
+    <div className="space-y-2 py-1">
       {/* Greeting */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-5 px-1"
+        className="mb-3 px-1"
       >
         <h1 className="text-[2.05rem] font-semibold leading-[0.96] tracking-[-0.03em] text-[#262623]">
           {getGreeting()}, {currentUser?.name}
@@ -229,7 +229,10 @@ export function Dashboard() {
           </CardHeader>
           <CardContent className="pt-0">
             {todaysEvents.length === 0 ? (
-              <p className="py-5 text-center text-sm text-[#a09e96]">Ingen planer i dag</p>
+              <div className="py-6 text-center">
+                <CalendarPlus className="h-8 w-8 text-[#b0ada4] mx-auto mb-2" />
+                <p className="text-sm text-[#a09e96]">Ingen planer i dag</p>
+              </div>
             ) : (
               <div className="space-y-2">
                 {todaysEvents.map((event) => (

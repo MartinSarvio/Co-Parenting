@@ -98,6 +98,11 @@ eventsRouter.patch('/:id', async (req: AuthRequest, res: Response) => {
       return;
     }
 
+    if (existing.createdBy !== req.userId) {
+      res.status(403).json({ error: 'Du har ikke adgang til at ændre denne begivenhed' });
+      return;
+    }
+
     const {
       title,
       description,
@@ -145,6 +150,11 @@ eventsRouter.delete('/:id', async (req: AuthRequest, res: Response) => {
 
     if (!existing) {
       res.status(404).json({ error: 'Begivenhed ikke fundet' });
+      return;
+    }
+
+    if (existing.createdBy !== req.userId) {
+      res.status(403).json({ error: 'Du har ikke adgang til at slette denne begivenhed' });
       return;
     }
 

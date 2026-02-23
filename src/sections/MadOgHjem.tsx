@@ -109,6 +109,17 @@ type AutoMealCandidate = {
   childFriendly: boolean;
 };
 
+type FoodLogEntry = {
+  id: string;
+  meal: string;
+  food: string;
+  kcal: number;
+  protein?: number;
+  carbs?: number;
+  fat?: number;
+  time?: string;
+};
+
 const mealSuggestions: MealSuggestion[] = [
   {
     title: 'Pastagratin med grønt',
@@ -614,6 +625,17 @@ export function MadOgHjem() {
   });
   // Shopping sub-tabs
   const [shoppingSubTab, setShoppingSubTab] = useState<'koleskab' | 'indkobsliste'>('indkobsliste');
+
+  // Kaloriedagbog state
+  const [dagbogView, setDagbogView] = useState<'self' | 'family'>('self');
+  const [dagbogSelectedChild, setDagbogSelectedChild] = useState<string | null>(null);
+  const [dagbogDate, setDagbogDate] = useState(format(new Date(), 'yyyy-MM-dd'));
+  const [foodLog, setFoodLog] = useState<FoodLogEntry[]>([]);
+  const [dailyCalorieGoal] = useState(2000);
+  const [isAddFoodOpen, setIsAddFoodOpen] = useState(false);
+  const [addFoodMeal, setAddFoodMeal] = useState('morgenmad');
+  const [newFoodEntry, setNewFoodEntry] = useState({ food: '', kcal: '', protein: '', carbs: '', fat: '' });
+
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const scannerStreamRef = useRef<MediaStream | null>(null);
   const scannerRafRef = useRef<number | null>(null);
@@ -1710,7 +1732,7 @@ export function MadOgHjem() {
   };
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-2 py-1">
       <motion.div
         initial={{ opacity: 0, y: -12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -1725,6 +1747,7 @@ export function MadOgHjem() {
           {[
             { value: 'meal-plan', label: 'Madplan' },
             { value: 'shopping', label: 'Indkøb' },
+            { value: 'dagbog', label: 'Dagbog' },
             { value: 'ideas', label: 'Flere ting' },
           ].map((tab) => (
             <button
@@ -2702,6 +2725,294 @@ export function MadOgHjem() {
           </>)}
         </div>
       )}
+
+      {activeTab === 'dagbog' && (() => {
+        const meals = [
+          { key: 'morgenmad', label: 'Morgenmad', emoji: '☀️' },
+          { key: 'mellemmåltid', label: 'Mellemmåltid', emoji: '🍎' },
+          { key: 'frokost', label: 'Frokost', emoji: '🥗' },
+          { key: 'mellemmåltid2', label: 'Eftermiddagssnack', emoji: '🍌' },
+          { key: 'aftensmad', label: 'Aftensmad', emoji: '🍽️' },
+          { key: 'snack', label: 'Aftensnack', emoji: '🌙' },
+        ];
+        const todayEntries = foodLog.filter(e => e.meal !== undefined);
+        const totalKcal = todayEntries.reduce((sum, e) => sum + e.kcal, 0);
+        const remainingKcal = dailyCalorieGoal - totalKcal;
+        const progressPct = Math.min(100, Math.round((totalKcal / dailyCalorieGoal) * 100));
+        const progressColor = progressPct >= 100 ? '#ef4444' : progressPct >= 80 ? '#f59e0b' : '#34C759';
+
+        // For family view — show all children + self
+        const familyMembers = [
+          { id: currentUser?.id || 'self', name: currentUser?.name || 'Mig', type: 'user' as const },
+          ...children.map(c => ({ id: c.id, name: c.name, type: 'child' as const })),
+        ];
+
+        return (
+          <div className="space-y-4">
+            {/* View toggle: Mig / Familie */}
+            <div className="flex rounded-xl border border-[#d8d7cf] bg-[#ecebe5] p-1">
+              <button
+                onClick={() => setDagbogView('self')}
+                className={cn(
+                  "flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-semibold transition-all",
+                  dagbogView === 'self' ? "bg-white text-[#2f2f2d] shadow-sm" : "text-[#78766d]"
+                )}
+              >
+                Mig
+              </button>
+              <button
+                onClick={() => setDagbogView('family')}
+                className={cn(
+                  "flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-semibold transition-all",
+                  dagbogView === 'family' ? "bg-white text-[#2f2f2d] shadow-sm" : "text-[#78766d]"
+                )}
+              >
+                Familie
+              </button>
+            </div>
+
+            {dagbogView === 'family' && (
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+                {familyMembers.map(member => (
+                  <button
+                    key={member.id}
+                    onClick={() => setDagbogSelectedChild(member.id === currentUser?.id ? null : member.id)}
+                    className={cn(
+                      "shrink-0 rounded-2xl border-2 px-4 py-2 text-[13px] font-semibold transition-all",
+                      (member.id === currentUser?.id ? dagbogSelectedChild === null : dagbogSelectedChild === member.id)
+                        ? "border-[#f58a2d] bg-[#fff2e6] text-[#b96424]"
+                        : "border-[#e5e3dc] bg-white text-[#78766d]"
+                    )}
+                  >
+                    {member.name}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Dato-vælger */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setDagbogDate(format(addDays(new Date(dagbogDate), -1), 'yyyy-MM-dd'))}
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#e5e3dc] bg-white text-[#78766d] transition-all active:scale-95"
+              >
+                ‹
+              </button>
+              <div className="flex-1 rounded-xl border border-[#e5e3dc] bg-white px-3 py-2 text-center text-[14px] font-semibold text-[#2f2f2d]">
+                {dagbogDate === format(new Date(), 'yyyy-MM-dd') ? 'I dag' :
+                  dagbogDate === format(addDays(new Date(), -1), 'yyyy-MM-dd') ? 'I går' :
+                  format(new Date(dagbogDate), 'd. MMMM', { locale: da })}
+              </div>
+              <button
+                onClick={() => setDagbogDate(format(addDays(new Date(dagbogDate), 1), 'yyyy-MM-dd'))}
+                disabled={dagbogDate >= format(new Date(), 'yyyy-MM-dd')}
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#e5e3dc] bg-white text-[#78766d] transition-all active:scale-95 disabled:opacity-30"
+              >
+                ›
+              </button>
+            </div>
+
+            {/* Kalorieoverigt */}
+            <div className="rounded-2xl border border-[#e5e3dc] bg-white p-4">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <p className="text-[13px] text-[#78766d]">Kalorier i dag</p>
+                  <div className="flex items-baseline gap-1.5 mt-0.5">
+                    <span className="text-[28px] font-bold text-[#2f2f2d]">{totalKcal}</span>
+                    <span className="text-[14px] text-[#78766d]">/ {dailyCalorieGoal} kcal</span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-[12px] text-[#78766d]">Tilbage</p>
+                  <p className={cn("text-[22px] font-bold mt-0.5", remainingKcal < 0 ? "text-red-500" : "text-[#34C759]")}>
+                    {remainingKcal < 0 ? `+${Math.abs(remainingKcal)}` : remainingKcal}
+                  </p>
+                </div>
+              </div>
+              {/* Progress bar */}
+              <div className="h-2.5 w-full rounded-full bg-[#f2f1ed] overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-500"
+                  style={{ width: `${progressPct}%`, backgroundColor: progressColor }}
+                />
+              </div>
+              <div className="flex justify-between mt-1.5">
+                <p className="text-[11px] text-[#9a978f]">{progressPct}% af dagsmål</p>
+                {progressPct >= 100 && (
+                  <p className="text-[11px] font-semibold text-red-500">Dagsmål overskredet</p>
+                )}
+              </div>
+
+              {/* Makronæringsstoffer */}
+              {todayEntries.some(e => e.protein || e.carbs || e.fat) && (
+                <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-[#f2f1ed]">
+                  {[
+                    { label: 'Protein', value: todayEntries.reduce((s, e) => s + (e.protein || 0), 0), unit: 'g', color: '#3b82f6' },
+                    { label: 'Kulhydrat', value: todayEntries.reduce((s, e) => s + (e.carbs || 0), 0), unit: 'g', color: '#f59e0b' },
+                    { label: 'Fedt', value: todayEntries.reduce((s, e) => s + (e.fat || 0), 0), unit: 'g', color: '#ef4444' },
+                  ].map(macro => (
+                    <div key={macro.label} className="text-center">
+                      <p className="text-[11px] text-[#78766d]">{macro.label}</p>
+                      <p className="text-[16px] font-bold mt-0.5" style={{ color: macro.color }}>{macro.value}<span className="text-[11px] font-normal text-[#9a978f]"> {macro.unit}</span></p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Måltider */}
+            <div className="space-y-3">
+              {meals.map(meal => {
+                const mealEntries = todayEntries.filter(e => e.meal === meal.key);
+                const mealKcal = mealEntries.reduce((s, e) => s + e.kcal, 0);
+                return (
+                  <div key={meal.key} className="rounded-2xl border border-[#e5e3dc] bg-white overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3">
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-lg">{meal.emoji}</span>
+                        <div>
+                          <p className="text-[14px] font-semibold text-[#2f2f2d]">{meal.label}</p>
+                          {mealKcal > 0 && (
+                            <p className="text-[12px] text-[#78766d]">{mealKcal} kcal</p>
+                          )}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => { setAddFoodMeal(meal.key); setIsAddFoodOpen(true); }}
+                        className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#f2f1ed] text-[#78766d] transition-all active:scale-95 hover:bg-[#e5e3dc]"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </button>
+                    </div>
+                    {mealEntries.length > 0 && (
+                      <div className="border-t border-[#f2f1ed] divide-y divide-[#f2f1ed]">
+                        {mealEntries.map(entry => (
+                          <div key={entry.id} className="flex items-center justify-between px-4 py-2.5">
+                            <div>
+                              <p className="text-[13px] font-medium text-[#2f2f2d]">{entry.food}</p>
+                              {entry.time && <p className="text-[11px] text-[#9a978f]">{entry.time}</p>}
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <span className="text-[13px] font-semibold text-[#2f2f2d]">{entry.kcal} kcal</span>
+                              <button
+                                onClick={() => setFoodLog(prev => prev.filter(e => e.id !== entry.id))}
+                                className="text-[#c0bdb4] hover:text-red-400 transition-colors"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {mealEntries.length === 0 && (
+                      <p className="px-4 pb-3 text-[12px] text-[#b0ada4]">Ingen mad logget endnu</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Tilføj mad dialog */}
+            <Dialog open={isAddFoodOpen} onOpenChange={setIsAddFoodOpen}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Log mad</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-3 pt-2">
+                  <div className="space-y-1.5">
+                    <Label>Måltid</Label>
+                    <Select value={addFoodMeal} onValueChange={setAddFoodMeal}>
+                      <SelectTrigger className="rounded-xl">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {meals.map(m => (
+                          <SelectItem key={m.key} value={m.key}>{m.emoji} {m.label}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>Mad / Drik</Label>
+                    <Input
+                      placeholder="fx Rugbrød med ost, Havregrød..."
+                      value={newFoodEntry.food}
+                      onChange={e => setNewFoodEntry(prev => ({ ...prev, food: e.target.value }))}
+                      className="rounded-xl"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <Label>Kalorier (kcal) *</Label>
+                      <Input
+                        type="number"
+                        placeholder="350"
+                        value={newFoodEntry.kcal}
+                        onChange={e => setNewFoodEntry(prev => ({ ...prev, kcal: e.target.value }))}
+                        className="rounded-xl"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>Protein (g)</Label>
+                      <Input
+                        type="number"
+                        placeholder="20"
+                        value={newFoodEntry.protein}
+                        onChange={e => setNewFoodEntry(prev => ({ ...prev, protein: e.target.value }))}
+                        className="rounded-xl"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>Kulhydrat (g)</Label>
+                      <Input
+                        type="number"
+                        placeholder="45"
+                        value={newFoodEntry.carbs}
+                        onChange={e => setNewFoodEntry(prev => ({ ...prev, carbs: e.target.value }))}
+                        className="rounded-xl"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label>Fedt (g)</Label>
+                      <Input
+                        type="number"
+                        placeholder="12"
+                        value={newFoodEntry.fat}
+                        onChange={e => setNewFoodEntry(prev => ({ ...prev, fat: e.target.value }))}
+                        className="rounded-xl"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    disabled={!newFoodEntry.food || !newFoodEntry.kcal}
+                    onClick={() => {
+                      if (!newFoodEntry.food || !newFoodEntry.kcal) return;
+                      const entry: FoodLogEntry = {
+                        id: `food-${Date.now()}`,
+                        meal: addFoodMeal,
+                        food: newFoodEntry.food,
+                        kcal: parseInt(newFoodEntry.kcal),
+                        protein: newFoodEntry.protein ? parseFloat(newFoodEntry.protein) : undefined,
+                        carbs: newFoodEntry.carbs ? parseFloat(newFoodEntry.carbs) : undefined,
+                        fat: newFoodEntry.fat ? parseFloat(newFoodEntry.fat) : undefined,
+                        time: format(new Date(), 'HH:mm'),
+                      };
+                      setFoodLog(prev => [...prev, entry]);
+                      setNewFoodEntry({ food: '', kcal: '', protein: '', carbs: '', fat: '' });
+                      setIsAddFoodOpen(false);
+                      toast.success('Mad logget!');
+                    }}
+                    className="w-full rounded-2xl bg-[#f58a2d] py-3 text-[14px] font-bold text-white disabled:opacity-40 transition-all active:scale-[0.98]"
+                  >
+                    Log mad
+                  </button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        );
+      })()}
 
       {activeTab === 'ideas' && (
         <div className="space-y-5">

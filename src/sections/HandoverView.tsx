@@ -22,7 +22,8 @@ import {
   Send,
   History,
   Plus,
-  Trash2
+  Trash2,
+  Clock
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, parseISO } from 'date-fns';
@@ -200,7 +201,7 @@ export function HandoverView() {
   // If no active handover, show message
   if (!activeHandover) {
     return (
-      <div className="space-y-4 p-4">
+      <div className="space-y-2 py-1">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -243,7 +244,7 @@ export function HandoverView() {
   const toParent = users.find(u => u.id === activeHandover.toParentId);
 
   return (
-    <div className="space-y-4 p-4">
+    <div className="space-y-2 py-1">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -560,7 +561,10 @@ export function HandoverView() {
                       </div>
                     ))}
                   {handovers.filter(h => h.status === 'completed').length === 0 && (
-                    <p className="text-center text-slate-400 py-4">Ingen afsluttede afleveringer endnu</p>
+                    <div className="py-6 text-center">
+                      <Clock className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+                      <p className="text-sm text-slate-400">Ingen afsluttede afleveringer endnu</p>
+                    </div>
                   )}
                 </div>
               </CardContent>

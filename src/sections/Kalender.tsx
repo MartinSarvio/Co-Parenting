@@ -257,6 +257,7 @@ export function Kalender() {
     eventTemplates, addEventTemplate, deleteEventTemplate,
     calendarColorPreferences, setCalendarColorPreference, resetCalendarColorPreferences,
     calendarSharing, requestCalendarSharing, respondToCalendarSharing,
+    sideMenuOpen, setSideMenuOpen,
   } = useAppStore();
   const { createEvent, updateEvent, deleteEvent } = useApiActions();
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -291,7 +292,8 @@ export function Kalender() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [allUpcomingOpen, setAllUpcomingOpen] = useState(false);
   const [calendarTab, setCalendarTab] = useState<'filter' | 'colors' | 'sync'>('filter');
-  const [calSidePanelOpen, setCalSidePanelOpen] = useState(false);
+  const calSidePanelOpen = sideMenuOpen;
+  const setCalSidePanelOpen = setSideMenuOpen;
   const [shareCalendarOpen, setShareCalendarOpen] = useState(false);
   const [templateFormOpen, setTemplateFormOpen] = useState(false);
   const [newSideTemplate, setNewSideTemplate] = useState({ title: '', type: 'school' as EventType, duration: 60, location: '', notes: '' });
@@ -633,7 +635,7 @@ export function Kalender() {
   };
 
   return (
-    <div className="space-y-4 p-1">
+    <div className="space-y-2 py-1">
       {/* ─── Side panel (slides from left) ─── */}
       <AnimatePresence>
         {calSidePanelOpen && (
@@ -1107,8 +1109,8 @@ export function Kalender() {
         </Dialog>
       </motion.div>
 
-      {/* Threads-style tab bar: Alle | Farver | Synk | ≡ */}
-      <div className="sticky top-0 z-10 bg-[#faf9f6] pb-0">
+      {/* Threads-style tab bar: Alle | Farver | Synk */}
+      <div className="sticky top-0 z-10 pb-0">
         <div className="flex items-center border-b border-[#e5e3dc]">
           {[
             { value: 'filter' as const, label: 'Alle' },
@@ -1133,13 +1135,6 @@ export function Kalender() {
               )}
             </button>
           ))}
-          {/* Hamburger */}
-          <button
-            onClick={() => setCalSidePanelOpen(true)}
-            className="flex items-center justify-center w-11 py-3 text-[#7a786f] hover:text-[#2f2f2d] transition-colors"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
         </div>
       </div>
 

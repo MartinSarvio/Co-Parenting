@@ -149,7 +149,7 @@ export function Dokumenter() {
   };
 
   return (
-    <div className="space-y-4 py-1">
+    <div className="space-y-2 py-1">
       <div>
         <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Dokumenter</h1>
         <p className="mt-0.5 text-[13px] text-[#78766d]">

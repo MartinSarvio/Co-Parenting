@@ -110,7 +110,7 @@ export function VigtigeDatoer() {
   }
 
   return (
-    <div className="space-y-4 py-1">
+    <div className="space-y-2 py-1">
       <div className="flex items-center justify-between">
         <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Vigtige datoer</h1>
         <Button
@@ -275,7 +275,10 @@ export function VigtigeDatoer() {
                 min={0}
                 max={30}
                 value={reminderDays}
-                onChange={e => setReminderDays(e.target.value)}
+                onChange={e => {
+                  const val = Math.min(30, Math.max(0, parseInt(e.target.value) || 0));
+                  setReminderDays(String(val));
+                }}
                 className="rounded-xl border-[#d8d7cf] bg-white"
               />
             </div>

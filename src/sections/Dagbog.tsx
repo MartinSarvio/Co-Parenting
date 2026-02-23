@@ -107,7 +107,7 @@ export function Dagbog() {
   }
 
   return (
-    <div className="space-y-4 py-1">
+    <div className="space-y-2 py-1">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Dagbog</h1>
@@ -214,6 +214,7 @@ export function Dagbog() {
                 placeholder="Skriv et notat om afleveringen..."
                 value={note}
                 onChange={e => setNote(e.target.value)}
+                maxLength={2000}
                 className="min-h-[80px] resize-none rounded-2xl border-[#d8d7cf] bg-white text-sm"
               />
             </div>

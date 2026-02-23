@@ -106,6 +106,10 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
       toast.error('Udfyld venligst alle felter');
       return;
     }
+    if (step === 2 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.parentEmail)) {
+      toast.error('Indtast venligst en gyldig email');
+      return;
+    }
     if (step === 2 && data.parentPassword.length < 6) {
       toast.error('Adgangskode skal være mindst 6 tegn');
       return;

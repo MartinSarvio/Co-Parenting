@@ -35,6 +35,10 @@ export function Fotoalbum() {
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Filen er for stor. Maksimum er 10 MB.');
+      return;
+    }
     const reader = new FileReader();
     reader.onload = () => {
       setPreviewUrl(reader.result as string);
@@ -73,7 +77,7 @@ export function Fotoalbum() {
   const nextPhoto = () => setLightboxIndex(i => (i !== null ? Math.min(childPhotos.length - 1, i + 1) : null));
 
   return (
-    <div className="space-y-4 py-1">
+    <div className="space-y-2 py-1">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Fotoalbum</h1>

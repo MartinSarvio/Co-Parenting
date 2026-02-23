@@ -62,6 +62,10 @@ diaryRouter.patch('/:id', async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: 'Dagbogsindlæg ikke fundet' });
     }
 
+    if (existing.writtenBy !== req.userId) {
+      return res.status(403).json({ error: 'Du har ikke adgang til at ændre dette dagbogsindlæg' });
+    }
+
     const entry = await prisma.diaryEntry.update({
       where: { id },
       data: {
@@ -91,6 +95,10 @@ diaryRouter.delete('/:id', async (req: AuthRequest, res: Response) => {
 
     if (!existing) {
       return res.status(404).json({ error: 'Dagbogsindlæg ikke fundet' });
+    }
+
+    if (existing.writtenBy !== req.userId) {
+      return res.status(403).json({ error: 'Du har ikke adgang til at slette dette dagbogsindlæg' });
     }
 
     await prisma.diaryEntry.delete({ where: { id } });

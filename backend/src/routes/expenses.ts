@@ -88,6 +88,11 @@ expensesRouter.patch('/:id', async (req: AuthRequest, res: Response) => {
       return;
     }
 
+    if (existing.paidBy !== req.userId) {
+      res.status(403).json({ error: 'Du har ikke adgang til at ændre denne udgift' });
+      return;
+    }
+
     const {
       title,
       description,
@@ -189,6 +194,11 @@ expensesRouter.delete('/:id', async (req: AuthRequest, res: Response) => {
 
     if (!existing) {
       res.status(404).json({ error: 'Udgift ikke fundet' });
+      return;
+    }
+
+    if (existing.paidBy !== req.userId) {
+      res.status(403).json({ error: 'Du har ikke adgang til at slette denne udgift' });
       return;
     }
 
