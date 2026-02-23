@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { BottomSheet } from '@/components/custom/BottomSheet';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 // Tabs replaced by underline-style tabs
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -24,10 +24,7 @@ import {
   Home,
   X,
   Menu,
-  ArrowLeft,
-  ChevronRight,
 } from 'lucide-react';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { motion, AnimatePresence } from 'framer-motion';
 import { parseISO, isToday, isTomorrow, format } from 'date-fns';
 import { da } from 'date-fns/locale';
@@ -111,7 +108,6 @@ export function Opgaver() {
     category: 'Dagligvarer',
   });
   const [isCategoryPanelOpen, setIsCategoryPanelOpen] = useState(false);
-  const [isHistorikOpen, setIsHistorikOpen] = useState(false);
   const [isAddCleaningOpen, setIsAddCleaningOpen] = useState(false);
   const [newCleaning, setNewCleaning] = useState({
     title: '',
@@ -129,13 +125,6 @@ export function Opgaver() {
 
   const pendingTasks = filteredTasks.filter(t => !t.completed);
   const completedTasks = filteredTasks.filter(t => t.completed);
-
-  // All completed tasks across all categories (for Historik page)
-  const allCompletedTasks = useMemo(() => {
-    return tasks
-      .filter(t => t.completed)
-      .sort((a, b) => (b.completedAt || b.createdAt || '').localeCompare(a.completedAt || a.createdAt || ''));
-  }, [tasks]);
 
   // Shopping uses same filter — "shopping" category shows all shopping items,
   // other categories filter by matching shopping item category
@@ -282,7 +271,7 @@ export function Opgaver() {
   };
 
   return (
-    <div className="space-y-2 py-1">
+    <div className="space-y-1.5 py-1">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -399,7 +388,6 @@ export function Opgaver() {
                         key={item.value}
                         onClick={() => {
                           setFilter(item.value);
-                          setActiveTab('tasks');
                           setIsCategoryPanelOpen(false);
                         }}
                         className={cn(
@@ -428,26 +416,6 @@ export function Opgaver() {
                     );
                   });
                 })()}
-
-                {/* Historik divider */}
-                <div className="my-2 mx-5 border-t border-[#eeedea]" />
-
-                {/* Historik — åbn fuld side */}
-                <button
-                  onClick={() => { setIsCategoryPanelOpen(false); setIsHistorikOpen(true); }}
-                  className="flex items-center justify-between w-full px-5 py-3 text-left active:bg-[#f5f4f0] transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#e8f5e9]">
-                      <CheckCircle2 className="h-4 w-4 text-[#4caf50]" />
-                    </div>
-                    <div>
-                      <p className="text-[14px] font-semibold text-[#2f2f2d]">Historik</p>
-                      <p className="text-[11px] text-[#9a978f]">{allCompletedTasks.length} fuldførte opgaver</p>
-                    </div>
-                  </div>
-                  <ChevronRight className="h-4 w-4 text-[#c0beb6]" />
-                </button>
               </div>
             </motion.div>
           </>
@@ -456,7 +424,7 @@ export function Opgaver() {
 
       {/* Tasks Tab */}
       {activeTab === 'tasks' && (
-        <div className="space-y-4 mt-4">
+        <div className="space-y-2 mt-4">
           {/* Active filter chip — shown when not "all" */}
           {filter !== 'all' && (
             <div className="flex items-center gap-2">
@@ -476,12 +444,18 @@ export function Opgaver() {
           )}
 
           {/* Add Task Button */}
-          <Button className="w-full" onClick={() => setIsAddTaskOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Ny opgave
-          </Button>
-          <BottomSheet open={isAddTaskOpen} onOpenChange={setIsAddTaskOpen} title="Tilføj ny opgave">
-              <div className="space-y-4 pt-4">
+          <Dialog open={isAddTaskOpen} onOpenChange={setIsAddTaskOpen}>
+            <DialogTrigger asChild>
+              <Button className="w-full">
+                <Plus className="w-4 h-4 mr-2" />
+                Ny opgave
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Tilføj ny opgave</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-2 pt-4">
                 <div className="space-y-2">
                   <Label>Titel</Label>
                   <Input 
@@ -544,7 +518,8 @@ export function Opgaver() {
                   Tilføj opgave
                 </Button>
               </div>
-          </BottomSheet>
+            </DialogContent>
+          </Dialog>
 
           {/* Pending Tasks */}
           <div className="space-y-2">
@@ -558,7 +533,7 @@ export function Opgaver() {
             </div>
             {pendingTasks.length === 0 ? (
               <Card className="bg-green-50 border-green-200">
-                <CardContent className="p-6 text-center">
+                <CardContent className="p-4 text-center">
                   <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto mb-2" />
                   <p className="text-green-700 font-medium">Alle opgaver er klaret!</p>
                 </CardContent>
@@ -660,7 +635,7 @@ export function Opgaver() {
 
       {/* Cleaning (Rengøring) Tab */}
       {activeTab === 'cleaning' && (
-        <div className="space-y-4 mt-4">
+        <div className="space-y-2 mt-4">
           {/* ── Status card ── */}
           <div className="rounded-2xl border border-[#e5e3dc] bg-white p-4">
             <div className="flex items-center justify-between">
@@ -692,33 +667,20 @@ export function Opgaver() {
 
           {/* ── Action cards ── */}
           <div className="grid grid-cols-2 gap-2.5">
-            <Sheet open={isAddCleaningOpen} onOpenChange={setIsAddCleaningOpen}>
-              <SheetTrigger asChild>
+            <Dialog open={isAddCleaningOpen} onOpenChange={setIsAddCleaningOpen}>
+              <DialogTrigger asChild>
                 <button className="flex items-center gap-2.5 rounded-2xl border-2 border-[#f3c59d] bg-[#fff2e6] p-3 text-left shadow-[0_2px_12px_rgba(245,138,45,0.12)] transition-all active:scale-[0.98]">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f58a2d]">
                     <Plus className="h-4 w-4 text-white" />
                   </div>
                   <span className="text-[13px] font-bold text-[#bf6722]">Ny pligt</span>
                 </button>
-              </SheetTrigger>
-              <SheetContent
-                side="bottom"
-                className="flex max-h-[90vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]"
-              >
-                {/* Handle bar */}
-                <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
-                {/* Header */}
-                <div className="flex items-center justify-between px-5 pt-2 pb-3 shrink-0">
-                  <h2 className="text-lg font-semibold text-[#2f2f2d]">Tilføj huslig pligt</h2>
-                  <button
-                    onClick={() => setIsAddCleaningOpen(false)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-[#ecebe5] text-[#5f5d56] hover:bg-[#dddbd3] transition-colors"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-                {/* Form */}
-                <div className="flex-1 overflow-y-auto overscroll-contain touch-pan-y px-5 pb-[calc(env(safe-area-inset-bottom,0px)+24px)] space-y-4">
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Tilføj huslig pligt</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-2 pt-2">
                   <div className="space-y-2">
                     <Label>Opgave</Label>
                     <Input
@@ -789,12 +751,12 @@ export function Opgaver() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <Button className="w-full rounded-2xl bg-[#f58a2d] py-3 text-[14px] font-bold text-white hover:bg-[#e47921] active:scale-[0.98] transition-transform" onClick={handleAddCleaningTask}>
+                  <Button className="w-full" onClick={handleAddCleaningTask}>
                     Tilføj pligt
                   </Button>
                 </div>
-              </SheetContent>
-            </Sheet>
+              </DialogContent>
+            </Dialog>
 
             {cleaningTemplates.map((template) => (
               <button
@@ -871,14 +833,20 @@ export function Opgaver() {
 
       {/* Shopping Tab */}
       {activeTab === 'shopping' && (
-        <div className="space-y-4 mt-4">
+        <div className="space-y-2 mt-4">
           {/* Add Shopping Item */}
-          <Button className="w-full" onClick={() => setIsAddShoppingOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Tilføj vare
-          </Button>
-          <BottomSheet open={isAddShoppingOpen} onOpenChange={setIsAddShoppingOpen} title="Tilføj til indkøbslisten">
-              <div className="space-y-4 pt-4">
+          <Dialog open={isAddShoppingOpen} onOpenChange={setIsAddShoppingOpen}>
+            <DialogTrigger asChild>
+              <Button className="w-full">
+                <Plus className="w-4 h-4 mr-2" />
+                Tilføj vare
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Tilføj til indkøbslisten</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-2 pt-4">
                 <div className="space-y-2">
                   <Label>Vare</Label>
                   <Input 
@@ -917,7 +885,8 @@ export function Opgaver() {
                   Tilføj til listen
                 </Button>
               </div>
-          </BottomSheet>
+            </DialogContent>
+          </Dialog>
 
           {/* Pending Items */}
           <div className="space-y-2">
@@ -938,7 +907,7 @@ export function Opgaver() {
             </div>
             {pendingShopping.length === 0 ? (
               <Card className="bg-green-50 border-green-200">
-                <CardContent className="p-6 text-center">
+                <CardContent className="p-4 text-center">
                   <ShoppingCart className="w-12 h-12 text-green-500 mx-auto mb-2" />
                   <p className="text-green-700 font-medium">Indkøbslisten er tom!</p>
                 </CardContent>
@@ -1029,59 +998,6 @@ export function Opgaver() {
           )}
         </div>
       )}
-
-      {/* ── Historik full-screen page ── */}
-      <AnimatePresence>
-        {isHistorikOpen && (
-          <motion.div
-            className="fixed inset-0 z-[50] flex flex-col bg-[#faf9f6]"
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', stiffness: 380, damping: 38 }}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-[#faf9f6] border-b border-[#e5e3dc]">
-              <button
-                onClick={() => setIsHistorikOpen(false)}
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f2f1ed] text-[#2f2f2d] active:scale-[0.92] transition-transform"
-              >
-                <ArrowLeft className="h-[18px] w-[18px]" />
-              </button>
-              <h1 className="text-[17px] font-bold text-[#2f2f2d]">Historik</h1>
-              <div className="w-9" />
-            </div>
-
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto px-4 pt-4 pb-8 space-y-2 max-w-[430px] mx-auto w-full">
-              {allCompletedTasks.length === 0 ? (
-                <div className="text-center pt-20">
-                  <CheckCircle2 className="h-12 w-12 text-[#d8d7cf] mx-auto mb-3" />
-                  <p className="text-[15px] font-semibold text-[#78766d]">Ingen fuldførte opgaver</p>
-                  <p className="text-[13px] text-[#9a978f] mt-1">Fuldførte opgaver og rengøringer vises her</p>
-                </div>
-              ) : (
-                allCompletedTasks.map(task => (
-                  <div key={task.id} className="flex items-center gap-3 rounded-2xl bg-white border border-[#e5e3dc] p-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#e8f5e9]">
-                      <CheckCircle2 className="h-4 w-4 text-[#4caf50]" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[14px] font-medium text-[#9a978f] line-through truncate">{task.title}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-[11px] text-[#b0ada4]">{getTaskCategoryLabel(task.category)}</span>
-                        {task.completedAt && (
-                          <span className="text-[11px] text-[#c4c1b8]">· {formatRelative(task.completedAt)}</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

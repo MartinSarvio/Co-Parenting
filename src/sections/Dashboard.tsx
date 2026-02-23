@@ -93,12 +93,12 @@ export function Dashboard() {
   };
 
   return (
-    <div className="space-y-2 py-1">
+    <div className="space-y-1.5 py-1">
       {/* Greeting */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-3 px-1"
+        className="mb-2 px-1"
       >
         <h1 className="text-[2.05rem] font-semibold leading-[0.96] tracking-[-0.03em] text-[#262623]">
           {getGreeting()}, {currentUser?.name}
@@ -115,7 +115,7 @@ export function Dashboard() {
         {isTogether ? (
           /* ── Together mode: show all family member avatars ── */
           <Card className="overflow-hidden border border-[#d8d7d1] bg-[#faf8f3]">
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <div className="flex items-center gap-4">
                 <div className="h-14 w-14 shrink-0 rounded-2xl border border-[#d5d4cc] bg-[#f0eee8] flex items-center justify-center">
                   <Users className="h-7 w-7 text-[#2f2f2f]" />
@@ -155,7 +155,7 @@ export function Dashboard() {
               ? "border-[#d8d7d1] bg-[#faf8f3]"
               : "border-[#d8d7d1] bg-[#f7f6f2]"
           )}>
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="h-14 w-14 rounded-2xl border border-[#d5d4cc] bg-[#f0eee8] flex items-center justify-center">
@@ -329,7 +329,7 @@ export function Dashboard() {
                 <span className="text-sm font-semibold text-[#f58a2d]">{handoverProgress}%</span>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3 pt-0">
+            <CardContent className="space-y-2 pt-0">
               <Progress value={handoverProgress} className="h-1.5 bg-[#e8e7e0]" />
               <div className="space-y-2">
                 {activeHandover.checklist.slice(0, 3).map((item) => (

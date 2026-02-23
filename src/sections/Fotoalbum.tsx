@@ -8,7 +8,12 @@ import { Plus, Trash2, Camera, X, ChevronLeft, ChevronRight } from 'lucide-react
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { BottomSheet } from '@/components/custom/BottomSheet';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
 export function Fotoalbum() {
@@ -72,7 +77,7 @@ export function Fotoalbum() {
   const nextPhoto = () => setLightboxIndex(i => (i !== null ? Math.min(childPhotos.length - 1, i + 1) : null));
 
   return (
-    <div className="space-y-2 py-1">
+    <div className="space-y-1.5 py-1">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Fotoalbum</h1>
@@ -129,9 +134,13 @@ export function Fotoalbum() {
         </div>
       )}
 
-      {/* Add photo BottomSheet */}
-      <BottomSheet open={addDialogOpen} onOpenChange={(o) => { if (!o) { setAddDialogOpen(false); setPreviewUrl(null); setCaption(''); if (fileInputRef.current) fileInputRef.current.value = ''; } }} title="Tilføj foto">
-          <div className="space-y-3">
+      {/* Add photo dialog */}
+      <Dialog open={addDialogOpen} onOpenChange={(o) => { if (!o) { setAddDialogOpen(false); setPreviewUrl(null); setCaption(''); if (fileInputRef.current) fileInputRef.current.value = ''; } }}>
+        <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
+          <DialogHeader>
+            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Tilføj foto</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
             {previewUrl && (
               <div className="relative overflow-hidden rounded-2xl">
                 <img src={previewUrl} alt="Preview" className="max-h-64 w-full object-contain" />
@@ -160,7 +169,8 @@ export function Fotoalbum() {
               </Button>
             </div>
           </div>
-      </BottomSheet>
+        </DialogContent>
+      </Dialog>
 
       {/* Lightbox */}
       {lightboxIndex !== null && childPhotos[lightboxIndex] && (

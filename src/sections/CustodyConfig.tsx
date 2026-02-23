@@ -6,21 +6,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-// Tabs replaced by underline-style tabs
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  Calendar,
-  Save,
-  Plus,
+import { 
+  Calendar, 
+  Repeat, 
+  Save, 
+  Plus, 
   Sun,
   Gift,
-  MapPin,
-  Clock,
-  ShieldAlert,
-  Repeat,
-  Sliders,
-  type LucideIcon,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { format, parseISO } from 'date-fns';
@@ -38,16 +33,13 @@ const swapDays = [
   { value: 6, label: 'Søndag' },
 ];
 
-// Each preview array = 7 days (Mon-Sun): true = me (cool/sort), false = other parent (warm/orange)
-const patternOptions: { value: string; label: string; subtitle: string; icon: LucideIcon; preview: boolean[] }[] = [
-  { value: '7/7',               label: '7 / 7',           subtitle: 'En uge hos hver',           icon: Calendar,    preview: [true,true,true,true,true,true,true] },
-  { value: '10/4',              label: '10 / 4',          subtitle: '10 dage / 4 dage',          icon: Calendar,    preview: [true,true,true,true,true,false,false] },
-  { value: '14/0',              label: '14 / 0',          subtitle: 'Fuld tid hos én forælder',   icon: Calendar,    preview: [true,true,true,true,true,true,true] },
-  { value: 'weekday-weekend',   label: 'Hverdag / Wknd',  subtitle: 'Hverdage + weekend delt',   icon: Clock,       preview: [true,true,true,true,true,false,false] },
-  { value: 'alternating',       label: 'Alternerende',     subtitle: 'Skift hver anden dag',      icon: Repeat,      preview: [true,false,true,false,true,false,true] },
-  { value: 'supervised',        label: 'Overvåget',        subtitle: 'Samvær med opsyn',          icon: ShieldAlert, preview: [true,true,true,true,true,true,false] },
-  { value: 'supervised_limited',label: 'Begrænset',        subtitle: 'Få timer, offentligt sted', icon: ShieldAlert, preview: [true,true,true,true,true,true,false] },
-  { value: 'custom',            label: 'Tilpasset',        subtitle: 'Definer din egen plan',     icon: Sliders,     preview: [true,true,false,false,true,true,false] },
+const patternOptions = [
+  { value: '7/7', label: '7/7 - En uge hos hver', description: 'Barnet skifter hver uge' },
+  { value: '10/4', label: '10/4 - 10 dage / 4 dage', description: 'Længere perioder hos hver forælder' },
+  { value: '14/0', label: '14/0 - To uger / Weekend', description: 'To uger hos den ene, weekend hos den anden' },
+  { value: 'weekday-weekend', label: 'Hverdage / Weekend', description: 'Hverdage hos én og weekend hos den anden' },
+  { value: 'alternating', label: 'Alternerende dage', description: 'Skift hver anden dag' },
+  { value: 'custom', label: 'Tilpasset', description: 'Definer din egen plan' },
 ];
 
 const defaultHandoverDays = [0, 2, 4];
@@ -64,31 +56,16 @@ const normalizeAssignments = (
 ): string[] => Array.from({ length: 7 }, (_, day) => assignments?.[day] || fallbackAssignments[day] || '');
 
 export function CustodyConfig() {
-  const { custodyPlans, household, users, children, updateCustodyPlan, currentUser } = useAppStore();
+  const { custodyPlans, household, users, children, updateCustodyPlan } = useAppStore();
   const custodyPlan = custodyPlans[0];
   const [activeTab, setActiveTab] = useState('general');
   const [isSaving, setIsSaving] = useState(false);
-
+  
   const currentChild = children[0];
-
-  // Me = cool (sort), other = warm (orange) — same logic as Samversplan
-  const meUser = currentUser;
-  const otherParentId = currentChild
-    ? (currentChild.parent1Id === currentUser?.id
-        ? currentChild.parent2Id
-        : currentChild.parent2Id === currentUser?.id
-          ? currentChild.parent1Id
-          : currentChild.parent2Id)
-    : undefined;
-  const otherUser = otherParentId
-    ? users.find(u => u.id === otherParentId && u.id !== currentUser?.id)
-    : undefined;
-
-  const parent1Id = meUser?.id || 'parent1';
-  // CRITICAL: parent2Id must NEVER equal parent1Id — use a stable placeholder when
-  // the other parent is not a separate user in the app.
-  const rawOther = otherUser?.id || otherParentId;
-  const parent2Id = rawOther && rawOther !== parent1Id ? rawOther : '__parent2__';
+  const parent1 = users.find(u => u.id === currentChild?.parent1Id);
+  const parent2 = users.find(u => u.id === currentChild?.parent2Id);
+  const parent1Id = parent1?.id || '';
+  const parent2Id = parent2?.id || '';
   const defaultEvenWeek = buildWeekAssignments(parent1Id, parent2Id);
   const defaultOddWeek = buildWeekAssignments(parent2Id, parent1Id);
 
@@ -99,17 +76,6 @@ export function CustodyConfig() {
     swapTime: custodyPlan?.swapTime || '18:00',
     parent1Weeks: custodyPlan?.parent1Weeks || 1,
     parent2Weeks: custodyPlan?.parent2Weeks || 1,
-    supervisedConfig: custodyPlan?.supervisedConfig || {
-      frequencyWeeks: 2,
-      durationHours: 3,
-      location: '',
-      locationType: 'public' as const,
-      supervisorRequired: false,
-      supervisorName: '',
-      specificDays: [5], // Saturday
-      startTime: '10:00',
-      notes: '',
-    },
     customWeekConfig: {
       handoverDays: custodyPlan?.customWeekConfig?.handoverDays?.length
         ? custodyPlan.customWeekConfig.handoverDays
@@ -173,10 +139,6 @@ export function CustodyConfig() {
         parent2Weeks: config.parent2Weeks,
       };
 
-      if (config.pattern === 'supervised' || config.pattern === 'supervised_limited') {
-        updatedPlan.supervisedConfig = config.supervisedConfig;
-      }
-
       if (config.pattern === 'custom') {
         const normalizedHandoverDays = [...new Set(config.customWeekConfig.handoverDays)].sort((a, b) => a - b);
         const handoverDays = normalizedHandoverDays.length ? normalizedHandoverDays : defaultHandoverDays;
@@ -213,7 +175,7 @@ export function CustodyConfig() {
 
 
   return (
-    <div className="space-y-4 p-4 max-w-lg mx-auto">
+    <div className="space-y-2 p-4 max-w-lg mx-auto">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -232,48 +194,69 @@ export function CustodyConfig() {
         )}
       </motion.div>
 
-      {/* Parent Overview — Me = cool (sort), Other = warm (orange) */}
+      {/* Parent Overview */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
         className="flex justify-center gap-4"
       >
-        {/* Me — always cool/sort */}
-        {meUser && (
-          <div className="flex items-center gap-2 rounded-xl border border-[#2f2f2f] bg-[#2f2f2f] px-4 py-2">
+        {parent1 && (
+          <div className={cn(
+            "flex items-center gap-2 rounded-xl border px-4 py-2",
+            parent1.color === 'warm'
+              ? "border-[#f3c59d] bg-[#fff2e6]"
+              : "border-[#2f2f2f] bg-[#2f2f2f]"
+          )}>
             <Avatar className="w-8 h-8">
-              <AvatarImage src={meUser.avatar} />
-              <AvatarFallback className="bg-[#4f4b45] text-xs text-white">
-                {meUser.name[0]}
+              <AvatarImage src={parent1.avatar} />
+              <AvatarFallback className={cn(
+                "text-xs",
+                parent1.color === 'warm' ? "bg-[#f58a2d] text-white" : "bg-[#4f4b45] text-white"
+              )}>
+                {parent1.name[0]}
               </AvatarFallback>
             </Avatar>
             <div>
-              <p className="text-sm font-medium text-white">{meUser.name}</p>
-              <p className="text-xs text-[#dfddd5]">Dig</p>
+              <p className={cn(
+                "text-sm font-medium",
+                parent1.color === 'warm' ? "text-[#c66f23]" : "text-white"
+              )}>{parent1.name}</p>
+              <p className={cn(
+                "text-xs",
+                parent1.color === 'warm' ? "text-[#cf7a33]" : "text-[#dfddd5]"
+              )}>Forælder 1</p>
             </div>
           </div>
         )}
-        {/* Other parent — always warm/orange, or placeholder */}
-        <div className={cn(
-          "flex items-center gap-2 rounded-xl border px-4 py-2",
-          "border-[#f3c59d] bg-[#fff2e6]"
-        )}>
-          <Avatar className="w-8 h-8">
-            {otherUser && <AvatarImage src={otherUser.avatar} />}
-            <AvatarFallback className="bg-[#f58a2d] text-xs text-white">
-              {otherUser ? otherUser.name[0] : '?'}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="text-sm font-medium text-[#c66f23]">
-              {otherUser ? otherUser.name : 'Forælder 2'}
-            </p>
-            <p className="text-xs text-[#cf7a33]">
-              {otherUser ? 'Forælder 2' : 'Ikke tilknyttet'}
-            </p>
+        {parent2 && (
+          <div className={cn(
+            "flex items-center gap-2 rounded-xl border px-4 py-2",
+            parent2.color === 'warm'
+              ? "border-[#f3c59d] bg-[#fff2e6]"
+              : "border-[#2f2f2f] bg-[#2f2f2f]"
+          )}>
+            <Avatar className="w-8 h-8">
+              <AvatarImage src={parent2.avatar} />
+              <AvatarFallback className={cn(
+                "text-xs",
+                parent2.color === 'warm' ? "bg-[#f58a2d] text-white" : "bg-[#4f4b45] text-white"
+              )}>
+                {parent2.name[0]}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className={cn(
+                "text-sm font-medium",
+                parent2.color === 'warm' ? "text-[#c66f23]" : "text-white"
+              )}>{parent2.name}</p>
+              <p className={cn(
+                "text-xs",
+                parent2.color === 'warm' ? "text-[#cf7a33]" : "text-[#dfddd5]"
+              )}>Forælder 2</p>
+            </div>
           </div>
-        </div>
+        )}
       </motion.div>
 
       {/* Configuration Tabs */}
@@ -282,498 +265,227 @@ export function CustodyConfig() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        {/* Underline-style Tabs */}
-        <div className="sticky top-0 z-10 bg-[#faf9f6] pb-0">
-          <div className="flex items-center border-b border-[#e5e3dc]">
-            {[
-              { value: 'general', label: 'Generelt' },
-              { value: 'holidays', label: 'Ferie' },
-              { value: 'special', label: 'Særlige dage' },
-            ].map((tab) => (
-              <button
-                key={tab.value}
-                onClick={() => setActiveTab(tab.value)}
-                className={cn(
-                  'relative flex-1 py-3 text-center text-[14px] font-semibold transition-colors',
-                  activeTab === tab.value ? 'text-[#2f2f2d]' : 'text-[#b0ada4]'
-                )}
-              >
-                {tab.label}
-                {activeTab === tab.value && (
-                  <motion.div
-                    layoutId="custody-underline"
-                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#2f2f2d] rounded-full"
-                    transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                  />
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="general">Generelt</TabsTrigger>
+            <TabsTrigger value="holidays">Ferie</TabsTrigger>
+            <TabsTrigger value="special">Særlige dage</TabsTrigger>
+          </TabsList>
 
-        {/* General Settings */}
-        {activeTab === 'general' && (
-          <div className="space-y-4 mt-4">
-
-            {/* Pattern Card Grid */}
-            <div className="grid grid-cols-2 gap-3">
-              {patternOptions.map(opt => {
-                const isSelected = config.pattern === opt.value;
-                const Icon = opt.icon;
-                return (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => setConfig({...config, pattern: opt.value as CustodyPattern})}
-                    className={cn(
-                      "flex flex-col items-start gap-2 rounded-2xl border-2 p-3.5 text-left transition-all",
-                      isSelected
-                        ? "border-[#f3c59d] bg-[#fff2e6] shadow-[0_2px_12px_rgba(245,138,45,0.12)]"
-                        : "border-[#e5e3dc] bg-white hover:border-[#cccbc3]"
-                    )}
+          {/* General Settings */}
+          <TabsContent value="general" className="space-y-2 mt-4">
+            <Card className="border-slate-200">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Repeat className="w-5 h-5 text-slate-500" />
+                  Samværsmodel
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="space-y-2">
+                  <Label>Vælg model</Label>
+                  <Select 
+                    value={config.pattern} 
+                    onValueChange={(v) => setConfig({...config, pattern: v as CustodyPattern})}
                   >
-                    <div className="flex items-center gap-2">
-                      <div className={cn(
-                        "flex h-7 w-7 items-center justify-center rounded-lg",
-                        isSelected ? "bg-[#f58a2d]" : "bg-[#f0efe8]"
-                      )}>
-                        <Icon className={cn("h-3.5 w-3.5", isSelected ? "text-white" : "text-[#75736b]")} />
-                      </div>
-                      <span className={cn(
-                        "text-[13px] font-bold",
-                        isSelected ? "text-[#bf6722]" : "text-[#2f2f2d]"
-                      )}>{opt.label}</span>
-                    </div>
-                    <p className="text-[11px] leading-tight text-[#75736b]">{opt.subtitle}</p>
-                    {/* Mini week preview — 7 dots */}
-                    <div className="flex gap-[3px] pt-0.5">
-                      {opt.preview.map((isMe, i) => (
-                        <div key={i} className={cn(
-                          "h-[6px] w-[6px] rounded-full",
-                          isMe ? "bg-[#2f2f2f]" : "bg-[#f58a2d]"
-                        )} />
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {patternOptions.map(opt => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          <div>
+                            <p className="font-medium">{opt.label}</p>
+                            <p className="text-xs text-slate-500">{opt.description}</p>
+                          </div>
+                        </SelectItem>
                       ))}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Swap day & time — shown for non-custom patterns */}
-            {config.pattern !== 'custom' && (
-              <div className="rounded-2xl border border-[#e5e3dc] bg-white p-4 space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Skiftedetaljer</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <Label className="text-xs">Skiftedag</Label>
-                    <Select
-                      value={config.swapDay.toString()}
-                      onValueChange={(v) => setConfig({ ...config, swapDay: parseInt(v) })}
-                    >
-                      <SelectTrigger className="h-10 rounded-xl border-[#e5e3dc]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {swapDays.map(day => (
-                          <SelectItem key={day.value} value={day.value.toString()}>
-                            {day.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label className="text-xs">Tidspunkt</Label>
-                    <Input
-                      type="time"
-                      value={config.swapTime}
-                      onChange={(e) => setConfig({ ...config, swapTime: e.target.value })}
-                      className="h-10 rounded-xl border-[#e5e3dc]"
-                    />
-                  </div>
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                {config.pattern === '7/7' && (
-                  <div className="grid grid-cols-2 gap-3 pt-1">
-                    <div className="space-y-1.5">
-                      <Label className="text-xs">Uger hos {meUser?.name?.split(' ')[0] || 'dig'}</Label>
+                {config.pattern !== 'custom' && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Skiftedag</Label>
+                      <Select
+                        value={config.swapDay.toString()}
+                        onValueChange={(v) => setConfig({ ...config, swapDay: parseInt(v) })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {swapDays.map(day => (
+                            <SelectItem key={day.value} value={day.value.toString()}>
+                              {day.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Skiftetidspunkt</Label>
                       <Input
+                        type="time"
+                        value={config.swapTime}
+                        onChange={(e) => setConfig({ ...config, swapTime: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {config.pattern === '7/7' && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Uger hos {parent1?.name}</Label>
+                      <Input 
                         type="number"
                         min={1}
                         max={4}
                         value={config.parent1Weeks}
                         onChange={(e) => setConfig({...config, parent1Weeks: parseInt(e.target.value) || 1})}
-                        className="h-10 rounded-xl border-[#e5e3dc]"
                       />
                     </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs">Uger hos {otherUser?.name?.split(' ')[0] || 'Forælder 2'}</Label>
-                      <Input
+                    <div className="space-y-2">
+                      <Label>Uger hos {parent2?.name}</Label>
+                      <Input 
                         type="number"
                         min={1}
                         max={4}
                         value={config.parent2Weeks}
                         onChange={(e) => setConfig({...config, parent2Weeks: parseInt(e.target.value) || 1})}
-                        className="h-10 rounded-xl border-[#e5e3dc]"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-                {/* Supervised visitation config */}
-                {(config.pattern === 'supervised' || config.pattern === 'supervised_limited') && (
-                  <div className="space-y-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
-                    <div className="flex items-center gap-2 mb-1">
-                      <ShieldAlert className="w-4 h-4 text-amber-600" />
-                      <p className="text-sm font-semibold text-amber-800">
-                        {config.pattern === 'supervised' ? 'Overvåget samvær' : 'Begrænset samvær'}
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-2">
-                        <Label className="text-xs">Hver X uge</Label>
-                        <Input
-                          type="number"
-                          min={1}
-                          max={12}
-                          value={config.supervisedConfig.frequencyWeeks}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            supervisedConfig: { ...prev.supervisedConfig, frequencyWeeks: parseInt(e.target.value) || 2 },
-                          }))}
-                          className="bg-white"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-xs">Antal timer</Label>
-                        <Input
-                          type="number"
-                          min={1}
-                          max={12}
-                          value={config.supervisedConfig.durationHours}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            supervisedConfig: { ...prev.supervisedConfig, durationHours: parseInt(e.target.value) || 3 },
-                          }))}
-                          className="bg-white"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label className="text-xs">Starttidspunkt</Label>
-                      <Input
-                        type="time"
-                        value={config.supervisedConfig.startTime || '10:00'}
-                        onChange={(e) => setConfig(prev => ({
-                          ...prev,
-                          supervisedConfig: { ...prev.supervisedConfig, startTime: e.target.value },
-                        }))}
-                        className="bg-white"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label className="text-xs">Dag(e) for samvær</Label>
-                      <div className="flex flex-wrap gap-2">
-                        {swapDays.map(day => {
-                          const isSelected = config.supervisedConfig.specificDays?.includes(day.value);
-                          return (
-                            <Button
-                              key={day.value}
-                              type="button"
-                              size="sm"
-                              variant={isSelected ? 'default' : 'outline'}
-                              onClick={() => setConfig(prev => {
-                                const days = prev.supervisedConfig.specificDays || [];
-                                const next = isSelected ? days.filter(d => d !== day.value) : [...days, day.value];
-                                return { ...prev, supervisedConfig: { ...prev.supervisedConfig, specificDays: next.sort((a, b) => a - b) } };
-                              })}
-                              className={isSelected ? 'bg-amber-500 text-white hover:bg-amber-600' : 'bg-white'}
-                            >
-                              {day.label}
-                            </Button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label className="text-xs flex items-center gap-1">
-                        <MapPin className="w-3 h-3" />
-                        Sted for samvær
-                      </Label>
-                      <Select
-                        value={config.supervisedConfig.locationType}
-                        onValueChange={(v: 'public' | 'home' | 'institution' | 'other') => setConfig(prev => ({
-                          ...prev,
-                          supervisedConfig: { ...prev.supervisedConfig, locationType: v },
-                        }))}
-                      >
-                        <SelectTrigger className="bg-white">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="public">Offentligt sted</SelectItem>
-                          <SelectItem value="home">Hjemme hos forælder</SelectItem>
-                          <SelectItem value="institution">Institution/familiecenter</SelectItem>
-                          <SelectItem value="other">Andet</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Input
-                        value={config.supervisedConfig.location}
-                        onChange={(e) => setConfig(prev => ({
-                          ...prev,
-                          supervisedConfig: { ...prev.supervisedConfig, location: e.target.value },
-                        }))}
-                        placeholder="Fx legeplads, bibliotek, familiecenter"
-                        className="bg-white"
-                      />
-                    </div>
-
-                    {config.pattern === 'supervised' && (
-                      <div className="space-y-2">
-                        <Label className="text-xs">Tilsynsperson (valgfrit)</Label>
-                        <Input
-                          value={config.supervisedConfig.supervisorName || ''}
-                          onChange={(e) => setConfig(prev => ({
-                            ...prev,
-                            supervisedConfig: { ...prev.supervisedConfig, supervisorRequired: true, supervisorName: e.target.value },
-                          }))}
-                          placeholder="Navn på tilsynsførende"
-                          className="bg-white"
-                        />
-                      </div>
-                    )}
-
-                    <div className="space-y-2">
-                      <Label className="text-xs">Bemærkninger</Label>
-                      <Input
-                        value={config.supervisedConfig.notes || ''}
-                        onChange={(e) => setConfig(prev => ({
-                          ...prev,
-                          supervisedConfig: { ...prev.supervisedConfig, notes: e.target.value },
-                        }))}
-                        placeholder="Evt. særlige aftaler"
-                        className="bg-white"
                       />
                     </div>
                   </div>
                 )}
 
                 {config.pattern === 'custom' && (
-                  <div className="space-y-5">
-                    {/* ── Skiftetype — card-style picker ── */}
-                    <div className="space-y-2.5">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Skiftetype</p>
-                      <div className="grid grid-cols-2 gap-2.5">
-                        {([
-                          { value: 'after_daycare',  label: 'Institution',   subtitle: 'Efter vuggestue / børnehave', icon: Calendar },
-                          { value: 'specific_time',  label: 'Fast tid',      subtitle: 'Bestemt klokkeslæt',          icon: Clock },
-                          { value: 'public_place',   label: 'Offentligt',    subtitle: 'Offentligt mødested',         icon: MapPin },
-                          { value: 'specific_days',  label: 'Faste dage',    subtitle: 'Bestemte dage + tidspunkt',   icon: Calendar },
-                        ] as const).map(opt => {
-                          const sel = config.customWeekConfig.handoverContext === opt.value;
-                          const Icon = opt.icon;
-                          return (
-                            <button
-                              key={opt.value}
-                              type="button"
-                              onClick={() => setConfig(prev => ({
-                                ...prev,
-                                customWeekConfig: { ...prev.customWeekConfig, handoverContext: opt.value as any },
-                              }))}
-                              className={cn(
-                                "flex flex-col items-start gap-1.5 rounded-2xl border-2 p-3 text-left transition-all",
-                                sel
-                                  ? "border-[#f3c59d] bg-[#fff2e6] shadow-[0_2px_12px_rgba(245,138,45,0.12)]"
-                                  : "border-[#e5e3dc] bg-white hover:border-[#cccbc3]"
-                              )}
-                            >
-                              <div className="flex items-center gap-2">
-                                <div className={cn(
-                                  "flex h-7 w-7 items-center justify-center rounded-lg",
-                                  sel ? "bg-[#f58a2d]" : "bg-[#f0efe8]"
-                                )}>
-                                  <Icon className={cn("h-3.5 w-3.5", sel ? "text-white" : "text-[#75736b]")} />
-                                </div>
-                                <span className={cn(
-                                  "text-[13px] font-bold",
-                                  sel ? "text-[#bf6722]" : "text-[#2f2f2d]"
-                                )}>{opt.label}</span>
-                              </div>
-                              <p className="text-[11px] leading-tight text-[#75736b]">{opt.subtitle}</p>
-                            </button>
-                          );
-                        })}
-                      </div>
+                  <div className="space-y-2 rounded-xl border border-[#f3c59d] bg-[#fff7f1] p-4">
+                    <div className="space-y-2">
+                      <Label>Skiftetype</Label>
+                      <Select
+                        value={config.customWeekConfig.handoverContext}
+                        onValueChange={(value: 'after_daycare' | 'specific_time') => setConfig(prev => ({
+                          ...prev,
+                          customWeekConfig: {
+                            ...prev.customWeekConfig,
+                            handoverContext: value,
+                          },
+                        }))}
+                      >
+                        <SelectTrigger className="bg-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="after_daycare">Efter vuggestue / institution</SelectItem>
+                          <SelectItem value="specific_time">Fast klokkeslæt</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
 
-                    {/* ── Tidspunkt ── */}
-                    <div className="rounded-2xl border border-[#e5e3dc] bg-white p-4 space-y-1.5">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Tidspunkt for skifte</p>
+                    <div className="space-y-2">
+                      <Label>Tidspunkt for skifte</Label>
                       <Input
                         type="time"
                         value={config.customWeekConfig.handoverTime}
                         onChange={(e) => setConfig(prev => ({
                           ...prev,
-                          customWeekConfig: { ...prev.customWeekConfig, handoverTime: e.target.value },
+                          customWeekConfig: {
+                            ...prev.customWeekConfig,
+                            handoverTime: e.target.value,
+                          },
                         }))}
-                        className="h-11 rounded-xl border-[#e5e3dc] bg-[#faf9f6] text-base"
+                        className="bg-white"
                       />
                     </div>
 
-                    {/* ── Skiftedage — pill toggles ── */}
-                    <div className="rounded-2xl border border-[#e5e3dc] bg-white p-4 space-y-2.5">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Skiftedage</p>
+                    <div className="space-y-2">
+                      <Label>Skiftedage</Label>
                       <div className="flex flex-wrap gap-2">
                         {swapDays.map(day => {
-                          const isActive = config.customWeekConfig.handoverDays.includes(day.value);
+                          const isSelected = config.customWeekConfig.handoverDays.includes(day.value);
                           return (
-                            <button
+                            <Button
                               key={day.value}
                               type="button"
+                              size="sm"
+                              variant={isSelected ? 'default' : 'outline'}
                               onClick={() => toggleHandoverDay(day.value)}
-                              className={cn(
-                                "rounded-full px-3.5 py-1.5 text-sm font-medium transition-all",
-                                isActive
-                                  ? "bg-[#f58a2d] text-white shadow-[0_2px_8px_rgba(245,138,45,0.25)]"
-                                  : "border border-[#e5e3dc] bg-[#faf9f6] text-[#75736b] hover:border-[#cccbc3]"
-                              )}
+                              className={isSelected ? 'bg-[#f58a2d] text-white hover:bg-[#e47921]' : 'bg-white'}
                             >
-                              {day.label.slice(0, 3)}
-                            </button>
+                              {day.label}
+                            </Button>
                           );
                         })}
                       </div>
-                      <p className="text-[11px] text-[#9e9b93]">
-                        Vælg de dage hvor barnet skifter forælder
+                      <p className="text-xs text-slate-600">
+                        Vælg de dage hvor barnet skifter forælder, fx mandag, onsdag og fredag.
                       </p>
                     </div>
 
-                    {/* ── Lige uger — visual day assignment ── */}
-                    <div className="rounded-2xl border border-[#e5e3dc] bg-white p-4 space-y-3">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Lige uger</p>
-                      <div className="grid grid-cols-7 gap-1.5">
-                        {swapDays.map(day => {
-                          const assignedId = config.customWeekConfig.evenWeekAssignments[day.value] || parent1Id;
-                          const isMe = assignedId === parent1Id;
-                          return (
-                            <button
-                              key={`even-${day.value}`}
-                              type="button"
-                              onClick={() => handleWeekAssignmentChange(
-                                'evenWeekAssignments',
-                                day.value,
-                                isMe ? parent2Id : parent1Id
-                              )}
-                              className={cn(
-                                "flex flex-col items-center gap-1 rounded-xl border-2 py-2.5 transition-all",
-                                isMe
-                                  ? "border-[#2f2f2f] bg-[#2f2f2f]"
-                                  : "border-[#f3c59d] bg-[#fff2e6]"
-                              )}
+                    <div className="space-y-2">
+                      <Label>Lige uger</Label>
+                      <div className="space-y-2">
+                        {swapDays.map(day => (
+                          <div key={`even-${day.value}`} className="grid grid-cols-[86px_1fr] items-center gap-2">
+                            <p className="text-sm font-medium text-slate-700">{day.label}</p>
+                            <Select
+                              value={config.customWeekConfig.evenWeekAssignments[day.value] || parent1Id}
+                              onValueChange={(value) => handleWeekAssignmentChange('evenWeekAssignments', day.value, value)}
                             >
-                              <span className={cn(
-                                "text-[10px] font-bold uppercase",
-                                isMe ? "text-[#b0ada4]" : "text-[#c87a30]"
-                              )}>
-                                {day.label.slice(0, 3)}
-                              </span>
-                              <div className={cn(
-                                "h-5 w-5 rounded-full flex items-center justify-center text-[9px] font-bold",
-                                isMe
-                                  ? "bg-white/20 text-white"
-                                  : "bg-[#f58a2d]/20 text-[#c87a30]"
-                              )}>
-                                {isMe
-                                  ? (meUser?.name?.[0] || 'D')
-                                  : (otherUser?.name?.[0] || 'F2')}
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                      {/* Legend */}
-                      <div className="flex items-center justify-center gap-4 pt-1">
-                        <div className="flex items-center gap-1.5">
-                          <div className="h-2.5 w-2.5 rounded-full bg-[#2f2f2f]" />
-                          <span className="text-[11px] text-[#75736b]">{meUser?.name?.split(' ')[0] || 'Dig'}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <div className="h-2.5 w-2.5 rounded-full bg-[#f58a2d]" />
-                          <span className="text-[11px] text-[#75736b]">{otherUser?.name?.split(' ')[0] || 'Forælder 2'}</span>
-                        </div>
+                              <SelectTrigger className="bg-white">
+                                <SelectValue placeholder="Vælg forælder" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {parent1 && (
+                                  <SelectItem value={parent1.id}>{parent1.name}</SelectItem>
+                                )}
+                                {parent2 && (
+                                  <SelectItem value={parent2.id}>{parent2.name}</SelectItem>
+                                )}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        ))}
                       </div>
                     </div>
 
-                    {/* ── Ulige uger — visual day assignment ── */}
-                    <div className="rounded-2xl border border-[#e5e3dc] bg-white p-4 space-y-3">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Ulige uger</p>
-                      <div className="grid grid-cols-7 gap-1.5">
-                        {swapDays.map(day => {
-                          const assignedId = config.customWeekConfig.oddWeekAssignments[day.value] || parent2Id;
-                          const isMe = assignedId === parent1Id;
-                          return (
-                            <button
-                              key={`odd-${day.value}`}
-                              type="button"
-                              onClick={() => handleWeekAssignmentChange(
-                                'oddWeekAssignments',
-                                day.value,
-                                isMe ? parent2Id : parent1Id
-                              )}
-                              className={cn(
-                                "flex flex-col items-center gap-1 rounded-xl border-2 py-2.5 transition-all",
-                                isMe
-                                  ? "border-[#2f2f2f] bg-[#2f2f2f]"
-                                  : "border-[#f3c59d] bg-[#fff2e6]"
-                              )}
+                    <div className="space-y-2">
+                      <Label>Ulige uger</Label>
+                      <div className="space-y-2">
+                        {swapDays.map(day => (
+                          <div key={`odd-${day.value}`} className="grid grid-cols-[86px_1fr] items-center gap-2">
+                            <p className="text-sm font-medium text-slate-700">{day.label}</p>
+                            <Select
+                              value={config.customWeekConfig.oddWeekAssignments[day.value] || parent2Id}
+                              onValueChange={(value) => handleWeekAssignmentChange('oddWeekAssignments', day.value, value)}
                             >
-                              <span className={cn(
-                                "text-[10px] font-bold uppercase",
-                                isMe ? "text-[#b0ada4]" : "text-[#c87a30]"
-                              )}>
-                                {day.label.slice(0, 3)}
-                              </span>
-                              <div className={cn(
-                                "h-5 w-5 rounded-full flex items-center justify-center text-[9px] font-bold",
-                                isMe
-                                  ? "bg-white/20 text-white"
-                                  : "bg-[#f58a2d]/20 text-[#c87a30]"
-                              )}>
-                                {isMe
-                                  ? (meUser?.name?.[0] || 'D')
-                                  : (otherUser?.name?.[0] || 'F2')}
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                      {/* Legend */}
-                      <div className="flex items-center justify-center gap-4 pt-1">
-                        <div className="flex items-center gap-1.5">
-                          <div className="h-2.5 w-2.5 rounded-full bg-[#2f2f2f]" />
-                          <span className="text-[11px] text-[#75736b]">{meUser?.name?.split(' ')[0] || 'Dig'}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <div className="h-2.5 w-2.5 rounded-full bg-[#f58a2d]" />
-                          <span className="text-[11px] text-[#75736b]">{otherUser?.name?.split(' ')[0] || 'Forælder 2'}</span>
-                        </div>
+                              <SelectTrigger className="bg-white">
+                                <SelectValue placeholder="Vælg forælder" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {parent1 && (
+                                  <SelectItem value={parent1.id}>{parent1.name}</SelectItem>
+                                )}
+                                {parent2 && (
+                                  <SelectItem value={parent2.id}>{parent2.name}</SelectItem>
+                                )}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
                 )}
+              </CardContent>
+            </Card>
 
-          </div>
-        )}
+          </TabsContent>
 
-        {/* Holidays */}
-        {activeTab === 'holidays' && (
-          <div className="space-y-4 mt-4">
+          {/* Holidays */}
+          <TabsContent value="holidays" className="space-y-2 mt-4">
             <Card className="border-slate-200">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
@@ -789,7 +501,7 @@ export function CustodyConfig() {
               </CardHeader>
               <CardContent>
                 {custodyPlan?.holidays && custodyPlan.holidays.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {custodyPlan.holidays.map((holiday: { id: string; name: string; startDate: string; endDate: string; parentId: string }) => (
                       <div 
                         key={holiday.id}
@@ -822,12 +534,10 @@ export function CustodyConfig() {
                 )}
               </CardContent>
             </Card>
-          </div>
-        )}
+          </TabsContent>
 
-        {/* Special Days */}
-        {activeTab === 'special' && (
-          <div className="space-y-4 mt-4">
+          {/* Special Days */}
+          <TabsContent value="special" className="space-y-2 mt-4">
             <Card className="border-slate-200">
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
@@ -843,7 +553,7 @@ export function CustodyConfig() {
               </CardHeader>
               <CardContent>
                 {custodyPlan?.specialDays && custodyPlan.specialDays.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {custodyPlan.specialDays.map((day: { id: string; date: string; type: string; description: string; alternateYears?: boolean }) => (
                       <div 
                         key={day.id}
@@ -871,8 +581,8 @@ export function CustodyConfig() {
                 )}
               </CardContent>
             </Card>
-          </div>
-        )}
+          </TabsContent>
+        </Tabs>
       </motion.div>
 
       {/* Save Button */}

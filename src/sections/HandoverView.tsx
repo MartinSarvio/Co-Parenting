@@ -201,7 +201,7 @@ export function HandoverView() {
   // If no active handover, show message
   if (!activeHandover) {
     return (
-      <div className="space-y-2 py-1">
+      <div className="space-y-1.5 py-1">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -244,7 +244,7 @@ export function HandoverView() {
   const toParent = users.find(u => u.id === activeHandover.toParentId);
 
   return (
-    <div className="space-y-2 py-1">
+    <div className="space-y-1.5 py-1">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -261,7 +261,7 @@ export function HandoverView() {
         transition={{ delay: 0.1 }}
       >
         <Card className="border-slate-200 overflow-hidden">
-          <CardContent className="p-6">
+          <CardContent className="p-4">
             <div className="flex items-center justify-between">
               {/* From Parent */}
               <div className="flex flex-col items-center">
@@ -334,7 +334,7 @@ export function HandoverView() {
               </Badge>
             </div>
           </CardHeader>
-          <CardContent className="pt-0 space-y-4">
+          <CardContent className="pt-0 space-y-2">
             <Progress value={handoverProgress} className="h-2" />
             <div className="rounded-2xl border border-slate-200 bg-white p-3">
               <p className="mb-2 text-xs font-medium text-slate-800">Tilføj ting til pakkeliste</p>
@@ -456,7 +456,7 @@ export function HandoverView() {
               Noter til {toParent?.name}
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-0 space-y-4">
+          <CardContent className="pt-0 space-y-2">
             {activeHandover.notes && (
               <div className="p-3 rounded-xl bg-amber-50 border border-amber-200">
                 <p className="text-sm text-amber-800">{activeHandover.notes}</p>
@@ -535,7 +535,7 @@ export function HandoverView() {
                 <CardTitle className="text-lg">Tidligere afleveringer</CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {handovers
                     .filter(h => h.status === 'completed')
                     .map(handover => (

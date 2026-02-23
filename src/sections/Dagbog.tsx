@@ -8,7 +8,12 @@ import { Plus, BookOpen, Smile, Meh, Frown, Zap, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { BottomSheet } from '@/components/custom/BottomSheet';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import type { DiaryEntry } from '@/types';
 
@@ -102,7 +107,7 @@ export function Dagbog() {
   }
 
   return (
-    <div className="space-y-2 py-1">
+    <div className="space-y-1.5 py-1">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Dagbog</h1>
@@ -135,7 +140,7 @@ export function Dagbog() {
           </Button>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {entries.map(entry => {
             const moodInfo = getMoodInfo(entry.mood);
             const MoodIcon = moodInfo.icon;
@@ -169,8 +174,12 @@ export function Dagbog() {
         </div>
       )}
 
-      <BottomSheet open={addOpen} onOpenChange={setAddOpen} title="Nyt dagbogsnotat">
-          <div className="space-y-4">
+      <Dialog open={addOpen} onOpenChange={setAddOpen}>
+        <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
+          <DialogHeader>
+            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Nyt dagbogsnotat</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
             {/* Mood */}
             <div className="space-y-1.5">
               <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Humør</p>
@@ -219,7 +228,8 @@ export function Dagbog() {
               </Button>
             </div>
           </div>
-      </BottomSheet>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -115,7 +115,7 @@ export function Aarskalender() {
   }
 
   return (
-    <div className="space-y-4 py-1">
+    <div className="space-y-2 py-1">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Årskalender</h1>
@@ -357,7 +357,7 @@ export function Aarskalender() {
               </p>
             )}
 
-          <div className="space-y-4 pt-2">
+          <div className="space-y-2 pt-2">
             <div className="space-y-2">
               <Label htmlFor="event-title" className="text-[13px] font-medium text-[#2f2f2d]">Titel</Label>
               <Input

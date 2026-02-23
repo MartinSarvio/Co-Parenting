@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
-import { BottomSheet } from '@/components/custom/BottomSheet';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
 import { 
@@ -89,7 +89,7 @@ export function MeetingMinutesView() {
     const isApproved = minutes.approvedBy?.includes(currentUser?.id || '');
 
     return (
-      <div className="space-y-4 p-4 max-w-lg mx-auto">
+      <div className="space-y-2 p-4 max-w-lg mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -268,7 +268,7 @@ export function MeetingMinutesView() {
 
   // List view
   return (
-    <div className="space-y-4 p-4 max-w-lg mx-auto">
+    <div className="space-y-2 p-4 max-w-lg mx-auto">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -277,18 +277,28 @@ export function MeetingMinutesView() {
       >
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Mødereferater</h1>
+          <p className="text-slate-500">
+            {isProfessionalView 
+              ? 'Dokumentation fra samtaler' 
+              : 'Referater fra jeres møder'}
+          </p>
         </div>
         {canCreateMinutes && (
-          <>
-          <Button className="bg-gradient-to-r from-blue-500 to-indigo-600" onClick={() => setIsCreating(true)}>
+          <Dialog open={isCreating} onOpenChange={setIsCreating}>
+            <DialogTrigger asChild>
+              <Button className="bg-gradient-to-r from-blue-500 to-indigo-600">
                 <Plus className="w-4 h-4 mr-1" />
                 Nyt
               </Button>
-          <BottomSheet open={isCreating} onOpenChange={setIsCreating} title="Opret nyt referat">
-              <div className="space-y-4 pt-4">
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Opret nyt referat</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-2 pt-4">
                 <div className="space-y-2">
                   <Label>Titel</Label>
-                  <Input
+                  <Input 
                     value={newMinutes.title}
                     onChange={(e) => setNewMinutes({...newMinutes, title: e.target.value})}
                     placeholder="F.eks. Samværssamtale - August 2024"
@@ -296,7 +306,7 @@ export function MeetingMinutesView() {
                 </div>
                 <div className="space-y-2">
                   <Label>Dato</Label>
-                  <Input
+                  <Input 
                     type="date"
                     value={newMinutes.date}
                     onChange={(e) => setNewMinutes({...newMinutes, date: e.target.value})}
@@ -304,7 +314,7 @@ export function MeetingMinutesView() {
                 </div>
                 <div className="space-y-2">
                   <Label>Sted</Label>
-                  <Input
+                  <Input 
                     value={newMinutes.location}
                     onChange={(e) => setNewMinutes({...newMinutes, location: e.target.value})}
                     placeholder="F.eks. Familierådgivningen"
@@ -312,7 +322,7 @@ export function MeetingMinutesView() {
                 </div>
                 <div className="space-y-2">
                   <Label>Dagsorden</Label>
-                  <Textarea
+                  <Textarea 
                     value={newMinutes.agenda}
                     onChange={(e) => setNewMinutes({...newMinutes, agenda: e.target.value})}
                     placeholder="Hvad skal drøftes på mødet?"
@@ -322,8 +332,8 @@ export function MeetingMinutesView() {
                   Opret referat
                 </Button>
               </div>
-          </BottomSheet>
-          </>
+            </DialogContent>
+          </Dialog>
         )}
       </motion.div>
 
@@ -353,7 +363,7 @@ export function MeetingMinutesView() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="space-y-3"
+        className="space-y-2"
       >
         {filteredMinutes.length === 0 ? (
           <div className="text-center py-12">

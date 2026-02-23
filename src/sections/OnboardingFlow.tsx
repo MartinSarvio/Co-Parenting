@@ -276,7 +276,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
                 <span>Gratis</span>
               </div>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2">
               <button
                 onClick={handleNext}
                 className="w-full h-[50px] rounded-xl text-white font-semibold text-[1rem] tracking-[-0.01em] transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2"
@@ -354,7 +354,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
               <h2 className="text-[1.4rem] font-bold text-[#2f2f2d] tracking-tight mb-1">Opret din konto</h2>
               <p className="text-[13px] text-[#78766d]">Dine oplysninger gemmes sikkert</p>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="space-y-1.5">
                 <Label htmlFor="parentName" className="text-[13px] text-[#5f5d56] font-medium">Dit navn</Label>
                 <Input
@@ -408,7 +408,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
               <h2 className="text-[1.4rem] font-bold text-[#2f2f2d] tracking-tight mb-1">Tilføj dit barn</h2>
               <p className="text-[13px] text-[#78766d]">Du kan tilføje flere børn senere</p>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="space-y-1.5">
                 <Label htmlFor="childName" className="text-[13px] text-[#5f5d56] font-medium">Barnets navn</Label>
                 <Input
@@ -445,7 +445,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
               <h2 className="text-[1.4rem] font-bold text-[#2f2f2d] tracking-tight mb-1">Inviter den anden forælder</h2>
               <p className="text-[13px] text-[#78766d]">Send en invitation til at deltage i familien</p>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="space-y-1.5">
                 <Label htmlFor="otherParentEmail" className="text-[13px] text-[#5f5d56] font-medium">Den anden forælders email</Label>
                 <Input
