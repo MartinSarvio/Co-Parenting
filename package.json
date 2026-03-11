@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "build:web": "tsc -b && vite build --config vite.config.web.ts && mv dist-web/web.html dist-web/index.html",
+    "build:web": "vite build --config vite.config.web.ts && mv dist-web/web.html dist-web/index.html",
     "cap:build": "VITE_API_URL=https://sa.up.railway.app npm run build && npx cap sync ios",
     "cap:open": "npx cap open ios",
     "cap:run": "npx cap run ios"
