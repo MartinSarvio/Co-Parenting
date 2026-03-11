@@ -35,3 +35,9 @@ dev-dist/
 ios/App/Pods/
 ios/App/App/public/
 ios/App/output/
+
+# Large media files
+public/videos/
+Tilbudsaviser/
+public/covers/
+public/logos/

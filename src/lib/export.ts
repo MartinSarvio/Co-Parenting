@@ -1,4 +1,5 @@
 import type { Expense, User } from '@/types';
+import { supabase } from './supabase';
 
 /**
  * Exports expenses as a UTF-8 BOM CSV file compatible with Excel/Numbers.
@@ -138,4 +139,57 @@ export function printExpenses(expenses: Expense[], users: User[]): void {
   win.document.close();
   win.focus();
   win.print();
+}
+
+/**
+ * GDPR Data Export — henter alle brugerens data fra Supabase og downloader som JSON.
+ */
+export async function exportAllData(): Promise<void> {
+  const { data: { user: authUser } } = await supabase.auth.getUser();
+  if (!authUser) throw new Error('Ikke logget ind');
+
+  const tables = [
+    'profiles',
+    'children',
+    'calendar_events',
+    'tasks',
+    'expenses',
+    'documents',
+    'meal_plans',
+    'messages',
+    'message_threads',
+    'decision_logs',
+    'key_dates',
+    'diary_entries',
+    'milestones',
+    'household_members',
+  ] as const;
+
+  const results: Record<string, unknown[]> = {};
+
+  // Hent alle tabeller parallelt — RLS filtrerer automatisk
+  await Promise.all(
+    tables.map(async (table) => {
+      const { data } = await supabase.from(table).select('*');
+      results[table] = data || [];
+    }),
+  );
+
+  const exportData = {
+    exported_at: new Date().toISOString(),
+    user_id: authUser.id,
+    email: authUser.email,
+    data: results,
+  };
+
+  const json = JSON.stringify(exportData, null, 2);
+  const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `mine-data-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }

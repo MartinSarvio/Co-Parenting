@@ -4,25 +4,31 @@ import { useAppStore } from '@/store';
 import { useApiActions } from '@/hooks/useApiActions';
 import { calendarSourceId, templateId } from '@/lib/id';
 import { cn, formatTime, getEventTypeLabel } from '@/lib/utils';
+import { usePermissions } from '@/hooks/usePermissions';
+import { ShareCalendarFlow } from '@/components/custom/ShareCalendarFlow';
+import { isDeviceCalendarAvailable, requestCalendarAccess, listDeviceCalendars, importDeviceEvents } from '@/lib/deviceCalendar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SelectSheet } from '@/components/custom/SelectSheet';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { toast } from 'sonner';
 import { getPlanFeatures } from '@/lib/subscription';
+import { SavingOverlay } from '@/components/custom/SavingOverlay';
 import type { CalendarEvent, EventType } from '@/types';
 
 import {
+  ArrowLeft,
   CloudDownload,
   ChevronLeft,
   ChevronRight,
   Link2,
+  ListFilter,
   Loader2,
+  Pencil,
   Plus,
   RefreshCw,
   Clock,
@@ -35,21 +41,18 @@ import {
   Calendar,
   Briefcase,
   User,
-  Palette,
   Timer,
   UserCircle,
-  ChevronDown,
   Lock,
   Share2,
   Users,
-  Menu,
-  ListFilter,
-  BookOpen,
   FileText,
   ShoppingBag,
+  Smartphone,
+  CalendarRange,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { format, isSameDay, parseISO, addMonths, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from 'date-fns';
+import { format, isSameDay, parseISO, startOfMonth, endOfMonth, eachDayOfInterval, getDay, getISOWeek } from 'date-fns';
 import { da } from 'date-fns/locale';
 
 /* ── Swipeable event row with delete ── */
@@ -95,7 +98,7 @@ function SwipeableEventRow({ children, onDelete, eventId: eId }: { children: Rea
   }, []);
 
   return (
-    <div key={eId} className="relative overflow-hidden rounded-xl">
+    <div key={eId} className="relative overflow-hidden rounded-[8px]">
       {/* Delete background */}
       <div className="absolute inset-y-0 right-0 flex w-[120px] items-center justify-center rounded-r-xl bg-red-500">
         <button
@@ -256,26 +259,36 @@ export function Kalender() {
   const {
     events, users, children, currentUser, household, setHousehold,
     eventTemplates, addEventTemplate, deleteEventTemplate,
-    calendarColorPreferences, setCalendarColorPreference, resetCalendarColorPreferences,
-    calendarSharing, requestCalendarSharing, respondToCalendarSharing,
-    sideMenuOpen, setSideMenuOpen,
+    calendarColorPreferences, setCalendarColorPreference,
+    calendarSharing, respondToCalendarSharing,
+    sideMenuOpen, setSideMenuOpen, sideMenuContext,
+    pendingCalendarAction, setPendingCalendarAction,
+    calendarDate: currentDate,
+    calendarAddOpen, setCalendarAddOpen,
+    setFullScreenOverlayOpen,
+    setCalendarWeekViewDate, setActiveTab,
   } = useAppStore();
   const { createEvent, updateEvent, deleteEvent } = useApiActions();
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const { permissions, isLinked } = usePermissions();
+  const isSingleParent = household?.familyMode === 'single_parent';
   const syncCalendarSourceRef = useRef<
     ((source: { id: string; name: string; type: CalendarSourceType; url: string; enabled: boolean; autoSync: boolean; lastSyncedAt?: string }, showToast?: boolean) => Promise<void>) | null
   >(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [filter, setFilter] = useState('all');
   const [personFilter, setPersonFilter] = useState<string | null>(null);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const isAddDialogOpen = calendarAddOpen;
+  const setIsAddDialogOpen = setCalendarAddOpen;
   const [isSourceDialogOpen, setIsSourceDialogOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [syncingSourceId, setSyncingSourceId] = useState<string | null>(null);
   const [newEvent, setNewEvent] = useState({
     title: '',
     type: 'school',
     startDate: '',
+    startTime: '',
     endDate: '',
+    endTime: '',
     location: '',
     description: '',
   });
@@ -290,19 +303,18 @@ export function Kalender() {
   const [newTemplate, setNewTemplate] = useState({ title: '', type: 'school' as EventType, duration: 60, location: '' });
   const [isColorDialogOpen, setIsColorDialogOpen] = useState(false);
   const [colorEditCategory, setColorEditCategory] = useState<string | null>(null);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [allUpcomingOpen, setAllUpcomingOpen] = useState(false);
-  const [calendarTab, setCalendarTab] = useState<'filter' | 'colors' | 'sync'>('filter');
-  const calSidePanelOpen = sideMenuOpen;
+  const calSidePanelOpen = sideMenuOpen && sideMenuContext === 'kalender';
   const setCalSidePanelOpen = setSideMenuOpen;
   const [shareCalendarOpen, setShareCalendarOpen] = useState(false);
   const [templateFormOpen, setTemplateFormOpen] = useState(false);
+  const [syncSheetOpen, setSyncSheetOpen] = useState(false);
+  const [colorsSheetOpen, setColorsSheetOpen] = useState(false);
   const [newSideTemplate, setNewSideTemplate] = useState({ title: '', type: 'school' as EventType, duration: 60, location: '', notes: '' });
   const [connectDiaryOpen, setConnectDiaryOpen] = useState(false);
   const [connectMealsOpen, setConnectMealsOpen] = useState(false);
   const [diaryCalendarId, setDiaryCalendarId] = useState<string>('main');
   const [mealsCalendarId, setMealsCalendarId] = useState<string>('main');
-  const [calFilterMode, setCalFilterMode] = useState<'all' | 'mine' | string>('all');
   const [eventDetailOpen, setEventDetailOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [templateUseOpen, setTemplateUseOpen] = useState(false);
@@ -310,12 +322,35 @@ export function Kalender() {
   const [templateStartTime, setTemplateStartTime] = useState('');
   const [templateNotifyPartner, setTemplateNotifyPartner] = useState(false);
   const [templateStartTimer, setTemplateStartTimer] = useState(false);
+  const [categoriesSheetOpen, setCategoriesSheetOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<string | null>(null);
+  const [editingCategoryName, setEditingCategoryName] = useState('');
+  const [calendarsSheetOpen, setCalendarsSheetOpen] = useState(false);
+  const [dayViewDate, setDayViewDate] = useState<Date | null>(null);
+  const [deviceSyncLoading, setDeviceSyncLoading] = useState(false);
+  const deviceCalendarAvailable = isDeviceCalendarAvailable();
 
-  const _features = getPlanFeatures(household);
-  void _features;
+  // Handle pending calendar action from Aarskalender side panel
+  useEffect(() => {
+    if (!pendingCalendarAction) return;
+    const actions: Record<string, () => void> = {
+      share: () => setShareCalendarOpen(true),
+      colors: () => setColorsSheetOpen(true),
+      categories: () => setCategoriesSheetOpen(true),
+      calendars: () => setCalendarsSheetOpen(true),
+      upcoming: () => setAllUpcomingOpen(true),
+      templates: () => setTemplateFormOpen(true),
+      diary: () => setConnectDiaryOpen(true),
+      meals: () => setConnectMealsOpen(true),
+    };
+    actions[pendingCalendarAction]?.();
+    setPendingCalendarAction(null);
+  }, [pendingCalendarAction]);
+
+  const features = getPlanFeatures(household, currentUser?.isAdmin);
   const currentChild = children[0];
-  const warmParent = users.find((user) => user.role === 'parent' && user.color === 'warm');
-  const coolParent = users.find((user) => user.role === 'parent' && user.color === 'cool');
+  // Perspektiv-baseret: indlogget bruger = sort, anden forælder = orange
+  const warmParent = users.find((user) => user.role === 'parent' && user.id !== currentUser?.id);
   const calendarSources = household?.calendarSources || [];
 
   // Calendar sharing logic for separated families
@@ -336,11 +371,22 @@ export function Kalender() {
     return calendarColorPreferences[eventType] || DEFAULT_EVENT_COLORS[eventType] || '#8b8677';
   };
 
+  // Safe parseISO — returns null on invalid/missing input
+  const safeParse = (dateStr: string | undefined | null): Date | null => {
+    if (!dateStr) return null;
+    try {
+      const d = parseISO(dateStr);
+      return isNaN(d.getTime()) ? null : d;
+    } catch {
+      return null;
+    }
+  };
+
   // Get events for a specific day
   const getEventsForDay = (day: Date) => {
     return events.filter(e => {
-      const eventDate = parseISO(e.startDate);
-      if (!isSameDay(eventDate, day)) return false;
+      const eventDate = safeParse(e.startDate);
+      if (!eventDate || !isSameDay(eventDate, day)) return false;
       if (filter !== 'all' && e.type !== filter) return false;
       if (personFilter && e.createdBy !== personFilter) return false;
       // Hide partner's events if calendar sharing is not accepted (separated families)
@@ -353,13 +399,8 @@ export function Kalender() {
     return getCustomEventColor(eventType);
   };
 
-  // Navigate months
-  const goToPreviousMonth = () => setCurrentDate(addMonths(currentDate, -1));
-  const goToNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
-  const goToToday = () => setCurrentDate(new Date());
-
-  // Get weekday names starting from Monday
-  const weekdayNames = ['Man', 'Tirs', 'Ons', 'Tors', 'Fre', 'Lør', 'Søn'];
+  // Get weekday names starting from Monday (single-letter like iOS Calendar)
+  const weekdayNames = ['M', 'T', 'O', 'T', 'F', 'L', 'S'];
 
   const updateCalendarSources = (nextSources: typeof calendarSources) => {
     if (!household) return;
@@ -429,7 +470,7 @@ export function Kalender() {
           return;
         }
 
-        void createEvent({
+        createEvent({
           title: payload.title || 'Ekstern kalenderaftale',
           description: payload.description,
           startDate: payload.startDate || new Date().toISOString(),
@@ -442,7 +483,7 @@ export function Kalender() {
           assignedTo: payload.assignedTo,
           childId: payload.childId,
           createdBy: users[0]?.id || 'u1'
-        });
+        }).catch(() => {});
         createdCount += 1;
       });
 
@@ -469,6 +510,55 @@ export function Kalender() {
   };
 
   syncCalendarSourceRef.current = syncCalendarSource;
+
+  const handleDeviceSync = async () => {
+    setDeviceSyncLoading(true);
+    try {
+      const granted = await requestCalendarAccess();
+      if (!granted) {
+        toast.error('Kalenderadgang afvist. Åbn Indstillinger for at give adgang.');
+        return;
+      }
+      const calendars = await listDeviceCalendars();
+      if (calendars.length === 0) {
+        toast.info('Ingen enhedskalendere fundet');
+        return;
+      }
+
+      // Import events from all calendars for the next 3 months
+      const now = new Date();
+      const threeMonthsLater = new Date(now);
+      threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
+
+      let totalImported = 0;
+      for (const cal of calendars) {
+        const events = await importDeviceEvents(cal.id, now, threeMonthsLater);
+        for (const evt of events) {
+          // Check if event already exists (dedup by title + start date)
+          const isDuplicate = useAppStore.getState().events.some(
+            (e) => e.title === evt.title && e.startDate === evt.startDate
+          );
+          if (!isDuplicate) {
+            createEvent({
+              title: evt.title,
+              type: 'activity',
+              startDate: evt.startDate,
+              endDate: evt.endDate,
+              location: evt.location,
+              description: evt.notes,
+              createdBy: currentUser?.id || '',
+            }).catch(() => {});
+            totalImported++;
+          }
+        }
+      }
+      toast.success(`${totalImported} begivenheder importeret fra ${calendars.length} kalender${calendars.length > 1 ? 'e' : ''}`);
+    } catch {
+      toast.error('Fejl ved synkronisering af enhedskalender');
+    } finally {
+      setDeviceSyncLoading(false);
+    }
+  };
 
   const addCalendarSource = async () => {
     if (!newCalendarSource.name.trim() || !newCalendarSource.url.trim()) {
@@ -551,41 +641,79 @@ export function Kalender() {
     };
   }, [calendarSources]);
 
+  // Pre-populate date/time when add-event page opens
+  useEffect(() => {
+    if (isAddDialogOpen) {
+      const now = new Date();
+      const nextHour = new Date(now);
+      nextHour.setMinutes(0, 0, 0);
+      nextHour.setHours(nextHour.getHours() + 1);
+      const endHour = new Date(nextHour);
+      endHour.setHours(endHour.getHours() + 1);
+      setNewEvent(prev => ({
+        ...prev,
+        startDate: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : format(nextHour, 'yyyy-MM-dd'),
+        startTime: format(nextHour, 'HH:mm'),
+        endDate: selectedDate ? format(selectedDate, 'yyyy-MM-dd') : format(nextHour, 'yyyy-MM-dd'),
+        endTime: format(endHour, 'HH:mm'),
+      }));
+    }
+  }, [isAddDialogOpen]);
+
+  // Hide BottomNav when full-screen overlay is open
+  useEffect(() => {
+    setFullScreenOverlayOpen(!!dayViewDate || isAddDialogOpen);
+    return () => setFullScreenOverlayOpen(false);
+  }, [dayViewDate, isAddDialogOpen, setFullScreenOverlayOpen]);
+
   const handleAddEvent = async () => {
-    if (!newEvent.title || !newEvent.startDate) return;
+    if (!newEvent.title || !newEvent.startDate || !newEvent.startTime) return;
+    setIsSaving(true);
+    try {
+      const startDateTime = new Date(`${newEvent.startDate}T${newEvent.startTime}:00`);
+      const endDateTime = newEvent.endDate && newEvent.endTime
+        ? new Date(`${newEvent.endDate}T${newEvent.endTime}:00`)
+        : startDateTime;
 
-    await createEvent({
-      title: newEvent.title,
-      type: newEvent.type as EventType,
-      startDate: new Date(newEvent.startDate).toISOString(),
-      endDate: newEvent.endDate
-        ? new Date(newEvent.endDate).toISOString()
-        : new Date(newEvent.startDate).toISOString(),
-      location: newEvent.location,
-      description: newEvent.description,
-      createdBy: users[0]?.id || 'u1',
-      childId: currentChild?.id,
-    });
+      await createEvent({
+        title: newEvent.title,
+        type: newEvent.type as EventType,
+        startDate: startDateTime.toISOString(),
+        endDate: endDateTime.toISOString(),
+        location: newEvent.location,
+        description: newEvent.description,
+        createdBy: users[0]?.id || 'u1',
+        childId: currentChild?.id,
+      });
 
-    setIsAddDialogOpen(false);
-    setNewEvent({
-      title: '',
-      type: 'school',
-      startDate: '',
-      endDate: '',
-      location: '',
-      description: '',
-    });
+      toast.success('Begivenhed tilføjet');
+      setIsAddDialogOpen(false);
+      setNewEvent({
+        title: '',
+        type: 'school',
+        startDate: '',
+        startTime: '',
+        endDate: '',
+        endTime: '',
+        location: '',
+        description: '',
+      });
+    } catch {
+      toast.error('Kunne ikke tilføje begivenhed');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // All upcoming events (hide partner events when sharing not accepted)
   const allUpcoming = events
     .filter(e => {
-      if (parseISO(e.startDate) < new Date()) return false;
+      const d = safeParse(e.startDate);
+      if (!d || d < new Date()) return false;
       if (!canSeePartnerEvents && otherParent && e.createdBy === otherParent.id) return false;
       return true;
     })
-    .sort((a, b) => parseISO(a.startDate).getTime() - parseISO(b.startDate).getTime());
+    .sort((a, b) => (safeParse(a.startDate)?.getTime() ?? 0) - (safeParse(b.startDate)?.getTime() ?? 0));
 
   // Handle template use: open config dialog
   const handleUseTemplate = (tmpl: typeof eventTemplates[0]) => {
@@ -637,7 +765,7 @@ export function Kalender() {
 
   return (
     <div className="space-y-1.5 py-1">
-      {/* ─── Side panel (slides from left) — rendered via portal to escape max-w container ─── */}
+      {/* ─── Side panel (OverblikSidePanel-stil) — rendered via portal ─── */}
       {createPortal(
       <AnimatePresence>
         {calSidePanelOpen && (
@@ -655,110 +783,54 @@ export function Kalender() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-              className="fixed inset-y-0 left-0 z-[9999] w-[280px] bg-white shadow-[4px_0_24px_rgba(0,0,0,0.1)] flex flex-col"
+              className="fixed inset-y-0 left-0 z-[9999] w-full bg-white flex flex-col"
               style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
             >
-              <div className="flex items-center justify-between px-5 py-4 border-b border-[#eeedea]">
+              <div className="flex items-center justify-between px-5 py-3 border-b border-[#eeedea]">
                 <h2 className="text-[17px] font-bold text-[#2f2f2d]">Kalender</h2>
                 <button
                   onClick={() => setCalSidePanelOpen(false)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56]"
+                  className="flex items-center justify-center text-[#5f5d56] hover:text-[#2f2f2d] transition-colors"
                 >
                   <X className="h-4 w-4" />
                 </button>
               </div>
-              <div className="flex-1 overflow-y-auto py-2">
-                {/* Del Kalender */}
-                <div className="px-5 py-2">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#9a978f] mb-2">Deling</p>
-                </div>
-                <button
-                  onClick={() => { setShareCalendarOpen(true); setCalSidePanelOpen(false); }}
-                  className="flex w-full items-center gap-3.5 px-5 py-3 text-left hover:bg-[#faf9f6] transition-colors"
-                >
-                  <div className={cn('flex h-9 w-9 items-center justify-center rounded-xl', isSharingAccepted || isTogether ? 'bg-[#fff2e6]' : 'bg-[#f2f1ed]')}>
-                    <Share2 className={cn('h-[18px] w-[18px]', isSharingAccepted || isTogether ? 'text-[#f58a2d]' : 'text-[#7a786f]')} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[14px] font-semibold text-[#4a4945]">Del kalender</p>
-                    <p className="text-[11px] text-[#9a978f]">
-                      {isSharingAccepted || isTogether ? 'Kalender deles' : isSharingPending ? 'Afventer accept' : 'Del med co-parent'}
-                    </p>
-                  </div>
-                  {isSharingPending && <div className="h-2 w-2 rounded-full bg-[#f58a2d] shrink-0" />}
-                  {(isSharingAccepted || isTogether) && <div className="h-2 w-2 rounded-full bg-[#4caf50] shrink-0" />}
-                </button>
-
-                <div className="my-2 mx-5 border-t border-[#eeedea]" />
-
-                {/* Relaterede sider */}
-                <div className="px-5 py-2">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#9a978f] mb-2">Relateret</p>
-                </div>
+              <div className="flex-1 overflow-y-auto py-2 pb-[env(safe-area-inset-bottom,0px)]">
                 {[
-                  { label: 'Aftale-skabeloner', desc: 'Opret genbrugelige aftaletyper', icon: LayoutTemplate, action: () => { setTemplateFormOpen(true); setCalSidePanelOpen(false); } },
-                  { label: 'Samværsplan', desc: 'Afleveringsplan & regler', icon: BookOpen, action: () => setCalSidePanelOpen(false) },
-                  { label: 'Dagbog', desc: 'Forbind til kalender', icon: FileText, action: () => { setConnectDiaryOpen(true); setCalSidePanelOpen(false); } },
-                  { label: 'Indkøb & måltider', desc: 'Forbind til kalender', icon: ShoppingBag, action: () => { setConnectMealsOpen(true); setCalSidePanelOpen(false); } },
+                  { label: 'Årskalender', icon: CalendarRange, action: () => { setActiveTab('aarskalender'); setCalSidePanelOpen(false); } },
+                  ...(!isSingleParent ? [{ label: 'Del kalender', icon: Share2, action: () => {
+                    if (isTogether) {
+                      toast.info('Kalenderen deles automatisk i sammen-familier');
+                      setCalSidePanelOpen(false);
+                      return;
+                    }
+                    if (permissions.requiresLinkingForSharing && !isLinked) {
+                      toast.error('Forbind med din co-parent først for at dele kalenderen');
+                      setCalSidePanelOpen(false);
+                      return;
+                    }
+                    setShareCalendarOpen(true); setCalSidePanelOpen(false);
+                  } }] : []),
+                  { label: 'Farver', icon: Calendar, action: () => { setColorsSheetOpen(true); setCalSidePanelOpen(false); } },
+                  { label: 'Kategorier', icon: ListFilter, action: () => { setCategoriesSheetOpen(true); setCalSidePanelOpen(false); } },
+                  { label: 'Deling og kilder', icon: Users, action: () => { setCalendarsSheetOpen(true); setCalSidePanelOpen(false); } },
+                  { label: 'Kommende aftaler', icon: Clock, action: () => { setAllUpcomingOpen(true); setCalSidePanelOpen(false); } },
+                  { label: 'Aftale-skabeloner', icon: LayoutTemplate, action: () => { setTemplateFormOpen(true); setCalSidePanelOpen(false); } },
+                  { label: 'Dagbog', icon: FileText, action: () => { setConnectDiaryOpen(true); setCalSidePanelOpen(false); } },
+                  { label: 'Indkøb & måltider', icon: ShoppingBag, action: () => { setConnectMealsOpen(true); setCalSidePanelOpen(false); } },
                 ].map((item) => {
                   const Icon = item.icon;
                   return (
                     <button
                       key={item.label}
                       onClick={item.action}
-                      className="flex w-full items-center gap-3.5 px-5 py-3 text-left hover:bg-[#faf9f6] transition-colors"
+                      className="flex w-full items-center gap-3.5 px-5 py-3.5 text-left transition-colors hover:bg-[#faf9f6]"
                     >
-                      <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f2f1ed]">
-                        <Icon className="h-[18px] w-[18px] text-[#7a786f]" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[14px] font-semibold text-[#4a4945]">{item.label}</p>
-                        <p className="text-[11px] text-[#9a978f] truncate">{item.desc}</p>
-                      </div>
+                      <Icon className="h-5 w-5 shrink-0 text-[#7a786f]" />
+                      <p className="flex-1 min-w-0 text-[15px] font-semibold text-[#4a4945]">{item.label}</p>
                     </button>
                   );
                 })}
-
-                <div className="my-2 mx-5 border-t border-[#eeedea]" />
-
-                {/* Person filter / calendar view mode — compact dropdown */}
-                <div className="px-5 py-2">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.05em] text-[#9a978f] mb-2">Vis aftaler fra</p>
-                  <Select
-                    value={personFilter || 'all'}
-                    onValueChange={(v: string) => {
-                      setPersonFilter(v === 'all' ? null : v);
-                      setCalFilterMode(v);
-                      setCalSidePanelOpen(false);
-                    }}
-                  >
-                    <SelectTrigger className="h-9 rounded-xl border-[#e5e3dc] bg-white text-[13px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">
-                        <span className="flex items-center gap-2">
-                          <span className="h-2.5 w-2.5 rounded-full bg-[#8b8677] shrink-0" />
-                          Alle kalendere
-                        </span>
-                      </SelectItem>
-                      <SelectItem value={currentUser?.id || 'me'}>
-                        <span className="flex items-center gap-2">
-                          <span className="h-2.5 w-2.5 rounded-full bg-[#2f2f2f] shrink-0" />
-                          {currentUser?.name || 'Mig'} (min)
-                        </span>
-                      </SelectItem>
-                      {warmParent && canSeePartnerEvents && (
-                        <SelectItem value={warmParent.id}>
-                          <span className="flex items-center gap-2">
-                            <span className="h-2.5 w-2.5 rounded-full bg-[#f58a2d] shrink-0" />
-                            {warmParent.name}
-                          </span>
-                        </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
               </div>
             </motion.div>
           </>
@@ -767,117 +839,91 @@ export function Kalender() {
       document.body
       )}
 
-      {/* ─── Del Kalender popup ─── */}
-      <Dialog open={shareCalendarOpen} onOpenChange={setShareCalendarOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Del kalender</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2 pt-2">
-            <p className="text-[13px] text-[#75736b]">
-              Del din kalender med din co-parent, så I begge kan se hinandens aftaler og begivenheder.
-            </p>
-
-            {isSharingAccepted || isTogether ? (
-              <div className="rounded-2xl border-2 border-[#c8e6c9] bg-[#e8f5e9] p-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#4caf50]">
-                    <Share2 className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-[14px] font-semibold text-[#2e7d32]">Kalender deles aktivt</p>
-                    <p className="text-[11px] text-[#558b2f]">
-                      {warmParent?.name || 'Forælder 2'} kan se dine aftaler
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className="rounded-2xl border-2 border-[#e5e3dc] bg-white p-4">
-                  <div className="flex items-center gap-3.5">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f2f1ed]">
-                      <Users className="h-5 w-5 text-[#7a786f]" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-[14px] font-semibold text-[#2f2f2d]">Co-parent kalender</p>
-                      <p className="text-[11px] text-[#9a978f]">
-                        {warmParent?.name || 'Forælder 2'}{warmParent?.email ? ` · ${warmParent.email}` : ''}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                {isSharingPending ? (
-                  <div className="rounded-xl bg-[#fff6ef] p-3 text-center">
-                    <p className="text-[13px] text-[#b96424] font-medium">Afventer accept fra partner</p>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => {
-                      if (currentUser) {
-                        requestCalendarSharing(currentUser.id);
-                        toast.success('Anmodning om kalenderdeling sendt');
-                        setShareCalendarOpen(false);
-                      }
-                    }}
-                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#f58a2d] px-4 py-3 text-[14px] font-bold text-white shadow-[0_2px_12px_rgba(245,138,45,0.25)] transition-all active:scale-[0.98]"
-                  >
-                    <Share2 className="h-4 w-4" />
-                    Send delingsanmodning
-                  </button>
-                )}
-              </>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* ─── 2-trins Del Kalender flow ─── */}
+      <ShareCalendarFlow open={shareCalendarOpen} onOpenChange={setShareCalendarOpen} />
 
       {/* ─── Aftale-skabeloner popup ─── */}
-      <Dialog open={templateFormOpen} onOpenChange={setTemplateFormOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Ny aftale-skabelon</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2 pt-2">
-            <p className="text-[13px] text-[#75736b]">
-              Opret en genbrugelig skabelon til hurtige aftaler.
-            </p>
+      <Sheet open={templateFormOpen} onOpenChange={setTemplateFormOpen}>
+        <SheetContent side="bottom" hideClose className="flex max-h-[85vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+          <SheetHeader className="px-4 pb-2 shrink-0">
+            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Aftale-skabeloner</SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom,0px)+24px)] space-y-2">
+            {/* Existing templates list */}
+            {eventTemplates.length > 0 && (
+              <div className="space-y-2 mb-3">
+                {eventTemplates.map(tmpl => (
+                  <div key={tmpl.id} className="flex items-center justify-between rounded-[8px] border border-[#f0efe8] bg-white px-3 py-2.5">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-semibold text-[#2f2f2d]">{tmpl.title}</p>
+                      <p className="text-[11px] text-[#78766d]">
+                        {getEventTypeLabel(tmpl.type)} · {tmpl.duration} min{tmpl.location ? ` · ${tmpl.location}` : ''}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        onClick={() => { handleUseTemplate(tmpl); setTemplateFormOpen(false); }}
+                        className="rounded-[8px] bg-[#ecebe5] px-2.5 py-1 text-[11px] font-semibold text-[#3f3e3a] hover:bg-[#e0deda]"
+                      >
+                        Brug
+                      </button>
+                      <button
+                        onClick={() => { deleteEventTemplate(tmpl.id); toast.success('Skabelon slettet'); }}
+                        className="rounded-full p-1 text-[#c8c6bc] hover:text-rose-500"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {eventTemplates.length === 0 && (
+              <div className="flex flex-col items-center gap-2 py-4 text-center">
+                <LayoutTemplate className="h-8 w-8 text-[#c8c6bc]" />
+                <p className="text-[12px] text-[#78766d]">Ingen skabeloner endnu.</p>
+              </div>
+            )}
+
+            <div className="border-t border-[#eeedea] pt-3">
+              <p className="text-[13px] font-semibold text-[#2f2f2d] mb-2">Ny skabelon</p>
+            </div>
             <div className="space-y-1.5">
               <Label className="text-[12px] font-semibold text-[#78766d]">Titel</Label>
               <Input
                 value={newSideTemplate.title}
                 onChange={(e) => setNewSideTemplate(prev => ({ ...prev, title: e.target.value }))}
                 placeholder="Fx Lægebesøg, SFO-hentning"
-                className="rounded-xl border-[#e5e3dc] bg-[#faf9f6] text-[13px]"
+                className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] text-[13px]"
               />
             </div>
             <div className="space-y-1.5">
               <Label className="text-[12px] font-semibold text-[#78766d]">Type</Label>
-              <Select
+              <SelectSheet
                 value={newSideTemplate.type}
                 onValueChange={(v) => setNewSideTemplate(prev => ({ ...prev, type: v as EventType }))}
-              >
-                <SelectTrigger className="rounded-xl border-[#e5e3dc]">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="school">Skole</SelectItem>
-                  <SelectItem value="medical">Læge</SelectItem>
-                  <SelectItem value="activity">Aktivitet</SelectItem>
-                  <SelectItem value="handover">Aflevering</SelectItem>
-                  <SelectItem value="birthday">Fødselsdag</SelectItem>
-                  <SelectItem value="other">Andet</SelectItem>
-                </SelectContent>
-              </Select>
+                title="Type"
+                options={[
+                  { value: 'school', label: 'Skole' },
+                  { value: 'medical', label: 'Læge' },
+                  { value: 'activity', label: 'Aktivitet' },
+                  { value: 'handover', label: 'Aflevering' },
+                  { value: 'birthday', label: 'Fødselsdag' },
+                  { value: 'other', label: 'Andet' },
+                ]}
+                className="rounded-[8px] border-[#e5e3dc]"
+              />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-[12px] font-semibold text-[#78766d]">Varighed (min.)</Label>
                 <Input
                   type="number"
-                  value={newSideTemplate.duration}
-                  onChange={(e) => setNewSideTemplate(prev => ({ ...prev, duration: Number(e.target.value) }))}
-                  className="rounded-xl border-[#e5e3dc] bg-[#faf9f6] text-[13px]"
+                  value={newSideTemplate.duration || ''}
+                  onChange={(e) => setNewSideTemplate(prev => ({ ...prev, duration: e.target.value === '' ? 0 : Number(e.target.value) }))}
+                  className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] text-[13px]"
                 />
               </div>
               <div className="space-y-1.5">
@@ -886,7 +932,7 @@ export function Kalender() {
                   value={newSideTemplate.location}
                   onChange={(e) => setNewSideTemplate(prev => ({ ...prev, location: e.target.value }))}
                   placeholder="Valgfrit"
-                  className="rounded-xl border-[#e5e3dc] bg-[#faf9f6] text-[13px]"
+                  className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] text-[13px]"
                 />
               </div>
             </div>
@@ -896,7 +942,7 @@ export function Kalender() {
                 value={newSideTemplate.notes}
                 onChange={(e) => setNewSideTemplate(prev => ({ ...prev, notes: e.target.value }))}
                 placeholder="Valgfri bemærkninger"
-                className="rounded-xl border-[#e5e3dc] bg-[#faf9f6] text-[13px]"
+                className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] text-[13px]"
               />
             </div>
             <button
@@ -906,21 +952,22 @@ export function Kalender() {
                 setNewSideTemplate({ title: '', type: 'school', duration: 60, location: '', notes: '' });
                 setTemplateFormOpen(false);
               }}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#f58a2d] px-4 py-3 text-[14px] font-bold text-white shadow-[0_2px_12px_rgba(245,138,45,0.25)] transition-all active:scale-[0.98]"
+              className="flex w-full items-center justify-center gap-2 rounded-[8px] bg-[#f58a2d] px-4 py-3 text-[14px] font-bold text-white shadow-[0_2px_12px_rgba(245,138,45,0.25)] transition-all active:scale-[0.98]"
             >
               Gem skabelon
             </button>
           </div>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
       {/* ─── Dagbog → Forbind til kalender popup ─── */}
-      <Dialog open={connectDiaryOpen} onOpenChange={setConnectDiaryOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Forbind dagbog til kalender</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2 pt-2">
+      <Sheet open={connectDiaryOpen} onOpenChange={setConnectDiaryOpen}>
+        <SheetContent side="bottom" hideClose className="flex max-h-[85vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+          <SheetHeader className="px-4 pb-2 shrink-0">
+            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Forbind dagbog til kalender</SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom,0px)+24px)] space-y-2">
             <p className="text-[13px] text-[#75736b]">
               Vælg hvilken kalender dagbogsnotater skal vises i.
             </p>
@@ -934,7 +981,7 @@ export function Kalender() {
                   key={cal.id}
                   onClick={() => setDiaryCalendarId(cal.id)}
                   className={cn(
-                    'flex w-full items-center gap-3.5 rounded-2xl border-2 px-4 py-3 text-left transition-all',
+                    'flex w-full items-center gap-3.5 rounded-[8px] border-2 px-4 py-3 text-left transition-all',
                     diaryCalendarId === cal.id
                       ? 'border-[#f3c59d] bg-[#fff2e6]'
                       : 'border-[#e5e3dc] bg-white hover:border-[#cccbc3]'
@@ -959,21 +1006,22 @@ export function Kalender() {
                 toast.success(`Dagbog forbundet til ${diaryCalendarId === 'main' ? 'hovedkalender' : diaryCalendarId === 'shared' ? 'delt kalender' : 'ingen kalender'}`);
                 setConnectDiaryOpen(false);
               }}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#f58a2d] px-4 py-3 text-[14px] font-bold text-white shadow-[0_2px_12px_rgba(245,138,45,0.25)] transition-all active:scale-[0.98]"
+              className="flex w-full items-center justify-center gap-2 rounded-[8px] bg-[#f58a2d] px-4 py-3 text-[14px] font-bold text-white shadow-[0_2px_12px_rgba(245,138,45,0.25)] transition-all active:scale-[0.98]"
             >
               Gem forbindelse
             </button>
           </div>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
       {/* ─── Indkøb & Måltider → Forbind til kalender popup ─── */}
-      <Dialog open={connectMealsOpen} onOpenChange={setConnectMealsOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Forbind måltider til kalender</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2 pt-2">
+      <Sheet open={connectMealsOpen} onOpenChange={setConnectMealsOpen}>
+        <SheetContent side="bottom" hideClose className="flex max-h-[85vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+          <SheetHeader className="px-4 pb-2 shrink-0">
+            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Forbind måltider til kalender</SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom,0px)+24px)] space-y-2">
             <p className="text-[13px] text-[#75736b]">
               Vælg hvilken kalender madplan og indkøb skal synkroniseres med.
             </p>
@@ -987,7 +1035,7 @@ export function Kalender() {
                   key={cal.id}
                   onClick={() => setMealsCalendarId(cal.id)}
                   className={cn(
-                    'flex w-full items-center gap-3.5 rounded-2xl border-2 px-4 py-3 text-left transition-all',
+                    'flex w-full items-center gap-3.5 rounded-[8px] border-2 px-4 py-3 text-left transition-all',
                     mealsCalendarId === cal.id
                       ? 'border-[#f3c59d] bg-[#fff2e6]'
                       : 'border-[#e5e3dc] bg-white hover:border-[#cccbc3]'
@@ -1012,440 +1060,712 @@ export function Kalender() {
                 toast.success(`Måltider forbundet til ${mealsCalendarId === 'main' ? 'hovedkalender' : mealsCalendarId === 'shared' ? 'delt kalender' : 'ingen kalender'}`);
                 setConnectMealsOpen(false);
               }}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#f58a2d] px-4 py-3 text-[14px] font-bold text-white shadow-[0_2px_12px_rgba(245,138,45,0.25)] transition-all active:scale-[0.98]"
+              className="flex w-full items-center justify-center gap-2 rounded-[8px] bg-[#f58a2d] px-4 py-3 text-[14px] font-bold text-white shadow-[0_2px_12px_rgba(245,138,45,0.25)] transition-all active:scale-[0.98]"
             >
               Gem forbindelse
             </button>
           </div>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between"
+      {/* Large month title (iOS Calendar style) */}
+      <h1
+        className="text-[2rem] font-bold leading-tight text-[#2f2f2d] px-1 capitalize cursor-pointer hover:text-[#f58a2d] transition-colors"
+        onClick={() => { setCalendarWeekViewDate(new Date()); setActiveTab('kalender-week'); }}
       >
-        <div>
-          <h1 className="text-[1.3rem] font-semibold leading-tight text-[#2f2f2d]">Fælles kalender</h1>
-          <p className="text-xs text-[#75736b]">Koordiner aktiviteter og aftaler</p>
-        </div>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="h-10 bg-[#f58a2d] text-white hover:bg-[#e47921]">
-              <Plus className="w-4 h-4 mr-2" />
-              Ny aftale
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Tilføj ny aftale</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-2 pt-4">
-              <div className="space-y-2">
-                <Label>Titel</Label>
-                <Input
-                  value={newEvent.title}
-                  onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
-                  placeholder="F.eks. Fodboldtræning"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Type</Label>
-                <Select
-                  value={newEvent.type}
-                  onValueChange={(v) => setNewEvent({...newEvent, type: v})}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {eventTypes.filter(t => t.value !== 'all').map(type => (
-                      <SelectItem key={type.value} value={type.value}>
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getEventInlineColor(type.value) }} />
-                          {type.label}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Start</Label>
-                  <Input
-                    type="datetime-local"
-                    value={newEvent.startDate}
-                    onChange={(e) => setNewEvent({...newEvent, startDate: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Slut</Label>
-                  <Input
-                    type="datetime-local"
-                    value={newEvent.endDate}
-                    onChange={(e) => setNewEvent({...newEvent, endDate: e.target.value})}
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Sted</Label>
-                <Input
-                  value={newEvent.location}
-                  onChange={(e) => setNewEvent({...newEvent, location: e.target.value})}
-                  placeholder="F.eks. Idrætshallen"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Beskrivelse</Label>
-                <Input
-                  value={newEvent.description}
-                  onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
-                  placeholder="Valgfri beskrivelse"
-                />
-              </div>
-              <Button onClick={handleAddEvent} className="w-full">
-                Tilføj aftale
-              </Button>
+        {format(currentDate, 'MMMM', { locale: da })}
+      </h1>
+
+      {/* Add event full-page (triggered by TopBar + button) */}
+      <AnimatePresence>
+        {isAddDialogOpen && (
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+            drag="x"
+            dragConstraints={{ left: 0 }}
+            dragElastic={0.15}
+            onDragEnd={(_: unknown, info: { offset: { x: number } }) => { if (info.offset.x > 100) setIsAddDialogOpen(false); }}
+            className="fixed inset-0 z-50 bg-[#f7f6f2] flex flex-col"
+            style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+          >
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-[#eeedea]">
+              <button
+                onClick={() => setIsAddDialogOpen(false)}
+                className="flex items-center justify-center text-[#5f5d56] hover:text-[#2f2f2d] transition-colors"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+              <h2 className="text-[17px] font-bold text-[#2f2f2d]">Tilføj ny aftale</h2>
             </div>
-          </DialogContent>
-        </Dialog>
-      </motion.div>
+            <div className="flex-1 overflow-y-auto px-4 py-4 pb-[calc(env(safe-area-inset-bottom,0px)+24px)]">
+              <div className="max-w-[430px] mx-auto space-y-4">
+                <div className="space-y-2">
+                  <Label>Titel</Label>
+                  <Input
+                    value={newEvent.title}
+                    onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
+                    placeholder="F.eks. Fodboldtræning"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Type</Label>
+                  <SelectSheet
+                    value={newEvent.type}
+                    onValueChange={(v) => setNewEvent({...newEvent, type: v})}
+                    title="Type"
+                    options={eventTypes.filter(t => t.value !== 'all').map(type => ({
+                      value: type.value,
+                      label: type.label,
+                      icon: <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getEventInlineColor(type.value) }} />,
+                    }))}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3 overflow-hidden">
+                  <div className="space-y-2 min-w-0 overflow-hidden">
+                    <Label>Startdato</Label>
+                    <Input
+                      type="date"
+                      value={newEvent.startDate}
+                      onChange={(e) => setNewEvent({...newEvent, startDate: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2 min-w-0 overflow-hidden">
+                    <Label>Starttid</Label>
+                    <Input
+                      type="time"
+                      value={newEvent.startTime}
+                      onChange={(e) => setNewEvent({...newEvent, startTime: e.target.value})}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3 overflow-hidden">
+                  <div className="space-y-2 min-w-0 overflow-hidden">
+                    <Label>Slutdato</Label>
+                    <Input
+                      type="date"
+                      value={newEvent.endDate}
+                      onChange={(e) => setNewEvent({...newEvent, endDate: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2 min-w-0 overflow-hidden">
+                    <Label>Sluttid</Label>
+                    <Input
+                      type="time"
+                      value={newEvent.endTime}
+                      onChange={(e) => setNewEvent({...newEvent, endTime: e.target.value})}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Sted</Label>
+                  <Input
+                    value={newEvent.location}
+                    onChange={(e) => setNewEvent({...newEvent, location: e.target.value})}
+                    placeholder="F.eks. Idrætshallen"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Beskrivelse</Label>
+                  <Input
+                    value={newEvent.description}
+                    onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
+                    placeholder="Valgfri beskrivelse"
+                  />
+                </div>
+                <Button onClick={handleAddEvent} className="w-full flex items-center justify-center gap-2" disabled={isSaving}>
+                  Tilføj aftale
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Threads-style tab bar: Alle | Farver | Synk */}
-      <div className="sticky top-0 z-10 pb-0">
-        <div className="flex items-center border-b border-[#e5e3dc]">
-          {[
-            { value: 'filter' as const, label: 'Alle' },
-            { value: 'colors' as const, label: 'Farver' },
-            { value: 'sync' as const, label: 'Synk' },
-          ].map((tab) => (
-            <button
-              key={tab.value}
-              onClick={() => setCalendarTab(tab.value)}
-              className={cn(
-                'relative flex-1 py-3 text-center text-[14px] font-semibold transition-colors',
-                calendarTab === tab.value ? 'text-[#2f2f2d]' : 'text-[#b0ada4]'
-              )}
-            >
-              {tab.label}
-              {calendarTab === tab.value && (
-                <motion.div
-                  layoutId="calendar-underline"
-                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#2f2f2d] rounded-full"
-                  transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                />
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* Day View — full-page iOS-style time grid */}
+      <AnimatePresence>
+        {dayViewDate && createPortal(
+          <motion.div
+            key="day-view"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+            drag="x"
+            dragConstraints={{ left: 0 }}
+            dragElastic={0.15}
+            onDragEnd={(_: unknown, info: { offset: { x: number } }) => { if (info.offset.x > 100) setDayViewDate(null); }}
+            className="fixed inset-0 z-50 bg-[#f7f6f2] flex flex-col"
+            style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+          >
+            {/* Header */}
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-[#eeedea]">
+              <button
+                onClick={() => setDayViewDate(null)}
+                className="flex items-center justify-center text-[#5f5d56] hover:text-[#2f2f2d] transition-colors"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+              <h2 className="text-[17px] font-bold text-[#2f2f2d] capitalize">
+                {format(dayViewDate, 'EEEE d. MMMM', { locale: da })}
+              </h2>
+              <button
+                onClick={() => { setSelectedDate(dayViewDate); setIsAddDialogOpen(true); }}
+                className="ml-auto flex items-center justify-center text-[#5f5d56] hover:text-[#2f2f2d] transition-colors"
+              >
+                <Plus className="h-5 w-5" />
+              </button>
+            </div>
 
-      {/* Tab content: Alle (category filter) */}
-      {calendarTab === 'filter' && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
-          <div className="relative">
-            <button
-              onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="flex w-full items-center justify-between rounded-xl border border-[#d8d7cf] bg-white px-3 py-2.5 text-sm font-medium text-[#2f2f2d] hover:bg-[#faf9f6] transition-colors"
-            >
-              <span className="flex items-center gap-2">
-                {(() => {
-                  const activeType = eventTypes.find(t => t.value === filter);
-                  if (!activeType) return null;
-                  const FilterIcon = activeType.icon;
+            {/* Time grid */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="relative" style={{ height: `${17 * 60}px` }}>
+                {/* Hour lines 06:00 - 22:00 */}
+                {Array.from({ length: 17 }, (_, i) => {
+                  const hour = i + 6;
                   return (
-                    <>
-                      <span className="w-3 h-3 rounded-full" style={{ backgroundColor: filter === 'all' ? '#8b8677' : getCustomEventColor(filter) }} />
-                      <FilterIcon className="h-4 w-4 text-[#78766d]" />
-                      {activeType.label}
-                    </>
-                  );
-                })()}
-              </span>
-              <ChevronDown className={cn("h-4 w-4 text-[#78766d] transition-transform", isFilterOpen && "rotate-180")} />
-            </button>
-            {isFilterOpen && (
-              <div className="absolute z-20 mt-1 w-full rounded-xl border border-[#d8d7cf] bg-white py-1 shadow-lg">
-                {eventTypes.map(type => {
-                  const TypeIcon = type.icon;
-                  return (
-                    <button
-                      key={type.value}
-                      onClick={() => { setFilter(type.value); setIsFilterOpen(false); }}
-                      className={cn(
-                        "flex w-full items-center gap-2.5 px-3 py-2 text-sm transition-colors",
-                        filter === type.value ? "bg-[#f0efe8] font-semibold text-[#2f2f2d]" : "text-[#4a4945] hover:bg-[#faf9f6]"
-                      )}
-                    >
-                      <span className="w-3 h-3 rounded-full" style={{ backgroundColor: type.value === 'all' ? '#8b8677' : getCustomEventColor(type.value) }} />
-                      <TypeIcon className="h-4 w-4" />
-                      {type.label}
-                    </button>
+                    <div key={hour} className="absolute inset-x-0" style={{ top: `${i * 60}px` }}>
+                      <div className="flex items-start">
+                        <span className="w-14 shrink-0 pr-2 text-right text-[11px] text-[#a09e96] -mt-[7px]">
+                          {`${hour.toString().padStart(2, '0')}:00`}
+                        </span>
+                        <div className="flex-1 border-t border-[#e8e7e0]" />
+                      </div>
+                    </div>
                   );
                 })}
+
+                {/* Events as positioned blocks */}
+                <div className="absolute inset-0 ml-14">
+                  {getEventsForDay(dayViewDate).map((event) => {
+                    const start = safeParse(event.startDate) ?? new Date();
+                    const end = safeParse(event.endDate) ?? new Date(start.getTime() + 60 * 60000);
+                    const startMinutes = start.getHours() * 60 + start.getMinutes();
+                    const endMinutes = end.getHours() * 60 + end.getMinutes();
+                    const top = ((startMinutes - 6 * 60) / 60) * 60;
+                    const height = Math.max(((endMinutes - startMinutes) / 60) * 60, 24);
+                    const color = getCustomEventColor(event.type);
+
+                    return (
+                      <button
+                        key={event.id}
+                        onClick={() => { setSelectedEvent(event); setEventDetailOpen(true); }}
+                        className="absolute left-1 right-2 rounded-[8px] px-2.5 py-1.5 text-left overflow-hidden"
+                        style={{
+                          top: `${top}px`,
+                          height: `${height}px`,
+                          backgroundColor: color + '18',
+                          borderLeft: `3px solid ${color}`,
+                        }}
+                      >
+                        <p className="text-[12px] font-semibold truncate" style={{ color }}>{event.title}</p>
+                        <p className="text-[10px] text-[#78766d]">
+                          {format(start, 'HH:mm')} – {format(end, 'HH:mm')}
+                        </p>
+                        {event.location && (
+                          <p className="text-[10px] text-[#a09e96] truncate">{event.location}</p>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Current time indicator */}
+                {isSameDay(dayViewDate, new Date()) && (() => {
+                  const now = new Date();
+                  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+                  const nowTop = ((nowMinutes - 6 * 60) / 60) * 60;
+                  if (nowTop < 0 || nowTop > 17 * 60) return null;
+                  return (
+                    <div className="absolute inset-x-0 ml-12 flex items-center" style={{ top: `${nowTop}px` }}>
+                      <div className="h-2.5 w-2.5 rounded-full bg-[#f58a2d]" />
+                      <div className="flex-1 border-t-2 border-[#f58a2d]" />
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+          </motion.div>,
+          document.body
+        )}
+      </AnimatePresence>
+
+      {/* Category filter moved to side panel */}
+
+      {/* Farver Sheet */}
+      <Sheet open={colorsSheetOpen} onOpenChange={setColorsSheetOpen}>
+        <SheetContent side="bottom" hideClose className="flex max-h-[85vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+          <SheetHeader className="px-4 pb-2 shrink-0">
+            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Farver</SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom,0px)+24px)] space-y-1">
+            {eventTypes.filter(t => t.value !== 'all').map(type => {
+              const TypeIcon = type.icon;
+              const currentColor = getCustomEventColor(type.value);
+              return (
+                <button
+                  key={type.value}
+                  onClick={() => { setColorEditCategory(type.value); setIsColorDialogOpen(true); }}
+                  className="flex w-full items-center gap-3 rounded-[8px] px-3 py-2.5 text-left transition-colors hover:bg-[#f0efe8]"
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-[8px]" style={{ backgroundColor: currentColor + '22' }}>
+                    <TypeIcon className="h-4 w-4" style={{ color: currentColor }} />
+                  </div>
+                  <span className="flex-1 text-sm font-medium text-[#2f2f2d]">{type.label}</span>
+                  <div className="h-5 w-5 rounded-full border border-[#e0dfd8]" style={{ backgroundColor: currentColor }} />
+                  <ChevronRight className="h-4 w-4 text-[#a3a299]" />
+                </button>
+              );
+            })}
+            <button
+              onClick={() => { toast.success('Farver gemt'); setColorsSheetOpen(false); }}
+              className="mt-2 w-full rounded-[8px] border border-[#d8d7cf] bg-[#2f2f2f] py-2 text-center text-[12px] font-semibold text-white hover:bg-[#1a1a1a] transition-colors"
+            >
+              Gem farver
+            </button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Kategorier Sheet */}
+      <Sheet open={categoriesSheetOpen} onOpenChange={setCategoriesSheetOpen}>
+        <SheetContent side="bottom" hideClose className="flex max-h-[85vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+          <SheetHeader className="px-4 pb-2 shrink-0">
+            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Kategorier</SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom,0px)+24px)] space-y-1">
+            {eventTypes.map(type => {
+              const TypeIcon = type.icon;
+              const currentColor = type.value === 'all' ? '#8b8677' : getCustomEventColor(type.value);
+              const isEditing = editingCategory === type.value;
+              return (
+                <div
+                  key={type.value}
+                  className={cn(
+                    'flex w-full items-center gap-3 rounded-[8px] px-3 py-2.5 transition-colors',
+                    filter === type.value ? 'bg-[#fff2e6]' : 'hover:bg-[#f0efe8]'
+                  )}
+                >
+                  <button
+                    onClick={() => { setFilter(type.value); setCategoriesSheetOpen(false); }}
+                    className="flex flex-1 items-center gap-3 text-left min-w-0"
+                  >
+                    <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: currentColor }} />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-[8px] shrink-0" style={{ backgroundColor: currentColor + '22' }}>
+                      <TypeIcon className="h-4 w-4" style={{ color: currentColor }} />
+                    </div>
+                    {isEditing ? (
+                      <Input
+                        value={editingCategoryName}
+                        onChange={(e) => setEditingCategoryName(e.target.value)}
+                        onBlur={() => { toast.success(`Kategori omdøbt til "${editingCategoryName}"`); setEditingCategory(null); }}
+                        onKeyDown={(e) => { if (e.key === 'Enter') { toast.success(`Kategori omdøbt til "${editingCategoryName}"`); setEditingCategory(null); } }}
+                        className="h-8 flex-1 text-sm"
+                        autoFocus
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    ) : (
+                      <span className={cn('flex-1 text-sm font-medium truncate', filter === type.value ? 'font-semibold text-[#2f2f2d]' : 'text-[#4a4945]')}>
+                        {type.label}
+                      </span>
+                    )}
+                  </button>
+                  {type.value !== 'all' && !isEditing && (
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={() => { setEditingCategory(type.value); setEditingCategoryName(type.label); }}
+                        className="flex h-7 w-7 items-center justify-center rounded-[8px] text-[#78766d] hover:bg-[#e0deda]"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        onClick={() => { toast.success(`"${type.label}" slettet`); }}
+                        className="flex h-7 w-7 items-center justify-center rounded-[8px] text-[#c8c6bc] hover:text-rose-500 hover:bg-rose-50"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+            <button
+              onClick={() => {
+                if (!features.unlimitedCategories && eventTypes.length >= 5) {
+                  toast.error('Opgrader til et betalt abonnement for at tilføje flere kategorier');
+                  return;
+                }
+                toast.info('Tilføj kategori (kommer snart)');
+              }}
+              className="flex w-full items-center justify-center gap-2 rounded-[8px] border-2 border-dashed border-[#d8d7cf] bg-white px-4 py-3 text-[13px] font-semibold text-[#5f5d56] hover:border-[#f58a2d] hover:bg-[#fff8f0] transition-colors mt-2"
+            >
+              <Plus className="h-4 w-4" />
+              Tilføj kategori
+            </button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {/* Deling og kilder Sheet */}
+      <Sheet open={calendarsSheetOpen} onOpenChange={setCalendarsSheetOpen}>
+        <SheetContent side="bottom" hideClose className="flex max-h-[85vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+          <SheetHeader className="px-4 pb-2 shrink-0">
+            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Deling og kilder</SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom,0px)+24px)] space-y-4">
+            {/* ── Section: Deling ── */}
+            {!isSingleParent && (
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Deling</p>
+
+                {/* Sharing status */}
+                {isTogether ? (
+                  <div className="flex items-center gap-2.5 rounded-xl border border-[#c8e6c9] bg-[#e8f5e9] p-3">
+                    <Share2 className="h-4 w-4 text-[#4caf50] shrink-0" />
+                    <p className="text-[13px] font-medium text-[#2e7d32]">Kalenderen deles automatisk</p>
+                  </div>
+                ) : isSharingAccepted ? (
+                  <div className="flex items-center gap-2.5 rounded-xl border border-[#c8e6c9] bg-[#e8f5e9] p-3">
+                    <Share2 className="h-4 w-4 text-[#4caf50] shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-[13px] font-medium text-[#2e7d32]">Deler med {warmParent?.name || 'co-parent'}</p>
+                    </div>
+                  </div>
+                ) : isSharingPending && calendarSharing?.requestedBy !== currentUser?.id ? (
+                  <div className="rounded-xl border border-[#f3c59d] bg-[#fff8f0] p-3">
+                    <p className="text-[13px] font-semibold text-[#2f2f2d]">Anmodning om kalenderdeling</p>
+                    <p className="text-[11px] text-[#78766d] mt-0.5">
+                      {users.find(u => u.id === calendarSharing?.requestedBy)?.name ?? 'Din partner'} ønsker at dele kalender.
+                    </p>
+                    <div className="mt-2 flex gap-2">
+                      <button
+                        onClick={() => { respondToCalendarSharing(true); toast.success('Kalenderdeling accepteret'); setCalendarsSheetOpen(false); }}
+                        className="rounded-lg bg-[#f58a2d] px-3 py-1.5 text-[11px] font-semibold text-white"
+                      >
+                        Acceptér
+                      </button>
+                      <button
+                        onClick={() => { respondToCalendarSharing(false); toast.info('Afvist'); setCalendarsSheetOpen(false); }}
+                        className="rounded-lg border border-[#d8d7cf] bg-white px-3 py-1.5 text-[11px] font-semibold text-[#4a4945]"
+                      >
+                        Afvis
+                      </button>
+                    </div>
+                  </div>
+                ) : !isSharingAccepted && !isSharingPending ? (
+                  <button
+                    onClick={() => {
+                      if (!features.calendarSharing) {
+                        toast.error('Opgrader til et betalt abonnement for kalenderdeling');
+                        return;
+                      }
+                      if (permissions.requiresLinkingForSharing && !isLinked) {
+                        toast.error('Forbind med din co-parent først');
+                        return;
+                      }
+                      setCalendarsSheetOpen(false);
+                      setShareCalendarOpen(true);
+                    }}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#d8d7cf] bg-white px-4 py-3 text-[13px] font-semibold text-[#5f5d56] hover:border-[#f58a2d] hover:bg-[#fff8f0] transition-colors"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Del kalender
+                  </button>
+                ) : null}
               </div>
             )}
-          </div>
-        </motion.div>
-      )}
 
-      {/* Tab content: Farver (color customization inline) */}
-      {calendarTab === 'colors' && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-1">
-          {eventTypes.filter(t => t.value !== 'all').map(type => {
-            const TypeIcon = type.icon;
-            const currentColor = getCustomEventColor(type.value);
-            return (
+            {/* ── Section: Kilder ── */}
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Kilder</p>
+              {calendarSources.length === 0 ? (
+                <p className="text-[12px] text-[#a09e96] py-2">Ingen eksterne kalendere tilføjet.</p>
+              ) : (
+                calendarSources.map((source) => (
+                  <div key={source.id} className="flex items-center gap-3 rounded-xl border border-[#e5e3dc] bg-white p-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f2f1ed]">
+                      <Calendar className="h-4 w-4 text-[#5f5d56]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] font-semibold text-[#2f2f2d] truncate">{source.name}</p>
+                      <p className="text-[10px] text-[#a09e96]">{source.type}</p>
+                    </div>
+                    {source.enabled && (
+                      <span className="text-[10px] font-semibold text-[#4caf50]">Aktiv</span>
+                    )}
+                  </div>
+                ))
+              )}
               <button
-                key={type.value}
-                onClick={() => { setColorEditCategory(type.value); setIsColorDialogOpen(true); }}
-                className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition-colors hover:bg-[#f0efe8]"
+                onClick={() => { setCalendarsSheetOpen(false); setSyncSheetOpen(true); }}
+                className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#d8d7cf] bg-white px-4 py-3 text-[13px] font-semibold text-[#5f5d56] hover:border-[#f58a2d] hover:bg-[#fff8f0] transition-colors"
               >
-                <div className="flex h-8 w-8 items-center justify-center rounded-xl" style={{ backgroundColor: currentColor + '22' }}>
-                  <TypeIcon className="h-4 w-4" style={{ color: currentColor }} />
-                </div>
-                <span className="flex-1 text-sm font-medium text-[#2f2f2d]">{type.label}</span>
-                <div className="h-5 w-5 rounded-full border border-[#e0dfd8]" style={{ backgroundColor: currentColor }} />
-                <ChevronRight className="h-4 w-4 text-[#a3a299]" />
+                <CloudDownload className="h-4 w-4" />
+                Tilføj kalenderkilde
               </button>
-            );
-          })}
-          <button
-            onClick={() => { toast.success('Farver gemt'); }}
-            className="mt-2 w-full rounded-xl border border-[#d8d7cf] bg-[#2f2f2f] py-2 text-center text-[12px] font-semibold text-white hover:bg-[#1a1a1a] transition-colors"
-          >
-            Gem farver
-          </button>
-        </motion.div>
-      )}
-
-      {/* Tab content: Synk (calendar sources inline) */}
-      {calendarTab === 'sync' && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-2">
-          <button
-            onClick={() => setIsSourceDialogOpen(true)}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[#d8d7cf] bg-white px-4 py-3 text-[13px] font-semibold text-[#5f5d56] hover:border-[#f58a2d] hover:bg-[#fff8f0] transition-colors"
-          >
-            <CloudDownload className="h-4 w-4" />
-            Tilføj kalenderkilde
-          </button>
-
-          {calendarSources.length === 0 ? (
-            <p className="rounded-xl border border-dashed border-[#d8d7cf] bg-[#faf9f6] p-4 text-center text-[12px] text-[#78766d]">
-              Ingen kalenderkilder endnu. Tilføj en iCal/ICS-kilde fra Google, Outlook eller din arbejdskalender.
-            </p>
-          ) : (
-            calendarSources.map((source) => (
-              <div key={source.id} className="rounded-2xl border border-[#e8e7e0] bg-white p-3">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-[13px] font-semibold text-[#2f2f2d]">{source.name}</p>
-                    <p className="text-[11px] text-[#78766d]">
-                      {source.type === 'work' ? 'Arbejde' : source.type === 'personal' ? 'Privat' : source.type === 'school' ? 'Skole' : 'Andet'}
-                      {source.lastSyncedAt
-                        ? ` · synk: ${format(parseISO(source.lastSyncedAt), 'dd/MM HH:mm', { locale: da })}`
-                        : ' · ikke synkroniseret endnu'}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => void syncCalendarSource(source)}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-[#78766d] hover:bg-[#f0efe8]"
-                    >
-                      {syncingSourceId === source.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <RefreshCw className="w-4 h-4" />
-                      )}
-                    </button>
-                    <button
-                      onClick={() => removeCalendarSource(source.id)}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg text-[#c8c6bc] hover:text-rose-500 hover:bg-rose-50"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-                <div className="mt-2 flex items-center gap-4 text-xs text-[#78766d]">
-                  <label className="flex items-center gap-1.5">
-                    <Checkbox
-                      checked={source.enabled}
-                      onCheckedChange={(checked) => {
-                        updateCalendarSources(
-                          calendarSources.map((item) =>
-                            item.id === source.id ? { ...item, enabled: checked as boolean } : item
-                          )
-                        );
-                      }}
-                    />
-                    Aktiv
-                  </label>
-                  <label className="flex items-center gap-1.5">
-                    <Checkbox
-                      checked={source.autoSync}
-                      onCheckedChange={(checked) => {
-                        updateCalendarSources(
-                          calendarSources.map((item) =>
-                            item.id === source.id ? { ...item, autoSync: checked as boolean } : item
-                          )
-                        );
-                      }}
-                    />
-                    Auto-sync
-                  </label>
-                </div>
-              </div>
-            ))
-          )}
-        </motion.div>
-      )}
-
-      {/* Calendar sharing invitation banner */}
-      {!isTogether && isSharingPending && calendarSharing?.requestedBy !== currentUser?.id && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-2xl border border-[#f3c59d] bg-[#fff8f0] p-3"
-        >
-          <div className="flex items-start gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f58a2d]/10">
-              <Share2 className="h-4 w-4 text-[#f58a2d]" />
+              {deviceCalendarAvailable ? (
+                <button
+                  onClick={() => { setCalendarsSheetOpen(false); handleDeviceSync(); }}
+                  disabled={deviceSyncLoading}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#d8d7cf] bg-white px-4 py-3 text-[13px] font-semibold text-[#5f5d56] hover:bg-[#faf9f6] transition-colors disabled:opacity-50"
+                >
+                  <Smartphone className="h-4 w-4" />
+                  {deviceSyncLoading ? 'Synkroniserer...' : 'Synkroniser fra enhed'}
+                </button>
+              ) : (
+                <p className="text-center text-[11px] text-[#a09e96] py-1">
+                  Enhedssynkronisering er kun tilgængelig i appen.
+                </p>
+              )}
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-semibold text-[#2f2f2d]">Anmodning om kalenderdeling</p>
-              <p className="text-[11px] text-[#78766d] mt-0.5">
-                {users.find(u => u.id === calendarSharing.requestedBy)?.name ?? 'Din partner'} ønsker at dele kalender med dig.
-              </p>
-              <div className="mt-2 flex gap-2">
+
+            {/* ── Section: Filter ── */}
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Filter</p>
+              <button
+                onClick={() => { setPersonFilter(null); setCalendarsSheetOpen(false); }}
+                className={cn(
+                  'flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition-colors',
+                  !personFilter ? 'bg-[#fff2e6] font-semibold text-[#2f2f2d]' : 'text-[#4a4945] hover:bg-[#faf9f6]'
+                )}
+              >
+                <span className="h-2.5 w-2.5 rounded-full bg-[#8b8677] shrink-0" />
+                Alle kalendere
+              </button>
+              <button
+                onClick={() => { setPersonFilter(currentUser?.id || 'me'); setCalendarsSheetOpen(false); }}
+                className={cn(
+                  'flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition-colors',
+                  personFilter === (currentUser?.id || 'me') ? 'bg-[#fff2e6] font-semibold text-[#2f2f2d]' : 'text-[#4a4945] hover:bg-[#faf9f6]'
+                )}
+              >
+                <span className="h-2.5 w-2.5 rounded-full bg-[#2f2f2f] shrink-0" />
+                {currentUser?.name || 'Mig'} (min)
+              </button>
+              {warmParent && canSeePartnerEvents && (
                 <button
-                  onClick={() => { respondToCalendarSharing(true); toast.success('Kalenderdeling accepteret'); }}
-                  className="rounded-lg bg-[#f58a2d] px-3 py-1 text-[11px] font-semibold text-white hover:bg-[#e47921]"
+                  onClick={() => { setPersonFilter(warmParent.id); setCalendarsSheetOpen(false); }}
+                  className={cn(
+                    'flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm transition-colors',
+                    personFilter === warmParent.id ? 'bg-[#fff2e6] font-semibold text-[#2f2f2d]' : 'text-[#4a4945] hover:bg-[#faf9f6]'
+                  )}
                 >
-                  Acceptér
+                  <span className="h-2.5 w-2.5 rounded-full bg-[#f58a2d] shrink-0" />
+                  {warmParent.name}
                 </button>
-                <button
-                  onClick={() => { respondToCalendarSharing(false); toast.info('Kalenderdeling afvist'); }}
-                  className="rounded-lg border border-[#d8d7cf] bg-white px-3 py-1 text-[11px] font-semibold text-[#4a4945] hover:bg-[#faf9f6]"
-                >
-                  Afvis
-                </button>
-              </div>
+              )}
+
+              {/* Partner hidden notice */}
+              {!isTogether && !canSeePartnerEvents && otherParent && (
+                <div className="flex items-center gap-2 rounded-xl border border-[#e8e7e0] bg-[#faf9f6] px-3 py-2">
+                  <Lock className="h-3.5 w-3.5 shrink-0 text-[#a09e96]" />
+                  <p className="text-[11px] text-[#78766d]">{otherParent.name}s kalender er skjult.</p>
+                </div>
+              )}
             </div>
           </div>
-        </motion.div>
-      )}
+        </SheetContent>
+      </Sheet>
 
-      {/* Partner events hidden notice */}
-      {!isTogether && !canSeePartnerEvents && otherParent && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-2.5 rounded-xl border border-[#e8e7e0] bg-[#faf9f6] px-3 py-2"
-        >
-          <Lock className="h-4 w-4 shrink-0 text-[#a09e96]" />
-          <p className="text-[11px] text-[#78766d]">
-            {otherParent.name}s kalender er skjult. Del kalender for at se hinandens aftaler.
-          </p>
-        </motion.div>
-      )}
+      {/* Synk Sheet */}
+      <Sheet open={syncSheetOpen} onOpenChange={setSyncSheetOpen}>
+        <SheetContent side="bottom" hideClose className="flex max-h-[85vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+          <SheetHeader className="px-4 pb-2 shrink-0">
+            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Synkronisering</SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom,0px)+24px)] space-y-2">
+            <button
+              onClick={() => setIsSourceDialogOpen(true)}
+              className="flex w-full items-center justify-center gap-2 rounded-[8px] border-2 border-dashed border-[#d8d7cf] bg-white px-4 py-3 text-[13px] font-semibold text-[#5f5d56] hover:border-[#f58a2d] hover:bg-[#fff8f0] transition-colors"
+            >
+              <CloudDownload className="h-4 w-4" />
+              Tilføj kalenderkilde
+            </button>
 
-      {/* Month Navigation */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="flex items-center justify-between bg-white rounded-xl border border-slate-200 p-2"
-      >
-        <Button variant="ghost" size="icon" onClick={goToPreviousMonth}>
-          <ChevronLeft className="w-5 h-5" />
-        </Button>
-        <div className="text-center">
-          <p className="font-semibold text-slate-900">
-            {format(currentDate, 'MMMM yyyy', { locale: da })}
-          </p>
-        </div>
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="sm" onClick={goToToday}>
-            I dag
-          </Button>
-          <Button variant="ghost" size="icon" onClick={goToNextMonth}>
-            <ChevronRight className="w-5 h-5" />
-          </Button>
-        </div>
-      </motion.div>
+            {calendarSources.length === 0 ? (
+              <p className="rounded-[8px] border border-dashed border-[#d8d7cf] bg-[#faf9f6] p-4 text-center text-[12px] text-[#78766d]">
+                Ingen kalenderkilder endnu. Tilføj en iCal/ICS-kilde fra Google, Outlook eller din arbejdskalender.
+              </p>
+            ) : (
+              calendarSources.map((source) => (
+                <div key={source.id} className="rounded-[8px] border border-[#e8e7e0] bg-white p-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-[13px] font-semibold text-[#2f2f2d]">{source.name}</p>
+                      <p className="text-[11px] text-[#78766d]">
+                        {source.type === 'work' ? 'Arbejde' : source.type === 'personal' ? 'Privat' : source.type === 'school' ? 'Skole' : 'Andet'}
+                        {source.lastSyncedAt
+                          ? ` · synk: ${format(safeParse(source.lastSyncedAt) ?? new Date(), 'dd/MM HH:mm', { locale: da })}`
+                          : ' · ikke synkroniseret endnu'}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => void syncCalendarSource(source)}
+                        className="flex h-8 w-8 items-center justify-center rounded-[8px] text-[#78766d] hover:bg-[#f0efe8]"
+                      >
+                        {syncingSourceId === source.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <RefreshCw className="w-4 h-4" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => removeCalendarSource(source.id)}
+                        className="flex h-8 w-8 items-center justify-center rounded-[8px] text-[#c8c6bc] hover:text-rose-500 hover:bg-rose-50"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="mt-2 flex items-center gap-4 text-xs text-[#78766d]">
+                    <label className="flex items-center gap-1.5">
+                      <Checkbox
+                        checked={source.enabled}
+                        onCheckedChange={(checked) => {
+                          updateCalendarSources(
+                            calendarSources.map((item) =>
+                              item.id === source.id ? { ...item, enabled: checked as boolean } : item
+                            )
+                          );
+                        }}
+                      />
+                      Aktiv
+                    </label>
+                    <label className="flex items-center gap-1.5">
+                      <Checkbox
+                        checked={source.autoSync}
+                        onCheckedChange={(checked) => {
+                          updateCalendarSources(
+                            calendarSources.map((item) =>
+                              item.id === source.id ? { ...item, autoSync: checked as boolean } : item
+                            )
+                          );
+                        }}
+                      />
+                      Auto-sync
+                    </label>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
 
-      {/* Calendar Grid */}
+      {/* Calendar Grid — iOS Calendar style */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <Card className="border-slate-200 overflow-hidden">
-          <CardContent className="p-0">
-            {/* Weekday headers */}
-            <div className="grid grid-cols-7 border-b border-slate-100">
-              {weekdayNames.map((day, index) => (
-                <div
-                  key={day}
-                  className={cn(
-                    "py-2 text-center text-sm font-medium",
-                    index >= 5 ? "text-[#d37628]" : "text-slate-600"
-                  )}
-                >
-                  {day}
-                </div>
-              ))}
-            </div>
+        <div className="overflow-hidden rounded-[8px] border border-[#e0ded7] bg-white">
+          {/* Weekday headers */}
+          <div className="grid grid-cols-[20px_repeat(7,1fr)] border-b border-[#eeedea]">
+            <div />
+            {weekdayNames.map((day, index) => (
+              <div
+                key={`${day}-${index}`}
+                className={cn(
+                  "py-1.5 text-center text-[11px] font-semibold",
+                  index >= 5 ? "text-[#b0876a]" : "text-[#78766d]"
+                )}
+              >
+                {day}
+              </div>
+            ))}
+          </div>
 
-            {/* Calendar days */}
-            <div className="grid grid-cols-7">
-              {Array.from({ length: getDay(monthStart) === 0 ? 6 : getDay(monthStart) - 1 }).map((_, i) => (
-                <div key={`empty-${i}`} className="min-h-[80px] border-b border-r border-slate-50 bg-slate-50/30" />
-              ))}
-              {monthDays.map((day) => {
-                const dayEvents = getEventsForDay(day);
-                const isToday = isSameDay(day, new Date());
-                const isSelected = selectedDate && isSameDay(day, selectedDate);
-                const isWeekend = getDay(day) === 0 || getDay(day) === 6;
+          {/* Calendar weeks with week numbers */}
+          {(() => {
+            const leadingEmpties = getDay(monthStart) === 0 ? 6 : getDay(monthStart) - 1;
+            const allCells: (Date | null)[] = [
+              ...Array.from({ length: leadingEmpties }, () => null),
+              ...monthDays,
+            ];
+            const trailingEmpties = (7 - (allCells.length % 7)) % 7;
+            allCells.push(...Array.from({ length: trailingEmpties }, () => null));
 
-                return (
-                  <div
-                    key={day.toISOString()}
-                    onClick={() => setSelectedDate(day)}
-                    className={cn(
-                      "min-h-[80px] p-1 border-b border-r border-slate-100 cursor-pointer transition-colors hover:bg-slate-50",
-                      isWeekend && "bg-slate-50/30",
-                      isSelected && "bg-[#fff2e6]"
-                    )}
-                  >
-                    <div className={cn(
-                      "w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium mb-1",
-                      isToday
-                        ? "bg-[#f58a2d] text-white"
-                        : "text-slate-700"
-                    )}>
-                      {format(day, 'd')}
-                    </div>
-                    <div className="space-y-1">
-                      {dayEvents.slice(0, 2).map((event) => (
-                        <div
-                          key={event.id}
-                          className="h-1.5 rounded-full"
-                          style={{ backgroundColor: getCustomEventColor(event.type) }}
-                        />
-                      ))}
-                      {dayEvents.length > 2 && (
-                        <p className="text-xs text-slate-400">+{dayEvents.length - 2}</p>
-                      )}
-                    </div>
+            const weeks: (Date | null)[][] = [];
+            for (let i = 0; i < allCells.length; i += 7) {
+              weeks.push(allCells.slice(i, i + 7));
+            }
+
+            return weeks.map((week, weekIdx) => {
+              const firstDay = week.find(d => d !== null);
+              const weekNum = firstDay ? getISOWeek(firstDay) : '';
+              return (
+                <div key={weekIdx} className="grid grid-cols-[20px_repeat(7,1fr)] border-b border-[#f0efe8] last:border-b-0">
+                  {/* Week number */}
+                  <div className="flex items-start justify-center pt-1.5 text-[9px] font-medium text-[#b5b3aa]">
+                    {weekNum}
                   </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+                  {/* Day cells */}
+                  {week.map((day, dayIdx) => {
+                    if (!day) {
+                      return <div key={`empty-${weekIdx}-${dayIdx}`} className="min-h-[88px] border-r border-[#f5f4ef] bg-[#faf9f6]/50" />;
+                    }
+                    const dayEvents = getEventsForDay(day);
+                    const dayIsToday = isSameDay(day, new Date());
+                    const isSelected = selectedDate && isSameDay(day, selectedDate);
+                    const isWeekend = dayIdx >= 5;
+
+                    return (
+                      <div
+                        key={day.toISOString()}
+                        onClick={() => { setCalendarWeekViewDate(day); setActiveTab('kalender-week'); }}
+                        className={cn(
+                          "min-h-[88px] border-r border-[#f5f4ef] p-0.5 cursor-pointer transition-colors",
+                          isWeekend && "bg-[#faf9f6]/50",
+                          isSelected && "bg-[#fff8f0]"
+                        )}
+                      >
+                        <div className="flex justify-center mb-0.5">
+                          <div className={cn(
+                            "w-6 h-6 rounded-full flex items-center justify-center text-[13px] font-semibold",
+                            dayIsToday
+                              ? "bg-[#f58a2d] text-white"
+                              : isWeekend ? "text-[#b0876a]" : "text-[#2f2f2d]"
+                          )}>
+                            {format(day, 'd')}
+                          </div>
+                        </div>
+                        <div className="space-y-px">
+                          {dayEvents.slice(0, 3).map((event) => {
+                            const color = getCustomEventColor(event.type);
+                            return (
+                              <div
+                                key={event.id}
+                                className="rounded-[3px] px-[3px] py-[1px] text-[7.5px] font-semibold leading-[1.2] truncate"
+                                style={{
+                                  backgroundColor: color + '20',
+                                  color: color,
+                                  borderLeft: `2px solid ${color}`,
+                                }}
+                                title={`${event.title} ${formatTime(event.startDate)}`}
+                              >
+                                {event.title}
+                              </div>
+                            );
+                          })}
+                          {dayEvents.length > 3 && (
+                            <p className="text-[7px] text-center text-[#a09e96]">+{dayEvents.length - 3}</p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            });
+          })()}
+        </div>
       </motion.div>
 
       {/* Selected Day Events */}
@@ -1476,7 +1796,7 @@ export function Kalender() {
                       <button
                         key={event.id}
                         onClick={() => { setSelectedEvent(event); setEventDetailOpen(true); }}
-                        className="flex w-full items-start gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors text-left"
+                        className="flex w-full items-start gap-3 p-3 rounded-[8px] bg-slate-50 hover:bg-slate-100 transition-colors text-left"
                       >
                         <div
                           className="w-3 h-3 rounded-full mt-1.5 flex-shrink-0"
@@ -1516,7 +1836,7 @@ export function Kalender() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        <div className="rounded-2xl border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+        <div className="rounded-[8px] border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
           <p className="mb-3 text-[0.95rem] font-semibold tracking-[-0.01em] text-[#2f2f2d]">Kommende aftaler</p>
           <div className="space-y-2">
             {allUpcoming
@@ -1525,14 +1845,14 @@ export function Kalender() {
                 <button
                   key={event.id}
                   onClick={() => { setSelectedEvent(event); setEventDetailOpen(true); }}
-                  className="flex w-full items-start gap-3 rounded-xl border border-[#f0efe8] bg-[#faf9f6] px-3 py-2.5 text-left hover:bg-[#f5f4ef] transition-colors"
+                  className="flex w-full items-start gap-3 rounded-[8px] border border-[#f0efe8] bg-[#faf9f6] px-3 py-2.5 text-left hover:bg-[#f5f4ef] transition-colors"
                 >
                   <div className="flex flex-col items-center min-w-[38px]">
                     <span className="text-[9px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">
-                      {format(parseISO(event.startDate), 'MMM', { locale: da })}
+                      {format(safeParse(event.startDate) ?? new Date(), 'MMM', { locale: da })}
                     </span>
                     <span className="text-[18px] font-bold leading-tight text-[#2f2f2d]">
-                      {format(parseISO(event.startDate), 'd')}
+                      {format(safeParse(event.startDate) ?? new Date(), 'd')}
                     </span>
                   </div>
                   <div className="w-0.5 rounded-full self-stretch" style={{ backgroundColor: getCustomEventColor(event.type) }} />
@@ -1549,7 +1869,7 @@ export function Kalender() {
                       )}
                     </div>
                   </div>
-                  <span className="shrink-0 rounded-lg bg-[#ecebe5] px-2 py-0.5 text-[10px] font-semibold text-[#5f5d56]">
+                  <span className="shrink-0 rounded-[8px] bg-[#ecebe5] px-2 py-0.5 text-[10px] font-semibold text-[#5f5d56]">
                     {getEventTypeLabel(event.type)}
                   </span>
                 </button>
@@ -1560,7 +1880,7 @@ export function Kalender() {
             {allUpcoming.length > 4 && (
               <button
                 onClick={() => setAllUpcomingOpen(true)}
-                className="w-full rounded-xl border border-[#d8d7cf] bg-[#faf9f6] py-2 text-center text-[12px] font-semibold text-[#5f5d56] hover:bg-[#f0efe8] transition-colors"
+                className="w-full rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] py-2 text-center text-[12px] font-semibold text-[#5f5d56] hover:bg-[#f0efe8] transition-colors"
               >
                 Se alle ({allUpcoming.length} aftaler)
               </button>
@@ -1569,62 +1889,14 @@ export function Kalender() {
         </div>
       </motion.div>
 
-      {/* Event templates */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
-        <div className="rounded-2xl border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-[0.95rem] font-semibold tracking-[-0.01em] text-[#2f2f2d]">Aftale-skabeloner</p>
-            <button
-              onClick={() => setIsTemplateDialogOpen(true)}
-              className="flex h-7 w-7 items-center justify-center rounded-full bg-[#ecebe5] text-[#5f5d56] hover:bg-[#e0deda]"
-            >
-              <Plus className="h-4 w-4" />
-            </button>
-          </div>
-
-          {eventTemplates.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 py-6 text-center">
-              <LayoutTemplate className="h-8 w-8 text-[#c8c6bc]" />
-              <p className="text-[12px] text-[#78766d]">Ingen skabeloner endnu. Tilføj genbrugelige aftaletyper.</p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {eventTemplates.map(tmpl => (
-                <div key={tmpl.id} className="flex items-center justify-between rounded-xl border border-[#f0efe8] bg-[#faf9f6] px-3 py-2.5">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-semibold text-[#2f2f2d]">{tmpl.title}</p>
-                    <p className="text-[11px] text-[#78766d]">
-                      {getEventTypeLabel(tmpl.type)} · {tmpl.duration} min{tmpl.location ? ` · ${tmpl.location}` : ''}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleUseTemplate(tmpl)}
-                      className="rounded-lg bg-[#ecebe5] px-2.5 py-1 text-[11px] font-semibold text-[#3f3e3a] hover:bg-[#e0deda]"
-                    >
-                      Brug
-                    </button>
-                    <button
-                      onClick={() => { deleteEventTemplate(tmpl.id); toast.success('Skabelon slettet'); }}
-                      className="rounded-full p-1 text-[#c8c6bc] hover:text-rose-500"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </motion.div>
-
-      {/* Template create dialog */}
-      <Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen}>
-        <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
-          <DialogHeader>
-            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Ny skabelon</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2">
+      {/* Template create sheet */}
+      <Sheet open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen}>
+        <SheetContent side="bottom" hideClose className="flex max-h-[85vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+          <SheetHeader className="px-4 pb-2 shrink-0">
+            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Ny skabelon</SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom,0px)+24px)] space-y-2">
             <div className="space-y-1">
               <Label htmlFor="tpl-title" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Navn</Label>
               <Input
@@ -1632,22 +1904,19 @@ export function Kalender() {
                 value={newTemplate.title}
                 onChange={e => setNewTemplate(prev => ({ ...prev, title: e.target.value }))}
                 placeholder="f.eks. Fodboldtræning"
-                className="rounded-xl border-[#d8d7cf] bg-white"
+                className="rounded-[8px] border-[#d8d7cf] bg-white"
               />
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1">
                 <Label htmlFor="tpl-type" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Type</Label>
-                <Select value={newTemplate.type} onValueChange={v => setNewTemplate(prev => ({ ...prev, type: v as EventType }))}>
-                  <SelectTrigger id="tpl-type" className="rounded-xl border-[#d8d7cf] bg-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {eventTypes.filter(et => et.value !== 'all').map(et => (
-                      <SelectItem key={et.value} value={et.value}>{et.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <SelectSheet
+                  value={newTemplate.type}
+                  onValueChange={v => setNewTemplate(prev => ({ ...prev, type: v as EventType }))}
+                  title="Type"
+                  options={eventTypes.filter(et => et.value !== 'all').map(et => ({ value: et.value, label: et.label }))}
+                  className="rounded-[8px] border-[#d8d7cf] bg-white"
+                />
               </div>
               <div className="space-y-1">
                 <Label htmlFor="tpl-duration" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Varighed (min)</Label>
@@ -1662,7 +1931,7 @@ export function Kalender() {
                     if (isNaN(val)) return;
                     setNewTemplate(prev => ({ ...prev, duration: Math.max(5, Math.min(480, val)) }));
                   }}
-                  className="rounded-xl border-[#d8d7cf] bg-white"
+                  className="rounded-[8px] border-[#d8d7cf] bg-white"
                 />
               </div>
             </div>
@@ -1673,15 +1942,15 @@ export function Kalender() {
                 value={newTemplate.location}
                 onChange={e => setNewTemplate(prev => ({ ...prev, location: e.target.value }))}
                 placeholder="f.eks. Idrætscenter"
-                className="rounded-xl border-[#d8d7cf] bg-white"
+                className="rounded-[8px] border-[#d8d7cf] bg-white"
               />
             </div>
             <div className="flex gap-2 pt-1">
-              <Button variant="outline" className="flex-1 rounded-2xl border-[#d8d7cf]" onClick={() => setIsTemplateDialogOpen(false)}>
+              <Button variant="outline" className="flex-1 rounded-[8px] border-[#d8d7cf]" onClick={() => setIsTemplateDialogOpen(false)}>
                 Annuller
               </Button>
               <Button
-                className="flex-1 rounded-2xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+                className="flex-1 rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
                 disabled={!newTemplate.title.trim()}
                 onClick={() => {
                   const user = users.find(u => u.role === 'parent');
@@ -1703,18 +1972,19 @@ export function Kalender() {
               </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
-      {/* Template use configuration dialog */}
-      <Dialog open={templateUseOpen} onOpenChange={setTemplateUseOpen}>
-        <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
-          <DialogHeader>
-            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">
+      {/* Template use configuration sheet */}
+      <Sheet open={templateUseOpen} onOpenChange={setTemplateUseOpen}>
+        <SheetContent side="bottom" hideClose className="flex max-h-[85vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+          <SheetHeader className="px-4 pb-2 shrink-0">
+            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">
               Brug skabelon: {templateToUse?.title}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2">
+            </SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom,0px)+24px)] space-y-2">
             <div className="space-y-1">
               <Label htmlFor="tmpl-start" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Starttidspunkt</Label>
               <Input
@@ -1722,11 +1992,11 @@ export function Kalender() {
                 type="datetime-local"
                 value={templateStartTime}
                 onChange={e => setTemplateStartTime(e.target.value)}
-                className="rounded-xl border-[#d8d7cf] bg-white"
+                className="rounded-[8px] border-[#d8d7cf] bg-white"
               />
             </div>
             {templateToUse && (
-              <div className="rounded-xl border border-[#e8e7e0] bg-white px-3 py-2 text-[12px] text-[#4a4945]">
+              <div className="rounded-[8px] border border-[#e8e7e0] bg-white px-3 py-2 text-[12px] text-[#4a4945]">
                 Varighed: {templateToUse.duration} min
                 {templateToUse.location ? ` · Sted: ${templateToUse.location}` : ''}
               </div>
@@ -1749,11 +2019,11 @@ export function Kalender() {
               </span>
             </label>
             <div className="flex gap-2 pt-1">
-              <Button variant="outline" className="flex-1 rounded-2xl border-[#d8d7cf]" onClick={() => setTemplateUseOpen(false)}>
+              <Button variant="outline" className="flex-1 rounded-[8px] border-[#d8d7cf]" onClick={() => setTemplateUseOpen(false)}>
                 Annuller
               </Button>
               <Button
-                className="flex-1 rounded-2xl bg-[#f58a2d] text-white hover:bg-[#e47921]"
+                className="flex-1 rounded-[8px] bg-[#f58a2d] text-white hover:bg-[#e47921]"
                 onClick={handleConfirmTemplateUse}
                 disabled={!templateStartTime}
               >
@@ -1761,16 +2031,17 @@ export function Kalender() {
               </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
-      {/* Calendar Source Dialog */}
-      <Dialog open={isSourceDialogOpen} onOpenChange={setIsSourceDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle>Tilføj kalenderkilde</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2 pt-4">
+      {/* Calendar Source Sheet */}
+      <Sheet open={isSourceDialogOpen} onOpenChange={setIsSourceDialogOpen}>
+        <SheetContent side="bottom" hideClose className="flex max-h-[85vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+          <SheetHeader className="px-4 pb-2 shrink-0">
+            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Tilføj kalenderkilde</SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom,0px)+24px)] space-y-2">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="space-y-2">
                 <Label>Navn</Label>
@@ -1782,20 +2053,17 @@ export function Kalender() {
               </div>
               <div className="space-y-2">
                 <Label>Type</Label>
-                <Select
+                <SelectSheet
                   value={newCalendarSource.type}
-                  onValueChange={(value: CalendarSourceType) => setNewCalendarSource((prev) => ({ ...prev, type: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="work">Arbejde</SelectItem>
-                    <SelectItem value="personal">Privat</SelectItem>
-                    <SelectItem value="school">Skole</SelectItem>
-                    <SelectItem value="other">Andet</SelectItem>
-                  </SelectContent>
-                </Select>
+                  onValueChange={(value) => setNewCalendarSource((prev) => ({ ...prev, type: value as CalendarSourceType }))}
+                  title="Type"
+                  options={[
+                    { value: 'work', label: 'Arbejde' },
+                    { value: 'personal', label: 'Privat' },
+                    { value: 'school', label: 'Skole' },
+                    { value: 'other', label: 'Andet' },
+                  ]}
+                />
               </div>
             </div>
             <div className="space-y-2">
@@ -1830,26 +2098,28 @@ export function Kalender() {
               Tilføj kalenderkilde
             </Button>
           </div>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
-      {/* Color Configuration Dialog */}
-      <Dialog open={isColorDialogOpen} onOpenChange={(open) => { setIsColorDialogOpen(open); if (!open) setColorEditCategory(null); }}>
-        <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
-          <DialogHeader>
-            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">
+      {/* Color Configuration Sheet */}
+      <Sheet open={isColorDialogOpen} onOpenChange={(open) => { setIsColorDialogOpen(open); if (!open) setColorEditCategory(null); }}>
+        <SheetContent side="bottom" hideClose className="flex max-h-[85vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+          <SheetHeader className="px-4 pb-2 shrink-0">
+            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">
               {colorEditCategory ? (
                 <button
                   onClick={() => setColorEditCategory(null)}
-                  className="flex items-center gap-1.5 text-[1rem] font-semibold text-[#2f2f2d] hover:text-[#f58a2d] transition-colors"
+                  className="flex items-center gap-1.5 mx-auto text-[1rem] font-semibold text-[#2f2f2d] hover:text-[#f58a2d] transition-colors"
                 >
                   <ChevronLeft className="h-4 w-4" />
                   {eventTypes.find(t => t.value === colorEditCategory)?.label ?? 'Kategori'}
                 </button>
               ) : 'Tilpas kategorifarver'}
-            </DialogTitle>
-          </DialogHeader>
+            </SheetTitle>
+          </SheetHeader>
 
+          <div className="flex-1 overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom,0px)+24px)]">
           {!colorEditCategory ? (
             /* Category list view */
             <div className="space-y-1">
@@ -1860,9 +2130,9 @@ export function Kalender() {
                   <button
                     key={type.value}
                     onClick={() => setColorEditCategory(type.value)}
-                    className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left transition-colors hover:bg-[#f0efe8]"
+                    className="flex w-full items-center gap-3 rounded-[8px] px-3 py-2.5 text-left transition-colors hover:bg-[#f0efe8]"
                   >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-xl" style={{ backgroundColor: currentColor + '22' }}>
+                    <div className="flex h-8 w-8 items-center justify-center rounded-[8px]" style={{ backgroundColor: currentColor + '22' }}>
                       <Icon className="h-4 w-4" style={{ color: currentColor }} />
                     </div>
                     <span className="flex-1 text-sm font-medium text-[#2f2f2d]">{type.label}</span>
@@ -1874,13 +2144,13 @@ export function Kalender() {
               <div className="flex gap-2 pt-3">
                 <Button
                   variant="outline"
-                  className="flex-1 rounded-2xl border-[#d8d7cf] text-[12px]"
+                  className="flex-1 rounded-[8px] border-[#d8d7cf] text-[12px]"
                   onClick={() => setIsColorDialogOpen(false)}
                 >
                   Annuller
                 </Button>
                 <Button
-                  className="flex-1 rounded-2xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a] text-[12px]"
+                  className="flex-1 rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a] text-[12px]"
                   onClick={() => { toast.success('Farver gemt'); setIsColorDialogOpen(false); }}
                 >
                   Gem farver
@@ -1898,7 +2168,7 @@ export function Kalender() {
                   {/* Preview */}
                   <div className="flex flex-col items-center gap-2 py-2">
                     <div
-                      className="flex h-14 w-14 items-center justify-center rounded-2xl transition-colors"
+                      className="flex h-14 w-14 items-center justify-center rounded-[8px] transition-colors"
                       style={{ backgroundColor: currentColor + '22' }}
                     >
                       <Icon className="h-7 w-7 transition-colors" style={{ color: currentColor }} />
@@ -1913,7 +2183,7 @@ export function Kalender() {
                         key={color}
                         onClick={() => setCalendarColorPreference(colorEditCategory, color)}
                         className={cn(
-                          "w-9 h-9 rounded-xl transition-all",
+                          "w-9 h-9 rounded-[8px] transition-all",
                           currentColor === color
                             ? "ring-2 ring-[#f58a2d] ring-offset-2 ring-offset-[#faf9f6] scale-110"
                             : "hover:scale-110"
@@ -1928,13 +2198,13 @@ export function Kalender() {
                   <div className="flex gap-2 pt-1">
                     <Button
                       variant="outline"
-                      className="flex-1 rounded-2xl border-[#d8d7cf] text-[12px]"
+                      className="flex-1 rounded-[8px] border-[#d8d7cf] text-[12px]"
                       onClick={() => setColorEditCategory(null)}
                     >
                       ← Tilbage
                     </Button>
                     <Button
-                      className="flex-1 rounded-2xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a] text-[12px]"
+                      className="flex-1 rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a] text-[12px]"
                       onClick={() => { setColorEditCategory(null); setIsColorDialogOpen(false); }}
                     >
                       Færdig
@@ -1944,19 +2214,21 @@ export function Kalender() {
               );
             })()
           )}
-        </DialogContent>
-      </Dialog>
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* All Upcoming Events Sheet */}
       <Sheet open={allUpcomingOpen} onOpenChange={setAllUpcomingOpen}>
-        <SheetContent side="bottom" className="h-[80vh] rounded-t-3xl bg-[#faf9f6]">
-          <SheetHeader>
-            <SheetTitle className="text-[1rem] text-[#2f2f2d]">
+        <SheetContent side="bottom" hideClose className="flex max-h-[85vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+          <SheetHeader className="px-4 pb-2 shrink-0">
+            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">
               Alle kommende aftaler ({allUpcoming.length})
             </SheetTitle>
           </SheetHeader>
-          <p className="px-1 pb-1 text-[11px] text-[#8a897e]">Swipe til venstre for at slette</p>
-          <div className="overflow-y-auto space-y-2 px-1 pb-6">
+          <p className="px-4 pb-1 text-[11px] text-[#8a897e]">Swipe til venstre for at slette</p>
+          <div className="flex-1 overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom,0px)+24px)] space-y-2">
             {allUpcoming.map(event => (
               <SwipeableEventRow
                 key={event.id}
@@ -1965,14 +2237,14 @@ export function Kalender() {
               >
                 <button
                   onClick={() => { setSelectedEvent(event); setEventDetailOpen(true); setAllUpcomingOpen(false); }}
-                  className="flex w-full items-start gap-3 rounded-xl border border-[#f0efe8] bg-white px-3 py-2.5 text-left hover:bg-[#faf9f6] transition-colors"
+                  className="flex w-full items-start gap-3 rounded-[8px] border border-[#f0efe8] bg-white px-3 py-2.5 text-left hover:bg-[#faf9f6] transition-colors"
                 >
                   <div className="flex flex-col items-center min-w-[38px]">
                     <span className="text-[9px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">
-                      {format(parseISO(event.startDate), 'MMM', { locale: da })}
+                      {format(safeParse(event.startDate) ?? new Date(), 'MMM', { locale: da })}
                     </span>
                     <span className="text-[18px] font-bold leading-tight text-[#2f2f2d]">
-                      {format(parseISO(event.startDate), 'd')}
+                      {format(safeParse(event.startDate) ?? new Date(), 'd')}
                     </span>
                   </div>
                   <div className="w-0.5 rounded-full self-stretch" style={{ backgroundColor: getCustomEventColor(event.type) }} />
@@ -1989,7 +2261,7 @@ export function Kalender() {
                       )}
                     </div>
                   </div>
-                  <span className="shrink-0 rounded-lg bg-[#ecebe5] px-2 py-0.5 text-[10px] font-semibold text-[#5f5d56]">
+                  <span className="shrink-0 rounded-[8px] bg-[#ecebe5] px-2 py-0.5 text-[10px] font-semibold text-[#5f5d56]">
                     {getEventTypeLabel(event.type)}
                   </span>
                 </button>
@@ -1999,25 +2271,27 @@ export function Kalender() {
         </SheetContent>
       </Sheet>
 
-      {/* Event Detail Dialog */}
-      <Dialog open={eventDetailOpen} onOpenChange={setEventDetailOpen}>
-        <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
-          <DialogHeader>
-            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Aftaledetaljer</DialogTitle>
-          </DialogHeader>
+      {/* Event Detail Sheet */}
+      <Sheet open={eventDetailOpen} onOpenChange={setEventDetailOpen}>
+        <SheetContent side="bottom" hideClose className="flex max-h-[85vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+          <SheetHeader className="px-4 pb-2 shrink-0">
+            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Aftaledetaljer</SheetTitle>
+          </SheetHeader>
+          <div className="flex-1 overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom,0px)+24px)]">
           {selectedEvent && (
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded-full" style={{ backgroundColor: getCustomEventColor(selectedEvent.type) }} />
                 <p className="text-[15px] font-semibold text-[#2f2f2d]">{selectedEvent.title}</p>
               </div>
-              <div className="rounded-xl border border-[#e8e7e0] bg-white p-3 space-y-2">
+              <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-3 space-y-2">
                 <div className="flex items-center gap-2 text-sm text-[#4a4945]">
                   <Clock className="h-4 w-4 text-[#78766d]" />
                   <span>
-                    {format(parseISO(selectedEvent.startDate), 'EEEE d. MMMM yyyy · HH:mm', { locale: da })}
+                    {format(safeParse(selectedEvent.startDate) ?? new Date(), 'EEEE d. MMMM yyyy · HH:mm', { locale: da })}
                     {selectedEvent.endDate && selectedEvent.endDate !== selectedEvent.startDate && (
-                      <> – {format(parseISO(selectedEvent.endDate), 'HH:mm', { locale: da })}</>
+                      <> – {format(safeParse(selectedEvent.endDate) ?? new Date(), 'HH:mm', { locale: da })}</>
                     )}
                   </span>
                 </div>
@@ -2033,7 +2307,7 @@ export function Kalender() {
                 </div>
               </div>
               {selectedEvent.description && (
-                <div className="rounded-xl border border-[#e8e7e0] bg-white p-3">
+                <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-3">
                   <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] mb-1">Beskrivelse</p>
                   <p className="text-sm text-[#4a4945] whitespace-pre-wrap">{selectedEvent.description}</p>
                 </div>
@@ -2046,7 +2320,7 @@ export function Kalender() {
               <div className="flex gap-2">
                 <Button
                   variant="outline"
-                  className="flex-1 rounded-2xl border-red-200 text-red-600 hover:bg-red-50"
+                  className="flex-1 rounded-[8px] border-red-200 text-red-600 hover:bg-red-50"
                   onClick={() => {
                     if (selectedEvent) {
                       void deleteEvent(selectedEvent.id);
@@ -2060,7 +2334,7 @@ export function Kalender() {
                   Slet
                 </Button>
                 <Button
-                  className="flex-1 rounded-2xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+                  className="flex-1 rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
                   onClick={() => setEventDetailOpen(false)}
                 >
                   Luk
@@ -2068,8 +2342,10 @@ export function Kalender() {
               </div>
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+          </div>
+        </SheetContent>
+      </Sheet>
+      <SavingOverlay open={isSaving} />
     </div>
   );
 }

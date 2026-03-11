@@ -37,3 +37,8 @@ export const templateId = () => generateId('tpl');
 export const photoId = () => generateId('photo');
 export const diaryEntryId = () => generateId('diary');
 export const keyDateId = () => generateId('kd');
+export const shoppingListId = () => generateId('slist');
+export const professionalCaseId = () => generateId('pcase');
+export const riskAssessmentId = () => generateId('rsk');
+export const caseActivityId = () => generateId('cact');
+export const departmentId = () => generateId('dept');

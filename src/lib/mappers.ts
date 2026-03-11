@@ -1,8 +1,5 @@
 /**
- * Data Mappers — konverterer backend (Prisma) responses til frontend types.
- *
- * Prisma returnerer DateTime som ISO-strenge (JSON serialization),
- * men vi sikrer konsistens og mapper nested relationer til flade IDs.
+ * Data Mappers — konverterer Supabase (snake_case) responses til frontend types (camelCase).
  */
 
 import type {
@@ -21,6 +18,13 @@ import type {
   DiaryEntry,
   KeyDate,
   DecisionLog,
+  ShoppingItem,
+  ShoppingList,
+  Recipe,
+  ProfessionalCase,
+  RiskAssessment,
+  ProfessionalDepartment,
+  CaseActivity,
 } from '@/types';
 
 // ── Helpers ────────────────────────────────────────────────
@@ -39,9 +43,9 @@ function toDateString(val: unknown): string {
   return iso ? iso.slice(0, 10) : '';
 }
 
-// ── User ───────────────────────────────────────────────────
+// ── Supabase row types (snake_case) ─────────────────────────
 
-export interface ApiUser {
+export interface DbUser {
   id: string;
   email: string;
   name: string;
@@ -49,13 +53,227 @@ export interface ApiUser {
   role: string;
   color: string;
   phone?: string | null;
-  professionalType?: string | null;
+  professional_type?: string | null;
   organization?: string | null;
-  isAdmin?: boolean;
-  createdAt?: string;
+  is_admin?: boolean;
+  created_at?: string;
 }
 
-export function mapUser(raw: ApiUser): User {
+export interface DbChild {
+  id: string;
+  name: string;
+  birth_date: string;
+  avatar?: string | null;
+  parent1_id: string;
+  parent2_id: string;
+  household_id: string;
+  institution_name?: string | null;
+  institution_type?: string | null;
+  allergies: string[];
+  medications: string[];
+}
+
+export interface DbHouseholdMember {
+  id: string;
+  user_id: string;
+  household_id: string;
+  role: string;
+  user?: DbUser;
+}
+
+export interface DbCalendarEvent {
+  id: string;
+  title: string;
+  description?: string | null;
+  start_date: string;
+  end_date: string;
+  type: string;
+  child_id?: string | null;
+  created_by: string;
+  location?: string | null;
+  assigned_to: string[];
+  is_recurring: boolean;
+}
+
+export interface DbTask {
+  id: string;
+  title: string;
+  description?: string | null;
+  assigned_to: string;
+  created_by: string;
+  deadline?: string | null;
+  completed: boolean;
+  completed_at?: string | null;
+  category: string;
+  is_recurring: boolean;
+  planned_weekday?: number | null;
+  area?: string | null;
+}
+
+export interface DbExpense {
+  id: string;
+  title: string;
+  description?: string | null;
+  amount: number;
+  currency: string;
+  category: string;
+  paid_by: string;
+  split_with: string[];
+  split_amounts: Record<string, number> | string;
+  split_type: string;
+  date: string;
+  status: string;
+  receipt_url?: string | null;
+  approved_by: string[];
+  is_recurring: boolean;
+  created_at: string;
+}
+
+export interface DbDocument {
+  id: string;
+  title: string;
+  type: string;
+  url: string;
+  uploaded_by: string;
+  shared_with: string[];
+  is_official: boolean;
+  valid_from?: string | null;
+  valid_until?: string | null;
+  created_at: string;
+}
+
+export interface DbMealPlan {
+  id: string;
+  date: string;
+  meal_type: string;
+  title: string;
+  notes?: string | null;
+  created_by: string;
+  recipe?: unknown;
+  created_at: string;
+}
+
+export interface DbThread {
+  id: string;
+  title: string;
+  participants: string[];
+  child_id?: string | null;
+  unread_count: number;
+  deleted_by: string[];
+  created_at: string;
+  updated_at: string;
+  messages?: DbMessage[];
+}
+
+export interface DbMessage {
+  id: string;
+  content: string;
+  sender_id: string;
+  thread_id: string;
+  read_by: string[];
+  deleted_by: string[];
+  attachments?: unknown;
+  created_at: string;
+}
+
+export interface DbMilestone {
+  id: string;
+  child_id: string;
+  title: string;
+  description?: string | null;
+  date: string;
+  category: string;
+  added_by: string;
+  photos: string[];
+  created_at: string;
+}
+
+export interface DbFamilyPhoto {
+  id: string;
+  child_id: string;
+  url: string;
+  caption?: string | null;
+  taken_at: string;
+  added_by: string;
+  added_at: string;
+}
+
+export interface DbDiaryEntry {
+  id: string;
+  child_id: string;
+  date: string;
+  mood: string;
+  sleep: string;
+  appetite: string;
+  note?: string | null;
+  written_by: string;
+  created_at: string;
+}
+
+export interface DbKeyDate {
+  id: string;
+  child_id?: string | null;
+  title: string;
+  date: string;
+  type: string;
+  recurrence: string;
+  reminder_days_before: number;
+  notes?: string | null;
+  added_by: string;
+  created_at: string;
+}
+
+export interface DbDecisionLog {
+  id: string;
+  child_id?: string | null;
+  title: string;
+  description: string;
+  category: string;
+  decided_at: string;
+  proposed_by: string;
+  approved_by: string[];
+  status: string;
+  notes?: string | null;
+  created_at: string;
+}
+
+export interface DbShoppingItem {
+  id: string;
+  household_id: string;
+  list_id?: string | null;
+  name: string;
+  quantity?: string | null;
+  unit?: string | null;
+  category?: string | null;
+  purchased: boolean;
+  added_by: string;
+  created_at: string;
+}
+
+export interface DbShoppingList {
+  id: string;
+  household_id: string;
+  name: string;
+  created_by: string;
+  created_at: string;
+}
+
+export interface DbUserRecipe {
+  id: string;
+  household_id: string;
+  name: string;
+  ingredients: unknown;
+  instructions?: string | null;
+  image_url?: string | null;
+  category?: string | null;
+  shared_with_family: boolean;
+  created_by: string;
+  created_at: string;
+}
+
+// ── Mappers ────────────────────────────────────────────────
+
+export function mapUser(raw: DbUser): User {
   return {
     id: raw.id,
     name: raw.name,
@@ -64,183 +282,82 @@ export function mapUser(raw: ApiUser): User {
     color: (raw.color as User['color']) || 'warm',
     phone: raw.phone ?? undefined,
     role: (raw.role as User['role']) || 'parent',
-    isAdmin: raw.isAdmin ?? false,
-    professionalType: raw.professionalType as User['professionalType'],
+    isAdmin: raw.is_admin ?? false,
+    professionalType: raw.professional_type as User['professionalType'],
     organization: raw.organization ?? undefined,
   };
 }
 
-// ── Child ──────────────────────────────────────────────────
-
-export interface ApiChild {
-  id: string;
-  name: string;
-  birthDate: string;
-  avatar?: string | null;
-  parent1Id: string;
-  parent2Id: string;
-  householdId: string;
-  institutionName?: string | null;
-  institutionType?: string | null;
-  allergies: string[];
-  medications: string[];
-  parent1?: { id: string; name: string; avatar?: string | null };
-  parent2?: { id: string; name: string; avatar?: string | null };
-}
-
-export function mapChild(raw: ApiChild): Child {
+export function mapChild(raw: DbChild): Child {
   return {
     id: raw.id,
     name: raw.name,
-    birthDate: toDateString(raw.birthDate),
+    birthDate: toDateString(raw.birth_date),
     avatar: raw.avatar ?? undefined,
-    parent1Id: raw.parent1Id,
-    parent2Id: raw.parent2Id,
+    parent1Id: raw.parent1_id,
+    parent2Id: raw.parent2_id,
     allergies: raw.allergies ?? [],
     medications: raw.medications ?? [],
-    institutionName: raw.institutionName ?? undefined,
-    institutionType: raw.institutionType as Child['institutionType'],
+    institutionName: raw.institution_name ?? undefined,
+    institutionType: raw.institution_type as Child['institutionType'],
   };
 }
 
-// ── Household ──────────────────────────────────────────────
-
-export interface ApiHousehold {
-  id: string;
-  name: string;
-  familyMode: string;
-  caseNumber?: string | null;
-  members: Array<{
-    id: string;
-    userId: string;
-    role: string;
-    user: { id: string; name: string; avatar?: string | null; email: string; role: string; color: string };
-  }>;
-  children?: Array<{ id: string; name: string; birthDate: string; avatar?: string | null }>;
-}
-
-export function mapHousehold(raw: ApiHousehold): Household {
+export function mapHousehold(raw: { id: string; name: string; family_mode: string; case_number?: string | null }, members?: DbHouseholdMember[], children?: DbChild[]): Household {
   return {
     id: raw.id,
     name: raw.name,
-    familyMode: (raw.familyMode as Household['familyMode']) || 'co_parenting',
-    caseNumber: raw.caseNumber ?? undefined,
-    members: raw.members.map(m => m.user.id),
-    children: raw.children?.map(c => c.id) ?? [],
+    familyMode: (raw.family_mode as Household['familyMode']) || 'co_parenting',
+    caseNumber: raw.case_number ?? undefined,
+    members: members?.map(m => m.user_id) ?? [],
+    children: children?.map(c => c.id) ?? [],
   };
 }
 
-/** Ekstraher User-objekter fra household members */
-export function extractUsersFromHousehold(raw: ApiHousehold): User[] {
-  return raw.members.map(m =>
-    mapUser({
-      id: m.user.id,
-      email: m.user.email,
-      name: m.user.name,
-      avatar: m.user.avatar,
-      role: m.user.role,
-      color: m.user.color,
-    }),
-  );
+export function extractUsersFromMembers(members: DbHouseholdMember[]): User[] {
+  return members
+    .filter(m => m.user)
+    .map(m => mapUser(m.user!));
 }
 
-// ── CalendarEvent ──────────────────────────────────────────
-
-export interface ApiCalendarEvent {
-  id: string;
-  title: string;
-  description?: string | null;
-  startDate: string;
-  endDate: string;
-  type: string;
-  childId?: string | null;
-  createdBy: string;
-  location?: string | null;
-  assignedTo: string[];
-  isRecurring: boolean;
-  child?: { id: string; name: string } | null;
-  creator?: { id: string; name: string; avatar?: string | null };
-}
-
-export function mapEvent(raw: ApiCalendarEvent): CalendarEvent {
+export function mapEvent(raw: DbCalendarEvent): CalendarEvent {
   return {
     id: raw.id,
     title: raw.title,
     description: raw.description ?? undefined,
-    startDate: toISOString(raw.startDate),
-    endDate: toISOString(raw.endDate),
+    startDate: toISOString(raw.start_date),
+    endDate: toISOString(raw.end_date),
     type: raw.type as CalendarEvent['type'],
-    childId: raw.childId ?? undefined,
-    createdBy: raw.createdBy,
+    childId: raw.child_id ?? undefined,
+    createdBy: raw.created_by,
     location: raw.location ?? undefined,
-    assignedTo: raw.assignedTo ?? [],
-    isRecurring: raw.isRecurring ?? false,
+    assignedTo: raw.assigned_to ?? [],
+    isRecurring: raw.is_recurring ?? false,
   };
 }
 
-// ── Task ───────────────────────────────────────────────────
-
-export interface ApiTask {
-  id: string;
-  title: string;
-  description?: string | null;
-  assignedTo: string;
-  createdBy: string;
-  deadline?: string | null;
-  completed: boolean;
-  completedAt?: string | null;
-  category: string;
-  isRecurring: boolean;
-  plannedWeekday?: number | null;
-  area?: string | null;
-  creator?: { id: string; name: string; avatar?: string | null };
-  assignee?: { id: string; name: string; avatar?: string | null };
-}
-
-export function mapTask(raw: ApiTask): Task {
+export function mapTask(raw: DbTask): Task {
   return {
     id: raw.id,
     title: raw.title,
     description: raw.description ?? undefined,
-    assignedTo: raw.assignedTo,
-    createdBy: raw.createdBy,
+    assignedTo: raw.assigned_to,
+    createdBy: raw.created_by,
     deadline: raw.deadline ? toISOString(raw.deadline) : undefined,
     completed: raw.completed,
-    completedAt: raw.completedAt ? toISOString(raw.completedAt) : undefined,
+    completedAt: raw.completed_at ? toISOString(raw.completed_at) : undefined,
     category: raw.category as Task['category'],
-    isRecurring: raw.isRecurring ?? false,
-    plannedWeekday: raw.plannedWeekday ?? undefined,
+    isRecurring: raw.is_recurring ?? false,
+    plannedWeekday: raw.planned_weekday ?? undefined,
     area: raw.area ?? undefined,
   };
 }
 
-// ── Expense ────────────────────────────────────────────────
-
-export interface ApiExpense {
-  id: string;
-  title: string;
-  description?: string | null;
-  amount: number;
-  currency: string;
-  category: string;
-  paidBy: string;
-  splitWith: string[];
-  splitAmounts: Record<string, number> | string;
-  splitType: string;
-  date: string;
-  status: string;
-  receiptUrl?: string | null;
-  approvedBy: string[];
-  isRecurring: boolean;
-  createdAt: string;
-  payer?: { id: string; name: string; avatar?: string | null };
-}
-
-export function mapExpense(raw: ApiExpense): Expense {
+export function mapExpense(raw: DbExpense): Expense {
   const splitAmounts =
-    typeof raw.splitAmounts === 'string'
-      ? JSON.parse(raw.splitAmounts || '{}')
-      : (raw.splitAmounts ?? {});
+    typeof raw.split_amounts === 'string'
+      ? JSON.parse(raw.split_amounts || '{}')
+      : (raw.split_amounts ?? {});
 
   return {
     id: raw.id,
@@ -249,290 +366,323 @@ export function mapExpense(raw: ApiExpense): Expense {
     amount: raw.amount,
     currency: raw.currency || 'DKK',
     category: raw.category as Expense['category'],
-    paidBy: raw.paidBy,
-    splitWith: raw.splitWith ?? [],
+    paidBy: raw.paid_by,
+    splitWith: raw.split_with ?? [],
     splitAmounts,
-    splitType: (raw.splitType as Expense['splitType']) || 'equal',
+    splitType: (raw.split_type as Expense['splitType']) || 'equal',
     date: toDateString(raw.date),
     status: raw.status as Expense['status'],
-    receiptUrl: raw.receiptUrl ?? undefined,
-    approvedBy: raw.approvedBy ?? [],
-    isRecurring: raw.isRecurring ?? false,
-    createdAt: toISOString(raw.createdAt),
+    receiptUrl: raw.receipt_url ?? undefined,
+    approvedBy: raw.approved_by ?? [],
+    isRecurring: raw.is_recurring ?? false,
+    createdAt: toISOString(raw.created_at),
   };
 }
 
-// ── Document ───────────────────────────────────────────────
-
-export interface ApiDocument {
-  id: string;
-  title: string;
-  type: string;
-  url: string;
-  uploadedBy: string;
-  sharedWith: string[];
-  isOfficial: boolean;
-  validFrom?: string | null;
-  validUntil?: string | null;
-  createdAt: string;
-  uploader?: { id: string; name: string; avatar?: string | null };
-}
-
-export function mapDocument(raw: ApiDocument): Document {
+export function mapDocument(raw: DbDocument): Document {
   return {
     id: raw.id,
     title: raw.title,
     type: raw.type as Document['type'],
     url: raw.url,
-    uploadedBy: raw.uploadedBy,
-    uploadedAt: toISOString(raw.createdAt),
-    sharedWith: raw.sharedWith ?? [],
-    isOfficial: raw.isOfficial ?? false,
-    validFrom: raw.validFrom ? toDateString(raw.validFrom) : undefined,
-    validUntil: raw.validUntil ? toDateString(raw.validUntil) : undefined,
+    uploadedBy: raw.uploaded_by,
+    uploadedAt: toISOString(raw.created_at),
+    sharedWith: raw.shared_with ?? [],
+    isOfficial: raw.is_official ?? false,
+    validFrom: raw.valid_from ? toDateString(raw.valid_from) : undefined,
+    validUntil: raw.valid_until ? toDateString(raw.valid_until) : undefined,
   };
 }
 
-// ── MealPlan ───────────────────────────────────────────────
-
-export interface ApiMealPlan {
-  id: string;
-  date: string;
-  mealType: string;
-  title: string;
-  notes?: string | null;
-  createdBy: string;
-  recipe?: unknown;
-  createdAt: string;
-}
-
-export function mapMealPlan(raw: ApiMealPlan): MealPlan {
+export function mapMealPlan(raw: DbMealPlan): MealPlan {
   return {
     id: raw.id,
-    date: raw.date, // Already YYYY-MM-DD in backend
-    mealType: raw.mealType as MealPlan['mealType'],
+    date: raw.date,
+    mealType: raw.meal_type as MealPlan['mealType'],
     title: raw.title,
     notes: raw.notes ?? undefined,
-    createdBy: raw.createdBy,
-    createdAt: toISOString(raw.createdAt),
+    createdBy: raw.created_by,
+    createdAt: toISOString(raw.created_at),
     recipe: raw.recipe as MealPlan['recipe'],
   };
 }
 
-// ── MessageThread ──────────────────────────────────────────
-
-export interface ApiThread {
-  id: string;
-  title: string;
-  participants: string[];
-  childId?: string | null;
-  unreadCount: number;
-  deletedBy: string[];
-  createdAt: string;
-  updatedAt: string;
-  messages?: Array<{
-    id: string;
-    content: string;
-    senderId: string;
-    createdAt: string;
-    readBy: string[];
-    sender?: { id: string; name: string; avatar?: string | null };
-  }>;
-}
-
-export function mapThread(raw: ApiThread): MessageThread {
+export function mapThread(raw: DbThread): MessageThread {
   const lastMsg = raw.messages?.[0];
   return {
     id: raw.id,
     title: raw.title,
     participants: raw.participants,
-    childId: raw.childId ?? undefined,
-    unreadCount: raw.unreadCount ?? 0,
-    createdAt: toISOString(raw.createdAt),
-    deletedBy: raw.deletedBy ?? [],
+    childId: raw.child_id ?? undefined,
+    unreadCount: raw.unread_count ?? 0,
+    createdAt: toISOString(raw.created_at),
+    deletedBy: raw.deleted_by ?? [],
     lastMessage: lastMsg
       ? {
           id: lastMsg.id,
           content: lastMsg.content,
-          senderId: lastMsg.senderId,
-          timestamp: toISOString(lastMsg.createdAt),
+          senderId: lastMsg.sender_id,
+          timestamp: toISOString(lastMsg.created_at),
           threadId: raw.id,
-          readBy: lastMsg.readBy ?? [],
+          readBy: lastMsg.read_by ?? [],
         }
       : undefined,
   };
 }
 
-// ── Message ────────────────────────────────────────────────
-
-export interface ApiMessage {
-  id: string;
-  content: string;
-  senderId: string;
-  threadId: string;
-  readBy: string[];
-  deletedBy: string[];
-  attachments?: unknown;
-  createdAt: string;
-  sender?: { id: string; name: string; avatar?: string | null };
-}
-
-export function mapMessage(raw: ApiMessage): Message {
+export function mapMessage(raw: DbMessage): Message {
   return {
     id: raw.id,
     content: raw.content,
-    senderId: raw.senderId,
-    timestamp: toISOString(raw.createdAt),
-    threadId: raw.threadId,
-    readBy: raw.readBy ?? [],
-    deletedBy: raw.deletedBy ?? [],
+    senderId: raw.sender_id,
+    timestamp: toISOString(raw.created_at),
+    threadId: raw.thread_id,
+    readBy: raw.read_by ?? [],
+    deletedBy: raw.deleted_by ?? [],
     attachments: raw.attachments as Message['attachments'],
   };
 }
 
-// ── Milestone ──────────────────────────────────────────────
-
-export interface ApiMilestone {
-  id: string;
-  childId: string;
-  title: string;
-  description?: string | null;
-  date: string;
-  category: string;
-  addedBy: string;
-  photos: string[];
-  createdAt: string;
-}
-
-export function mapMilestone(raw: ApiMilestone): Milestone {
+export function mapMilestone(raw: DbMilestone): Milestone {
   return {
     id: raw.id,
-    childId: raw.childId,
+    childId: raw.child_id,
     title: raw.title,
     description: raw.description ?? undefined,
     date: toDateString(raw.date),
     category: raw.category as Milestone['category'],
-    addedBy: raw.addedBy,
+    addedBy: raw.added_by,
     photos: raw.photos ?? [],
   };
 }
 
-// ── FamilyPhoto ────────────────────────────────────────────
-
-export interface ApiFamilyPhoto {
-  id: string;
-  childId: string;
-  url: string;
-  caption?: string | null;
-  takenAt: string;
-  addedBy: string;
-  addedAt: string;
-}
-
-export function mapFamilyPhoto(raw: ApiFamilyPhoto): FamilyPhoto {
+export function mapFamilyPhoto(raw: DbFamilyPhoto): FamilyPhoto {
   return {
     id: raw.id,
-    childId: raw.childId,
+    childId: raw.child_id,
     url: raw.url,
     caption: raw.caption ?? undefined,
-    takenAt: toISOString(raw.takenAt),
-    addedBy: raw.addedBy,
-    addedAt: toISOString(raw.addedAt),
+    takenAt: toISOString(raw.taken_at),
+    addedBy: raw.added_by,
+    addedAt: toISOString(raw.added_at),
   };
 }
 
-// ── DiaryEntry ─────────────────────────────────────────────
-
-export interface ApiDiaryEntry {
-  id: string;
-  childId: string;
-  date: string;
-  mood: string;
-  sleep: string;
-  appetite: string;
-  note?: string | null;
-  writtenBy: string;
-  createdAt: string;
-}
-
-export function mapDiaryEntry(raw: ApiDiaryEntry): DiaryEntry {
+export function mapDiaryEntry(raw: DbDiaryEntry): DiaryEntry {
   return {
     id: raw.id,
-    childId: raw.childId,
+    childId: raw.child_id,
     date: toDateString(raw.date),
     mood: raw.mood as DiaryEntry['mood'],
     sleep: raw.sleep as DiaryEntry['sleep'],
     appetite: raw.appetite as DiaryEntry['appetite'],
     note: raw.note ?? undefined,
-    writtenBy: raw.writtenBy,
-    createdAt: toISOString(raw.createdAt),
+    writtenBy: raw.written_by,
+    createdAt: toISOString(raw.created_at),
   };
 }
 
-// ── KeyDate ────────────────────────────────────────────────
-
-export interface ApiKeyDate {
-  id: string;
-  childId?: string | null;
-  title: string;
-  date: string;
-  type: string;
-  recurrence: string;
-  reminderDaysBefore: number;
-  notes?: string | null;
-  addedBy: string;
-  createdAt: string;
-}
-
-export function mapKeyDate(raw: ApiKeyDate): KeyDate {
+export function mapKeyDate(raw: DbKeyDate): KeyDate {
   return {
     id: raw.id,
-    childId: raw.childId ?? undefined,
+    childId: raw.child_id ?? undefined,
     title: raw.title,
     date: toDateString(raw.date),
     type: raw.type as KeyDate['type'],
     recurrence: raw.recurrence as KeyDate['recurrence'],
-    reminderDaysBefore: raw.reminderDaysBefore ?? 7,
+    reminderDaysBefore: raw.reminder_days_before ?? 7,
     notes: raw.notes ?? undefined,
-    addedBy: raw.addedBy,
-    createdAt: toISOString(raw.createdAt),
+    addedBy: raw.added_by,
+    createdAt: toISOString(raw.created_at),
   };
 }
 
-// ── DecisionLog ────────────────────────────────────────────
-
-export interface ApiDecisionLog {
-  id: string;
-  childId?: string | null;
-  title: string;
-  description: string;
-  category: string;
-  decidedAt: string;
-  proposedBy: string;
-  approvedBy: string[];
-  status: string;
-  validFrom?: string | null;
-  validUntil?: string | null;
-  notes?: string | null;
-  documentIds?: string[] | null;
-  createdAt: string;
-}
-
-export function mapDecisionLog(raw: ApiDecisionLog): DecisionLog {
+export function mapDecisionLog(raw: DbDecisionLog): DecisionLog {
   return {
     id: raw.id,
-    childId: raw.childId ?? undefined,
+    childId: raw.child_id ?? undefined,
     title: raw.title,
     description: raw.description,
     category: raw.category as DecisionLog['category'],
-    decidedAt: toISOString(raw.decidedAt),
-    proposedBy: raw.proposedBy,
-    approvedBy: raw.approvedBy ?? [],
+    decidedAt: toISOString(raw.decided_at),
+    proposedBy: raw.proposed_by,
+    approvedBy: raw.approved_by ?? [],
     status: raw.status as DecisionLog['status'],
-    validFrom: raw.validFrom ? toDateString(raw.validFrom) : undefined,
-    validUntil: raw.validUntil ? toDateString(raw.validUntil) : undefined,
     notes: raw.notes ?? undefined,
-    documentIds: raw.documentIds ?? [],
-    createdAt: toISOString(raw.createdAt),
+    createdAt: toISOString(raw.created_at),
+  };
+}
+
+export function mapShoppingItem(raw: DbShoppingItem): ShoppingItem {
+  return {
+    id: raw.id,
+    name: raw.name,
+    quantity: raw.quantity ?? undefined,
+    purchased: raw.purchased,
+    addedBy: raw.added_by,
+    category: raw.category ?? undefined,
+    listId: raw.list_id ?? undefined,
+  };
+}
+
+export function mapShoppingList(raw: DbShoppingList): ShoppingList {
+  return {
+    id: raw.id,
+    name: raw.name,
+    createdAt: toISOString(raw.created_at),
+    createdBy: raw.created_by,
+  };
+}
+
+// ── Professional DB types ─────────────────────────────────
+
+export interface DbProfessionalCase {
+  id: string;
+  case_number: string;
+  department_id: string;
+  municipality: string;
+  family_name: string;
+  parents: string[];
+  child_name: string;
+  child_age: number;
+  status: string;
+  priority: string;
+  risk_level: string;
+  last_contact?: string | null;
+  next_meeting?: string | null;
+  unread_messages: number;
+  pending_approvals: number;
+  notes: string;
+  assigned_to: string;
+  household_id?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DbRiskAssessment {
+  id: string;
+  case_id: string;
+  assessor_id: string;
+  assessment_date: string;
+  risk_level: string;
+  risk_factors: unknown;
+  protective_factors?: string | null;
+  summary?: string | null;
+  recommendations?: string | null;
+  status: string;
+  sent_to: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DbProfessionalDepartment {
+  id: string;
+  municipality: string;
+  department_code: string;
+  department_name: string;
+  region?: string | null;
+  created_at: string;
+}
+
+export interface DbCaseActivity {
+  id: string;
+  case_id: string;
+  type: string;
+  title: string;
+  description?: string | null;
+  related_id?: string | null;
+  related_type?: string | null;
+  created_by: string;
+  created_at: string;
+}
+
+// ── Professional mappers ──────────────────────────────────
+
+export function mapProfessionalCase(raw: DbProfessionalCase): ProfessionalCase {
+  return {
+    id: raw.id,
+    caseNumber: raw.case_number,
+    departmentId: raw.department_id,
+    municipality: raw.municipality || '',
+    familyName: raw.family_name,
+    parents: raw.parents ?? [],
+    childName: raw.child_name,
+    childAge: raw.child_age,
+    status: raw.status as ProfessionalCase['status'],
+    priority: raw.priority as ProfessionalCase['priority'],
+    riskLevel: raw.risk_level as ProfessionalCase['riskLevel'],
+    lastContact: raw.last_contact ? toISOString(raw.last_contact) : '',
+    nextMeeting: raw.next_meeting ? toISOString(raw.next_meeting) : '',
+    unreadMessages: raw.unread_messages ?? 0,
+    pendingApprovals: raw.pending_approvals ?? 0,
+    notes: raw.notes || '',
+    assignedTo: raw.assigned_to,
+    householdId: raw.household_id ?? undefined,
+    createdAt: toISOString(raw.created_at),
+    updatedAt: toISOString(raw.updated_at),
+  };
+}
+
+export function mapRiskAssessment(raw: DbRiskAssessment): RiskAssessment {
+  return {
+    id: raw.id,
+    caseId: raw.case_id,
+    assessorId: raw.assessor_id,
+    assessmentDate: toDateString(raw.assessment_date),
+    riskLevel: raw.risk_level as RiskAssessment['riskLevel'],
+    riskFactors: Array.isArray(raw.risk_factors) ? raw.risk_factors as RiskAssessment['riskFactors'] : [],
+    protectiveFactors: raw.protective_factors || '',
+    summary: raw.summary || '',
+    recommendations: raw.recommendations || '',
+    status: raw.status as RiskAssessment['status'],
+    sentTo: raw.sent_to ?? [],
+    createdAt: toISOString(raw.created_at),
+    updatedAt: toISOString(raw.updated_at),
+  };
+}
+
+export function mapProfessionalDepartment(raw: DbProfessionalDepartment): ProfessionalDepartment {
+  return {
+    id: raw.id,
+    municipality: raw.municipality,
+    departmentCode: raw.department_code,
+    departmentName: raw.department_name,
+    region: raw.region || '',
+  };
+}
+
+export function mapCaseActivity(raw: DbCaseActivity): CaseActivity {
+  return {
+    id: raw.id,
+    caseId: raw.case_id,
+    type: raw.type as CaseActivity['type'],
+    title: raw.title,
+    description: raw.description || '',
+    relatedId: raw.related_id ?? undefined,
+    relatedType: raw.related_type ?? undefined,
+    createdBy: raw.created_by,
+    createdAt: toISOString(raw.created_at),
+  };
+}
+
+export function mapUserRecipe(raw: DbUserRecipe): Recipe {
+  const ingredients = Array.isArray(raw.ingredients) ? raw.ingredients : [];
+  return {
+    id: raw.id,
+    name: raw.name,
+    description: '',
+    category: raw.category || 'other',
+    servings: 4,
+    prepTime: 0,
+    cookTime: 0,
+    difficulty: 'medium',
+    ingredients: ingredients as Recipe['ingredients'],
+    steps: [],
+    nutrition: { kcal: 0, protein: 0, carbs: 0, fat: 0 },
+    tags: [],
+    childFriendly: false,
+    createdBy: raw.created_by,
+    isUserRecipe: true,
+    isShared: raw.shared_with_family,
   };
 }

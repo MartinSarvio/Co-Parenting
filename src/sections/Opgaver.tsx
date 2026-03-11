@@ -1,18 +1,20 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAppStore } from '@/store';
 import { useApiActions } from '@/hooks/useApiActions';
-import { shoppingItemId } from '@/lib/id';
 import { cn, getTaskCategoryLabel } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-// Tabs replaced by underline-style tabs
+import { SelectSheet } from '@/components/custom/SelectSheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
+import { BottomSheet } from '@/components/custom/BottomSheet';
+import { ConfirmCloseDialog } from '@/components/custom/ConfirmCloseDialog';
+import { SavingOverlay } from '@/components/custom/SavingOverlay';
+import { OpgaverSidePanel } from '@/components/custom/OpgaverSidePanel';
+import type { OpgaverSubTab } from '@/components/custom/OpgaverSidePanel';
 import {
   Plus,
   CheckCircle2,
@@ -23,9 +25,9 @@ import {
   Trash2,
   Home,
   X,
-  Menu,
+  Layout,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useTransform, type PanInfo } from 'framer-motion';
 import { parseISO, isToday, isTomorrow, format } from 'date-fns';
 import { da } from 'date-fns/locale';
 import { toast } from 'sonner';
@@ -67,6 +69,40 @@ function getRecurringLabel(pattern?: string): string {
   return labels[pattern || ''] || 'Efter behov';
 }
 
+function SwipeableTaskCard({ children, onDelete }: { children: React.ReactNode; onDelete: () => void }) {
+  const x = useMotionValue(0);
+  const deleteOpacity = useTransform(x, [-100, -40, 0], [1, 0.6, 0]);
+
+  return (
+    <div className="relative overflow-hidden rounded-[8px]">
+      <motion.div
+        className="absolute inset-y-0 right-0 flex w-[80px] items-center justify-center bg-[#ef4444] rounded-r-[8px]"
+        style={{ opacity: deleteOpacity }}
+      >
+        <button
+          onClick={(e) => { e.stopPropagation(); onDelete(); }}
+          className="flex flex-col items-center gap-0.5 text-white"
+        >
+          <Trash2 className="h-5 w-5" />
+          <span className="text-[10px] font-semibold">Slet</span>
+        </button>
+      </motion.div>
+      <motion.div
+        drag="x"
+        dragConstraints={{ left: -80, right: 0 }}
+        dragElastic={0.1}
+        style={{ x }}
+        onDragEnd={(_: unknown, info: PanInfo) => {
+          if (info.offset.x < -150) onDelete();
+        }}
+        className="relative z-10"
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+}
+
 export function Opgaver() {
   const {
     tasks,
@@ -74,10 +110,11 @@ export function Opgaver() {
     users,
     children,
     currentUser,
-    addShoppingItem,
-    updateShoppingItem,
-    deleteShoppingItem
+    household,
+    shoppingLists,
   } = useAppStore();
+  // Multi-deltager opgaver for samboende og bonusfamilier
+  const useMultiParticipant = household?.familyMode === 'together' || household?.familyMode === 'blended';
 
   // Build shopping categories with dynamic child label
   const shoppingCategories = shoppingCategoryDefs.map(cat =>
@@ -85,8 +122,9 @@ export function Opgaver() {
       ? { ...cat, label: children.length > 1 ? 'Børn' : 'Barn' }
       : cat
   );
-  const { createTask, updateTask, deleteTask } = useApiActions();
-  
+  const { createTask, updateTask, deleteTask, createShoppingList, deleteShoppingList } = useApiActions();
+  const opgaverAction = useAppStore(s => s.opgaverAction);
+
   const [activeTab, setActiveTab] = useState('tasks');
   const [filter, setFilter] = useState('all');
   const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
@@ -102,20 +140,30 @@ export function Opgaver() {
     assignedTo: '',
     deadline: '',
   });
-  const [newShoppingItem, setNewShoppingItem] = useState({
-    name: '',
-    quantity: '',
-    category: 'Dagligvarer',
-  });
-  const [isCategoryPanelOpen, setIsCategoryPanelOpen] = useState(false);
+  const [newListName, setNewListName] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [confirmClose, setConfirmClose] = useState(false);
   const [isAddCleaningOpen, setIsAddCleaningOpen] = useState(false);
   const [newCleaning, setNewCleaning] = useState({
     title: '',
     area: '',
     assignedTo: currentUser?.id || users[0]?.id || '',
     weekday: '5',
-    recurringPattern: 'weekly'
+    recurringPattern: 'weekly',
+    participants: [] as string[],
   });
+
+  // Handle TopBar-triggered "+" action
+  useEffect(() => {
+    if (!opgaverAction) return;
+    if (opgaverAction === 'add') {
+      if (activeTab === 'tasks') setIsAddTaskOpen(true);
+      else if (activeTab === 'cleaning') setIsAddCleaningOpen(true);
+      else if (activeTab === 'shopping') setIsAddShoppingOpen(true);
+      else if (activeTab === 'templates') setIsAddCleaningOpen(true);
+    }
+    useAppStore.getState().setOpgaverAction(null);
+  }, [opgaverAction, activeTab]);
 
   // Filter tasks by selected category
   const filteredTasks = tasks.filter(task => {
@@ -126,43 +174,43 @@ export function Opgaver() {
   const pendingTasks = filteredTasks.filter(t => !t.completed);
   const completedTasks = filteredTasks.filter(t => t.completed);
 
-  // Shopping uses same filter — "shopping" category shows all shopping items,
-  // other categories filter by matching shopping item category
-  const pendingShopping = shoppingItems.filter(i => !i.purchased);
-  const purchasedShopping = shoppingItems.filter(i => i.purchased);
-
   const handleAddTask = async () => {
     if (!newTask.title) return;
-
-    await createTask({
-      title: newTask.title,
-      category: newTask.category,
-      assignedTo: newTask.assignedTo || currentUser?.id || 'u1',
-      createdBy: currentUser?.id || 'u1',
-      deadline: newTask.deadline || undefined,
-      completed: false,
-    });
-
-    setIsAddTaskOpen(false);
-    setNewTask({ title: '', category: 'general', assignedTo: '', deadline: '' });
-    toast.success('Opgave tilføjet');
+    setIsSaving(true);
+    try {
+      await createTask({
+        title: newTask.title,
+        category: newTask.category,
+        assignedTo: newTask.assignedTo || currentUser?.id || 'u1',
+        createdBy: currentUser?.id || 'u1',
+        deadline: newTask.deadline || undefined,
+        completed: false,
+      });
+      toast.success('Opgave tilføjet');
+      setIsAddTaskOpen(false);
+      setNewTask({ title: '', category: 'general', assignedTo: '', deadline: '' });
+    } catch {
+      toast.error('Kunne ikke tilføje opgave');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleAddShoppingItem = () => {
-    if (!newShoppingItem.name) return;
-    
-    addShoppingItem({
-      id: shoppingItemId(),
-      name: newShoppingItem.name,
-      quantity: newShoppingItem.quantity,
-      category: newShoppingItem.category,
-      purchased: false,
-      addedBy: currentUser?.id || 'u1',
-    });
-    
-    setIsAddShoppingOpen(false);
-    setNewShoppingItem({ name: '', quantity: '', category: 'Dagligvarer' });
-    toast.success('Vare tilføjet til indkøbslisten');
+  const handleCreateShoppingList = async () => {
+    if (!newListName.trim()) return;
+    setIsSaving(true);
+    try {
+      await createShoppingList({
+        name: newListName.trim(),
+      });
+      toast.success('Indkøbsliste oprettet');
+      setNewListName('');
+      setIsAddShoppingOpen(false);
+    } catch {
+      toast.error('Kunne ikke oprette liste');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const toggleTask = (id: string, completed: boolean) => {
@@ -176,14 +224,6 @@ export function Opgaver() {
     }
   };
 
-  const toggleShoppingItem = (itemId: string, purchased: boolean) => {
-    updateShoppingItem(itemId, {
-      purchased,
-      purchasedBy: purchased ? currentUser?.id : undefined,
-      purchasedAt: purchased ? new Date().toISOString() : undefined
-    });
-  };
-
   const markAllPendingTasksComplete = () => {
     if (pendingTasks.length === 0) return;
     const completedAt = new Date().toISOString();
@@ -191,24 +231,6 @@ export function Opgaver() {
       void updateTask(task.id, { completed: true, completedAt });
     });
     toast.success(`${pendingTasks.length} opgaver markeret som fuldført`);
-  };
-
-  const markAllPendingShoppingPurchased = () => {
-    if (pendingShopping.length === 0) return;
-    const purchasedAt = new Date().toISOString();
-    const purchasedBy = currentUser?.id || users[0]?.id || 'u1';
-    pendingShopping.forEach((item) => {
-      updateShoppingItem(item.id, { purchased: true, purchasedAt, purchasedBy });
-    });
-    toast.success(`${pendingShopping.length} varer markeret som købt`);
-  };
-
-  const resetAllPurchasedShopping = () => {
-    if (purchasedShopping.length === 0) return;
-    purchasedShopping.forEach((item) => {
-      updateShoppingItem(item.id, { purchased: false, purchasedBy: undefined, purchasedAt: undefined });
-    });
-    toast.success('Købte varer er nulstillet');
   };
 
   // ── Cleaning (Rengøring) ──
@@ -228,35 +250,44 @@ export function Opgaver() {
 
   const completedCleaning = cleaningTasks.filter((task) => task.completed).length;
 
-  const handleAddCleaningTask = () => {
-    if (!newCleaning.title.trim() || !newCleaning.assignedTo) {
-      toast.error('Skriv opgave og vælg person');
+  const handleAddCleaningTask = async () => {
+    if (!newCleaning.title.trim() || (!useMultiParticipant && !newCleaning.assignedTo) || (useMultiParticipant && newCleaning.participants.length === 0)) {
+      toast.error(useMultiParticipant ? 'Skriv opgave og vælg deltagere' : 'Skriv opgave og vælg person');
       return;
     }
-    void createTask({
-      title: newCleaning.title.trim(),
-      area: newCleaning.area.trim() || undefined,
-      assignedTo: newCleaning.assignedTo,
-      createdBy: currentUser?.id || users[0]?.id || 'p1',
-      completed: false,
-      category: 'cleaning',
-      isRecurring: true,
-      recurringPattern: newCleaning.recurringPattern,
-      plannedWeekday: Number(newCleaning.weekday)
-    });
-    setIsAddCleaningOpen(false);
-    setNewCleaning({
-      title: '',
-      area: '',
-      assignedTo: currentUser?.id || users[0]?.id || '',
-      weekday: '5',
-      recurringPattern: 'weekly'
-    });
-    toast.success('Rengøringsopgave oprettet');
+    setIsSaving(true);
+    try {
+      await createTask({
+        title: newCleaning.title.trim(),
+        area: newCleaning.area.trim() || undefined,
+        assignedTo: useMultiParticipant ? newCleaning.participants[0] : newCleaning.assignedTo,
+        createdBy: currentUser?.id || users[0]?.id || 'p1',
+        completed: false,
+        category: 'cleaning',
+        isRecurring: true,
+        recurringPattern: newCleaning.recurringPattern,
+        plannedWeekday: Number(newCleaning.weekday),
+        participants: useMultiParticipant && newCleaning.participants.length > 0 ? newCleaning.participants : undefined,
+      });
+      toast.success('Rengøringsopgave oprettet');
+      setIsAddCleaningOpen(false);
+      setNewCleaning({
+        title: '',
+        area: '',
+        assignedTo: currentUser?.id || users[0]?.id || '',
+        weekday: '5',
+        recurringPattern: 'weekly',
+        participants: [],
+      });
+    } catch {
+      toast.error('Kunne ikke oprette rengøringsopgave');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const addTemplateCleaningTask = (template: { title: string; area: string; weekday: number; recurringPattern: string }) => {
-    void createTask({
+    createTask({
       title: template.title,
       area: template.area,
       assignedTo: currentUser?.id || users[0]?.id || 'p1',
@@ -266,161 +297,17 @@ export function Opgaver() {
       isRecurring: true,
       recurringPattern: template.recurringPattern,
       plannedWeekday: template.weekday
-    });
+    }).catch(() => {});
     toast.success(`${template.title} tilføjet`);
   };
 
   return (
     <div className="space-y-1.5 py-1">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between"
-      >
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900">Opgaver & Hjem</h1>
-        </div>
-      </motion.div>
-
-      {/* Underline-style Tabs + filter icon */}
-      <div className="sticky top-0 z-10 bg-[#faf9f6] pb-0">
-        <div className="flex items-center border-b border-[#e5e3dc]">
-          {[
-            { value: 'tasks', label: 'Opgaver' },
-            { value: 'cleaning', label: 'Rengøring' },
-            { value: 'shopping', label: 'Indkøb' },
-          ].map((tab) => (
-            <button
-              key={tab.value}
-              onClick={() => setActiveTab(tab.value)}
-              className={cn(
-                'relative flex-1 py-3 text-center text-[14px] font-semibold transition-colors flex items-center justify-center gap-1.5',
-                activeTab === tab.value ? 'text-[#2f2f2d]' : 'text-[#b0ada4]'
-              )}
-            >
-              {tab.label}
-              {tab.value === 'tasks' && pendingTasks.length > 0 && (
-                <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1 text-[10px]">{pendingTasks.length}</Badge>
-              )}
-              {tab.value === 'cleaning' && cleaningTasks.length > 0 && (
-                <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1 text-[10px]">{completedCleaning}/{cleaningTasks.length}</Badge>
-              )}
-              {tab.value === 'shopping' && pendingShopping.length > 0 && (
-                <Badge variant="secondary" className="ml-1 h-5 min-w-5 px-1 text-[10px]">{pendingShopping.length}</Badge>
-              )}
-              {activeTab === tab.value && (
-                <motion.div
-                  layoutId="opgaver-underline"
-                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#2f2f2d] rounded-full"
-                  transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                />
-              )}
-            </button>
-          ))}
-          {/* Filter icon — right side */}
-          <button
-            type="button"
-            onClick={() => setIsCategoryPanelOpen(true)}
-            className={cn(
-              "relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-colors ml-1",
-              filter !== 'all'
-                ? "bg-[#2f2f2f] text-white"
-                : "hover:bg-[#eceae2] text-[#75736b]"
-            )}
-          >
-            <Menu className="h-5 w-5" />
-            {filter !== 'all' && (
-              <div className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-[#f58a2d] border-2 border-[#faf9f6]" />
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* Category side panel overlay */}
-      <AnimatePresence>
-        {isCategoryPanelOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40 bg-black/30"
-              onClick={() => setIsCategoryPanelOpen(false)}
-            />
-            {/* Panel — slides from left (matches Settings/Mere panel) */}
-            <motion.div
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-              className="fixed inset-y-0 left-0 z-50 w-[280px] bg-white shadow-[4px_0_24px_rgba(0,0,0,0.1)] flex flex-col"
-              style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
-            >
-              {/* Panel header — matches Settings "Mere" */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-[#eeedea]">
-                <h2 className="text-[17px] font-bold text-[#2f2f2d]">Kategorier</h2>
-                <button
-                  onClick={() => setIsCategoryPanelOpen(false)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56]"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              {/* Category list — matches Settings item style */}
-              <div className="flex-1 overflow-y-auto py-2">
-                {(() => {
-                  // Build items with dividers: first 3 items, divider, next 3
-                  const items: (typeof shoppingCategories[0] | null)[] = [];
-                  shoppingCategories.forEach((cat, idx) => {
-                    items.push(cat);
-                    if (idx === 2) items.push(null); // divider after Indkøb
-                  });
-                  return items.map((item, idx) => {
-                    if (item === null) {
-                      return <div key={`div-${idx}`} className="my-2 mx-5 border-t border-[#eeedea]" />;
-                    }
-                    const isActive = filter === item.value;
-                    const Icon = item.icon;
-                    return (
-                      <button
-                        key={item.value}
-                        onClick={() => {
-                          setFilter(item.value);
-                          setIsCategoryPanelOpen(false);
-                        }}
-                        className={cn(
-                          'flex w-full items-center gap-3.5 px-5 py-3 text-left transition-colors',
-                          isActive
-                            ? 'bg-[#f7f6f2]'
-                            : 'hover:bg-[#faf9f6]'
-                        )}
-                      >
-                        <div className={cn(
-                          'flex h-9 w-9 items-center justify-center rounded-xl',
-                          isActive ? 'bg-[#fff2e6]' : 'bg-[#f2f1ed]'
-                        )}>
-                          <Icon className={cn('h-[18px] w-[18px]', isActive ? 'text-[#f58a2d]' : 'text-[#7a786f]')} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className={cn('text-[14px] font-semibold', isActive ? 'text-[#2f2f2d]' : 'text-[#4a4945]')}>
-                            {item.label}
-                          </p>
-                          <p className="text-[11px] text-[#9a978f] truncate">{item.desc}</p>
-                        </div>
-                        {isActive && (
-                          <div className="h-2 w-2 rounded-full bg-[#f58a2d] shrink-0" />
-                        )}
-                      </button>
-                    );
-                  });
-                })()}
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      {/* Opgaver side panel (opened via hamburger in TopBar) */}
+      <OpgaverSidePanel
+        activeSubTab={activeTab}
+        onSelectSubTab={(tab: OpgaverSubTab) => setActiveTab(tab)}
+      />
 
       {/* Tasks Tab */}
       {activeTab === 'tasks' && (
@@ -443,83 +330,72 @@ export function Opgaver() {
             </div>
           )}
 
-          {/* Add Task Button */}
-          <Dialog open={isAddTaskOpen} onOpenChange={setIsAddTaskOpen}>
-            <DialogTrigger asChild>
-              <Button className="w-full">
-                <Plus className="w-4 h-4 mr-2" />
-                Ny opgave
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Tilføj ny opgave</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-2 pt-4">
-                <div className="space-y-2">
-                  <Label>Titel</Label>
-                  <Input 
-                    value={newTask.title}
-                    onChange={(e) => setNewTask({...newTask, title: e.target.value})}
-                    placeholder="F.eks. Køb skolebøger"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Kategori</Label>
-                  <Select 
-                    value={newTask.category} 
-                    onValueChange={(v) => setNewTask({...newTask, category: v as Task['category']})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.filter(c => c.value !== 'all').map(cat => (
-                        <SelectItem key={cat.value} value={cat.value}>
-                          {cat.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Tildelt til</Label>
-                  <Select 
-                    value={newTask.assignedTo} 
-                    onValueChange={(v) => setNewTask({...newTask, assignedTo: v})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Vælg person" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {users.map(user => (
-                        <SelectItem key={user.id} value={user.id}>
-                          <div className="flex items-center gap-2">
-                            <Avatar className="w-5 h-5">
-                              <AvatarImage src={user.avatar} />
-                              <AvatarFallback className="text-xs">{user.name[0]}</AvatarFallback>
-                            </Avatar>
-                            {user.name}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Deadline</Label>
-                  <Input 
-                    type="date"
-                    value={newTask.deadline}
-                    onChange={(e) => setNewTask({...newTask, deadline: e.target.value})}
-                  />
-                </div>
-                <Button onClick={handleAddTask} className="w-full">
-                  Tilføj opgave
-                </Button>
+          {/* Add Task BottomSheet (triggered by TopBar +) */}
+          <ConfirmCloseDialog
+            open={confirmClose}
+            onCancel={() => setConfirmClose(false)}
+            onConfirm={() => { setConfirmClose(false); setIsAddTaskOpen(false); setNewTask({ title: '', category: 'general', assignedTo: '', deadline: '' }); }}
+          />
+          <BottomSheet open={isAddTaskOpen} onOpenChange={(open) => {
+            if (!open && newTask.title.trim()) {
+              setConfirmClose(true);
+            } else {
+              setIsAddTaskOpen(open);
+            }
+          }} title="Tilføj ny opgave">
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label className="text-[12px] font-semibold text-[#78766d]">Titel</Label>
+                <Input
+                  value={newTask.title}
+                  onChange={(e) => setNewTask({...newTask, title: e.target.value})}
+                  placeholder="F.eks. Køb skolebøger"
+                  className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] focus:border-[#f58a2d]"
+                />
               </div>
-            </DialogContent>
-          </Dialog>
+              <div className="space-y-1.5">
+                <Label className="text-[12px] font-semibold text-[#78766d]">Kategori</Label>
+                <SelectSheet
+                  value={newTask.category}
+                  onValueChange={(v) => setNewTask({...newTask, category: v as Task['category']})}
+                  title="Kategori"
+                  options={categories.filter(c => c.value !== 'all').map(cat => ({ value: cat.value, label: cat.label }))}
+                  className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6]"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[12px] font-semibold text-[#78766d]">Tildelt til</Label>
+                <SelectSheet
+                  value={newTask.assignedTo}
+                  onValueChange={(v) => setNewTask({...newTask, assignedTo: v})}
+                  title="Tildelt til"
+                  placeholder="Vælg person"
+                  options={users.map(user => ({
+                    value: user.id,
+                    label: user.name,
+                    icon: <Avatar className="w-5 h-5"><AvatarImage src={user.avatar} /><AvatarFallback className="text-xs">{user.name[0]}</AvatarFallback></Avatar>,
+                  }))}
+                  className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6]"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[12px] font-semibold text-[#78766d]">Deadline</Label>
+                <Input
+                  type="date"
+                  value={newTask.deadline}
+                  onChange={(e) => setNewTask({...newTask, deadline: e.target.value})}
+                  className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] focus:border-[#f58a2d]"
+                />
+              </div>
+              <button
+                onClick={handleAddTask}
+                disabled={!newTask.title.trim() || isSaving}
+                className="w-full flex items-center justify-center gap-2 rounded-[8px] bg-[#f58a2d] py-4 text-[15px] font-bold text-white active:scale-[0.98] transition-transform disabled:opacity-40"
+              >
+                Tilføj opgave
+              </button>
+            </div>
+          </BottomSheet>
 
           {/* Pending Tasks */}
           <div className="space-y-2">
@@ -546,58 +422,60 @@ export function Opgaver() {
                       key={task.id}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 20 }}
+                      exit={{ opacity: 0, height: 0, marginBottom: 0 }}
                       transition={{ delay: index * 0.05 }}
                     >
-                      <Card className="border-slate-200 hover:border-slate-300 transition-colors">
-                        <CardContent className="p-3">
-                          <div className="flex items-start gap-3">
-                            <Checkbox 
-                              checked={task.completed}
-                              onCheckedChange={(checked) => toggleTask(task.id, checked as boolean)}
-                              className="mt-1"
-                            />
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium text-slate-900">{task.title}</p>
-                              <div className="flex items-center gap-2 mt-1 flex-wrap">
-                                <Badge variant="outline" className="text-xs">
-                                  {getTaskCategoryLabel(task.category)}
-                                </Badge>
-                                {task.deadline && (
-                                  <span className={cn(
-                                    "text-xs flex items-center gap-1",
-                                    isToday(parseISO(task.deadline)) ? "text-rose-500" : "text-slate-500"
-                                  )}>
-                                    <Calendar className="w-3 h-3" />
-                                    {isToday(parseISO(task.deadline)) ? 'I dag' : 
-                                     isTomorrow(parseISO(task.deadline)) ? 'I morgen' : 
-                                     format(parseISO(task.deadline), 'dd. MMM', { locale: da })}
-                                  </span>
-                                )}
-                                <div className="flex items-center gap-1">
-                                  <Avatar className="w-4 h-4">
-                                    <AvatarImage src={users.find(u => u.id === task.assignedTo)?.avatar} />
-                                    <AvatarFallback className="text-[8px]">
-                                      {users.find(u => u.id === task.assignedTo)?.name[0]}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <span className="text-xs text-slate-500">
-                                    {users.find(u => u.id === task.assignedTo)?.name}
-                                  </span>
+                      <SwipeableTaskCard onDelete={() => void deleteTask(task.id)}>
+                        <div className="border-b border-[#f2f1ed] transition-colors">
+                          <div className="p-3">
+                            <div className="flex items-start gap-3">
+                              <Checkbox
+                                checked={task.completed}
+                                onCheckedChange={(checked) => toggleTask(task.id, checked as boolean)}
+                                className="mt-1"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-slate-900">{task.title}</p>
+                                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                  <Badge variant="outline" className="text-xs">
+                                    {getTaskCategoryLabel(task.category)}
+                                  </Badge>
+                                  {task.deadline && (
+                                    <span className={cn(
+                                      "text-xs flex items-center gap-1",
+                                      isToday(parseISO(task.deadline)) ? "text-rose-500" : "text-slate-500"
+                                    )}>
+                                      <Calendar className="w-3 h-3" />
+                                      {isToday(parseISO(task.deadline)) ? 'I dag' :
+                                       isTomorrow(parseISO(task.deadline)) ? 'I morgen' :
+                                       format(parseISO(task.deadline), 'dd. MMM', { locale: da })}
+                                    </span>
+                                  )}
+                                  <div className="flex items-center gap-1">
+                                    <Avatar className="w-4 h-4">
+                                      <AvatarImage src={users.find(u => u.id === task.assignedTo)?.avatar} />
+                                      <AvatarFallback className="text-[8px]">
+                                        {users.find(u => u.id === task.assignedTo)?.name[0]}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <span className="text-xs text-slate-500">
+                                      {users.find(u => u.id === task.assignedTo)?.name}
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-slate-400 hover:text-rose-500"
+                                onClick={() => void deleteTask(task.id)}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
                             </div>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="h-8 w-8 text-slate-400 hover:text-rose-500"
-                              onClick={() => void deleteTask(task.id)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
                           </div>
-                        </CardContent>
-                      </Card>
+                        </div>
+                      </SwipeableTaskCard>
                     </motion.div>
                   ))}
                 </AnimatePresence>
@@ -611,8 +489,8 @@ export function Opgaver() {
               <h3 className="font-semibold text-slate-700">Fuldført ({completedTasks.length})</h3>
               <div className="space-y-2">
                 {completedTasks.slice(0, 3).map((task) => (
-                  <Card key={task.id} className="border-slate-200 bg-slate-50/50">
-                    <CardContent className="p-3">
+                  <div key={task.id} className="border-b border-[#f2f1ed]">
+                    <div className="p-3">
                       <div className="flex items-start gap-3">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5" />
                         <div className="flex-1 min-w-0">
@@ -624,8 +502,8 @@ export function Opgaver() {
                           )}
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -637,7 +515,7 @@ export function Opgaver() {
       {activeTab === 'cleaning' && (
         <div className="space-y-2 mt-4">
           {/* ── Status card ── */}
-          <div className="rounded-2xl border border-[#e5e3dc] bg-white p-4">
+          <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Status denne uge</p>
@@ -665,115 +543,126 @@ export function Opgaver() {
             </div>
           </div>
 
-          {/* ── Action cards ── */}
-          <div className="grid grid-cols-2 gap-2.5">
-            <Dialog open={isAddCleaningOpen} onOpenChange={setIsAddCleaningOpen}>
-              <DialogTrigger asChild>
-                <button className="flex items-center gap-2.5 rounded-2xl border-2 border-[#f3c59d] bg-[#fff2e6] p-3 text-left shadow-[0_2px_12px_rgba(245,138,45,0.12)] transition-all active:scale-[0.98]">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f58a2d]">
-                    <Plus className="h-4 w-4 text-white" />
+          {/* Add Cleaning BottomSheet (triggered by TopBar +) */}
+          <BottomSheet open={isAddCleaningOpen} onOpenChange={setIsAddCleaningOpen} title="Tilføj huslig pligt">
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label className="text-[12px] font-semibold text-[#78766d]">Opgave</Label>
+                <Input
+                  value={newCleaning.title}
+                  onChange={(e) => setNewCleaning((prev) => ({ ...prev, title: e.target.value }))}
+                  placeholder="Fx vask gulv i køkken"
+                  className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] focus:border-[#f58a2d]"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[12px] font-semibold text-[#78766d]">Område</Label>
+                <Input
+                  value={newCleaning.area}
+                  onChange={(e) => setNewCleaning((prev) => ({ ...prev, area: e.target.value }))}
+                  placeholder="Fx køkken"
+                  className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] focus:border-[#f58a2d]"
+                />
+              </div>
+              {useMultiParticipant ? (
+                <div className="space-y-1.5">
+                  <Label className="text-[12px] font-semibold text-[#78766d]">Deltagere</Label>
+                  <div className="space-y-1.5 rounded-[8px] border border-[#e5e3dc] p-2">
+                    {users.map((user) => (
+                      <label key={user.id} className="flex items-center gap-2.5 rounded-[8px] px-2 py-1.5 text-[13px] hover:bg-[#faf9f6] transition-colors">
+                        <Checkbox
+                          checked={newCleaning.participants.includes(user.id)}
+                          onCheckedChange={(checked) => {
+                            setNewCleaning((prev) => ({
+                              ...prev,
+                              participants: checked
+                                ? [...prev.participants, user.id]
+                                : prev.participants.filter((id) => id !== user.id),
+                            }));
+                          }}
+                          className="h-4 w-4"
+                        />
+                        {user.name}
+                      </label>
+                    ))}
+                    {children.filter(c => {
+                      const birthYear = c.birthDate ? new Date(c.birthDate).getFullYear() : null;
+                      const age = birthYear ? new Date().getFullYear() - birthYear : null;
+                      return age !== null && age >= 6;
+                    }).map((child) => {
+                      const birthYear = child.birthDate ? new Date(child.birthDate).getFullYear() : null;
+                      const age = birthYear ? new Date().getFullYear() - birthYear : null;
+                      return (
+                        <label key={child.id} className="flex items-center gap-2.5 rounded-[8px] px-2 py-1.5 text-[13px] hover:bg-[#faf9f6] transition-colors">
+                          <Checkbox
+                            checked={newCleaning.participants.includes(child.id)}
+                            onCheckedChange={(checked) => {
+                              setNewCleaning((prev) => ({
+                                ...prev,
+                                participants: checked
+                                  ? [...prev.participants, child.id]
+                                  : prev.participants.filter((id) => id !== child.id),
+                              }));
+                            }}
+                            className="h-4 w-4"
+                          />
+                          {child.name} {age !== null && <span className="text-[#9d9b93]">({age} år)</span>}
+                        </label>
+                      );
+                    })}
                   </div>
-                  <span className="text-[13px] font-bold text-[#bf6722]">Ny pligt</span>
-                </button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Tilføj huslig pligt</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-2 pt-2">
-                  <div className="space-y-2">
-                    <Label>Opgave</Label>
-                    <Input
-                      value={newCleaning.title}
-                      onChange={(e) => setNewCleaning((prev) => ({ ...prev, title: e.target.value }))}
-                      placeholder="Fx vask gulv i køkken"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Område</Label>
-                    <Input
-                      value={newCleaning.area}
-                      onChange={(e) => setNewCleaning((prev) => ({ ...prev, area: e.target.value }))}
-                      placeholder="Fx køkken"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <Label>Ansvarlig</Label>
-                      <Select
-                        value={newCleaning.assignedTo}
-                        onValueChange={(value) => setNewCleaning((prev) => ({ ...prev, assignedTo: value }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Vælg person" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {users.map((user) => (
-                            <SelectItem key={user.id} value={user.id}>
-                              {user.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Dag</Label>
-                      <Select
-                        value={newCleaning.weekday}
-                        onValueChange={(value) => setNewCleaning((prev) => ({ ...prev, weekday: value }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {weekdayNames.map((day, index) => (
-                            <SelectItem key={day} value={String(index)}>
-                              {day}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Hyppighed</Label>
-                    <Select
-                      value={newCleaning.recurringPattern}
-                      onValueChange={(value) => setNewCleaning((prev) => ({ ...prev, recurringPattern: value }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="weekly">Hver uge</SelectItem>
-                        <SelectItem value="biweekly">Hver 2. uge</SelectItem>
-                        <SelectItem value="monthly">Månedlig</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Button className="w-full" onClick={handleAddCleaningTask}>
-                    Tilføj pligt
-                  </Button>
                 </div>
-              </DialogContent>
-            </Dialog>
-
-            {cleaningTemplates.map((template) => (
+              ) : (
+                <div className="space-y-1.5">
+                  <Label className="text-[12px] font-semibold text-[#78766d]">Ansvarlig</Label>
+                  <SelectSheet
+                    value={newCleaning.assignedTo}
+                    onValueChange={(value) => setNewCleaning((prev) => ({ ...prev, assignedTo: value }))}
+                    title="Ansvarlig"
+                    placeholder="Vælg person"
+                    options={users.map((user) => ({ value: user.id, label: user.name }))}
+                    className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6]"
+                  />
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-[12px] font-semibold text-[#78766d]">Dag</Label>
+                  <SelectSheet
+                    value={newCleaning.weekday}
+                    onValueChange={(value) => setNewCleaning((prev) => ({ ...prev, weekday: value }))}
+                    title="Dag"
+                    options={weekdayNames.map((day, index) => ({ value: String(index), label: day }))}
+                    className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6]"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-[12px] font-semibold text-[#78766d]">Hyppighed</Label>
+                  <SelectSheet
+                    value={newCleaning.recurringPattern}
+                    onValueChange={(value) => setNewCleaning((prev) => ({ ...prev, recurringPattern: value }))}
+                    title="Hyppighed"
+                    options={[
+                      { value: 'weekly', label: 'Hver uge' },
+                      { value: 'biweekly', label: 'Hver 2. uge' },
+                      { value: 'monthly', label: 'Månedlig' },
+                    ]}
+                    className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6]"
+                  />
+                </div>
+              </div>
               <button
-                key={template.title}
-                onClick={() => addTemplateCleaningTask(template)}
-                className="flex items-center gap-2.5 rounded-2xl border-2 border-[#e5e3dc] bg-white p-3 text-left transition-all hover:border-[#cccbc3] active:scale-[0.98]"
+                onClick={handleAddCleaningTask}
+                disabled={!newCleaning.title.trim()}
+                className="w-full rounded-[8px] bg-[#f58a2d] py-4 text-[15px] font-bold text-white active:scale-[0.98] transition-transform disabled:opacity-40"
               >
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f0efe8]">
-                  <Plus className="h-4 w-4 text-[#75736b]" />
-                </div>
-                <span className="text-[13px] font-bold text-[#2f2f2d]">{template.title}</span>
+                Tilføj pligt
               </button>
-            ))}
-          </div>
+            </div>
+          </BottomSheet>
 
           {cleaningByWeekday.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-[#d8d7cf] bg-[#faf9f6] py-8 text-center text-sm text-[#78766d]">
+            <div className="rounded-[8px] border border-dashed border-[#d8d7cf] bg-[#faf9f6] py-8 text-center text-sm text-[#78766d]">
               Ingen rengøringsplan endnu. Tilføj første huslige pligt.
             </div>
           ) : (
@@ -785,43 +674,45 @@ export function Opgaver() {
                   </p>
                   <div className="space-y-2">
                     {dayTasks.map((task) => (
-                      <div key={task.id} className="flex items-center gap-3 rounded-2xl border border-[#e8e7e0] bg-white px-3 py-3">
-                        <Checkbox
-                          checked={task.completed}
-                          onCheckedChange={(checked) => {
-                            void updateTask(task.id, {
-                              completed: checked as boolean,
-                              completedAt: checked ? new Date().toISOString() : undefined
-                            });
-                          }}
-                          className="h-5 w-5 shrink-0 rounded-md"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className={cn(
-                            'text-[14px] font-medium text-[#2f2f2d]',
-                            task.completed && 'line-through text-[#9b9a93]'
-                          )}>
-                            {task.title}
-                          </p>
-                          <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                            {task.area && (
-                              <span className="text-[11px] text-[#78766d]">{task.area}</span>
-                            )}
-                            {task.area && <span className="text-[11px] text-[#d0cec5]">·</span>}
-                            <span className="text-[11px] text-[#78766d]">{getRecurringLabel(task.recurringPattern)}</span>
-                            <span className="text-[11px] text-[#d0cec5]">·</span>
-                            <span className="text-[11px] text-[#78766d]">
-                              {users.find((user) => user.id === task.assignedTo)?.name || 'Ukendt'}
-                            </span>
+                      <SwipeableTaskCard key={task.id} onDelete={() => void deleteTask(task.id)}>
+                        <div className="flex items-center gap-3 border-b border-[#f2f1ed] px-3 py-3">
+                          <Checkbox
+                            checked={task.completed}
+                            onCheckedChange={(checked) => {
+                              void updateTask(task.id, {
+                                completed: checked as boolean,
+                                completedAt: checked ? new Date().toISOString() : undefined
+                              });
+                            }}
+                            className="size-4 shrink-0 rounded-[8px]"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className={cn(
+                              'text-[14px] font-medium text-[#2f2f2d]',
+                              task.completed && 'line-through text-[#9b9a93]'
+                            )}>
+                              {task.title}
+                            </p>
+                            <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                              {task.area && (
+                                <span className="text-[11px] text-[#78766d]">{task.area}</span>
+                              )}
+                              {task.area && <span className="text-[11px] text-[#d0cec5]">·</span>}
+                              <span className="text-[11px] text-[#78766d]">{getRecurringLabel(task.recurringPattern)}</span>
+                              <span className="text-[11px] text-[#d0cec5]">·</span>
+                              <span className="text-[11px] text-[#78766d]">
+                                {users.find((user) => user.id === task.assignedTo)?.name || 'Ukendt'}
+                              </span>
+                            </div>
                           </div>
+                          <button
+                            onClick={() => void deleteTask(task.id)}
+                            className="shrink-0 p-1.5 text-[#c5c4be] hover:text-[#ef4444] transition-colors"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
                         </div>
-                        <button
-                          onClick={() => void deleteTask(task.id)}
-                          className="shrink-0 p-1.5 text-[#c5c4be] hover:text-[#ef4444] transition-colors"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
+                      </SwipeableTaskCard>
                     ))}
                   </div>
                 </div>
@@ -831,173 +722,235 @@ export function Opgaver() {
         </div>
       )}
 
-      {/* Shopping Tab */}
-      {activeTab === 'shopping' && (
-        <div className="space-y-2 mt-4">
-          {/* Add Shopping Item */}
-          <Dialog open={isAddShoppingOpen} onOpenChange={setIsAddShoppingOpen}>
-            <DialogTrigger asChild>
-              <Button className="w-full">
-                <Plus className="w-4 h-4 mr-2" />
-                Tilføj vare
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Tilføj til indkøbslisten</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-2 pt-4">
-                <div className="space-y-2">
-                  <Label>Vare</Label>
-                  <Input 
-                    value={newShoppingItem.name}
-                    onChange={(e) => setNewShoppingItem({...newShoppingItem, name: e.target.value})}
-                    placeholder="F.eks. Mælk"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Mængde (valgfri)</Label>
-                  <Input 
-                    value={newShoppingItem.quantity}
-                    onChange={(e) => setNewShoppingItem({...newShoppingItem, quantity: e.target.value})}
-                    placeholder="F.eks. 2 liter"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Kategori</Label>
-                  <Select 
-                    value={newShoppingItem.category} 
-                    onValueChange={(v) => setNewShoppingItem({...newShoppingItem, category: v})}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Dagligvarer">Dagligvarer</SelectItem>
-                      <SelectItem value="Skole">Skole</SelectItem>
-                      <SelectItem value="Fritid">Fritid</SelectItem>
-                      <SelectItem value="Medicin">Medicin</SelectItem>
-                      <SelectItem value="Andet">Andet</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button onClick={handleAddShoppingItem} className="w-full">
-                  Tilføj til listen
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+      {/* Shopping Tab — shows shopping lists (not individual items) */}
+      {activeTab === 'shopping' && (() => {
+        // Build display lists: real lists + virtual "Dagligvarer" for orphan items
+        const orphanItems = shoppingItems.filter(i => !i.listId);
+        const displayLists = [...shoppingLists];
+        if (orphanItems.length > 0 && !displayLists.some(l => l.name === 'Dagligvarer')) {
+          displayLists.unshift({
+            id: '__dagligvarer__',
+            name: 'Dagligvarer',
+            createdAt: new Date().toISOString(),
+            createdBy: currentUser?.id ?? '',
+          });
+        }
 
-          {/* Pending Items */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between gap-2">
-              <h3 className="font-semibold text-slate-700">Mangler ({pendingShopping.length})</h3>
-              <div className="flex items-center gap-2">
-                {pendingShopping.length > 1 && (
-                  <Button variant="outline" size="sm" onClick={markAllPendingShoppingPurchased}>
-                    Afkryds alle
-                  </Button>
-                )}
-                {purchasedShopping.length > 0 && (
-                  <Button variant="ghost" size="sm" onClick={resetAllPurchasedShopping}>
-                    Nulstil
-                  </Button>
-                )}
+        return (
+          <div className="space-y-3 mt-4">
+            {/* Create list BottomSheet (triggered by TopBar +) */}
+            <AnimatePresence>
+              {isAddShoppingOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: '100%' }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: '100%' }}
+                  transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+                  className="fixed inset-0 z-[9999] flex flex-col bg-[#faf9f6]"
+                  style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+                >
+                  {/* Header */}
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-[#e5e3dc] bg-white">
+                    <button
+                      onClick={() => { setIsAddShoppingOpen(false); setNewListName(''); }}
+                      className="flex items-center gap-1 text-[15px] font-medium text-[#78766d] active:opacity-70"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                    <h2 className="text-[16px] font-bold text-[#2f2f2d]">Opret indkøbsliste</h2>
+                    <button
+                      onClick={handleCreateShoppingList}
+                      disabled={!newListName.trim() || isSaving}
+                      className="text-[15px] font-bold text-[#f58a2d] disabled:opacity-40 active:opacity-70"
+                    >
+                      Gem
+                    </button>
+                  </div>
+                  {/* Content */}
+                  <div className="flex-1 px-4 pt-6 space-y-4">
+                    <div className="space-y-1.5">
+                      <Label className="text-[12px] font-semibold text-[#78766d]">Navn</Label>
+                      <Input
+                        value={newListName}
+                        onChange={(e) => setNewListName(e.target.value)}
+                        placeholder="F.eks. Weekendindkøb"
+                        className="rounded-[8px] border-[#e5e3dc] bg-white focus:border-[#f58a2d]"
+                        autoFocus
+                      />
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Create list button */}
+            <button
+              onClick={() => setIsAddShoppingOpen(true)}
+              className="flex w-full items-center justify-center gap-2 rounded-[8px] border-2 border-dashed border-[#d8d7cf] bg-[#faf9f6] py-4 text-[14px] font-semibold text-[#4a4945] transition-all hover:border-[#cccbc3] active:scale-[0.98]"
+            >
+              <Plus className="h-4 w-4" />
+              Opret indkøbsliste
+            </button>
+
+            {/* Shopping list cards */}
+            {displayLists.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-[8px] bg-[#f2f1ed]">
+                  <ShoppingCart className="h-8 w-8 text-[#b0ada4]" />
+                </div>
+                <div>
+                  <p className="text-[15px] font-semibold text-[#2f2f2d]">Ingen indkøbslister</p>
+                  <p className="text-[13px] text-[#9a978f] mt-1">Opret en liste eller tilføj varer i Mad & Hjem</p>
+                </div>
               </div>
-            </div>
-            {pendingShopping.length === 0 ? (
-              <Card className="bg-green-50 border-green-200">
-                <CardContent className="p-4 text-center">
-                  <ShoppingCart className="w-12 h-12 text-green-500 mx-auto mb-2" />
-                  <p className="text-green-700 font-medium">Indkøbslisten er tom!</p>
-                </CardContent>
-              </Card>
             ) : (
               <div className="space-y-2">
-                <AnimatePresence>
-                  {pendingShopping.map((item, index) => (
+                {displayLists.map((list) => {
+                  const listItems = list.id === '__dagligvarer__'
+                    ? orphanItems
+                    : shoppingItems.filter(i => i.listId === list.id);
+                  const purchased = listItems.filter(i => i.purchased).length;
+                  const total = listItems.length;
+                  const pct = total > 0 ? Math.round((purchased / total) * 100) : 0;
+
+                  return (
                     <motion.div
-                      key={item.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 20 }}
-                      transition={{ delay: index * 0.05 }}
+                      key={list.id}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
                     >
-                      <Card className="border-[#d8d7cf] bg-[#fcfbf8] shadow-[0_2px_10px_rgba(15,15,15,0.04)] transition-colors hover:border-[#cfcdbf]">
-                        <CardContent className="p-3.5">
-                          <div className="flex items-start gap-3.5">
-                            <Checkbox 
-                              checked={item.purchased}
-                              onCheckedChange={(checked) => toggleShoppingItem(item.id, checked as boolean)}
-                              className="mt-1 h-5 w-5 rounded-md"
-                            />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-[1.02rem] font-semibold leading-tight text-[#1f1f1d]">{item.name}</p>
-                              <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                                {item.quantity && (
-                                  <Badge variant="secondary" className="rounded-full border-[#ddd9cf] bg-[#ece9df] px-2.5 py-0.5 text-[11px] text-[#4d4a43]">
-                                    {item.quantity}
-                                  </Badge>
-                                )}
-                                <Badge variant="outline" className="rounded-full border-[#d8d7cf] bg-white px-2.5 py-0.5 text-[11px] text-[#58554d]">
-                                  {item.category}
-                                </Badge>
-                                {item.neededForDate && (
-                                  <Badge variant="outline" className="rounded-full border-[#f1d3b7] bg-[#fff1e3] px-2.5 py-0.5 text-[11px] text-[#9a622f]">
-                                    {isToday(parseISO(item.neededForDate))
-                                      ? 'I dag'
-                                      : isTomorrow(parseISO(item.neededForDate))
-                                        ? 'I morgen'
-                                        : format(parseISO(item.neededForDate), 'dd. MMM', { locale: da })}
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="h-9 w-9 rounded-full text-[#9b9a93] hover:bg-[#efece3] hover:text-[#2f2f2d]"
-                              onClick={() => deleteShoppingItem(item.id)}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                      <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[15px] font-bold text-[#2f2f2d] truncate">{list.name}</p>
+                            <p className="text-[12px] text-[#9a978f] mt-0.5">
+                              {total === 0
+                                ? 'Ingen varer endnu'
+                                : `${purchased}/${total} varer afkrydset`}
+                            </p>
                           </div>
-                        </CardContent>
-                      </Card>
+                          <div className="flex items-center gap-2">
+                            {total > 0 && (
+                              <span className="text-[13px] font-bold text-[#2f2f2d]">{pct}%</span>
+                            )}
+                            {list.id !== '__dagligvarer__' && (
+                              <button
+                                onClick={() => deleteShoppingList(list.id)}
+                                className="shrink-0 text-[#b0ada4] hover:text-red-500 transition-colors active:scale-95"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                        {total > 0 && (
+                          <div className="mt-3 h-1.5 rounded-full bg-[#f0efe8] overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-[#22c55e] transition-all"
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        )}
+                      </div>
                     </motion.div>
-                  ))}
-                </AnimatePresence>
+                  );
+                })}
               </div>
             )}
           </div>
+        );
+      })()}
 
-          {/* Purchased Items */}
-          {purchasedShopping.length > 0 && (
-            <div className="space-y-2">
-              <h3 className="font-semibold text-slate-700">Købt ({purchasedShopping.length})</h3>
-              <div className="space-y-2">
-                {purchasedShopping.slice(0, 3).map((item) => (
-                  <Card key={item.id} className="border-slate-200 bg-slate-50/50">
-                    <CardContent className="p-3">
-                      <div className="flex items-start gap-3">
-                        <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5" />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-slate-500 line-through">{item.name}</p>
-                          {item.purchasedBy && (
-                            <p className="text-xs text-slate-400">
-                              Købt af {users.find(u => u.id === item.purchasedBy)?.name}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+      {/* Templates (Skabeloner) Tab */}
+      {activeTab === 'templates' && (
+        <div className="space-y-3 mt-4">
+          {/* Add Cleaning from Template BottomSheet */}
+          <BottomSheet open={isAddCleaningOpen} onOpenChange={setIsAddCleaningOpen} title="Tilføj skabelon som opgave">
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label className="text-[12px] font-semibold text-[#78766d]">Opgave</Label>
+                <Input
+                  value={newCleaning.title}
+                  onChange={(e) => setNewCleaning((prev) => ({ ...prev, title: e.target.value }))}
+                  placeholder="Fx vask gulv i køkken"
+                  className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] focus:border-[#f58a2d]"
+                />
               </div>
+              <div className="space-y-1.5">
+                <Label className="text-[12px] font-semibold text-[#78766d]">Område</Label>
+                <Input
+                  value={newCleaning.area}
+                  onChange={(e) => setNewCleaning((prev) => ({ ...prev, area: e.target.value }))}
+                  placeholder="Fx køkken"
+                  className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] focus:border-[#f58a2d]"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-[12px] font-semibold text-[#78766d]">Dag</Label>
+                  <SelectSheet
+                    value={newCleaning.weekday}
+                    onValueChange={(value) => setNewCleaning((prev) => ({ ...prev, weekday: value }))}
+                    title="Dag"
+                    options={weekdayNames.map((day, index) => ({ value: String(index), label: day }))}
+                    className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6]"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-[12px] font-semibold text-[#78766d]">Hyppighed</Label>
+                  <SelectSheet
+                    value={newCleaning.recurringPattern}
+                    onValueChange={(value) => setNewCleaning((prev) => ({ ...prev, recurringPattern: value }))}
+                    title="Hyppighed"
+                    options={[
+                      { value: 'weekly', label: 'Hver uge' },
+                      { value: 'biweekly', label: 'Hver 2. uge' },
+                      { value: 'monthly', label: 'Månedlig' },
+                    ]}
+                    className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6]"
+                  />
+                </div>
+              </div>
+              <button
+                onClick={handleAddCleaningTask}
+                disabled={!newCleaning.title.trim()}
+                className="w-full rounded-[8px] bg-[#f58a2d] py-4 text-[15px] font-bold text-white active:scale-[0.98] transition-transform disabled:opacity-40"
+              >
+                Tilføj som opgave
+              </button>
             </div>
-          )}
+          </BottomSheet>
+
+          <p className="text-[13px] text-[#78766d]">Tryk på en skabelon for at tilføje den som rengøringsopgave.</p>
+
+          <div className="space-y-2">
+            {cleaningTemplates.map((template) => (
+              <button
+                key={template.title}
+                onClick={() => addTemplateCleaningTask(template)}
+                className="flex w-full items-center gap-3 rounded-[8px] border border-[#e5e3dc] bg-white p-4 text-left transition-all hover:border-[#cccbc3] active:scale-[0.98]"
+              >
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-[#f0efe8]">
+                  <Layout className="h-5 w-5 text-[#75736b]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[14px] font-bold text-[#2f2f2d]">{template.title}</p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="text-[11px] text-[#78766d]">{template.area}</span>
+                    <span className="text-[11px] text-[#d0cec5]">&middot;</span>
+                    <span className="text-[11px] text-[#78766d]">{weekdayNames[template.weekday]}</span>
+                    <span className="text-[11px] text-[#d0cec5]">&middot;</span>
+                    <span className="text-[11px] text-[#78766d]">{getRecurringLabel(template.recurringPattern)}</span>
+                  </div>
+                </div>
+                <Plus className="h-5 w-5 shrink-0 text-[#b0ada4]" />
+              </button>
+            ))}
+          </div>
         </div>
       )}
+
+      <SavingOverlay open={isSaving} />
     </div>
   );
 }

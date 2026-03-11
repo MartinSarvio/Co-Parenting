@@ -1,29 +1,36 @@
-import { useState, useRef, useEffect, type ChangeEvent } from 'react';
+import { useState, useRef, useEffect, useMemo, memo, type ChangeEvent } from 'react';
 import { useAppStore } from '@/store';
 import { useApiActions } from '@/hooks/useApiActions';
 import { attachmentId } from '@/lib/id';
-import { cn, getParentColor } from '@/lib/utils';
-import { Card, CardContent } from '@/components/ui/card';
+import { cn, getParentColor, getEffectiveColor } from '@/lib/utils';
+import { ConfirmCloseDialog } from '@/components/custom/ConfirmCloseDialog';
+import { SavingOverlay } from '@/components/custom/SavingOverlay';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Send,
-  Plus,
-  ChevronLeft,
-  MoreVertical,
   Image as ImageIcon,
   FileText,
   CheckCheck,
   Check,
   Trash2,
+  MessageSquarePlus,
+  ChevronLeft,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format, parseISO, isToday, isYesterday } from 'date-fns';
 import { da } from 'date-fns/locale';
 import { toast } from 'sonner';
 import type { Attachment } from '@/types';
+
+function formatMessageDate(timestamp: string) {
+  const date = parseISO(timestamp);
+  if (isToday(date)) return format(date, 'HH:mm');
+  if (isYesterday(date)) return `I går ${format(date, 'HH:mm')}`;
+  return format(date, 'dd. MMM HH:mm', { locale: da });
+}
 
 export function Kommunikation() {
   const {
@@ -32,25 +39,58 @@ export function Kommunikation() {
     children,
     messages,
     threads,
+    kommunikationThreadId,
+    setKommunikationThreadId,
+    isProfessionalView,
   } = useAppStore();
   const { createThread, sendMessage, deleteThread } = useApiActions();
-  
-  const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null);
+
+  const selectedThreadId = kommunikationThreadId;
+  const setSelectedThreadId = setKommunikationThreadId;
   const [newMessage, setNewMessage] = useState('');
   const [showNewThread, setShowNewThread] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [confirmClose, setConfirmClose] = useState(false);
   const [newThreadTitle, setNewThreadTitle] = useState('');
-  const [newThreadCategory, setNewThreadCategory] = useState<'institution' | 'medicin' | 'samvaer' | 'okonomi' | 'andet'>('institution');
+  const [newThreadCategory, setNewThreadCategory] = useState<string>('institution');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const currentChild = children[0];
   const otherParent = users.find(u => u.id !== currentUser?.id);
-  
-  const selectedThread = threads.find(t => t.id === selectedThreadId);
-  const threadMessages = messages
-    .filter(m => m.threadId === selectedThreadId && !m.deletedBy?.includes(currentUser?.id || ''))
-    .sort((a, b) => parseISO(a.timestamp).getTime() - parseISO(b.timestamp).getTime());
+
+  // Handle TopBar-triggered actions via store
+  const kommunikationAction = useAppStore(s => s.kommunikationAction);
+  useEffect(() => {
+    if (!kommunikationAction) return;
+    if (kommunikationAction === 'new-thread') setShowNewThread(true);
+    useAppStore.getState().setKommunikationAction(null);
+  }, [kommunikationAction]);
+
+  const threadMessages = useMemo(() =>
+    messages
+      .filter(m => m.threadId === selectedThreadId && !m.deletedBy?.includes(currentUser?.id || ''))
+      .sort((a, b) => parseISO(a.timestamp).getTime() - parseISO(b.timestamp).getTime()),
+    [messages, selectedThreadId, currentUser?.id]
+  );
+
+  // Pre-compute visible threads and last messages (avoid N+1 in render)
+  const visibleThreads = useMemo(() =>
+    threads.filter(t => !t.deletedBy?.includes(currentUser?.id || '')),
+    [threads, currentUser?.id]
+  );
+
+  const lastMessageMap = useMemo(() => {
+    const map: Record<string, typeof messages[0] | undefined> = {};
+    for (const thread of visibleThreads) {
+      map[thread.id] = messages
+        .filter(m => m.threadId === thread.id && !m.deletedBy?.includes(currentUser?.id || ''))
+        .sort((a, b) => parseISO(b.timestamp).getTime() - parseISO(a.timestamp).getTime())[0];
+    }
+    return map;
+  }, [visibleThreads, messages, currentUser?.id]);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -62,9 +102,12 @@ export function Kommunikation() {
     const trimmed = content.trim();
     if (!trimmed && (!_attachments || _attachments.length === 0)) return;
 
-    void sendMessage(selectedThreadId, trimmed);
+    sendMessage(selectedThreadId, trimmed).catch(() => {});
 
     setNewMessage('');
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
   };
 
   const fileToDataUrl = (file: File): Promise<string> => {
@@ -108,20 +151,26 @@ export function Kommunikation() {
       toast.error('Tilføj en tydelig titel til samtalen');
       return;
     }
+    setIsSaving(true);
+    try {
+      const thread = await createThread({
+        title: newThreadTitle.trim(),
+        participants: [currentUser?.id || 'u1', otherParent?.id || 'u2'],
+        childId: currentChild?.id,
+      });
 
-    const thread = await createThread({
-      title: newThreadTitle.trim(),
-      participants: [currentUser?.id || 'u1', otherParent?.id || 'u2'],
-      childId: currentChild?.id,
-    });
-
-    setNewThreadTitle('');
-    setNewThreadCategory('institution');
-    setShowNewThread(false);
-    if (thread) {
-      setSelectedThreadId(thread.id);
+      toast.success('Samtale oprettet');
+      setNewThreadTitle('');
+      setNewThreadCategory('institution');
+      setShowNewThread(false);
+      if (thread) {
+        setSelectedThreadId(thread.id);
+      }
+    } catch {
+      toast.error('Kunne ikke oprette samtale');
+    } finally {
+      setIsSaving(false);
     }
-    toast.success('Samtale oprettet');
   };
 
   const threadCategoryTemplates = [
@@ -129,176 +178,186 @@ export function Kommunikation() {
     { key: 'medicin' as const, label: 'Medicin', title: 'Medicin og sundhed' },
     { key: 'samvaer' as const, label: 'Samvær', title: 'Samvær: bytte og tider' },
     { key: 'okonomi' as const, label: 'Økonomi', title: 'Økonomi: udgifter og betalinger' },
+    { key: 'skole' as const, label: 'Skole', title: 'Skole: lektier og arrangementer' },
+    { key: 'aktiviteter' as const, label: 'Aktiviteter', title: 'Aktiviteter: sport og fritid' },
+    { key: 'ferie' as const, label: 'Ferie', title: 'Ferie: planlægning og aftaler' },
+    { key: 'toej' as const, label: 'Tøj', title: 'Tøj: indkøb og størrelse' },
     { key: 'andet' as const, label: 'Andet', title: 'Samtaleemne' },
   ];
 
-  const formatMessageDate = (timestamp: string) => {
-    const date = parseISO(timestamp);
-    if (isToday(date)) return format(date, 'HH:mm');
-    if (isYesterday(date)) return `I går ${format(date, 'HH:mm')}`;
-    return format(date, 'dd. MMM HH:mm', { locale: da });
-  };
+  // New Thread — fullscreen page
+  if (showNewThread) {
+    return (
+      <div
+        className="fixed inset-0 z-50 flex flex-col bg-[#f7f6f2]"
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      >
+        <ConfirmCloseDialog
+          open={confirmClose}
+          onCancel={() => setConfirmClose(false)}
+          onConfirm={() => { setConfirmClose(false); setShowNewThread(false); setNewThreadTitle(''); setNewThreadCategory('institution'); }}
+        />
+        {/* Header: < | Ny samtale | Gem */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-[#e5e3dc]">
+          <button
+            onClick={() => {
+              if (newThreadTitle.trim()) {
+                setConfirmClose(true);
+              } else {
+                setShowNewThread(false);
+              }
+            }}
+            className="w-9 flex items-center justify-center text-[#2f2f2d]"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <h2 className="text-[17px] font-semibold text-[#2f2f2d]">Ny samtale</h2>
+          <button
+            onClick={handleCreateThread}
+            disabled={!newThreadTitle.trim() || isSaving}
+            className="text-[15px] font-semibold text-[#2f2f2f] disabled:opacity-30"
+          >
+            Gem
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto px-4 py-6 mx-auto w-full max-w-[430px]">
+
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <p className="text-[12px] font-semibold text-[#78766d] uppercase tracking-wide">Kategori</p>
+              <div className="flex gap-2 flex-wrap">
+                {threadCategoryTemplates.map((template) => (
+                  <button
+                    key={template.key}
+                    type="button"
+                    onClick={() => {
+                      setNewThreadCategory(template.key);
+                      if (!newThreadTitle.trim()) {
+                        setNewThreadTitle(template.title);
+                      }
+                    }}
+                    className={cn(
+                      "shrink-0 rounded-full border px-3.5 py-1.5 text-[13px] font-medium",
+                      newThreadCategory === template.key
+                        ? "border-[#f3c59d] bg-white text-[#2f2f2d]"
+                        : "border-[#e4cdb7] bg-[#fff7ef] text-[#946539]"
+                    )}
+                  >
+                    {template.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <p className="text-[12px] font-semibold text-[#78766d] uppercase tracking-wide">Titel</p>
+              <Input
+                value={newThreadTitle}
+                onChange={(e) => setNewThreadTitle(e.target.value)}
+                placeholder="Titel på samtalen (fx Institution: sygedage)"
+                className="bg-white rounded-[8px]"
+                autoFocus
+              />
+            </div>
+          </div>
+        </div>
+
+        <SavingOverlay open={isSaving} />
+      </div>
+    );
+  }
 
   // Thread List View
   if (!selectedThreadId) {
     return (
-      <div className="space-y-1.5 py-1">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between"
-        >
-          <div>
-            <h1 className="text-2xl font-semibold text-[#2f2f2d]">Kommunikation</h1>
-          </div>
-          <Button 
-            size="icon"
-            onClick={() => setShowNewThread(true)}
-          >
-            <Plus className="w-5 h-5" />
-          </Button>
-        </motion.div>
-
-        {/* New Thread Dialog */}
-        {showNewThread && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-          >
-            <Card className="border-[#f3c59d] bg-[#fff2e6]">
-              <CardContent className="p-4 space-y-2">
-                <div className="flex flex-wrap gap-2">
-                  {threadCategoryTemplates.map((template) => (
-                    <button
-                      key={template.key}
-                      type="button"
-                      onClick={() => {
-                        setNewThreadCategory(template.key);
-                        if (!newThreadTitle.trim()) {
-                          setNewThreadTitle(template.title);
-                        }
-                      }}
-                      className={cn(
-                        "rounded-full border px-3 py-1 text-xs font-medium",
-                        newThreadCategory === template.key
-                          ? "border-[#f3c59d] bg-white text-[#2f2f2d]"
-                          : "border-[#e4cdb7] bg-[#fff7ef] text-[#946539]"
-                      )}
-                    >
-                      {template.label}
-                    </button>
-                  ))}
-                </div>
-                <Input
-                  value={newThreadTitle}
-                  onChange={(e) => setNewThreadTitle(e.target.value)}
-                  placeholder="Titel på samtalen (fx Institution: sygedage)"
-                  className="bg-white"
-                />
-                <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setShowNewThread(false)}
-                    className="flex-1"
-                  >
-                    Annuller
-                  </Button>
-                  <Button 
-                    onClick={handleCreateThread}
-                    disabled={!newThreadTitle.trim()}
-                    className="flex-1"
-                  >
-                    Opret
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
-
+      <div className="-mx-3 sm:-mx-4">
         {/* Thread List */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="space-y-2"
+          className=""
         >
-          {threads.filter(t => !t.deletedBy?.includes(currentUser?.id || '')).map((thread, index) => {
-            const lastMessage = messages
-              .filter(m => m.threadId === thread.id && !m.deletedBy?.includes(currentUser?.id || ''))
-              .sort((a, b) => parseISO(b.timestamp).getTime() - parseISO(a.timestamp).getTime())[0];
-            
+          {visibleThreads.map((thread, index) => {
+            const lastMessage = lastMessageMap[thread.id];
+
             return (
               <motion.div
                 key={thread.id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
-                onClick={() => setSelectedThreadId(thread.id)}
+                className="relative overflow-hidden"
               >
-                <Card className="border-slate-200 hover:border-[#f3c59d] cursor-pointer transition-colors">
-                  <CardContent className="p-4">
-                    <div className="flex items-start gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-[#fff2e6] flex items-center justify-center flex-shrink-0">
-                        <span className="text-xl font-bold text-[#bf6722]">
-                          {thread.title[0]}
+                {/* Delete background */}
+                <div className="absolute inset-0 flex items-center justify-end pr-5 bg-[#ef4444]">
+                  <Trash2 className="h-5 w-5 text-white" />
+                </div>
+                {/* Swipeable card */}
+                <motion.div
+                  drag="x"
+                  dragConstraints={{ right: 0 }}
+                  dragElastic={0.15}
+                  onDragEnd={(_, info) => {
+                    if (info.offset.x < -100 && currentUser) {
+                      void deleteThread(thread.id, currentUser.id);
+                      toast.success('Samtale skjult for dig');
+                    }
+                  }}
+                  onClick={() => setSelectedThreadId(thread.id)}
+                  className="relative flex items-start gap-3 px-3 sm:px-4 py-3.5 border-b border-[#f2f1ed] cursor-pointer bg-[#f7f6f2] active:bg-[#eeeee8] transition-colors"
+                >
+                  <div className="w-11 h-11 rounded-full bg-[#fff2e6] flex items-center justify-center flex-shrink-0">
+                    <span className="text-lg font-bold text-[#bf6722]">
+                      {thread.title[0]}
+                    </span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-[14px] font-semibold text-[#2f2f2d] truncate">{thread.title}</h3>
+                      {lastMessage && (
+                        <span className="text-[11px] text-[#9a978f] shrink-0 ml-2">
+                          {formatMessageDate(lastMessage.timestamp)}
                         </span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-semibold text-slate-900 truncate">{thread.title}</h3>
-                          {lastMessage && (
-                            <span className="text-xs text-slate-400">
-                              {formatMessageDate(lastMessage.timestamp)}
-                            </span>
-                          )}
-                        </div>
-                        {lastMessage ? (
-                          <p className="text-sm text-slate-500 truncate mt-1">
-                            <span className="font-medium">
-                              {users.find(u => u.id === lastMessage.senderId)?.name}:
-                            </span>{' '}
-                            {lastMessage.content}
-                          </p>
-                        ) : (
-                          <p className="text-sm text-slate-400 mt-1">Ingen beskeder endnu</p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        {thread.unreadCount > 0 && (
-                          <Badge className="bg-[#2f2f2f] text-white">
-                            {thread.unreadCount}
-                          </Badge>
-                        )}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (currentUser) {
-                              void deleteThread(thread.id, currentUser.id);
-                              toast.success('Samtale skjult for dig');
-                            }
-                          }}
-                          className="p-1.5 rounded-full text-[#c5c4be] hover:text-[#ef4444] hover:bg-red-50 transition-colors"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
+                      )}
                     </div>
-                  </CardContent>
-                </Card>
+                    {lastMessage ? (
+                      <p className="text-[13px] text-[#78766d] truncate mt-0.5">
+                        <span className="font-medium text-[#5f5d56]">
+                          {users.find(u => u.id === lastMessage.senderId)?.name}:
+                        </span>{' '}
+                        {lastMessage.content}
+                      </p>
+                    ) : (
+                      <p className="text-[13px] text-[#9a978f] mt-0.5">Ingen beskeder endnu</p>
+                    )}
+                  </div>
+                  {thread.unreadCount > 0 && (
+                    <Badge className="bg-[#2f2f2f] text-white shrink-0 self-center">
+                      {thread.unreadCount}
+                    </Badge>
+                  )}
+                </motion.div>
               </motion.div>
             );
           })}
           
-          {threads.length === 0 && (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 mx-auto rounded-full bg-slate-100 flex items-center justify-center mb-4">
-                <Send className="w-8 h-8 text-slate-400" />
+          {visibleThreads.length === 0 && (
+            <div className="text-center py-16">
+              <div className="w-20 h-20 mx-auto rounded-full bg-[#fff2e6] flex items-center justify-center mb-4">
+                <MessageSquarePlus className="w-10 h-10 text-[#f58a2d]" />
               </div>
-              <p className="text-slate-500">Ingen samtaler endnu</p>
-              <p className="text-sm text-slate-400">Start en ny samtale ved at trykke på +</p>
+              <h3 className="text-lg font-semibold text-[#2f2f2d] mb-1">Ingen samtaler endnu</h3>
+              <p className="text-sm text-[#9a978f] mb-5">Opret en ny chat for at starte en samtale</p>
+              <Button
+                onClick={() => setShowNewThread(true)}
+                className="rounded-full bg-[#2f2f2f] text-white hover:bg-[#1a1a1a] px-6"
+              >
+                <MessageSquarePlus className="h-4 w-4 mr-2" />
+                Opret ny chat
+              </Button>
             </div>
           )}
         </motion.div>
@@ -306,131 +365,36 @@ export function Kommunikation() {
     );
   }
 
-  // Chat View
+  // Chat View — fullscreen overlay
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)]">
-      {/* Chat Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center gap-3 p-4 border-b border-slate-200 bg-white"
-      >
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={() => setSelectedThreadId(null)}
-          className="-ml-2"
-        >
-          <ChevronLeft className="w-5 h-5" />
-        </Button>
-        <div className="w-10 h-10 rounded-xl bg-[#fff2e6] flex items-center justify-center">
-          <span className="font-bold text-[#bf6722]">{selectedThread?.title[0]}</span>
-        </div>
-        <div className="flex-1">
-          <h2 className="font-semibold text-slate-900">{selectedThread?.title}</h2>
-          <p className="text-xs text-slate-500">
-            Med {otherParent?.name}
-          </p>
-        </div>
-        <Button variant="ghost" size="icon">
-          <MoreVertical className="w-5 h-5" />
-        </Button>
-      </motion.div>
-
+    <div
+      className="fixed inset-x-0 top-0 bottom-0 z-40 flex flex-col bg-[#f7f6f2]"
+      style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 58px)' }}
+    >
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-2">
+      <div className="flex-1 overflow-y-auto p-4 pb-20 space-y-2 mx-auto w-full max-w-[430px]">
         <AnimatePresence>
-          {threadMessages.map((message, index) => {
-            const isCurrentUser = message.senderId === currentUser?.id;
-            const sender = users.find(u => u.id === message.senderId);
-            const showAvatar = index === 0 || threadMessages[index - 1].senderId !== message.senderId;
-            
-            return (
-              <motion.div
-                key={message.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={cn(
-                  "flex gap-2",
-                  isCurrentUser ? "justify-end" : "justify-start"
-                )}
-              >
-                {!isCurrentUser && showAvatar && (
-                  <Avatar className="w-8 h-8 mt-1">
-                    <AvatarImage src={sender?.avatar} />
-                    <AvatarFallback 
-                      className="text-xs"
-                      style={{ 
-                        backgroundColor: sender ? getParentColor(sender.color) + '30' : undefined,
-                        color: sender ? getParentColor(sender.color) : undefined
-                      }}
-                    >
-                      {sender?.name[0]}
-                    </AvatarFallback>
-                  </Avatar>
-                )}
-                {!isCurrentUser && !showAvatar && <div className="w-8" />}
-                
-                <div className={cn("max-w-[75%]", isCurrentUser ? "items-end" : "items-start")}>
-                  <div className={cn(
-                    "px-4 py-2.5 rounded-2xl",
-                    isCurrentUser 
-                      ? "bg-[#2f2f2f] text-white rounded-br-md" 
-                      : "bg-white border border-slate-200 text-slate-800 rounded-bl-md"
-                  )}>
-                    {message.attachments?.map((attachment) => (
-                      <div key={attachment.id} className="mb-2 last:mb-0">
-                        {attachment.type === 'image' ? (
-                          <img
-                            src={attachment.url}
-                            alt={attachment.name}
-                            className="max-h-52 w-full rounded-xl object-cover"
-                          />
-                        ) : (
-                          <a
-                            href={attachment.url}
-                            download={attachment.name}
-                            className={cn(
-                              "flex items-center gap-2 rounded-lg border px-2.5 py-2 text-sm",
-                              isCurrentUser ? "border-white/30 bg-white/10 text-white" : "border-slate-200 bg-slate-50 text-slate-700"
-                            )}
-                          >
-                            <FileText className="h-4 w-4" />
-                            <span className="truncate">{attachment.name}</span>
-                          </a>
-                        )}
-                      </div>
-                    ))}
-                    {message.content && <p className="text-sm">{message.content}</p>}
-                  </div>
-                  <div className={cn(
-                    "flex items-center gap-1 mt-1",
-                    isCurrentUser ? "justify-end" : "justify-start"
-                  )}>
-                    <span className="text-xs text-slate-400">
-                      {formatMessageDate(message.timestamp)}
-                    </span>
-                    {isCurrentUser && (
-                      message.readBy.length > 1 ? (
-                        <CheckCheck className="w-3 h-3 text-[#f58a2d]" />
-                      ) : (
-                        <Check className="w-3 h-3 text-slate-400" />
-                      )
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
+          {threadMessages.map((message, index) => (
+            <MessageBubble
+              key={message.id}
+              message={message}
+              isCurrentUser={message.senderId === currentUser?.id}
+              sender={users.find(u => u.id === message.senderId)}
+              showAvatar={index === 0 || threadMessages[index - 1].senderId !== message.senderId}
+              currentUserId={currentUser?.id}
+              isProfessionalView={isProfessionalView}
+              threadParticipants={visibleThreads.find(t => t.id === selectedThreadId)?.participants}
+              allUsers={users}
+            />
+          ))}
         </AnimatePresence>
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="p-4 border-t border-slate-200 bg-white"
+      {/* Floating input bar */}
+      <div
+        className="px-3 pb-3"
+        style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom, 0px))' }}
       >
         <input
           ref={imageInputRef}
@@ -451,38 +415,156 @@ export function Kommunikation() {
             void handleAttachmentSelect(event, 'document');
           }}
         />
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-slate-400"
+        <div className="flex items-end gap-2 rounded-[22px] bg-white/90 backdrop-blur-md border border-[#e5e3dc]/60 shadow-[0_2px_16px_rgba(0,0,0,0.08)] px-2 py-1.5">
+          <button
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56] active:scale-95 transition-all"
             onClick={() => imageInputRef.current?.click()}
+            aria-label="Tilføj billede"
           >
             <ImageIcon className="w-5 h-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-slate-400"
+          </button>
+          <button
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56] active:scale-95 transition-all"
             onClick={() => fileInputRef.current?.click()}
+            aria-label="Tilføj dokument"
           >
             <FileText className="w-5 h-5" />
-          </Button>
-          <Input
+          </button>
+          <textarea
+            ref={textareaRef}
             value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+            onChange={(e) => {
+              setNewMessage(e.target.value);
+              e.target.style.height = 'auto';
+              e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
             placeholder="Skriv en besked..."
-            className="flex-1"
+            rows={1}
+            className="flex-1 bg-transparent px-3 py-2 text-[14px] text-[#2f2f2d] placeholder:text-[#9a978f] outline-none resize-none max-h-[120px] leading-5"
           />
-          <Button 
+          <button
             onClick={() => handleSendMessage()}
             disabled={!newMessage.trim()}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f58a2d] text-white shadow-sm active:scale-95 transition-all disabled:opacity-40"
+            aria-label="Send besked"
           >
             <Send className="w-4 h-4" />
-          </Button>
+          </button>
         </div>
-      </motion.div>
+      </div>
+
+      <SavingOverlay open={isSaving} />
     </div>
   );
 }
+
+/** Memoized message bubble — prevents re-render when sibling messages change */
+const MessageBubble = memo(function MessageBubble({
+  message,
+  isCurrentUser,
+  sender,
+  showAvatar,
+  currentUserId,
+  isProfessionalView,
+  threadParticipants,
+  allUsers,
+}: {
+  message: { id: string; content: string; timestamp: string; readBy: string[]; attachments?: Attachment[] };
+  isCurrentUser: boolean;
+  sender: { id: string; name: string; avatar?: string; color: string } | undefined;
+  showAvatar: boolean;
+  currentUserId?: string;
+  isProfessionalView?: boolean;
+  threadParticipants?: string[];
+  allUsers?: { id: string; name: string; avatar?: string }[];
+}) {
+  const senderColor = sender ? getParentColor(getEffectiveColor(sender, currentUserId)) : undefined;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={cn("flex gap-2", isCurrentUser ? "justify-end" : "justify-start")}
+    >
+      {!isCurrentUser && showAvatar && (
+        <Avatar className="w-8 h-8 mt-1">
+          <AvatarImage src={sender?.avatar} />
+          <AvatarFallback
+            className="text-xs"
+            style={{ backgroundColor: senderColor ? senderColor + '30' : undefined, color: senderColor }}
+          >
+            {sender?.name[0]}
+          </AvatarFallback>
+        </Avatar>
+      )}
+      {!isCurrentUser && !showAvatar && <div className="w-8" />}
+
+      <div className={cn("max-w-[75%]", isCurrentUser ? "items-end" : "items-start")}>
+        <div className={cn(
+          "px-4 py-2.5 rounded-2xl",
+          isCurrentUser
+            ? "bg-[#2f2f2f] text-white rounded-br-md"
+            : "bg-white border border-[#e5e3dc] text-[#2f2f2d] rounded-bl-md"
+        )}>
+          {message.attachments?.map((attachment) => (
+            <div key={attachment.id} className="mb-2 last:mb-0">
+              {attachment.type === 'image' ? (
+                <img src={attachment.url} alt={attachment.name} className="max-h-52 w-full rounded-xl object-cover" />
+              ) : (
+                <a
+                  href={attachment.url}
+                  download={attachment.name}
+                  className={cn(
+                    "flex items-center gap-2 rounded-xl border px-2.5 py-2 text-sm",
+                    isCurrentUser ? "border-white/30 bg-white/10 text-white" : "border-[#e5e3dc] bg-[#f2f1ed] text-[#2f2f2d]"
+                  )}
+                >
+                  <FileText className="h-4 w-4" />
+                  <span className="truncate">{attachment.name}</span>
+                </a>
+              )}
+            </div>
+          ))}
+          {message.content && <p className="text-sm">{message.content}</p>}
+        </div>
+        <div className={cn("flex items-center gap-1 mt-1", isCurrentUser ? "justify-end" : "justify-start")}>
+          <span className="text-xs text-[#9a978f]">{formatMessageDate(message.timestamp)}</span>
+          {isCurrentUser && (
+            message.readBy.length > 1
+              ? <CheckCheck className="w-3 h-3 text-[#f58a2d]" />
+              : <Check className="w-3 h-3 text-[#9a978f]" />
+          )}
+        </div>
+        {/* Per-parent read receipts for professional view */}
+        {isProfessionalView && isCurrentUser && threadParticipants && allUsers && (
+          <div className="flex items-center gap-2 mt-1 justify-end">
+            {threadParticipants
+              .filter(pid => pid !== currentUserId)
+              .map(pid => {
+                const parent = allUsers.find(u => u.id === pid);
+                const hasRead = message.readBy.includes(pid);
+                return (
+                  <div key={pid} className="flex items-center gap-1">
+                    <span className={`text-[10px] ${hasRead ? 'text-[#1a7a3a]' : 'text-[#9a978f]'}`}>
+                      {parent?.name?.split(' ')[0] || 'Ukendt'}
+                    </span>
+                    {hasRead ? (
+                      <CheckCheck className="w-3 h-3 text-[#1a7a3a]" />
+                    ) : (
+                      <Check className="w-3 h-3 text-[#9a978f]" />
+                    )}
+                  </div>
+                );
+              })}
+          </div>
+        )}
+      </div>
+    </motion.div>
+  );
+});

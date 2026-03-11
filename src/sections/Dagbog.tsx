@@ -6,15 +6,12 @@ import { OverblikSidePanel } from '@/components/custom/OverblikSidePanel';
 import { format } from 'date-fns';
 import { da } from 'date-fns/locale';
 import { Plus, BookOpen, Smile, Meh, Frown, Zap, Moon } from 'lucide-react';
+import { SavingOverlay } from '@/components/custom/SavingOverlay';
+import { ConfirmCloseDialog } from '@/components/custom/ConfirmCloseDialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { BottomSheet } from '@/components/custom/BottomSheet';
 import { cn } from '@/lib/utils';
 import type { DiaryEntry } from '@/types';
 
@@ -45,7 +42,7 @@ function QualityPicker({ label, value, onChange }: { label: string; value: Quali
             key={opt.value}
             onClick={() => onChange(opt.value)}
             className={cn(
-              'flex-1 rounded-xl py-2 text-sm font-medium transition-all',
+              'flex-1 rounded-[8px] py-2 text-sm font-medium transition-all',
               value === opt.value
                 ? 'bg-[#2f2f2f] text-white'
                 : 'bg-[#ecebe5] text-[#5f5d56] hover:bg-[#e0deda]'
@@ -64,6 +61,8 @@ export function Dagbog() {
   const { createDiaryEntry } = useApiActions();
   const { currentChild } = useFamilyContext();
   const [addOpen, setAddOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [confirmClose, setConfirmClose] = useState(false);
   const [mood, setMood] = useState<Mood>('neutral');
   const [sleep, setSleep] = useState<Quality>('okay');
   const [appetite, setAppetite] = useState<Quality>('okay');
@@ -77,20 +76,27 @@ export function Dagbog() {
 
   async function handleAdd() {
     if (!currentUser || !childForDiary) return;
-    await createDiaryEntry({
-      childId: childForDiary.id,
-      date: new Date().toISOString(),
-      mood,
-      sleep,
-      appetite,
-      note: note.trim() || undefined,
-    });
-    setAddOpen(false);
-    setMood('neutral');
-    setSleep('okay');
-    setAppetite('okay');
-    setNote('');
-    toast.success('Dagbogsnotat gemt');
+    setIsSaving(true);
+    try {
+      await createDiaryEntry({
+        childId: childForDiary.id,
+        date: new Date().toISOString(),
+        mood,
+        sleep,
+        appetite,
+        note: note.trim() || undefined,
+      });
+      toast.success('Dagbogsnotat gemt');
+      setAddOpen(false);
+      setMood('neutral');
+      setSleep('okay');
+      setAppetite('okay');
+      setNote('');
+    } catch {
+      toast.error('Kunne ikke gemme dagbogsnotat');
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   function getMoodInfo(m: Mood) {
@@ -119,7 +125,7 @@ export function Dagbog() {
         </div>
         <Button
           onClick={() => setAddOpen(true)}
-          className="h-9 gap-1.5 rounded-2xl bg-[#2f2f2f] px-4 text-sm text-white hover:bg-[#1a1a1a]"
+          className="h-9 gap-1.5 rounded-[8px] bg-[#2f2f2f] px-4 text-sm text-white hover:bg-[#1a1a1a]"
         >
           <Plus className="h-4 w-4" />
           Nyt notat
@@ -135,7 +141,7 @@ export function Dagbog() {
           </div>
           <Button
             variant="outline"
-            className="mt-1 h-9 rounded-2xl border-[#d0cec5] px-4 text-sm"
+            className="mt-1 h-9 rounded-[8px] border-[#d0cec5] px-4 text-sm"
             onClick={() => setAddOpen(true)}
           >
             <Plus className="mr-1.5 h-4 w-4" /> Opret notat
@@ -147,7 +153,7 @@ export function Dagbog() {
             const moodInfo = getMoodInfo(entry.mood);
             const MoodIcon = moodInfo.icon;
             return (
-              <div key={entry.id} className="rounded-2xl border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+              <div key={entry.id} className="rounded-[8px] border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <MoodIcon className={cn('h-5 w-5', moodInfo.color)} />
@@ -176,62 +182,75 @@ export function Dagbog() {
         </div>
       )}
 
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
-          <DialogHeader>
-            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Nyt dagbogsnotat</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2">
-            {/* Mood */}
-            <div className="space-y-1.5">
-              <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Humør</p>
-              <div className="flex gap-2">
-                {moodOptions.map(opt => {
-                  const Icon = opt.icon;
-                  return (
-                    <button
-                      key={opt.value}
-                      onClick={() => setMood(opt.value)}
-                      className={cn(
-                        'flex flex-1 flex-col items-center gap-1 rounded-xl py-2.5 transition-all',
-                        mood === opt.value
-                          ? 'bg-[#2f2f2f] text-white'
-                          : 'bg-[#ecebe5] text-[#5f5d56] hover:bg-[#e0deda]'
-                      )}
-                    >
-                      <Icon className={cn('h-4 w-4', mood === opt.value ? 'text-white' : opt.color)} />
-                      <span className="text-[10px] font-medium">{opt.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <QualityPicker label="Søvn" value={sleep} onChange={setSleep} />
-            <QualityPicker label="Appetit" value={appetite} onChange={setAppetite} />
-
-            <div className="space-y-1.5">
-              <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Notat (valgfrit)</p>
-              <Textarea
-                placeholder="Skriv et notat om afleveringen..."
-                value={note}
-                onChange={e => setNote(e.target.value)}
-                maxLength={2000}
-                className="min-h-[80px] resize-none rounded-2xl border-[#d8d7cf] bg-white text-sm"
-              />
-            </div>
-
+      <ConfirmCloseDialog
+        open={confirmClose}
+        onCancel={() => setConfirmClose(false)}
+        onConfirm={() => { setConfirmClose(false); setAddOpen(false); setMood('neutral'); setSleep('okay'); setAppetite('okay'); setNote(''); }}
+      />
+      <BottomSheet open={addOpen} onOpenChange={(open) => {
+        if (!open && (note.trim() || mood !== 'neutral' || sleep !== 'okay' || appetite !== 'okay')) {
+          setConfirmClose(true);
+        } else {
+          setAddOpen(open);
+        }
+      }} title="Nyt dagbogsnotat">
+        <div className="space-y-2">
+          {/* Mood */}
+          <div className="space-y-1.5">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Humør</p>
             <div className="flex gap-2">
-              <Button variant="outline" className="flex-1 rounded-2xl border-[#d8d7cf]" onClick={() => setAddOpen(false)}>
-                Annuller
-              </Button>
-              <Button className="flex-1 rounded-2xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]" onClick={handleAdd}>
-                Gem notat
-              </Button>
+              {moodOptions.map(opt => {
+                const Icon = opt.icon;
+                return (
+                  <button
+                    key={opt.value}
+                    onClick={() => setMood(opt.value)}
+                    className={cn(
+                      'flex flex-1 flex-col items-center gap-1 rounded-[8px] py-2.5 transition-all',
+                      mood === opt.value
+                        ? 'bg-[#2f2f2f] text-white'
+                        : 'bg-[#ecebe5] text-[#5f5d56] hover:bg-[#e0deda]'
+                    )}
+                  >
+                    <Icon className={cn('h-4 w-4', mood === opt.value ? 'text-white' : opt.color)} />
+                    <span className="text-[10px] font-medium">{opt.label}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+
+          <QualityPicker label="Søvn" value={sleep} onChange={setSleep} />
+          <QualityPicker label="Appetit" value={appetite} onChange={setAppetite} />
+
+          <div className="space-y-1.5">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Notat (valgfrit)</p>
+            <Textarea
+              placeholder="Skriv et notat om afleveringen..."
+              value={note}
+              onChange={e => setNote(e.target.value)}
+              maxLength={2000}
+              className="min-h-[80px] resize-none rounded-[8px] border-[#d8d7cf] bg-white text-sm"
+            />
+          </div>
+
+          <div className="flex gap-2">
+            <Button variant="outline" className="flex-1 rounded-[8px] border-[#d8d7cf]" onClick={() => {
+              if (note.trim() || mood !== 'neutral' || sleep !== 'okay' || appetite !== 'okay') {
+                setConfirmClose(true);
+              } else {
+                setAddOpen(false);
+              }
+            }}>
+              Annuller
+            </Button>
+            <Button className="flex-1 flex items-center justify-center gap-2 rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]" onClick={handleAdd} disabled={isSaving}>
+              Gem notat
+            </Button>
+          </div>
+        </div>
+      </BottomSheet>
+      <SavingOverlay open={isSaving} />
     </div>
   );
 }

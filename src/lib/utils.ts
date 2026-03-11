@@ -67,11 +67,41 @@ export function getCurrentParentForChild(
   const daysSinceStart = differenceInDays(date, startDate);
   
   if (custodyPlan.pattern === '7/7') {
+    // Brug customWeekConfig hvis tilgængelig (fra indstillinger)
+    if (custodyPlan.customWeekConfig) {
+      const weekNo = getISOWeek(date);
+      const isEvenWeek = weekNo % 2 === 0;
+      const assignments = isEvenWeek
+        ? custodyPlan.customWeekConfig.evenWeekAssignments
+        : custodyPlan.customWeekConfig.oddWeekAssignments;
+      const dayOfWeek = date.getDay();
+      const adjustedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+      const assignedParentId = assignments?.[adjustedDay];
+      if (assignedParentId === parent1Id || assignedParentId === parent2Id) {
+        return assignedParentId;
+      }
+    }
+    // Fallback: simpel alternering
     const weekNumber = Math.floor(daysSinceStart / 7);
     return weekNumber % 2 === 0 ? parent1Id : parent2Id;
   }
-  
+
   if (custodyPlan.pattern === '10/4') {
+    // Brug customWeekConfig hvis tilgængelig
+    if (custodyPlan.customWeekConfig) {
+      const weekNo = getISOWeek(date);
+      const isEvenWeek = weekNo % 2 === 0;
+      const assignments = isEvenWeek
+        ? custodyPlan.customWeekConfig.evenWeekAssignments
+        : custodyPlan.customWeekConfig.oddWeekAssignments;
+      const dayOfWeek = date.getDay();
+      const adjustedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+      const assignedParentId = assignments?.[adjustedDay];
+      if (assignedParentId === parent1Id || assignedParentId === parent2Id) {
+        return assignedParentId;
+      }
+    }
+    // Fallback: simpel 10/4 cyklus
     const dayInCycle = daysSinceStart % 14;
     return dayInCycle < 10 ? parent1Id : parent2Id;
   }
@@ -79,7 +109,7 @@ export function getCurrentParentForChild(
   const dayOfWeek = date.getDay();
   const adjustedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Convert to 0=Monday
 
-  if (custodyPlan.pattern === 'custom' && custodyPlan.customWeekConfig) {
+  if (custodyPlan.customWeekConfig) {
     const weekNo = getISOWeek(date);
     const isEvenWeek = weekNo % 2 === 0;
     const assignments = isEvenWeek
@@ -175,6 +205,16 @@ export function getParentColorClass(color: 'warm' | 'cool' | 'neutral'): string 
   if (color === 'warm') return 'text-[#f58a2d] bg-[#fff2e6] border-[#f3c59d]';
   if (color === 'cool') return 'text-[#2f2f2f] bg-[#eceae2] border-[#d2d1c8]';
   return 'text-[#6c695f] bg-[#f2f1ec] border-[#d8d7cf]';
+}
+
+export function getEffectiveColor(
+  user: { id: string; role?: string },
+  currentUserId: string | undefined
+): 'cool' | 'warm' | 'neutral' {
+  if (!currentUserId) return 'neutral';
+  if (user.id === currentUserId) return 'cool';
+  if (user.role === 'parent') return 'warm';
+  return 'neutral';
 }
 
 export function getEventTypeColor(type: string): string {
@@ -336,6 +376,23 @@ export function formatDuration(hours: number, minutes: number): string {
     return `${hours} time${hours !== 1 ? 'r' : ''} ${minutes > 0 ? `${minutes} min` : ''}`;
   }
   return `${minutes} minutter`;
+}
+
+// Relative time formatting for forum posts
+export function formatRelativeTime(isoDate: string): string {
+  const date = parseISO(isoDate);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  const diffHrs = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMin < 1) return 'Lige nu';
+  if (diffMin < 60) return `${diffMin} min siden`;
+  if (diffHrs < 24) return `${diffHrs} time${diffHrs !== 1 ? 'r' : ''} siden`;
+  if (diffDays === 1) return 'I går';
+  if (diffDays < 7) return `${diffDays} dage siden`;
+  return formatDate(isoDate, 'dd. MMM yyyy');
 }
 
 // Currency formatting

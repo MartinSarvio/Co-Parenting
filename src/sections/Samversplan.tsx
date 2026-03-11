@@ -1,20 +1,16 @@
 import { useCallback, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useAppStore } from '@/store';
-import { useApiActions } from '@/hooks/useApiActions';
-import { notificationId } from '@/lib/id';
-import { cn, getCurrentParentForChild, weekdayNames } from '@/lib/utils';
+import { cn, getCurrentParentForChild, getEffectiveColor, weekdayNames } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
 import {
   ChevronLeft,
   ChevronRight,
-  Calendar,
   CheckCircle2,
+  ArrowRightLeft,
   X
 } from 'lucide-react';
 import { CustodyConfig } from './CustodyConfig';
@@ -32,7 +28,6 @@ import {
   startOfWeek
 } from 'date-fns';
 import { da } from 'date-fns/locale';
-import { toast } from 'sonner';
 
 const toWeekdayIndex = (day: Date): number => {
   const jsDay = day.getDay();
@@ -64,21 +59,27 @@ const getParentDayPalette = (color: 'warm' | 'cool' | 'neutral') => {
 };
 
 export function Samversplan() {
-  const { users, children, custodyPlans, currentUser, addNotification, sideMenuOpen, setSideMenuOpen } = useAppStore();
-  const { createEvent } = useApiActions();
+  const { users, children, custodyPlans, currentUser, sideMenuOpen, setSideMenuOpen, sideMenuContext, setSideMenuContext, setSwapRequestDate, setActiveTab } = useAppStore();
   const custodyPlan = custodyPlans[0];
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
-  const [isSwapDialogOpen, setIsSwapDialogOpen] = useState(false);
-  const [selectedSwapDate, setSelectedSwapDate] = useState<Date | null>(null);
-  const [swapReason, setSwapReason] = useState('');
-  const [swapRequestedTo, setSwapRequestedTo] = useState('');
 
   const currentChild = children[0];
-  const parent1 = users.find(u => u.id === currentChild?.parent1Id);
-  const parent2 = users.find(u => u.id === currentChild?.parent2Id);
-  const warmParent = [parent1, parent2].find((parent) => parent?.color === 'warm') || parent1 || parent2;
-  const coolParent = [parent1, parent2].find((parent) => parent?.color === 'cool') || parent2 || parent1;
+  // Perspektiv-baseret: indlogget bruger = sort, anden forælder = orange
+  const meParent = currentUser;
+  const rawOtherParentId = currentChild
+    ? (currentChild.parent1Id === currentUser?.id
+        ? currentChild.parent2Id
+        : currentChild.parent2Id === currentUser?.id
+          ? currentChild.parent1Id
+          : currentChild.parent2Id)
+    : undefined;
+  // Guard: hvis "anden forælder" er mig selv, er der ingen rigtig forælder 2
+  const otherParentId = rawOtherParentId && rawOtherParentId !== currentUser?.id
+    ? rawOtherParentId : undefined;
+  const otherParent = otherParentId
+    ? users.find(u => u.id === otherParentId)
+    : undefined;
 
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
@@ -95,22 +96,39 @@ export function Samversplan() {
   ];
 
   const handoverDays = useMemo(() => (
-    custodyPlan?.pattern === 'custom' && custodyPlan?.customWeekConfig?.handoverDays?.length
+    custodyPlan?.customWeekConfig?.handoverDays?.length
       ? custodyPlan.customWeekConfig.handoverDays
       : [custodyPlan?.swapDay ?? 4]
   ), [custodyPlan]);
 
   const getParentForDay = useCallback((day: Date) => {
     if (!custodyPlan || !currentChild) return null;
+    // Brug __parent2__ som placeholder når parent2 = parent1 (ingen reel forælder 2)
+    const p2Id = currentChild.parent2Id && currentChild.parent2Id !== currentChild.parent1Id
+      ? currentChild.parent2Id
+      : '__parent2__';
     const parentId = getCurrentParentForChild(
       currentChild.id,
       custodyPlan,
       currentChild.parent1Id,
-      currentChild.parent2Id,
+      p2Id,
       day
     );
-    return users.find(u => u.id === parentId);
-  }, [custodyPlan, currentChild, users]);
+    const found = users.find(u => u.id === parentId);
+    if (found) return found;
+    // Placeholder for forælder der ikke er tilknyttet endnu
+    if (parentId) {
+      const isMe = parentId === currentUser?.id;
+      return {
+        id: parentId,
+        name: isMe ? (currentUser?.name || 'Dig') : 'Forælder 2',
+        email: '',
+        color: (isMe ? 'cool' : 'warm') as 'warm' | 'cool' | 'neutral',
+        role: 'parent' as const,
+      };
+    }
+    return null;
+  }, [custodyPlan, currentChild, users, currentUser]);
 
   const getHandoverTransition = useCallback((day: Date) => {
     const previousParent = getParentForDay(addDays(day, -1));
@@ -156,82 +174,20 @@ export function Samversplan() {
   };
 
   const openSwapDialog = (day: Date) => {
-    const currentDayParent = getParentForDay(day);
-    const fallbackRecipient = users.find((user) => (
-      user.role === 'parent' && user.id !== currentUser?.id
-    ))?.id || '';
-
-    setSelectedSwapDate(day);
-    setSwapReason('');
-    setSwapRequestedTo(
-      currentDayParent?.id && currentDayParent.id !== currentUser?.id
-        ? currentDayParent.id
-        : fallbackRecipient
-    );
-    setIsSwapDialogOpen(true);
+    setSwapRequestDate(day);
+    setActiveTab('swap-request');
   };
 
-  const createSwapRequest = () => {
-    if (!selectedSwapDate || !currentUser || !currentChild) {
-      toast.error('Vælg en dag først');
-      return;
-    }
-    if (!swapRequestedTo) {
-      toast.error('Vælg hvem du vil sende anmodningen til');
-      return;
-    }
 
-    const recipient = users.find((user) => user.id === swapRequestedTo);
-    const startAt = new Date(selectedSwapDate);
-    startAt.setHours(12, 0, 0, 0);
-    const endAt = new Date(selectedSwapDate);
-    endAt.setHours(12, 30, 0, 0);
-
-    void createEvent({
-      title: `Bytteanmodning · ${format(selectedSwapDate, 'EEE d. MMM', { locale: da })}`,
-      description: `${currentUser.name} ønsker at bytte samvær.\nBegrundelse: ${swapReason.trim() || 'Ikke angivet'}`,
-      type: 'handover',
-      startDate: startAt.toISOString(),
-      endDate: endAt.toISOString(),
-      childId: currentChild.id,
-      createdBy: currentUser.id,
-      assignedTo: [currentUser.id, swapRequestedTo],
-    });
-
-    addNotification({
-      id: notificationId(),
-      type: 'schedule_change',
-      title: 'Ny bytteanmodning',
-      message: `${currentUser.name} vil bytte ${format(selectedSwapDate, 'EEEE d. MMMM', { locale: da })}`,
-      recipientId: swapRequestedTo,
-      read: false,
-      createdAt: new Date().toISOString(),
-    });
-
-    toast.success(`Bytteanmodning sendt til ${recipient?.name || 'forælder'}`);
-    setIsSwapDialogOpen(false);
-    setSwapReason('');
-  };
+  // Debug: log pattern ved render
+  console.log('[Samversplan] custodyPlan pattern:', custodyPlan?.pattern, 'customWeekConfig:', custodyPlan?.customWeekConfig?.evenWeekAssignments);
 
   return (
     <div className="space-y-1.5 py-1">
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between"
-      >
-        <div>
-          <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Samværsplan</h1>
-          <p className="text-[13px] leading-snug text-[#78766d] max-w-[220px]">
-            {custodyPlan?.name || 'Ingen plan'}
-          </p>
-        </div>
-      </motion.div>
-
       {/* ─── Side panel: CustodyConfig full-screen — portal ─── */}
       {createPortal(
       <AnimatePresence>
-        {sideMenuOpen && (
+        {sideMenuOpen && sideMenuContext === 'samversplan' && (
           <>
             <motion.div
               initial={{ opacity: 0 }}
@@ -249,11 +205,11 @@ export function Samversplan() {
               className="fixed inset-y-0 left-0 z-[9999] w-full bg-white flex flex-col"
               style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
             >
-              <div className="flex items-center justify-between px-5 py-3 border-b border-[#eeedea]">
+              <div className="flex items-center justify-between px-5 py-3">
                 <h2 className="text-[17px] font-bold text-[#2f2f2d]">Indstillinger</h2>
                 <button
                   onClick={() => setSideMenuOpen(false)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56]"
+                  className="flex h-8 w-8 items-center justify-center text-[#5f5d56] hover:text-[#2f2f2d] transition-colors"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -268,47 +224,69 @@ export function Samversplan() {
       document.body
       )}
 
+      {/* Konfigurationsbanner hvis plan ikke er konfigureret */}
+      {custodyPlan && !custodyPlan.customWeekConfig && (
+        <Card className="border-[#f3c59d] bg-[#fff2e6]">
+          <CardContent className="p-4 text-center space-y-2">
+            <p className="text-[14px] font-semibold text-[#2f2f2d]">
+              Bekræft din samværsplan
+            </p>
+            <p className="text-[13px] text-[#78766d]">
+              Åbn indstillinger for at konfigurere hvem der har barnet hvornår.
+            </p>
+            <Button
+              onClick={() => { setSideMenuContext('samversplan'); setSideMenuOpen(true); }}
+              className="bg-[#2f2f2f] text-white hover:bg-[#242424]"
+            >
+              Konfigurer plan
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
         className="grid grid-cols-1 gap-2 sm:grid-cols-2"
       >
-        {warmParent && (
-          <div className="flex items-center gap-2 rounded-xl border border-[#f3c59d] bg-[#fff2e6] px-3 py-2">
+        {meParent && (
+          <div className="flex items-center gap-2 rounded-[12px] border border-[#32302b] bg-[#2f2f2f] px-3 py-2">
             <Avatar className="h-7 w-7">
-              <AvatarImage src={warmParent.avatar} />
-              <AvatarFallback className="bg-[#f58a2d] text-xs text-white">
-                {warmParent.name[0]}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-[#cc6f1f]">{warmParent.name}</p>
-              <p className="text-xs text-[#d0792e]">Orange</p>
-            </div>
-          </div>
-        )}
-        {coolParent && (
-          <div className="flex items-center gap-2 rounded-xl border border-[#32302b] bg-[#2f2f2f] px-3 py-2">
-            <Avatar className="h-7 w-7">
-              <AvatarImage src={coolParent.avatar} />
+              <AvatarImage src={meParent.avatar} />
               <AvatarFallback className="bg-[#4f4b45] text-xs text-white">
-                {coolParent.name[0]}
+                {meParent.name[0]}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-white">{coolParent.name}</p>
+              <p className="truncate text-sm font-medium text-white">{meParent.name}</p>
               <p className="text-xs text-[#e2e1dc]">Sort</p>
             </div>
           </div>
         )}
+        <div className="flex items-center gap-2 rounded-[12px] border border-[#f3c59d] bg-[#fff2e6] px-3 py-2">
+          <Avatar className="h-7 w-7">
+            {otherParent && <AvatarImage src={otherParent.avatar} />}
+            <AvatarFallback className="bg-[#f58a2d] text-xs text-white">
+              {otherParent ? otherParent.name[0] : '?'}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium text-[#cc6f1f]">
+              {otherParent ? otherParent.name : 'Forælder 2'}
+            </p>
+            <p className="text-xs text-[#d0792e]">
+              {otherParent ? 'Orange' : 'Ikke tilknyttet'}
+            </p>
+          </div>
+        </div>
       </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="flex items-center justify-between rounded-xl border border-[#d8d7cf] bg-[#f8f7f3] p-2"
+        className="flex items-center justify-between rounded-[8px] border border-[#d8d7cf] bg-[#f8f7f3] p-2"
       >
         <Button variant="ghost" size="icon" onClick={goToPrevious}>
           <ChevronLeft className="h-5 w-5" />
@@ -316,7 +294,7 @@ export function Samversplan() {
         <button
           type="button"
           onClick={() => setViewMode((prev) => (prev === 'week' ? 'month' : 'week'))}
-          className="rounded-xl px-3 py-1 text-center transition-colors hover:bg-[#efeee8]"
+          className="rounded-[8px] px-3 py-1 text-center transition-colors hover:bg-[#efeee8]"
         >
           {viewMode === 'week' ? (
             <>
@@ -352,27 +330,29 @@ export function Samversplan() {
                   const parent = getParentForDay(day);
                   const isToday = isSameDay(day, new Date());
                   const isWeekend = index >= 5;
-                  const palette = getParentDayPalette(parent?.color || 'neutral');
+                  const isHandoverDay = handoverDays.includes(toWeekdayIndex(day));
+                  const palette = getParentDayPalette(parent ? getEffectiveColor(parent, currentUser?.id) : 'neutral');
 
                   return (
                     <div
                       key={day.toISOString()}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => openSwapDialog(day)}
+                      role={parent ? "button" : undefined}
+                      tabIndex={parent ? 0 : undefined}
+                      onClick={() => parent && openSwapDialog(day)}
                       onKeyDown={(event) => {
-                        if (event.key === 'Enter' || event.key === ' ') {
+                        if (parent && (event.key === 'Enter' || event.key === ' ')) {
                           event.preventDefault();
                           openSwapDialog(day);
                         }
                       }}
                       className={cn(
-                        "min-h-[120px] cursor-pointer p-1.5 transition-colors hover:bg-[#f4f2ec]",
+                        "min-h-[120px] p-1.5 transition-colors",
+                        parent ? "cursor-pointer hover:bg-[#f4f2ec]" : "cursor-default opacity-50",
                         isWeekend && "bg-[#f1f0ea]/65"
                       )}
                     >
                       <div className={cn(
-                        "mb-2 rounded-lg py-1 text-center",
+                        "mb-2 rounded-[8px] py-1 text-center",
                         isToday && "bg-[#fff2e6]"
                       )}>
                         <p className={cn(
@@ -389,9 +369,15 @@ export function Samversplan() {
                         </p>
                       </div>
 
+                      {isHandoverDay && parent && (
+                        <div className="flex items-center justify-center mb-1">
+                          <ArrowRightLeft className="h-3 w-3 text-[#f58a2d]" />
+                        </div>
+                      )}
+
                       {parent && (
                         <div className={cn(
-                          "rounded-lg border p-1.5 text-center",
+                          "rounded-[8px] border p-1.5 text-center",
                           palette.card
                         )}>
                           <Avatar className="mx-auto mb-1 h-6 w-6">
@@ -436,28 +422,36 @@ export function Samversplan() {
                   }
 
                   const parent = getParentForDay(day);
-                  const palette = getParentDayPalette(parent?.color || 'neutral');
+                  const palette = getParentDayPalette(parent ? getEffectiveColor(parent, currentUser?.id) : 'neutral');
                   const isToday = isSameDay(day, new Date());
                   const isCurrentMonthDay = isSameMonth(day, currentDate);
+                  const isHandoverDay = handoverDays.includes(toWeekdayIndex(day));
 
                   return (
                     <button
                       key={day.toISOString()}
                       type="button"
-                      onClick={() => openSwapDialog(day)}
+                      onClick={() => parent && openSwapDialog(day)}
+                      disabled={!parent}
                       className={cn(
-                        "min-h-[84px] border-b border-r border-[#ecebe4] px-1.5 py-1.5 text-left transition-colors hover:bg-[#f1efe8]",
+                        "min-h-[84px] border-b border-r border-[#ecebe4] px-1.5 py-1.5 text-left transition-colors",
+                        parent ? "hover:bg-[#f1efe8]" : "cursor-default opacity-50",
                         !isCurrentMonthDay && "bg-[#f3f2ec]"
                       )}
                     >
-                      <div className={cn(
-                        "mb-1 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold",
-                        isToday ? "bg-[#f58a2d] text-white" : "text-[#5d5a52]"
-                      )}>
-                        {format(day, 'd')}
+                      <div className="mb-1 flex items-center gap-0.5">
+                        <div className={cn(
+                          "flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold",
+                          isToday ? "bg-[#f58a2d] text-white" : "text-[#5d5a52]"
+                        )}>
+                          {format(day, 'd')}
+                        </div>
+                        {isHandoverDay && parent && (
+                          <ArrowRightLeft className="h-2.5 w-2.5 text-[#f58a2d]" />
+                        )}
                       </div>
                       {parent && (
-                        <div className={cn("flex items-center gap-1 rounded-md border px-1 py-1", palette.card)}>
+                        <div className={cn("flex items-center gap-1 rounded-[8px] border px-1 py-1", palette.card)}>
                           <Avatar className="h-5 w-5">
                             <AvatarImage src={parent.avatar} />
                             <AvatarFallback className={cn("text-[9px]", palette.avatarClass)}>
@@ -486,8 +480,7 @@ export function Samversplan() {
       >
         <Card className="border-[#d8d7cf]">
           <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <Calendar className="h-5 w-5 text-[#6f6b62]" />
+            <CardTitle className="text-lg">
               Kommende skiftedage
             </CardTitle>
           </CardHeader>
@@ -498,9 +491,9 @@ export function Samversplan() {
                 return (
                   <div
                     key={day.toISOString()}
-                    className="flex items-center gap-3 rounded-xl border border-[#e2e1d9] bg-[#f8f7f3] p-3"
+                    className="flex items-center gap-3 p-3 border-b border-[#f2f1ed]"
                   >
-                    <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-[#eceae2]">
+                    <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[8px] bg-[#eceae2]">
                       <span className="text-base font-semibold text-[#504d45]">
                         {format(day, 'd')}
                       </span>
@@ -522,7 +515,7 @@ export function Samversplan() {
                 );
               })}
               {transitionsInVisibleRange.length === 0 && (
-                <div className="rounded-xl border border-dashed border-[#d1d0c8] bg-[#f4f3ee] p-4 text-sm text-[#747168]">
+                <div className="rounded-[8px] border border-dashed border-[#d1d0c8] bg-[#f4f3ee] p-4 text-sm text-[#747168]">
                   Ingen skiftedage i den valgte periode.
                 </div>
               )}
@@ -531,54 +524,6 @@ export function Samversplan() {
         </Card>
       </motion.div>
 
-      <Dialog open={isSwapDialogOpen} onOpenChange={setIsSwapDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Anmod om bytte</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2 pt-2">
-            <p className="text-sm text-[#5f5c53]">
-              {selectedSwapDate
-                ? `Du anmoder om bytte for ${format(selectedSwapDate, 'EEEE d. MMMM', { locale: da })}.`
-                : 'Vælg en dag i samværskalenderen først.'}
-            </p>
-            <div className="space-y-2">
-              <p className="text-xs font-medium text-[#6f6c64]">Sendes til</p>
-              <div className="flex flex-wrap gap-2">
-                {users
-                  .filter((user) => user.role === 'parent' && user.id !== currentUser?.id)
-                  .map((user) => (
-                    <button
-                      key={user.id}
-                      type="button"
-                      onClick={() => setSwapRequestedTo(user.id)}
-                      className={cn(
-                        "rounded-full border px-3 py-1 text-xs font-medium",
-                        swapRequestedTo === user.id
-                          ? "border-[#f3c59d] bg-[#fff2e6] text-[#2f2f2d]"
-                          : "border-[#d8d7cf] bg-[#f8f7f3] text-[#6f6c64]"
-                      )}
-                    >
-                      {user.name}
-                    </button>
-                  ))}
-              </div>
-            </div>
-            <div className="space-y-2">
-              <p className="text-xs font-medium text-[#6f6c64]">Begrundelse</p>
-              <Textarea
-                value={swapReason}
-                onChange={(event) => setSwapReason(event.target.value)}
-                placeholder="Fx arbejde torsdag eftermiddag, ønsker bytte med fredag."
-                rows={3}
-              />
-            </div>
-            <Button className="w-full" onClick={createSwapRequest}>
-              Send bytteanmodning
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

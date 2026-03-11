@@ -33,6 +33,21 @@ export interface PlanFeatures {
   unlimitedCategories: boolean;
 }
 
+const ADMIN_FEATURES: PlanFeatures = {
+  maxChildren: 99,
+  multipleChildren: true,
+  shoppingScanner: true,
+  expenses: true,
+  inAppPayments: true,
+  recurringExpenses: true,
+  singleParentEvidence: true,
+  lawyerAccess: true,
+  familyMembers: true,
+  maxFamilyMembers: 99,
+  calendarSharing: true,
+  unlimitedCategories: true,
+};
+
 const PLAN_FEATURES: Record<SubscriptionPlan, PlanFeatures> = {
   free: {
     maxChildren: 1,
@@ -94,19 +109,21 @@ export function getSubscriptionPlan(household: Household | null | undefined): Su
   return household.subscription.plan;
 }
 
-export function getPlanFeatures(household: Household | null | undefined): PlanFeatures {
+export function getPlanFeatures(household: Household | null | undefined, isAdmin?: boolean): PlanFeatures {
+  if (isAdmin) return ADMIN_FEATURES;
   return PLAN_FEATURES[getSubscriptionPlan(household)];
 }
 
 export function hasSubscriptionFeature(
   household: Household | null | undefined,
-  feature: SubscriptionFeature
+  feature: SubscriptionFeature,
+  isAdmin?: boolean
 ): boolean {
-  return getPlanFeatures(household)[feature];
+  return getPlanFeatures(household, isAdmin)[feature];
 }
 
-export function getMaxChildren(household: Household | null | undefined): number {
-  return getPlanFeatures(household).maxChildren;
+export function getMaxChildren(household: Household | null | undefined, isAdmin?: boolean): number {
+  return getPlanFeatures(household, isAdmin).maxChildren;
 }
 
 export function normalizeSubscription(

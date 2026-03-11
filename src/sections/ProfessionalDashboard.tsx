@@ -21,85 +21,11 @@ import {
   Shield,
   MessageCircle,
   StickyNote,
-  Hash
+  Hash,
+  X
 } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-type CaseStatus = 'active' | 'closed' | 'paused';
-type CasePriority = 'normal' | 'high' | 'urgent';
-type RiskLevel = 'low' | 'medium' | 'high';
-
-interface AssignedCase {
-  id: string;
-  caseNumber: string;
-  departmentId: string;
-  familyName: string;
-  parents: string[];
-  childName: string;
-  childAge: number;
-  status: CaseStatus;
-  priority: CasePriority;
-  lastContact: string;
-  nextMeeting: string;
-  unreadMessages: number;
-  pendingApprovals: number;
-  notes: string;
-  riskLevel: RiskLevel;
-}
-
-const assignedCases: AssignedCase[] = [
-  {
-    id: 'h1',
-    caseNumber: 'FAM-2025-001234',
-    departmentId: 'AFD-KBH-03',
-    familyName: 'Petersens Familie',
-    parents: ['Soren Petersen', 'Mette Petersen'],
-    childName: 'Emma',
-    childAge: 6,
-    status: 'active' as const,
-    priority: 'normal' as const,
-    lastContact: '2025-02-10',
-    nextMeeting: '2025-03-01',
-    unreadMessages: 2,
-    pendingApprovals: 1,
-    notes: 'Forældrene samarbejder godt. Samværsplan fungerer.',
-    riskLevel: 'low' as const,
-  },
-  {
-    id: 'h2',
-    caseNumber: 'FAM-2025-002341',
-    departmentId: 'AFD-KBH-03',
-    familyName: 'Jensens Familie',
-    parents: ['Lars Jensen', 'Anna Jensen'],
-    childName: 'Oliver',
-    childAge: 4,
-    status: 'active' as const,
-    priority: 'high' as const,
-    lastContact: '2025-02-18',
-    nextMeeting: '2025-02-25',
-    unreadMessages: 5,
-    pendingApprovals: 2,
-    notes: 'Uenighed om ferieordning. Mægling planlagt.',
-    riskLevel: 'medium' as const,
-  },
-  {
-    id: 'h3',
-    caseNumber: 'FAM-2024-004521',
-    departmentId: 'AFD-KBH-07',
-    familyName: 'Nielsens Familie',
-    parents: ['Christian Nielsen', 'Line Nielsen'],
-    childName: 'Sofia',
-    childAge: 9,
-    status: 'closed' as const,
-    priority: 'normal' as const,
-    lastContact: '2025-01-15',
-    nextMeeting: '',
-    unreadMessages: 0,
-    pendingApprovals: 0,
-    notes: 'Sag afsluttet. Forældrene har indgået aftale.',
-    riskLevel: 'low' as const,
-  },
-];
+import type { CaseStatus, CasePriority, RiskLevel } from '@/types';
 
 function getStatusLabel(status: CaseStatus): string {
   switch (status) {
@@ -149,28 +75,25 @@ function getCaseLeftBorder(priority: CasePriority): string {
   }
 }
 
-function getDaysSinceContact(dateStr: string): number {
+function getDaysSinceContact(dateStr: string | null): number {
+  if (!dateStr) return 0;
   const contact = new Date(dateStr);
   const now = new Date();
   const diff = now.getTime() - contact.getTime();
   return Math.floor(diff / (1000 * 60 * 60 * 24));
 }
 
-// Demo activity timeline items
-const demoActivities = [
-  { id: 'a1', type: 'meeting' as const, text: 'Statusmøde afholdt', date: '2025-02-18', icon: Calendar },
-  { id: 'a2', type: 'note' as const, text: 'Referat godkendt af begge parter', date: '2025-02-15', icon: FileText },
-  { id: 'a3', type: 'message' as const, text: 'Besked sendt til forældre', date: '2025-02-12', icon: MessageCircle },
-  { id: 'a4', type: 'document' as const, text: 'Samværsplan opdateret', date: '2025-02-10', icon: FileText },
-  { id: 'a5', type: 'assessment' as const, text: 'Risikovurdering gennemført', date: '2025-02-05', icon: Shield },
-];
-
 export function ProfessionalDashboard() {
   const {
     currentUser,
     meetingMinutes,
     custodyPlans,
-    setActiveTab
+    professionalCases,
+    riskAssessments,
+    caseActivities,
+    professionalCaseFilter,
+    setProfessionalCaseFilter,
+    setActiveTab,
   } = useAppStore();
   const custodyPlan = custodyPlans[0];
 
@@ -179,7 +102,13 @@ export function ProfessionalDashboard() {
   const [noteText, setNoteText] = useState('');
   const [caseNotes, setCaseNotes] = useState<Record<string, { text: string; date: string }[]>>({});
 
-  const filteredCases = assignedCases.filter(c =>
+  const preFilteredCases = professionalCaseFilter === 'all'
+    ? professionalCases
+    : professionalCaseFilter === 'active'
+      ? professionalCases.filter(c => c.status === 'active')
+      : professionalCases.filter(c => c.pendingApprovals > 0);
+
+  const filteredCases = preFilteredCases.filter(c =>
     c.caseNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
     c.familyName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     c.parents.some(p => p.toLowerCase().includes(searchQuery.toLowerCase())) ||
@@ -187,8 +116,8 @@ export function ProfessionalDashboard() {
     c.departmentId.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const activeCases = assignedCases.filter(c => c.status === 'active');
-  const pendingCount = assignedCases.reduce((sum, c) => sum + c.pendingApprovals, 0);
+  const activeCases = professionalCases.filter(c => c.status === 'active');
+  const pendingCount = professionalCases.reduce((sum, c) => sum + c.pendingApprovals, 0);
   const totalMinutes = meetingMinutes.length;
 
   const handleAddNote = (caseId: string) => {
@@ -203,7 +132,7 @@ export function ProfessionalDashboard() {
 
   // Case detail view
   if (selectedCase) {
-    const caseData = assignedCases.find(c => c.id === selectedCase);
+    const caseData = professionalCases.find(c => c.id === selectedCase);
     if (!caseData) return null;
 
     const caseMinutes = meetingMinutes.filter(m => m.householdId === selectedCase);
@@ -228,7 +157,7 @@ export function ProfessionalDashboard() {
           </Button>
 
           {/* Case Header */}
-          <Card className="bg-white border border-[#e8e7e0] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <Card className="bg-white border border-[#e8e7e0] rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-3">
                 <div className="space-y-2">
@@ -270,10 +199,10 @@ export function ProfessionalDashboard() {
             <motion.div whileTap={{ scale: 0.97 }}>
               <Button
                 variant="outline"
-                className="w-full h-auto py-5 flex flex-col items-center gap-2.5 bg-white border border-[#e8e7e0] rounded-2xl hover:border-[#f3c59d] hover:bg-[#fff2e6] transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                className="w-full h-auto py-5 flex flex-col items-center gap-2.5 bg-white border border-[#e8e7e0] rounded-[8px] hover:border-[#f3c59d] hover:bg-[#fff2e6] transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
                 onClick={() => setActiveTab('meeting-minutes')}
               >
-                <div className="w-10 h-10 rounded-xl bg-[#ecebe5] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-[8px] bg-[#ecebe5] flex items-center justify-center">
                   <FileText className="w-5 h-5 text-[#5f5d56]" />
                 </div>
                 <span className="text-sm font-medium text-[#2f2f2d]">Nyt referat</span>
@@ -282,10 +211,10 @@ export function ProfessionalDashboard() {
             <motion.div whileTap={{ scale: 0.97 }}>
               <Button
                 variant="outline"
-                className="w-full h-auto py-5 flex flex-col items-center gap-2.5 bg-white border border-[#e8e7e0] rounded-2xl hover:border-[#f3c59d] hover:bg-[#fff2e6] transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative"
+                className="w-full h-auto py-5 flex flex-col items-center gap-2.5 bg-white border border-[#e8e7e0] rounded-[8px] hover:border-[#f3c59d] hover:bg-[#fff2e6] transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative"
                 onClick={() => setActiveTab('kommunikation')}
               >
-                <div className="w-10 h-10 rounded-xl bg-[#ecebe5] flex items-center justify-center relative">
+                <div className="w-10 h-10 rounded-[8px] bg-[#ecebe5] flex items-center justify-center relative">
                   <MessageCircle className="w-5 h-5 text-[#5f5d56]" />
                   {caseData.unreadMessages > 0 && (
                     <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#f58a2d] text-white text-[10px] font-bold flex items-center justify-center">
@@ -299,10 +228,10 @@ export function ProfessionalDashboard() {
             <motion.div whileTap={{ scale: 0.97 }}>
               <Button
                 variant="outline"
-                className="w-full h-auto py-5 flex flex-col items-center gap-2.5 bg-white border border-[#e8e7e0] rounded-2xl hover:border-[#f3c59d] hover:bg-[#fff2e6] transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                className="w-full h-auto py-5 flex flex-col items-center gap-2.5 bg-white border border-[#e8e7e0] rounded-[8px] hover:border-[#f3c59d] hover:bg-[#fff2e6] transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
                 onClick={() => setActiveTab('samvaer')}
               >
-                <div className="w-10 h-10 rounded-xl bg-[#ecebe5] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-[8px] bg-[#ecebe5] flex items-center justify-center">
                   <Calendar className="w-5 h-5 text-[#5f5d56]" />
                 </div>
                 <span className="text-sm font-medium text-[#2f2f2d]">Samværsplan</span>
@@ -311,10 +240,10 @@ export function ProfessionalDashboard() {
             <motion.div whileTap={{ scale: 0.97 }}>
               <Button
                 variant="outline"
-                className="w-full h-auto py-5 flex flex-col items-center gap-2.5 bg-white border border-[#e8e7e0] rounded-2xl hover:border-[#f3c59d] hover:bg-[#fff2e6] transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                className="w-full h-auto py-5 flex flex-col items-center gap-2.5 bg-white border border-[#e8e7e0] rounded-[8px] hover:border-[#f3c59d] hover:bg-[#fff2e6] transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
                 onClick={() => setActiveTab('dokumenter')}
               >
-                <div className="w-10 h-10 rounded-xl bg-[#ecebe5] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-[8px] bg-[#ecebe5] flex items-center justify-center">
                   <Briefcase className="w-5 h-5 text-[#5f5d56]" />
                 </div>
                 <span className="text-sm font-medium text-[#2f2f2d]">Dokumenter</span>
@@ -323,14 +252,14 @@ export function ProfessionalDashboard() {
           </div>
 
           {/* Status Overview */}
-          <Card className="bg-white border border-[#e8e7e0] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <Card className="bg-white border border-[#e8e7e0] rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
             <CardHeader className="pb-2 px-5 pt-5">
               <CardTitle className="text-base font-semibold text-[#2f2f2d]">Statusoversigt</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 px-5 pb-5">
-              <div className="flex items-center justify-between p-3 rounded-xl bg-[#faf9f6]">
+              <div className="flex items-center justify-between p-3 rounded-[8px] bg-[#faf9f6]">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#ecebe5] flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-[8px] bg-[#ecebe5] flex items-center justify-center">
                     <Calendar className="w-5 h-5 text-[#5f5d56]" />
                   </div>
                   <div>
@@ -341,9 +270,9 @@ export function ProfessionalDashboard() {
                 <CheckCircle2 className="w-5 h-5 text-[#1a7a3a]" />
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-xl bg-[#faf9f6]">
+              <div className="flex items-center justify-between p-3 rounded-[8px] bg-[#faf9f6]">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#fff2e6] flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-[8px] bg-[#fff2e6] flex items-center justify-center">
                     <Clock className="w-5 h-5 text-[#bf6722]" />
                   </div>
                   <div>
@@ -359,9 +288,9 @@ export function ProfessionalDashboard() {
               </div>
 
               {caseData.nextMeeting && (
-                <div className="flex items-center justify-between p-3 rounded-xl bg-[#faf9f6]">
+                <div className="flex items-center justify-between p-3 rounded-[8px] bg-[#faf9f6]">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#eef0ff] flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-[8px] bg-[#eef0ff] flex items-center justify-center">
                       <Calendar className="w-5 h-5 text-indigo-600" />
                     </div>
                     <div>
@@ -376,7 +305,7 @@ export function ProfessionalDashboard() {
           </Card>
 
           {/* Risk Assessment */}
-          <Card className="bg-white border border-[#e8e7e0] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <Card className="bg-white border border-[#e8e7e0] rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
             <CardHeader className="pb-2 px-5 pt-5">
               <CardTitle className="text-base font-semibold text-[#2f2f2d] flex items-center gap-2">
                 <Shield className="w-4 h-4 text-[#5f5d56]" />
@@ -384,20 +313,40 @@ export function ProfessionalDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="px-5 pb-5">
-              <div className="flex items-center gap-3 mb-3">
-                <Badge className={`${getRiskStyle(caseData.riskLevel)} border-transparent text-xs font-medium px-3 py-1`}>
-                  {caseData.riskLevel === 'low' && <CheckCircle2 className="w-3 h-3 mr-1" />}
-                  {caseData.riskLevel === 'medium' && <AlertTriangle className="w-3 h-3 mr-1" />}
-                  {caseData.riskLevel === 'high' && <AlertTriangle className="w-3 h-3 mr-1" />}
-                  Risiko: {getRiskLabel(caseData.riskLevel)}
-                </Badge>
-              </div>
-              <p className="text-sm text-[#78766d] leading-relaxed">{caseData.notes}</p>
+              {(() => {
+                const caseAssessments = riskAssessments.filter(a => a.caseId === selectedCase);
+                const latestAssessment = caseAssessments.sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
+                return (
+                  <>
+                    <div className="flex items-center gap-3 mb-3">
+                      <Badge className={`${getRiskStyle(caseData.riskLevel)} border-transparent text-xs font-medium px-3 py-1`}>
+                        {caseData.riskLevel === 'low' && <CheckCircle2 className="w-3 h-3 mr-1" />}
+                        {caseData.riskLevel === 'medium' && <AlertTriangle className="w-3 h-3 mr-1" />}
+                        {caseData.riskLevel === 'high' && <AlertTriangle className="w-3 h-3 mr-1" />}
+                        Risiko: {getRiskLabel(caseData.riskLevel)}
+                      </Badge>
+                      {latestAssessment && (
+                        <span className="text-xs text-[#78766d]">
+                          Seneste: {formatDate(latestAssessment.assessmentDate)}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-[#78766d] leading-relaxed">
+                      {latestAssessment?.summary || caseData.notes}
+                    </p>
+                    {caseAssessments.length > 0 && (
+                      <p className="text-xs text-[#78766d] mt-2">
+                        {caseAssessments.length} vurdering(er) i alt
+                      </p>
+                    )}
+                  </>
+                );
+              })()}
             </CardContent>
           </Card>
 
           {/* Timeline / Activity Log */}
-          <Card className="bg-white border border-[#e8e7e0] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <Card className="bg-white border border-[#e8e7e0] rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
             <CardHeader className="pb-2 px-5 pt-5">
               <CardTitle className="text-base font-semibold text-[#2f2f2d]">Seneste aktivitet</CardTitle>
             </CardHeader>
@@ -407,9 +356,9 @@ export function ProfessionalDashboard() {
                 {caseMinutes.slice(0, 2).map((minutes) => (
                   <div
                     key={minutes.id}
-                    className="flex items-start gap-3 p-3 rounded-xl hover:bg-[#faf9f6] transition-colors"
+                    className="flex items-start gap-3 p-3 rounded-[8px] hover:bg-[#faf9f6] transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-lg bg-[#eef0ff] flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <div className="w-8 h-8 rounded-[8px] bg-[#eef0ff] flex items-center justify-center flex-shrink-0 mt-0.5">
                       <FileText className="w-4 h-4 text-indigo-600" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -426,26 +375,36 @@ export function ProfessionalDashboard() {
                   </div>
                 ))}
 
-                {/* Demo activity items */}
-                {demoActivities.slice(0, caseMinutes.length > 0 ? 3 : 5).map((activity) => {
-                  const Icon = activity.icon;
-                  return (
-                    <div
-                      key={activity.id}
-                      className="flex items-start gap-3 p-3 rounded-xl hover:bg-[#faf9f6] transition-colors"
-                    >
-                      <div className="w-8 h-8 rounded-lg bg-[#ecebe5] flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <Icon className="w-4 h-4 text-[#5f5d56]" />
+                {/* Real activity items from store */}
+                {caseActivities
+                  .filter(a => a.caseId === selectedCase)
+                  .slice(0, 5)
+                  .map((activity) => {
+                    const Icon = activity.type === 'meeting' ? Calendar
+                      : activity.type === 'message' ? MessageCircle
+                      : activity.type === 'assessment' ? Shield
+                      : FileText;
+                    return (
+                      <div
+                        key={activity.id}
+                        className="flex items-start gap-3 p-3 rounded-[8px] hover:bg-[#faf9f6] transition-colors cursor-pointer"
+                        onClick={() => {
+                          if (activity.relatedType === 'meeting_minutes') setActiveTab('meeting-minutes');
+                          else if (activity.relatedType === 'message_thread') setActiveTab('kommunikation');
+                        }}
+                      >
+                        <div className="w-8 h-8 rounded-[8px] bg-[#ecebe5] flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Icon className="w-4 h-4 text-[#5f5d56]" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-[#2f2f2d] text-sm">{activity.title}</p>
+                          <p className="text-xs text-[#78766d]">{formatDate(activity.createdAt)}</p>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-[#2f2f2d] text-sm">{activity.text}</p>
-                        <p className="text-xs text-[#78766d]">{formatDate(activity.date)}</p>
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
 
-                {caseMinutes.length === 0 && demoActivities.length === 0 && (
+                {caseActivities.filter(a => a.caseId === selectedCase).length === 0 && caseMinutes.length === 0 && (
                   <p className="text-center text-[#78766d] py-4 text-sm">Ingen aktivitet endnu</p>
                 )}
               </div>
@@ -453,7 +412,7 @@ export function ProfessionalDashboard() {
           </Card>
 
           {/* Internal Notes Section */}
-          <Card className="bg-white border border-[#e8e7e0] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <Card className="bg-white border border-[#e8e7e0] rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
             <CardHeader className="pb-2 px-5 pt-5">
               <CardTitle className="text-base font-semibold text-[#2f2f2d] flex items-center gap-2">
                 <StickyNote className="w-4 h-4 text-[#5f5d56]" />
@@ -465,7 +424,7 @@ export function ProfessionalDashboard() {
               {notes.length > 0 && (
                 <div className="space-y-2">
                   {notes.map((note, i) => (
-                    <div key={i} className="p-3 rounded-xl bg-[#faf9f6] border border-[#e8e7e0]">
+                    <div key={i} className="p-3 rounded-[8px] bg-[#faf9f6] border border-[#e8e7e0]">
                       <p className="text-sm text-[#2f2f2d] leading-relaxed">{note.text}</p>
                       <p className="text-xs text-[#78766d] mt-1.5">{formatDate(note.date, 'dd. MMM yyyy, HH:mm')}</p>
                     </div>
@@ -479,12 +438,12 @@ export function ProfessionalDashboard() {
                   value={noteText}
                   onChange={(e) => setNoteText(e.target.value)}
                   placeholder="Skriv en intern note..."
-                  className="w-full min-h-[80px] p-3 rounded-xl border border-[#e8e7e0] bg-[#faf9f6] text-sm text-[#2f2f2d] placeholder:text-[#b0aea5] resize-none focus:outline-none focus:border-[#c7ccf0] focus:ring-1 focus:ring-[#c7ccf0] transition-colors"
+                  className="w-full min-h-[80px] p-3 rounded-[8px] border border-[#e8e7e0] bg-[#faf9f6] text-sm text-[#2f2f2d] placeholder:text-[#b0aea5] resize-none focus:outline-none focus:border-[#c7ccf0] focus:ring-1 focus:ring-[#c7ccf0] transition-colors"
                 />
                 <Button
                   onClick={() => handleAddNote(selectedCase)}
                   disabled={!noteText.trim()}
-                  className="bg-[#2f2f2f] text-white hover:bg-[#1a1a1a] rounded-xl text-sm h-9 px-4 disabled:opacity-40"
+                  className="bg-[#2f2f2f] text-white hover:bg-[#1a1a1a] rounded-[8px] text-sm h-9 px-4 disabled:opacity-40"
                 >
                   <Plus className="w-4 h-4 mr-1.5" />
                   Tilføj note
@@ -497,40 +456,39 @@ export function ProfessionalDashboard() {
     );
   }
 
+  // Beregn arbejdsflow-data
+  const upcomingMeetings = professionalCases
+    .filter(c => c.nextMeeting && c.status === 'active')
+    .sort((a, b) => a.nextMeeting.localeCompare(b.nextMeeting));
+  const casesWithPendingApprovals = professionalCases.filter(c => c.pendingApprovals > 0 && c.status === 'active');
+  const casesWithUnread = professionalCases.filter(c => c.unreadMessages > 0 && c.status === 'active');
+  const workflowItems = [
+    ...upcomingMeetings.map(c => ({ type: 'meeting' as const, case: c, label: `Møde: ${c.familyName}`, detail: formatDate(c.nextMeeting) })),
+    ...casesWithPendingApprovals.map(c => ({ type: 'approval' as const, case: c, label: `${c.pendingApprovals} afventer godkendelse`, detail: c.familyName })),
+    ...casesWithUnread.map(c => ({ type: 'message' as const, case: c, label: `${c.unreadMessages} ulæste beskeder`, detail: c.familyName })),
+  ];
+
   // Cases list view (main view)
   return (
     <div className="space-y-1.5 py-1">
-      {/* Professional Info Card */}
+      {/* Kompakt hilsen-header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
+        className="flex items-center justify-between px-1"
       >
-        <Card className="bg-white border border-[#c7ccf0] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-indigo-400 to-indigo-600" />
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-[#eef0ff] border border-[#c7ccf0] flex items-center justify-center flex-shrink-0">
-                <Briefcase className="w-6 h-6 text-indigo-600" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold text-[#2f2f2d] truncate">{currentUser?.name}</p>
-                <p className="text-sm text-[#78766d] truncate">{currentUser?.organization}</p>
-                <p className="text-xs text-indigo-600 font-medium">
-                  {currentUser?.professionalType === 'caseworker' && 'Sagsbehandler'}
-                  {currentUser?.professionalType === 'family_counselor' && 'Familieradgiver'}
-                  {currentUser?.professionalType === 'lawyer' && 'Jurist'}
-                  {currentUser?.professionalType === 'mediator' && 'Mægler'}
-                </p>
-              </div>
-              <Avatar className="w-10 h-10 flex-shrink-0">
-                <AvatarImage src={currentUser?.avatar} />
-                <AvatarFallback className="bg-[#eef0ff] text-indigo-700 text-sm font-medium">
-                  {currentUser?.name?.[0]}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-          </CardContent>
-        </Card>
+        <div>
+          <h1 className="text-lg font-bold text-[#2f2f2d]">
+            {new Date().getHours() < 12 ? 'Godmorgen' : new Date().getHours() < 18 ? 'God eftermiddag' : 'God aften'}, {currentUser?.name?.split(' ')[0]}
+          </h1>
+          <p className="text-xs text-[#78766d]">{currentUser?.organization}</p>
+        </div>
+        <Avatar className="w-9 h-9 flex-shrink-0">
+          <AvatarImage src={currentUser?.avatar} />
+          <AvatarFallback className="bg-[#eef0ff] text-indigo-700 text-sm font-medium">
+            {currentUser?.name?.[0]}
+          </AvatarFallback>
+        </Avatar>
       </motion.div>
 
       {/* Stats Row */}
@@ -540,25 +498,64 @@ export function ProfessionalDashboard() {
         transition={{ delay: 0.1 }}
         className="grid grid-cols-3 gap-3"
       >
-        <Card className="bg-white border border-[#e8e7e0] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+        <Card className="bg-white border border-[#e8e7e0] rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)] cursor-pointer" onClick={() => { setProfessionalCaseFilter('active'); }}>
           <CardContent className="p-3 text-center">
             <p className="text-2xl font-bold text-[#2f2f2d]">{activeCases.length}</p>
             <p className="text-[11px] text-[#78766d] font-medium">Aktive sager</p>
           </CardContent>
         </Card>
-        <Card className="bg-white border border-[#e8e7e0] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+        <Card className="bg-white border border-[#e8e7e0] rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)] cursor-pointer" onClick={() => { setProfessionalCaseFilter('pending'); }}>
           <CardContent className="p-3 text-center">
             <p className="text-2xl font-bold text-[#bf6722]">{pendingCount}</p>
             <p className="text-[11px] text-[#78766d] font-medium">Afventende</p>
           </CardContent>
         </Card>
-        <Card className="bg-white border border-[#e8e7e0] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+        <Card className="bg-white border border-[#e8e7e0] rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)] cursor-pointer" onClick={() => { setActiveTab('meeting-minutes'); }}>
           <CardContent className="p-3 text-center">
             <p className="text-2xl font-bold text-indigo-600">{totalMinutes}</p>
             <p className="text-[11px] text-[#78766d] font-medium">Total referater</p>
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Dagens opgaver */}
+      {workflowItems.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.12 }}
+        >
+          <Card className="bg-white border border-[#e8e7e0] rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+            <CardHeader className="pb-2 px-4 pt-4">
+              <CardTitle className="text-sm font-semibold text-[#2f2f2d]">Dagens opgaver</CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 pb-4 space-y-1">
+              {workflowItems.map((item, i) => (
+                <div
+                  key={`${item.type}-${item.case.id}-${i}`}
+                  onClick={() => setSelectedCase(item.case.id)}
+                  className="flex items-center gap-3 p-2.5 rounded-[8px] hover:bg-[#faf9f6] cursor-pointer transition-colors"
+                >
+                  <div className={`w-8 h-8 rounded-[8px] flex items-center justify-center flex-shrink-0 ${
+                    item.type === 'meeting' ? 'bg-[#eef0ff]' :
+                    item.type === 'approval' ? 'bg-[#fff2e6]' :
+                    'bg-[#fff2e6]'
+                  }`}>
+                    {item.type === 'meeting' && <Calendar className="w-4 h-4 text-indigo-600" />}
+                    {item.type === 'approval' && <Clock className="w-4 h-4 text-[#bf6722]" />}
+                    {item.type === 'message' && <MessageCircle className="w-4 h-4 text-[#f58a2d]" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[#2f2f2d] truncate">{item.label}</p>
+                    <p className="text-xs text-[#78766d]">{item.detail}</p>
+                  </div>
+                  <ArrowRight className="w-3.5 h-3.5 text-[#b0aea5] flex-shrink-0" />
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </motion.div>
+      )}
 
       {/* Search */}
       <motion.div
@@ -572,10 +569,22 @@ export function ProfessionalDashboard() {
             placeholder="Søg sagsnummer, navn eller afdeling..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-white border-[#e8e7e0] rounded-xl text-sm text-[#2f2f2d] placeholder:text-[#b0aea5] focus:border-[#c7ccf0] focus:ring-[#c7ccf0] h-11"
+            className="pl-10 bg-white border-[#e8e7e0] rounded-[8px] text-sm text-[#2f2f2d] placeholder:text-[#b0aea5] focus:border-[#c7ccf0] focus:ring-[#c7ccf0] h-11"
           />
         </div>
       </motion.div>
+
+      {/* Filter badge */}
+      {professionalCaseFilter !== 'all' && (
+        <div className="flex items-center gap-2">
+          <Badge className="bg-[#eef0ff] text-indigo-700 border border-[#c7ccf0] text-xs flex items-center gap-1">
+            {professionalCaseFilter === 'active' ? 'Aktive sager' : 'Afventende godkendelse'}
+            <button onClick={() => setProfessionalCaseFilter('all')} className="ml-1 hover:text-red-500">
+              <X className="w-3 h-3" />
+            </button>
+          </Badge>
+        </div>
+      )}
 
       {/* Section header */}
       <motion.div
@@ -607,7 +616,7 @@ export function ProfessionalDashboard() {
               onClick={() => setSelectedCase(caseItem.id)}
               className="cursor-pointer"
             >
-              <Card className={`bg-white border border-[#e8e7e0] rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:border-[#f3c59d] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all ${getCaseLeftBorder(caseItem.priority)}`}>
+              <Card className={`bg-white border border-[#e8e7e0] rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:border-[#f3c59d] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all ${getCaseLeftBorder(caseItem.priority)}`}>
                 <CardContent className="p-4">
                   {/* Top row: case number + status */}
                   <div className="flex items-start justify-between mb-2">
@@ -690,7 +699,7 @@ export function ProfessionalDashboard() {
 
         {filteredCases.length === 0 && (
           <div className="text-center py-12">
-            <div className="w-14 h-14 rounded-2xl bg-[#ecebe5] flex items-center justify-center mx-auto mb-3">
+            <div className="w-14 h-14 rounded-[8px] bg-[#ecebe5] flex items-center justify-center mx-auto mb-3">
               <Building2 className="w-7 h-7 text-[#78766d]" />
             </div>
             <p className="text-[#2f2f2d] font-medium">Ingen sager fundet</p>

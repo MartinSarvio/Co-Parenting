@@ -1,0 +1,19 @@
+/* Website-specific styles — override mobile constraints */
+#root {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Restore scrollbar for desktop */
+* {
+  scrollbar-width: auto !important;
+}
+*::-webkit-scrollbar {
+  display: block !important;
+}
+
+/* Smooth scroll for anchor navigation */
+html {
+  scroll-behavior: smooth;
+}

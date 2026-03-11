@@ -1,13 +1,14 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAppStore } from '@/store';
 import { useFamilyContext } from '@/hooks/useFamilyContext';
 import { generateId } from '@/lib/id';
 import { format } from 'date-fns';
 import { da } from 'date-fns/locale';
-import { Plus, Trash2, Camera, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, Camera, X, ChevronLeft, ChevronRight, Share2, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import { uploadPhoto, deleteStorageFile } from '@/lib/storage';
 import {
   Dialog,
   DialogContent,
@@ -15,14 +16,17 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
+import { SavingOverlay } from '@/components/custom/SavingOverlay';
 
 export function Fotoalbum() {
-  const { currentUser, photos, addPhoto, deletePhoto, children, currentChildId } = useAppStore();
+  const { currentUser, photos, addPhoto, deletePhoto, children, currentChildId, setFullScreenOverlayOpen } = useAppStore();
   const { currentChild } = useFamilyContext();
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [caption, setCaption] = useState('');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const selectedChildId = currentChildId ?? children[0]?.id ?? null;
@@ -39,42 +43,73 @@ export function Fotoalbum() {
       toast.error('Filen er for stor. Maksimum er 10 MB.');
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => {
-      setPreviewUrl(reader.result as string);
-    };
-    reader.readAsDataURL(file);
+    setSelectedFile(file);
+    // Vis lokal preview mens vi uploader
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
     setAddDialogOpen(true);
   }
 
-  function handleAddPhoto() {
-    if (!previewUrl || !currentUser || !childForPhotos) return;
-    addPhoto({
-      id: generateId('photo'),
-      childId: childForPhotos.id,
-      url: previewUrl,
-      caption: caption.trim() || undefined,
-      takenAt: new Date().toISOString(),
-      addedBy: currentUser.id,
-      addedAt: new Date().toISOString(),
-    });
-    setAddDialogOpen(false);
-    setPreviewUrl(null);
-    setCaption('');
-    if (fileInputRef.current) fileInputRef.current.value = '';
-    toast.success('Foto tilføjet');
+  async function handleAddPhoto() {
+    if (!selectedFile || !currentUser || !childForPhotos) return;
+    setIsUploading(true);
+    try {
+      // Upload til Supabase Storage (komprimeret)
+      const publicUrl = await uploadPhoto(selectedFile, childForPhotos.id);
+      addPhoto({
+        id: generateId('photo'),
+        childId: childForPhotos.id,
+        url: publicUrl,
+        caption: caption.trim() || undefined,
+        takenAt: new Date().toISOString(),
+        addedBy: currentUser.id,
+        addedAt: new Date().toISOString(),
+      });
+      setAddDialogOpen(false);
+      setPreviewUrl(null);
+      setSelectedFile(null);
+      setCaption('');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      toast.success('Foto tilføjet');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Upload fejlede';
+      toast.error(msg);
+    } finally {
+      setIsUploading(false);
+    }
   }
 
-  function handleDelete(id: string) {
+  async function handleDelete(id: string) {
+    const photo = childPhotos.find(p => p.id === id);
     deletePhoto(id);
     if (lightboxIndex !== null) setLightboxIndex(null);
+    // Slet fra Storage (ignorerer fejl — filen kan være legacy data-URL)
+    if (photo) deleteStorageFile('family-photos', photo.url).catch(() => {});
     toast.success('Foto slettet');
   }
 
-  const openLightbox = (i: number) => setLightboxIndex(i);
-  const closeLightbox = () => setLightboxIndex(null);
+  const openLightbox = (i: number) => { setLightboxIndex(i); setFullScreenOverlayOpen(true); };
+  const closeLightbox = () => { setLightboxIndex(null); setFullScreenOverlayOpen(false); };
   const prevPhoto = () => setLightboxIndex(i => (i !== null ? Math.max(0, i - 1) : null));
   const nextPhoto = () => setLightboxIndex(i => (i !== null ? Math.min(childPhotos.length - 1, i + 1) : null));
+
+  // Cleanup on unmount
+  useEffect(() => () => setFullScreenOverlayOpen(false), [setFullScreenOverlayOpen]);
+
+  const handleShare = async () => {
+    if (lightboxIndex === null) return;
+    const photo = childPhotos[lightboxIndex];
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: photo.caption || 'Foto', url: photo.url });
+      } else {
+        await navigator.clipboard.writeText(photo.url);
+        toast.success('Link kopieret til udklipsholder');
+      }
+    } catch {
+      // User cancelled share
+    }
+  };
 
   return (
     <div className="space-y-1.5 py-1">
@@ -87,7 +122,7 @@ export function Fotoalbum() {
         </div>
         <Button
           onClick={() => fileInputRef.current?.click()}
-          className="h-9 gap-1.5 rounded-2xl bg-[#2f2f2f] px-4 text-sm text-white hover:bg-[#1a1a1a]"
+          className="h-9 gap-1.5 rounded-[8px] bg-[#2f2f2f] px-4 text-sm text-white hover:bg-[#1a1a1a]"
         >
           <Camera className="h-4 w-4" />
           Tilføj foto
@@ -110,7 +145,7 @@ export function Fotoalbum() {
           </div>
           <Button
             variant="outline"
-            className="mt-1 h-9 rounded-2xl border-[#d0cec5] px-4 text-sm"
+            className="mt-1 h-9 rounded-[8px] border-[#d0cec5] px-4 text-sm"
             onClick={() => fileInputRef.current?.click()}
           >
             <Plus className="mr-1.5 h-4 w-4" /> Vælg foto
@@ -122,7 +157,7 @@ export function Fotoalbum() {
             <button
               key={photo.id}
               onClick={() => openLightbox(i)}
-              className="group relative aspect-square overflow-hidden rounded-xl bg-[#ecebe5]"
+              className="group relative aspect-square overflow-hidden rounded-[8px] bg-[#ecebe5]"
             >
               <img
                 src={photo.url}
@@ -142,7 +177,7 @@ export function Fotoalbum() {
           </DialogHeader>
           <div className="space-y-2">
             {previewUrl && (
-              <div className="relative overflow-hidden rounded-2xl">
+              <div className="relative overflow-hidden rounded-[8px]">
                 <img src={previewUrl} alt="Preview" className="max-h-64 w-full object-contain" />
               </div>
             )}
@@ -150,36 +185,44 @@ export function Fotoalbum() {
               placeholder="Tilføj en billedtekst (valgfrit)"
               value={caption}
               onChange={e => setCaption(e.target.value)}
-              className="min-h-[60px] resize-none rounded-2xl border-[#d8d7cf] bg-white text-sm"
+              className="min-h-[60px] resize-none rounded-[8px] border-[#d8d7cf] bg-white text-sm"
             />
             <div className="flex gap-2">
               <Button
                 variant="outline"
-                className="flex-1 rounded-2xl border-[#d8d7cf]"
+                className="flex-1 rounded-[8px] border-[#d8d7cf]"
                 onClick={() => { setAddDialogOpen(false); setPreviewUrl(null); setCaption(''); if (fileInputRef.current) fileInputRef.current.value = ''; }}
               >
                 Annuller
               </Button>
               <Button
-                className="flex-1 rounded-2xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+                className="flex-1 rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
                 onClick={handleAddPhoto}
-                disabled={!previewUrl}
+                disabled={!previewUrl || isUploading}
               >
-                Gem foto
+                {isUploading ? (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Uploader...
+                  </span>
+                ) : (
+                  'Gem foto'
+                )}
               </Button>
             </div>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Lightbox */}
+      {/* Lightbox — fullscreen, hides header/footer via fullScreenOverlayOpen */}
       {lightboxIndex !== null && childPhotos[lightboxIndex] && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black"
+          style={{ paddingTop: 'env(safe-area-inset-top, 0px)', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
           onClick={closeLightbox}
         >
           <div
-            className="relative flex max-h-[90svh] w-full max-w-[430px] flex-col"
+            className="relative flex h-full w-full max-w-[430px] flex-col"
             onClick={e => e.stopPropagation()}
           >
             {/* Top bar */}
@@ -188,6 +231,12 @@ export function Fotoalbum() {
                 {format(new Date(childPhotos[lightboxIndex].takenAt), 'd. MMM yyyy', { locale: da })}
               </span>
               <div className="flex items-center gap-3">
+                <button
+                  onClick={handleShare}
+                  className="rounded-full p-2 text-white/70 hover:bg-white/10"
+                >
+                  <Share2 className="h-4 w-4" />
+                </button>
                 <button
                   onClick={() => handleDelete(childPhotos[lightboxIndex].id)}
                   className="rounded-full p-2 text-white/70 hover:bg-white/10 hover:text-red-400"
@@ -208,7 +257,7 @@ export function Fotoalbum() {
               <img
                 src={childPhotos[lightboxIndex].url}
                 alt={childPhotos[lightboxIndex].caption ?? 'Foto'}
-                className="max-h-[70svh] w-full rounded-2xl object-contain"
+                className="max-h-[70svh] w-full rounded-[8px] object-contain"
               />
             </div>
 
@@ -236,6 +285,8 @@ export function Fotoalbum() {
           </div>
         </div>
       )}
+
+      <SavingOverlay open={isUploading} label="Uploader..." />
     </div>
   );
 }

@@ -1,36 +1,44 @@
-"use client"
-
 import * as React from "react"
-import * as SwitchPrimitive from "@radix-ui/react-switch"
 import { cn } from "@/lib/utils"
 
 /**
- * IOSSwitch — Apple iOS-style toggle.
- * Grøn (#34C759) når aktiv, grå (#E5E5EA) når inaktiv.
- * Størrelse matcher iOS standard (51×31px).
+ * IOSSwitch — Apple iOS-style toggle, pure CSS (no Radix dependency).
+ * Renders identically on Chrome, Safari and WKWebView (Capacitor).
+ * Grøn (#34C759) når aktiv, grå (#e9e9ea) når inaktiv.
  */
 function IOSSwitch({
+  checked,
+  onCheckedChange,
+  disabled,
   className,
-  ...props
-}: React.ComponentProps<typeof SwitchPrimitive.Root>) {
+}: {
+  checked?: boolean;
+  onCheckedChange?: (checked: boolean) => void;
+  disabled?: boolean;
+  className?: string;
+}) {
   return (
-    <SwitchPrimitive.Root
-      data-slot="switch"
+    <button
+      type="button"
+      role="switch"
+      aria-checked={!!checked}
+      disabled={disabled}
+      onClick={() => !disabled && onCheckedChange?.(!checked)}
       className={cn(
-        "relative inline-flex h-[31px] w-[51px] shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out outline-none focus-visible:ring-2 focus-visible:ring-[#34C759] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-        "data-[state=checked]:bg-[#34C759] data-[state=unchecked]:bg-[#E5E5EA]",
+        "relative inline-flex h-[31px] w-[51px] shrink-0 cursor-pointer items-center rounded-full p-[2px] border-none outline-none focus:outline-none focus-visible:outline-none transition-colors duration-200 ease-in-out active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50",
+        checked ? "bg-[#34C759]" : "bg-[#e9e9ea]",
         className
       )}
-      {...props}
+      style={{ WebkitTapHighlightColor: 'transparent', WebkitAppearance: 'none' } as React.CSSProperties}
     >
-      <SwitchPrimitive.Thumb
-        data-slot="switch-thumb"
+      <div
         className={cn(
-          "pointer-events-none block h-[27px] w-[27px] rounded-full bg-white shadow-[0_3px_8px_rgba(0,0,0,0.15),0_1px_1px_rgba(0,0,0,0.16),0_3px_1px_rgba(0,0,0,0.10)] transition-transform duration-200 ease-in-out",
-          "data-[state=checked]:translate-x-[20px] data-[state=unchecked]:translate-x-0"
+          "pointer-events-none block h-[27px] w-[27px] rounded-full bg-white transition-transform duration-200 ease-in-out",
+          checked ? "translate-x-[20px]" : "translate-x-0"
         )}
+        style={{ boxShadow: '0 2px 4px 0 rgba(0,0,0,0.15), 0 1px 1px 0 rgba(0,0,0,0.06)' }}
       />
-    </SwitchPrimitive.Root>
+    </button>
   )
 }
 

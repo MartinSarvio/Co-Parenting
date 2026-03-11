@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAppStore } from '@/store';
-import { cn, getParentColor } from '@/lib/utils';
-import { notificationId } from '@/lib/id';
+import { cn, getParentColor, getEffectiveColor } from '@/lib/utils';
+import { notificationId, handoverId } from '@/lib/id';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,17 +9,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SelectSheet } from '@/components/custom/SelectSheet';
 import { 
-  CheckCircle2, 
+  CheckCircle2,
   Circle,
-  ArrowRight, 
-  Package, 
-  Stethoscope, 
-  BookOpen, 
+  ArrowRight,
+  Package,
+  Stethoscope,
+  BookOpen,
   Heart,
-  MessageSquare,
-  Send,
   History,
   Plus,
   Trash2,
@@ -70,16 +68,49 @@ export function HandoverView() {
     handovers,
     updateHandover,
     addHandover,
-    addNotification
+    addNotification,
+    handoverAction
   } = useAppStore();
   
   const [note, setNote] = useState('');
   const [showHistory, setShowHistory] = useState(false);
   const [newChecklistItem, setNewChecklistItem] = useState('');
   const [newChecklistCategory, setNewChecklistCategory] = useState<'clothing' | 'school' | 'health' | 'toys' | 'other'>('other');
+  const [selectedReceiverId, setSelectedReceiverId] = useState<string | null>(null);
+  const showAddForm = handoverAction === 'add-pakkeliste';
 
   const currentChild = children[0];
-  const otherParent = users.find(u => u.id !== currentUser?.id);
+
+  // Alle voksne i husstanden ekskl. den indloggede bruger
+  const realReceivers = users.filter(u => u.id !== currentUser?.id);
+
+  // Placeholder "Forælder 2" når den anden forælder ikke er i appen
+  const placeholderParentId = (() => {
+    if (!currentChild) return 'placeholder-parent-2';
+    // Brug parent2Id hvis den er sat og IKKE er den aktuelle bruger
+    if (currentChild.parent2Id && currentChild.parent2Id !== currentUser?.id) return currentChild.parent2Id;
+    // Ellers brug parent1Id hvis den er sat og IKKE er den aktuelle bruger
+    if (currentChild.parent1Id && currentChild.parent1Id !== currentUser?.id) return currentChild.parent1Id;
+    return 'placeholder-parent-2';
+  })();
+
+  const placeholderParent = realReceivers.length === 0
+    ? {
+        id: placeholderParentId,
+        name: 'Forælder 2',
+        email: '',
+        color: 'warm' as const,
+        role: 'parent' as const,
+      }
+    : null;
+
+  const eligibleReceivers = realReceivers.length > 0
+    ? realReceivers
+    : [placeholderParent!];
+  const defaultReceiver = eligibleReceivers[0] || null;
+  const effectiveReceiver = selectedReceiverId
+    ? eligibleReceivers.find(u => u.id === selectedReceiverId) || defaultReceiver
+    : defaultReceiver;
   
   // Get active handover or create a new one
   const activeHandover = handovers.find(h => h.status !== 'completed');
@@ -168,8 +199,8 @@ export function HandoverView() {
       notes: note
     });
 
-    // Notify the other parent
-    const otherParentUser = users.find(u => u.id !== currentUser?.id);
+    // Notify the receiving parent (brug handoverens toParentId, ikke naiv lookup)
+    const otherParentUser = users.find(u => u.id === activeHandover.toParentId);
     if (otherParentUser) {
       const senderName = currentUser?.name || 'Den anden forælder';
       const childName = currentChild ? ` med ${currentChild.name}` : '';
@@ -198,6 +229,75 @@ export function HandoverView() {
     toast.success('Note tilføjet');
   };
 
+  // Full page: Tilføj til pakkeliste
+  if (showAddForm && activeHandover) {
+    return (
+      <div className="bg-[#f5f3ee]">
+        <div className="space-y-3 px-4 pt-4">
+          <Input
+            className="h-11 rounded-full text-sm"
+            value={newChecklistItem}
+            onChange={(e) => setNewChecklistItem(e.target.value)}
+            placeholder="Fx Regntøj, ekstra skiftetøj, sut"
+            autoFocus
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                addChecklistItem();
+              }
+            }}
+          />
+          <SelectSheet
+            value={newChecklistCategory}
+            onValueChange={(value) => setNewChecklistCategory(value as 'clothing' | 'school' | 'health' | 'toys' | 'other')}
+            title="Kategori"
+            options={checklistCategoryOptions.map((option) => ({ value: option.value, label: option.label }))}
+            className="h-11 w-full rounded-full text-sm"
+          />
+          <Button
+            type="button"
+            className="h-11 w-full rounded-full px-3 text-sm"
+            onClick={addChecklistItem}
+          >
+            <Plus className="w-4 h-4" />
+            Tilføj
+          </Button>
+
+          {activeHandover.checklist.length > 0 && (
+            <div className="pt-3">
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-[#9a978f]">På listen</p>
+              <div className="space-y-1.5">
+                {activeHandover.checklist.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-3 p-3 border-b border-[#f2f1ed]"
+                  >
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center bg-slate-200 text-slate-500">
+                      {checklistIcons[item.item] || checklistIcons['default']}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-[#2f2f2d]">{item.item}</p>
+                      <p className="text-xs text-[#9a978f]">{checklistCategoryLabels[item.category || 'other']}</p>
+                    </div>
+                    <Button
+                      type="button"
+                      size="icon-sm"
+                      variant="ghost"
+                      className="text-slate-400 hover:text-rose-500"
+                      onClick={() => removeChecklistItem(item.id)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   // If no active handover, show message
   if (!activeHandover) {
     return (
@@ -212,36 +312,65 @@ export function HandoverView() {
           </div>
           <h2 className="text-xl font-bold text-slate-900 mb-2">Ingen aktiv aflevering</h2>
           <p className="text-slate-500 mb-6">Der er ingen aflevering planlagt i øjeblikket.</p>
-          <Button 
-            onClick={() => {
-              if (!currentChild || !currentUser || !otherParent) return;
-              addHandover({
-                id: `h-${handovers.length + 1}`,
-                childId: currentChild.id,
-                fromParentId: currentUser.id,
-                toParentId: otherParent.id,
-                scheduledDate: new Date().toISOString(),
-                status: 'pending',
-                checklist: [
-                  { id: 'default-1', item: 'Skoletaske', completed: false, category: 'school' },
-                  { id: 'default-2', item: 'Tandbørste', completed: false, category: 'health' },
-                  { id: 'default-3', item: 'Medicin', completed: false, category: 'health' },
-                  { id: 'default-4', item: 'Favorit bamse', completed: false, category: 'toys' },
-                ],
-                notes: ''
-              });
-              toast.success('Ny aflevering oprettet');
-            }}
-          >
-            Opret aflevering
-          </Button>
+
+          {/* Modtager-valg når der er flere mulige modtagere */}
+          {eligibleReceivers.length > 1 && (
+            <div className="max-w-xs mx-auto mb-4">
+              <label className="text-sm text-slate-500 mb-1 block">Afleveres til</label>
+              <SelectSheet
+                value={selectedReceiverId || effectiveReceiver?.id || ''}
+                onValueChange={setSelectedReceiverId}
+                title="Afleveres til"
+                placeholder="Vælg modtager"
+                options={eligibleReceivers.map(u => ({ value: u.id, label: u.name }))}
+                className="h-11 rounded-full text-sm"
+              />
+            </div>
+          )}
+
+          {eligibleReceivers.length > 0 ? (
+            <Button
+              onClick={() => {
+                if (!currentUser || !effectiveReceiver) return;
+                addHandover({
+                  id: handoverId(),
+                  childId: currentChild?.id || 'default-child',
+                  fromParentId: currentUser.id,
+                  toParentId: effectiveReceiver.id,
+                  scheduledDate: new Date().toISOString(),
+                  status: 'pending',
+                  checklist: [
+                    { id: 'default-1', item: 'Skoletaske', completed: false, category: 'school' },
+                    { id: 'default-2', item: 'Tandbørste', completed: false, category: 'health' },
+                    { id: 'default-3', item: 'Medicin', completed: false, category: 'health' },
+                    { id: 'default-4', item: 'Favorit bamse', completed: false, category: 'toys' },
+                  ],
+                  notes: ''
+                });
+                toast.success('Ny aflevering oprettet');
+              }}
+              disabled={!effectiveReceiver}
+            >
+              Opret aflevering
+            </Button>
+          ) : null}
         </motion.div>
       </div>
     );
   }
 
-  const fromParent = users.find(u => u.id === activeHandover.fromParentId);
-  const toParent = users.find(u => u.id === activeHandover.toParentId);
+  let fromParent = users.find(u => u.id === activeHandover.fromParentId);
+  let toParent = users.find(u => u.id === activeHandover.toParentId);
+
+  // Safeguard: sikr altid to FORSKELLIGE forældre
+  if (!fromParent || !toParent || fromParent.id === toParent.id) {
+    fromParent = users.find(u => u.id === activeHandover.fromParentId)
+      || currentUser
+      || users[0];
+    toParent = users.find(u => u.id === activeHandover.toParentId && u.id !== fromParent?.id)
+      || users.find(u => u.id !== fromParent?.id)
+      || { id: 'parent2', name: 'Forælder 2', email: '', role: 'parent' as const, avatar: '', color: 'warm' as const } as typeof fromParent;
+  }
 
   return (
     <div className="space-y-1.5 py-1">
@@ -273,14 +402,14 @@ export function HandoverView() {
                   <AvatarFallback 
                     className="text-lg"
                     style={{ 
-                      backgroundColor: fromParent ? getParentColor(fromParent.color) + '30' : undefined,
-                      color: fromParent ? getParentColor(fromParent.color) : undefined
+                      backgroundColor: fromParent ? getParentColor(getEffectiveColor(fromParent, currentUser?.id)) + '30' : undefined,
+                      color: fromParent ? getParentColor(getEffectiveColor(fromParent, currentUser?.id)) : undefined
                     }}
                   >
                     {fromParent?.name[0]}
                   </AvatarFallback>
                 </Avatar>
-                <p className="font-semibold text-slate-900">{fromParent?.name}</p>
+                <p className="font-semibold text-slate-900">{fromParent?.name || 'Forælder 1'}</p>
                 <Badge variant="outline" className="mt-1">Fra</Badge>
               </div>
 
@@ -304,14 +433,14 @@ export function HandoverView() {
                   <AvatarFallback 
                     className="text-lg"
                     style={{ 
-                      backgroundColor: toParent ? getParentColor(toParent.color) + '30' : undefined,
-                      color: toParent ? getParentColor(toParent.color) : undefined
+                      backgroundColor: toParent ? getParentColor(getEffectiveColor(toParent, currentUser?.id)) + '30' : undefined,
+                      color: toParent ? getParentColor(getEffectiveColor(toParent, currentUser?.id)) : undefined
                     }}
                   >
                     {toParent?.name[0]}
                   </AvatarFallback>
                 </Avatar>
-                <p className="font-semibold text-slate-900">{toParent?.name}</p>
+                <p className="font-semibold text-slate-900">{toParent?.name || 'Forælder 2'}</p>
                 <Badge variant="outline" className="mt-1">Til</Badge>
               </div>
             </div>
@@ -328,8 +457,7 @@ export function HandoverView() {
         <Card className="border-slate-200">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Package className="w-5 h-5 text-slate-500" />
+              <CardTitle className="text-lg">
                 Pakkeliste
               </CardTitle>
               <Badge variant={handoverProgress === 100 ? 'default' : 'secondary'}>
@@ -339,45 +467,9 @@ export function HandoverView() {
           </CardHeader>
           <CardContent className="pt-0 space-y-2">
             <Progress value={handoverProgress} className="h-2" />
-            <div className="rounded-2xl border border-slate-200 bg-white p-3">
-              <p className="mb-2 text-xs font-medium text-slate-800">Tilføj ting til pakkeliste</p>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_132px]">
-                <Input
-                  className="h-11 rounded-full text-sm"
-                  value={newChecklistItem}
-                  onChange={(e) => setNewChecklistItem(e.target.value)}
-                  placeholder="Fx Regntøj, ekstra skiftetøj, sut"
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter') {
-                      event.preventDefault();
-                      addChecklistItem();
-                    }
-                  }}
-                />
-                <Select
-                  value={newChecklistCategory}
-                  onValueChange={(value: 'clothing' | 'school' | 'health' | 'toys' | 'other') => setNewChecklistCategory(value)}
-                >
-                  <SelectTrigger className="h-11 w-full rounded-full text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {checklistCategoryOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Button type="button" className="h-11 rounded-full px-3 text-sm" onClick={addChecklistItem}>
-                  <Plus className="w-4 h-4" />
-                  Tilføj
-                </Button>
-              </div>
-              <p className="mt-2 text-xs text-slate-500">
-                Aflevering kan først bekræftes når alle punkter er markeret som leveret.
-              </p>
-            </div>
+            <p className="text-xs text-slate-500">
+              Aflevering kan først bekræftes når alle punkter er markeret som leveret.
+            </p>
             <div className="space-y-2">
               {activeHandover.checklist.map((item, index) => (
                 <motion.div
@@ -387,10 +479,8 @@ export function HandoverView() {
                   transition={{ delay: 0.3 + index * 0.05 }}
                   onClick={() => toggleChecklistItem(item.id)}
                   className={cn(
-                    "flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all",
-                    item.completed 
-                      ? "bg-green-50 border border-green-200" 
-                      : "bg-slate-50 border border-slate-200 hover:bg-slate-100"
+                    "flex items-center gap-3 p-3 cursor-pointer transition-all border-b border-[#f2f1ed]",
+                    item.completed && "bg-green-50/50"
                   )}
                 >
                   <div className={cn(
@@ -406,7 +496,7 @@ export function HandoverView() {
                     )}
                   </div>
                   <div className={cn(
-                    "w-8 h-8 rounded-lg flex items-center justify-center",
+                    "w-8 h-8 rounded-[8px] flex items-center justify-center",
                     item.completed ? "bg-green-100 text-green-600" : "bg-slate-200 text-slate-500"
                   )}>
                     {checklistIcons[item.item] || checklistIcons['default']}
@@ -454,14 +544,13 @@ export function HandoverView() {
       >
         <Card className="border-slate-200">
           <CardHeader className="pb-3">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-slate-500" />
+            <CardTitle className="text-lg">
               Noter til {toParent?.name}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0 space-y-2">
             {activeHandover.notes && (
-              <div className="p-3 rounded-xl bg-amber-50 border border-amber-200">
+              <div className="p-3 rounded-[8px] bg-amber-50 border border-amber-200">
                 <p className="text-sm text-amber-800">{activeHandover.notes}</p>
               </div>
             )}
@@ -479,7 +568,6 @@ export function HandoverView() {
               variant="outline"
               className="w-full"
             >
-              <Send className="w-4 h-4 mr-2" />
               Tilføj note
             </Button>
           </CardContent>
@@ -544,7 +632,7 @@ export function HandoverView() {
                     .map(handover => (
                       <div 
                         key={handover.id}
-                        className="flex items-center gap-3 p-3 rounded-xl bg-slate-50"
+                        className="flex items-center gap-3 p-3 border-b border-[#f2f1ed]"
                       >
                         <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
                           <CheckCircle2 className="w-5 h-5 text-green-600" />
@@ -572,6 +660,7 @@ export function HandoverView() {
           </motion.div>
         )}
       </AnimatePresence>
+
     </div>
   );
 }

@@ -1,21 +1,17 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useAppStore } from '@/store';
+import { OverblikSidePanel } from '@/components/custom/OverblikSidePanel';
 import { useApiActions } from '@/hooks/useApiActions';
-import { cn, formatDate, getDocumentTypeLabel } from '@/lib/utils';
-import { Card, CardContent } from '@/components/ui/card';
+import { cn, formatDate } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SelectSheet } from '@/components/custom/SelectSheet';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
-  Plus,
   Calendar,
-  FileText,
   Stethoscope,
   GraduationCap,
   Users,
@@ -26,7 +22,7 @@ import {
   Baby,
   Brain,
   Sparkles,
-  X,
+  // X available if needed
   Eye,
   RefreshCw,
   Waves,
@@ -45,11 +41,12 @@ import {
   Trophy,
   Search,
 } from 'lucide-react';
+import { SavingOverlay } from '@/components/custom/SavingOverlay';
 import type { LucideIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { differenceInYears, differenceInMonths, differenceInWeeks, parseISO } from 'date-fns';
 import { toast } from 'sonner';
-import type { DocumentType, Milestone } from '@/types';
+import type { Milestone } from '@/types';
 
 // ─── Tigerspring (Wonder Weeks) & Development Stages ────────────────────────
 interface DevelopmentStage {
@@ -274,27 +271,22 @@ const milestoneCategories = [
   { value: 'social', label: 'Social', icon: Users, color: 'bg-purple-100 text-purple-600' },
 ];
 
-const documentTypes = [
-  { value: 'contract', label: 'Kontrakt' },
-  { value: 'medical', label: 'Medicinsk' },
-  { value: 'school', label: 'Skole' },
-  { value: 'insurance', label: 'Forsikring' },
-  { value: 'other', label: 'Andet' },
-];
 
 export function Borneoverblik() {
   const {
+    activeTab,
     currentUser,
     users,
     children,
     milestones,
-    documents,
+    milestonesAction,
+    setMilestonesAction,
+    milestoneFormMode,
+    setMilestoneFormMode,
   } = useAppStore();
-  const { createDocument, createMilestone } = useApiActions();
-  
-  const [activeTab, setActiveTab] = useState('milestones');
-  const [isAddMilestoneOpen, setIsAddMilestoneOpen] = useState(false);
-  const [isAddDocumentOpen, setIsAddDocumentOpen] = useState(false);
+  const { createMilestone, updateMilestone: apiUpdateMilestone, deleteMilestone: apiDeleteMilestone } = useApiActions();
+  const [isSaving, setIsSaving] = useState(false);
+  const [editingMilestone, setEditingMilestone] = useState<Milestone | null>(null);
   const [stageDetailOpen, setStageDetailOpen] = useState(false);
   const [viewingStageIndex, setViewingStageIndex] = useState<number | null>(null);
   const [newMilestone, setNewMilestone] = useState<{
@@ -307,15 +299,6 @@ export function Borneoverblik() {
     description: '',
     date: '',
     category: 'development',
-  });
-  const [newDocument, setNewDocument] = useState<{
-    title: string;
-    type: DocumentType;
-    url: string;
-  }>({
-    title: '',
-    type: 'other',
-    url: '',
   });
 
   const currentChild = children[0];
@@ -429,43 +412,59 @@ export function Borneoverblik() {
 
   const handleAddMilestone = async () => {
     if (!newMilestone.title || !newMilestone.date || !currentChild) return;
+    setIsSaving(true);
+    try {
+      await createMilestone({
+        childId: currentChild.id,
+        title: newMilestone.title,
+        description: newMilestone.description,
+        date: newMilestone.date,
+        category: newMilestone.category,
+        addedBy: currentUser?.id || '',
+        photos: [],
+      });
+      toast.success('Milepæl tilføjet');
+      setMilestoneFormMode(null);
+      setNewMilestone({ title: '', description: '', date: '', category: 'development' });
+    } catch {
+      toast.error('Kunne ikke tilføje milepæl');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
-    await createMilestone({
-      childId: currentChild.id,
-      title: newMilestone.title,
-      description: newMilestone.description,
-      date: newMilestone.date,
-      category: newMilestone.category,
-      addedBy: currentUser?.id || '',
-      photos: [],
-    });
-    
-    setIsAddMilestoneOpen(false);
+  const handleUpdateMilestone = async () => {
+    if (!editingMilestone || !newMilestone.title || !newMilestone.date) return;
+    setIsSaving(true);
+    try {
+      await apiUpdateMilestone(editingMilestone.id, {
+        title: newMilestone.title,
+        description: newMilestone.description || undefined,
+        date: newMilestone.date,
+        category: newMilestone.category,
+      });
+      toast.success('Milepæl opdateret');
+      setMilestoneFormMode(null);
+      setEditingMilestone(null);
+      setNewMilestone({ title: '', description: '', date: '', category: 'development' });
+    } catch {
+      toast.error('Kunne ikke opdatere milepæl');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteMilestone = async () => {
+    if (!editingMilestone) return;
+
+    await apiDeleteMilestone(editingMilestone.id);
+
+    setMilestoneFormMode(null);
+    setEditingMilestone(null);
     setNewMilestone({ title: '', description: '', date: '', category: 'development' });
-    toast.success('Milepæl tilføjet');
+    toast.success('Milepæl slettet');
   };
 
-  const handleAddDocument = () => {
-    if (!newDocument.title.trim() || !currentChild) {
-      toast.error('Tilføj en titel');
-      return;
-    }
-    if (!newDocument.url.trim()) {
-      toast.error('Tilføj filreference eller link');
-      return;
-    }
-    
-    void createDocument({
-      title: newDocument.title.trim(),
-      type: newDocument.type,
-      url: newDocument.url.trim(),
-      sharedWith: [parent1?.id, parent2?.id].filter(Boolean) as string[],
-    });
-    
-    setIsAddDocumentOpen(false);
-    setNewDocument({ title: '', type: 'other', url: '' });
-    toast.success('Dokument tilføjet');
-  };
 
   if (!currentChild) {
     return (
@@ -475,8 +474,214 @@ export function Borneoverblik() {
     );
   }
 
+  // ─── Listen to milestonesAction from TopBar ───
+  useEffect(() => {
+    if (milestonesAction === 'add') {
+      setNewMilestone({ title: '', description: '', date: '', category: 'development' });
+      setMilestoneFormMode('add');
+      setMilestonesAction(null);
+    }
+  }, [milestonesAction, setMilestonesAction]);
+
+  // ─── Milestones: full-page add form ───
+  if (activeTab === 'milestones' && milestoneFormMode === 'add') {
+    return (
+      <div className="space-y-3 py-1">
+        <OverblikSidePanel />
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <Label className="text-[12px] font-semibold text-[#78766d]">Titel</Label>
+            <Input
+              value={newMilestone.title}
+              onChange={(e) => setNewMilestone({...newMilestone, title: e.target.value})}
+              placeholder="F.eks. Første skoledag"
+              className="rounded-[8px] border-[#e5e3dc] bg-white"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-[12px] font-semibold text-[#78766d]">Beskrivelse (valgfri)</Label>
+            <Textarea
+              value={newMilestone.description}
+              onChange={(e) => setNewMilestone({...newMilestone, description: e.target.value})}
+              placeholder="Beskriv begivenheden..."
+              className="rounded-[8px] border-[#e5e3dc] bg-white min-h-[80px] resize-none"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-[12px] font-semibold text-[#78766d]">Dato</Label>
+            <Input
+              type="date"
+              value={newMilestone.date}
+              onChange={(e) => setNewMilestone({...newMilestone, date: e.target.value})}
+              className="rounded-[8px] border-[#e5e3dc] bg-white"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-[12px] font-semibold text-[#78766d]">Kategori</Label>
+            <SelectSheet
+              value={newMilestone.category}
+              onValueChange={(v) => setNewMilestone({...newMilestone, category: v as Milestone['category']})}
+              title="Kategori"
+              options={milestoneCategories.map(cat => ({ value: cat.value, label: cat.label, icon: <cat.icon className="w-4 h-4" /> }))}
+              className="rounded-[8px] border-[#e5e3dc] bg-white"
+            />
+          </div>
+          <Button onClick={handleAddMilestone} className="w-full flex items-center justify-center gap-2 rounded-[8px] bg-[#f58a2d] text-white hover:bg-[#e07b1e]" disabled={!newMilestone.title || !newMilestone.date || isSaving}>
+            Tilføj milepæl
+          </Button>
+        </div>
+        <SavingOverlay open={isSaving} />
+      </div>
+    );
+  }
+
+  // ─── Milestones: full-page edit form ───
+  if (activeTab === 'milestones' && milestoneFormMode === 'edit' && editingMilestone) {
+    return (
+      <div className="space-y-3 py-1">
+        <OverblikSidePanel />
+        <div className="flex items-center justify-between pt-2 pb-4">
+          <div className="flex items-center gap-3">
+            <button onClick={() => { setMilestoneFormMode(null); setEditingMilestone(null); }} className="transition-colors">
+              <ChevronLeft className="h-5 w-5 text-[#4a4945]" />
+            </button>
+            <h2 className="text-lg font-semibold text-[#2f2f2d]">Rediger milepæl</h2>
+          </div>
+          <button onClick={handleDeleteMilestone} className="text-sm font-medium text-red-500 hover:text-red-600 transition-colors">
+            Slet
+          </button>
+        </div>
+        <div className="space-y-2 rounded-2xl bg-white p-4 border border-[#e8e7e0]">
+          <div className="space-y-2">
+            <Label>Titel</Label>
+            <Input
+              value={newMilestone.title}
+              onChange={(e) => setNewMilestone({...newMilestone, title: e.target.value})}
+              placeholder="F.eks. Første skoledag"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Beskrivelse (valgfri)</Label>
+            <Textarea
+              value={newMilestone.description}
+              onChange={(e) => setNewMilestone({...newMilestone, description: e.target.value})}
+              placeholder="Beskriv begivenheden..."
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Dato</Label>
+            <Input
+              type="date"
+              value={newMilestone.date}
+              onChange={(e) => setNewMilestone({...newMilestone, date: e.target.value})}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Kategori</Label>
+            <SelectSheet
+              value={newMilestone.category}
+              onValueChange={(v) => setNewMilestone({...newMilestone, category: v as Milestone['category']})}
+              title="Kategori"
+              options={milestoneCategories.map(cat => ({ value: cat.value, label: cat.label, icon: <cat.icon className="w-4 h-4" /> }))}
+            />
+          </div>
+          <Button onClick={handleUpdateMilestone} className="w-full flex items-center justify-center gap-2" disabled={!newMilestone.title || !newMilestone.date || isSaving}>
+            Gem ændringer
+          </Button>
+        </div>
+        <SavingOverlay open={isSaving} />
+      </div>
+    );
+  }
+
+  // ─── Milestones list view ───
+  if (activeTab === 'milestones') {
+    return (
+      <div className="space-y-3 py-1">
+        <OverblikSidePanel />
+        <div className="text-center pt-2 pb-2">
+          <h1 className="text-2xl font-bold text-[#2f2f2d]">Milepæle & Begivenheder</h1>
+          <p className="text-sm text-[#75736b] mt-1">{currentChild.name}</p>
+        </div>
+
+        <div className="space-y-2">
+          {milestones
+            .filter(m => m.childId === currentChild.id)
+            .sort((a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime())
+            .map((milestone, index) => {
+              const category = milestoneCategories.find(c => c.value === milestone.category);
+              const addedBy = users.find(u => u.id === milestone.addedBy);
+              return (
+                <motion.div
+                  key={milestone.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                >
+                  <button
+                    type="button"
+                    className="w-full text-left rounded-[8px] border border-[#e8e7e0] bg-white px-4 py-3.5 transition-colors hover:bg-[#faf9f6]"
+                    onClick={() => {
+                      setEditingMilestone(milestone);
+                      setNewMilestone({
+                        title: milestone.title,
+                        description: milestone.description || '',
+                        date: milestone.date,
+                        category: milestone.category,
+                      });
+                      setMilestoneFormMode('edit');
+                    }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className={cn(
+                        "w-10 h-10 rounded-[8px] flex items-center justify-center flex-shrink-0",
+                        category?.color || 'bg-[#f2f1ed] text-[#7a786f]'
+                      )}>
+                        {category ? <category.icon className="w-5 h-5" /> : <Calendar className="w-5 h-5" />}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <p className="text-[14px] font-semibold text-[#2f2f2d]">{milestone.title}</p>
+                            {milestone.description && (
+                              <p className="text-[12px] text-[#9a978f] mt-0.5">{milestone.description}</p>
+                            )}
+                          </div>
+                          <span className="text-[11px] text-[#9a978f] font-medium shrink-0 ml-2">
+                            {formatDate(milestone.date)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Avatar className="w-5 h-5">
+                            <AvatarImage src={addedBy?.avatar} />
+                            <AvatarFallback className="text-[8px]">{addedBy?.name[0]}</AvatarFallback>
+                          </Avatar>
+                          <span className="text-[11px] text-[#9a978f]">
+                            Tilføjet af {addedBy?.name}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                </motion.div>
+              );
+            })}
+
+          {milestones.filter(m => m.childId === currentChild.id).length === 0 && (
+            <div className="text-center py-8">
+              <Calendar className="w-12 h-12 text-[#d8d7cf] mx-auto mb-3" />
+              <p className="text-[#75736b]">Ingen milepæle endnu</p>
+              <p className="text-[13px] text-[#9a978f]">Tilføj vigtige begivenheder i dit barns liv</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-1.5 py-1">
+      <OverblikSidePanel />
       {/* Header with child info */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -560,7 +765,7 @@ export function Borneoverblik() {
         >
           <button
             onClick={() => { setViewingStageIndex(stageInfo.currentIndex); setStageDetailOpen(true); }}
-            className="w-full rounded-2xl border-2 border-[#e5e3dc] bg-white p-4 text-left transition-all hover:border-[#f3c59d] hover:shadow-[0_2px_12px_rgba(245,138,45,0.08)] active:scale-[0.98]"
+            className="w-full rounded-[8px] border-2 border-[#e5e3dc] bg-white p-4 text-left transition-all hover:border-[#f3c59d] hover:shadow-[0_2px_12px_rgba(245,138,45,0.08)] active:scale-[0.98]"
           >
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
@@ -659,9 +864,9 @@ export function Borneoverblik() {
 
                     <div className="space-y-2 pt-2">
                       {/* Crisis Symptoms */}
-                      <div className="rounded-xl bg-[#fef3ee] p-3.5">
+                      <div className="rounded-[8px] bg-[#fef3ee] p-3.5">
                         <div className="mb-2 flex items-center gap-2">
-                          <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#fde0c8]">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-[8px] bg-[#fde0c8]">
                             <Sparkles className="h-3.5 w-3.5 text-[#e8842a]" />
                           </div>
                           <span className="text-[13px] font-bold text-[#cc6f1f]">
@@ -679,9 +884,9 @@ export function Borneoverblik() {
                       </div>
 
                       {/* New Skills */}
-                      <div className="rounded-xl bg-[#f0f7f0] p-3.5">
+                      <div className="rounded-[8px] bg-[#f0f7f0] p-3.5">
                         <div className="mb-2 flex items-center gap-2">
-                          <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#d5ecd5]">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-[8px] bg-[#d5ecd5]">
                             <Brain className="h-3.5 w-3.5 text-[#3d8b3d]" />
                           </div>
                           <span className="text-[13px] font-bold text-[#2d6e2d]">Nye færdigheder</span>
@@ -697,9 +902,9 @@ export function Borneoverblik() {
                       </div>
 
                       {/* Tips */}
-                      <div className="rounded-xl bg-[#f4f3ef] p-3.5">
+                      <div className="rounded-[8px] bg-[#f4f3ef] p-3.5">
                         <div className="mb-2 flex items-center gap-2">
-                          <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-[#e5e3dc]">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-[8px] bg-[#e5e3dc]">
                             <Baby className="h-3.5 w-3.5 text-[#6b6960]" />
                           </div>
                           <span className="text-[13px] font-bold text-[#4a4840]">Tips til dig</span>
@@ -717,9 +922,9 @@ export function Borneoverblik() {
                       {/* External link */}
                       <button
                         onClick={() => window.open(stage.link, '_blank', 'noopener,noreferrer')}
-                        className="flex w-full items-center gap-3 rounded-xl border border-[#e5e3dc] bg-white p-3 transition-colors hover:bg-[#faf9f6]"
+                        className="flex w-full items-center gap-3 rounded-[8px] border border-[#e5e3dc] bg-white p-3 transition-colors hover:bg-[#faf9f6]"
                       >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#fff2e6]">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-[#fff2e6]">
                           <ExternalLink className="h-4 w-4 text-[#f58a2d]" />
                         </div>
                         <div className="flex-1 text-left">
@@ -735,7 +940,7 @@ export function Borneoverblik() {
                           onClick={() => !isFirst && setViewingStageIndex(viewingStageIndex - 1)}
                           disabled={isFirst}
                           className={cn(
-                            "flex items-center gap-1 rounded-xl px-3 py-2 text-[13px] font-medium transition-colors",
+                            "flex items-center gap-1 rounded-[8px] px-3 py-2 text-[13px] font-medium transition-colors",
                             isFirst
                               ? "text-[#d8d7cf] cursor-not-allowed"
                               : "text-[#75736b] hover:bg-[#f2f1ed]"
@@ -753,7 +958,7 @@ export function Borneoverblik() {
                           onClick={() => !isLast && setViewingStageIndex(viewingStageIndex + 1)}
                           disabled={isLast}
                           className={cn(
-                            "flex items-center gap-1 rounded-xl px-3 py-2 text-[13px] font-medium transition-colors",
+                            "flex items-center gap-1 rounded-[8px] px-3 py-2 text-[13px] font-medium transition-colors",
                             isLast
                               ? "text-[#d8d7cf] cursor-not-allowed"
                               : "text-[#75736b] hover:bg-[#f2f1ed]"
@@ -772,305 +977,7 @@ export function Borneoverblik() {
         )}
       </AnimatePresence>
 
-      {/* Underline-style Tabs */}
-      <div className="sticky top-0 z-10 bg-[#faf9f6] pb-0">
-        <div className="flex items-center border-b border-[#e5e3dc]">
-          {[
-            { value: 'milestones', label: 'Milepæle', icon: Calendar },
-            { value: 'documents', label: 'Dokumenter', icon: FileText },
-          ].map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.value}
-                onClick={() => setActiveTab(tab.value)}
-                className={cn(
-                  'relative flex-1 py-3 text-center text-[14px] font-semibold transition-colors flex items-center justify-center gap-1.5',
-                  activeTab === tab.value ? 'text-[#2f2f2d]' : 'text-[#b0ada4]'
-                )}
-              >
-                <Icon className="w-4 h-4" />
-                {tab.label}
-                {activeTab === tab.value && (
-                  <motion.div
-                    layoutId="borneoverblik-underline"
-                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#2f2f2d] rounded-full"
-                    transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                  />
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Milestones Tab */}
-      {activeTab === 'milestones' && (
-        <div className="space-y-2 mt-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-[15px] font-bold text-[#2f2f2d]">Milepæle & Begivenheder</h3>
-            <Dialog open={isAddMilestoneOpen} onOpenChange={setIsAddMilestoneOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" variant="outline">
-                  <Plus className="w-4 h-4 mr-1" />
-                  Tilføj
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Tilføj milepæl</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-2 pt-4">
-                  <div className="space-y-2">
-                    <Label>Titel</Label>
-                    <Input 
-                      value={newMilestone.title}
-                      onChange={(e) => setNewMilestone({...newMilestone, title: e.target.value})}
-                      placeholder="F.eks. Første skoledag"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Beskrivelse (valgfri)</Label>
-                    <Textarea 
-                      value={newMilestone.description}
-                      onChange={(e) => setNewMilestone({...newMilestone, description: e.target.value})}
-                      placeholder="Beskriv begivenheden..."
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Dato</Label>
-                    <Input 
-                      type="date"
-                      value={newMilestone.date}
-                      onChange={(e) => setNewMilestone({...newMilestone, date: e.target.value})}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Kategori</Label>
-                    <Select 
-                      value={newMilestone.category} 
-                      onValueChange={(v) => setNewMilestone({...newMilestone, category: v as Milestone['category']})}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {milestoneCategories.map(cat => (
-                          <SelectItem key={cat.value} value={cat.value}>
-                            <div className="flex items-center gap-2">
-                              <cat.icon className="w-4 h-4" />
-                              {cat.label}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Button onClick={handleAddMilestone} className="w-full">
-                    Tilføj milepæl
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-
-          <div className="space-y-2">
-            {milestones
-              .filter(m => m.childId === currentChild.id)
-              .sort((a, b) => parseISO(b.date).getTime() - parseISO(a.date).getTime())
-              .map((milestone, index) => {
-                const category = milestoneCategories.find(c => c.value === milestone.category);
-                const addedBy = users.find(u => u.id === milestone.addedBy);
-                
-                return (
-                  <motion.div
-                    key={milestone.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <div className="rounded-2xl border border-[#e8e7e0] bg-white px-4 py-3.5">
-                      <div className="flex items-start gap-3">
-                        <div className={cn(
-                          "w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0",
-                          category?.color || 'bg-[#f2f1ed] text-[#7a786f]'
-                        )}>
-                          {category ? <category.icon className="w-5 h-5" /> : <Calendar className="w-5 h-5" />}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <p className="text-[14px] font-semibold text-[#2f2f2d]">{milestone.title}</p>
-                              {milestone.description && (
-                                <p className="text-[12px] text-[#9a978f] mt-0.5">{milestone.description}</p>
-                              )}
-                            </div>
-                            <span className="text-[11px] text-[#9a978f] font-medium shrink-0 ml-2">
-                              {formatDate(milestone.date)}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2 mt-2">
-                            <Avatar className="w-5 h-5">
-                              <AvatarImage src={addedBy?.avatar} />
-                              <AvatarFallback className="text-[8px]">{addedBy?.name[0]}</AvatarFallback>
-                            </Avatar>
-                            <span className="text-[11px] text-[#9a978f]">
-                              Tilføjet af {addedBy?.name}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            
-            {milestones.filter(m => m.childId === currentChild.id).length === 0 && (
-              <div className="text-center py-8">
-                <Calendar className="w-12 h-12 text-[#d8d7cf] mx-auto mb-3" />
-                <p className="text-[#75736b]">Ingen milepæle endnu</p>
-                <p className="text-[13px] text-[#9a978f]">Tilføj vigtige begivenheder i dit barns liv</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Documents Tab */}
-      {activeTab === 'documents' && (
-        <div className="space-y-2 mt-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-[15px] font-bold text-[#2f2f2d]">Dokumenter</h3>
-            <Dialog open={isAddDocumentOpen} onOpenChange={setIsAddDocumentOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" variant="outline">
-                  <Plus className="w-4 h-4 mr-1" />
-                  Tilføj
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Tilføj dokument</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-2 pt-4">
-                  <div className="space-y-2">
-                    <Label>Titel</Label>
-                    <Input 
-                      value={newDocument.title}
-                      onChange={(e) => setNewDocument({...newDocument, title: e.target.value})}
-                      placeholder="F.eks. Vaccinationskort"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Type</Label>
-                    <Select 
-                      value={newDocument.type} 
-                      onValueChange={(v) => setNewDocument({...newDocument, type: v as DocumentType})}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {documentTypes.map(type => (
-                          <SelectItem key={type.value} value={type.value}>
-                            {type.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Fil eller link</Label>
-                    <Input
-                      value={newDocument.url}
-                      onChange={(e) => setNewDocument({ ...newDocument, url: e.target.value })}
-                      placeholder="https://... eller fx vaccinationskort.pdf"
-                    />
-                    <p className="text-xs text-slate-500">
-                      Du kan gemme et link eller en filreference.
-                    </p>
-                  </div>
-                  <Button onClick={handleAddDocument} className="w-full">
-                    Tilføj dokument
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-
-          <div className="space-y-2">
-            {documents
-              .filter(d => d.childId === currentChild.id || d.childId === undefined)
-              .sort((a, b) => parseISO(b.uploadedAt).getTime() - parseISO(a.uploadedAt).getTime())
-              .map((document, index) => {
-                const uploadedBy = users.find(u => u.id === document.uploadedBy);
-                
-                return (
-                  <motion.div
-                    key={document.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <Card className="cursor-pointer border-[#d8d7cf] bg-[#faf9f5] transition-colors hover:border-[#f3c59d]">
-                      <CardContent className="p-4">
-                        <div className="flex items-start gap-3">
-                          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#fff2e6]">
-                            <FileText className="h-5 w-5 text-[#f58a2d]" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-start justify-between">
-                              <div>
-                                <p className="font-semibold text-slate-900">{document.title}</p>
-                                <p className="text-sm text-slate-500">{getDocumentTypeLabel(document.type)}</p>
-                              </div>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8"
-                                onClick={() => {
-                                  const raw = document.url.trim();
-                                  const normalized = /^https?:\/\//i.test(raw)
-                                    ? raw
-                                    : (raw.includes('.') ? `https://${raw}` : '');
-
-                                  if (!normalized) {
-                                    toast.message('Ingen klikbart link på dokumentet endnu');
-                                    return;
-                                  }
-                                  window.open(normalized, '_blank', 'noopener,noreferrer');
-                                }}
-                              >
-                                <ExternalLink className="w-4 h-4" />
-                              </Button>
-                            </div>
-                            <div className="flex items-center gap-2 mt-2">
-                              <Avatar className="w-5 h-5">
-                                <AvatarImage src={uploadedBy?.avatar} />
-                                <AvatarFallback className="text-[8px]">{uploadedBy?.name[0]}</AvatarFallback>
-                              </Avatar>
-                              <span className="text-xs text-slate-400">
-                                Uploadet {formatDate(document.uploadedAt)} af {uploadedBy?.name}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                );
-              })}
-            
-            {documents.filter(d => d.childId === currentChild.id || d.childId === undefined).length === 0 && (
-              <div className="text-center py-8">
-                <FileText className="w-12 h-12 text-[#d8d7cf] mx-auto mb-3" />
-                <p className="text-[#75736b]">Ingen dokumenter endnu</p>
-                <p className="text-[13px] text-[#9a978f]">Tilføj vigtige dokumenter som vaccinationskort, kontrakter mv.</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      <SavingOverlay open={isSaving} />
     </div>
   );
 }

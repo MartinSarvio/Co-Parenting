@@ -1,29 +1,19 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useAppStore } from '@/store';
 import { useApiActions } from '@/hooks/useApiActions';
 import { OverblikSidePanel } from '@/components/custom/OverblikSidePanel';
+import { SavingOverlay } from '@/components/custom/SavingOverlay';
 import { format } from 'date-fns';
 import { da } from 'date-fns/locale';
-import { Plus, ClipboardList, Check, X, Clock, FileText, Paperclip, Send } from 'lucide-react';
+import { Plus, ClipboardList, Check, X, Clock, FileText, Paperclip, Send, Upload, Loader2, Info, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { SelectSheet } from '@/components/custom/SelectSheet';
 import { cn } from '@/lib/utils';
+import { ConfirmCloseDialog } from '@/components/custom/ConfirmCloseDialog';
 import type { DecisionLog } from '@/types';
 
 type DecisionStatus = DecisionLog['status'];
@@ -46,8 +36,10 @@ function statusBadge(status: DecisionStatus) {
 
 export function Beslutningslog() {
   const { currentUser, decisions, approveDecision, rejectDecision, users, children, documents } = useAppStore();
-  const { createDecision, deleteDecision } = useApiActions();
+  const { createDecision, deleteDecision, createDocument } = useApiActions();
   const [addOpen, setAddOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [confirmClose, setConfirmClose] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<DecisionCategory>('other');
@@ -57,6 +49,41 @@ export function Beslutningslog() {
   const [notes, setNotes] = useState('');
   const [selectedDocIds, setSelectedDocIds] = useState<string[]>([]);
   const [filterStatus, setFilterStatus] = useState<DecisionStatus | 'all'>('all');
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !currentUser) return;
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('Filen er for stor (maks 10 MB)');
+      return;
+    }
+    setIsUploading(true);
+    try {
+      const reader = new FileReader();
+      const dataUrl = await new Promise<string>((resolve) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(file);
+      });
+      const doc = await createDocument({
+        title: file.name.replace(/\.[^.]+$/, ''),
+        type: 'other',
+        url: dataUrl,
+        sharedWith: users.map(u => u.id),
+        isOfficial: false,
+      });
+      if (doc) {
+        setSelectedDocIds(prev => [...prev, doc.id]);
+        toast.success('Dokument uploadet');
+      }
+    } catch {
+      toast.error('Kunne ikke uploade dokument');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   // Co-parent detektion
   const otherParent = users.find(u => u.role === 'parent' && u.id !== currentUser?.id);
@@ -68,29 +95,36 @@ export function Beslutningslog() {
 
   async function handleAdd() {
     if (!currentUser || !title.trim() || !description.trim()) return;
-    await createDecision({
-      childId: childId && childId !== 'none' ? childId : undefined,
-      title: title.trim(),
-      description: description.trim(),
-      category,
-      decidedAt: new Date().toISOString(),
-      approvedBy: [],
-      status: 'proposed',
-      validFrom: validFrom || undefined,
-      validUntil: validUntil || undefined,
-      notes: notes.trim() || undefined,
-      documentIds: selectedDocIds.length > 0 ? selectedDocIds : undefined,
-    });
-    setAddOpen(false);
-    setTitle('');
-    setDescription('');
-    setCategory('other');
-    setChildId('');
-    setValidFrom('');
-    setValidUntil('');
-    setNotes('');
-    setSelectedDocIds([]);
-    toast.success('Beslutning tilføjet');
+    setIsSaving(true);
+    try {
+      await createDecision({
+        childId: childId && childId !== 'none' ? childId : undefined,
+        title: title.trim(),
+        description: description.trim(),
+        category,
+        decidedAt: new Date().toISOString(),
+        approvedBy: [],
+        status: 'proposed',
+        validFrom: validFrom || undefined,
+        validUntil: validUntil || undefined,
+        notes: notes.trim() || undefined,
+        documentIds: selectedDocIds.length > 0 ? selectedDocIds : undefined,
+      });
+      toast.success('Beslutning tilføjet');
+      setAddOpen(false);
+      setTitle('');
+      setDescription('');
+      setCategory('other');
+      setChildId('');
+      setValidFrom('');
+      setValidUntil('');
+      setNotes('');
+      setSelectedDocIds([]);
+    } catch {
+      toast.error('Kunne ikke tilføje beslutning');
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   function handleApprove(id: string) {
@@ -111,7 +145,7 @@ export function Beslutningslog() {
         <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Beslutningslog</h1>
         <Button
           onClick={() => setAddOpen(true)}
-          className="h-9 gap-1.5 rounded-2xl bg-[#2f2f2f] px-4 text-sm text-white hover:bg-[#1a1a1a]"
+          className="h-9 gap-1.5 rounded-[8px] bg-[#2f2f2f] px-4 text-sm text-white hover:bg-[#1a1a1a]"
         >
           <Plus className="h-4 w-4" />
           Ny beslutning
@@ -125,7 +159,7 @@ export function Beslutningslog() {
             key={s}
             onClick={() => setFilterStatus(s)}
             className={cn(
-              'flex-1 rounded-xl py-1.5 text-[12px] font-semibold transition-all',
+              'flex-1 rounded-[8px] py-1.5 text-[12px] font-semibold transition-all',
               filterStatus === s
                 ? 'bg-[#2f2f2f] text-white'
                 : 'bg-[#ecebe5] text-[#5f5d56] hover:bg-[#e0deda]'
@@ -145,7 +179,7 @@ export function Beslutningslog() {
           </div>
           <Button
             variant="outline"
-            className="mt-1 h-9 rounded-2xl border-[#d0cec5] px-4 text-sm"
+            className="mt-1 h-9 rounded-[8px] border-[#d0cec5] px-4 text-sm"
             onClick={() => setAddOpen(true)}
           >
             <Plus className="mr-1.5 h-4 w-4" /> Tilføj beslutning
@@ -153,26 +187,38 @@ export function Beslutningslog() {
         </div>
       ) : (
         <div className="space-y-2">
+          {!hasCoParentOnApp && (
+            <div className="rounded-[8px] bg-amber-50 border border-amber-200 p-3 flex items-center gap-2">
+              <Info className="h-4 w-4 text-amber-600 shrink-0" />
+              <p className="text-[13px] text-amber-800">
+                Modparten er ikke tilknyttet appen — beslutninger gemmes kun lokalt.
+              </p>
+            </div>
+          )}
           {filtered.map(decision => {
             const badge = statusBadge(decision.status);
             const BadgeIcon = badge.icon;
             const proposer = users.find(u => u.id === decision.proposedBy);
             const child = children.find(c => c.id === decision.childId);
             const canApprove = currentUser && decision.status === 'proposed' && !decision.approvedBy.includes(currentUser.id) && currentUser.id !== decision.proposedBy;
+            const isMyProposal = currentUser?.id === decision.proposedBy;
 
             return (
               <div
                 key={decision.id}
-                className="rounded-2xl border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                className={cn(
+                  "rounded-[8px] border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border-l-[3px]",
+                  isMyProposal ? "border-l-[#2f2f2f]" : "border-l-[#f58a2d]"
+                )}
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className={cn('inline-flex items-center gap-1 rounded-lg px-2 py-0.5 text-[11px] font-semibold', badge.className)}>
+                      <span className={cn('inline-flex items-center gap-1 rounded-[8px] px-2 py-0.5 text-[11px] font-semibold', badge.className)}>
                         <BadgeIcon className="h-3 w-3" />
                         {badge.label}
                       </span>
-                      <span className="rounded-lg bg-[#ecebe5] px-2 py-0.5 text-[11px] font-medium text-[#5f5d56]">
+                      <span className="rounded-[8px] bg-[#ecebe5] px-2 py-0.5 text-[11px] font-medium text-[#5f5d56]">
                         {categoryOptions.find(c => c.value === decision.category)?.label}
                       </span>
                       {child && (
@@ -185,7 +231,9 @@ export function Beslutningslog() {
                       <p className="mt-1 text-[12px] text-[#78766d] italic">{decision.notes}</p>
                     )}
                     <div className="mt-2 flex items-center gap-3 text-[11px] text-[#78766d]">
-                      <span>Foreslået af {proposer?.name ?? 'ukendt'}</span>
+                      <span className={cn("font-semibold", isMyProposal ? "text-[#2f2f2f]" : "text-[#f58a2d]")}>
+                        {isMyProposal ? 'Dit forslag' : `${proposer?.name ?? 'Ukendt'}s forslag`}
+                      </span>
                       <span>{format(new Date(decision.createdAt), 'd. MMM yyyy', { locale: da })}</span>
                       {hasCoParentOnApp && decision.status === 'proposed' && (
                         <span className="inline-flex items-center gap-1 text-[11px] text-[#4caf50]">
@@ -225,19 +273,29 @@ export function Beslutningslog() {
                 {decision.status === 'proposed' && (
                   <div className="mt-3 flex gap-2 border-t border-[#f0efe8] pt-3">
                     {canApprove && (
-                      <Button
-                        size="sm"
-                        className="flex-1 h-8 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 text-[12px]"
-                        onClick={() => handleApprove(decision.id)}
-                      >
-                        <Check className="mr-1 h-3.5 w-3.5" /> Godkend
-                      </Button>
+                      <>
+                        <Button
+                          size="sm"
+                          className="flex-1 h-8 rounded-[8px] bg-emerald-600 text-white hover:bg-emerald-700 text-[12px]"
+                          onClick={() => handleApprove(decision.id)}
+                        >
+                          <Check className="mr-1 h-3.5 w-3.5" /> Godkend
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1 h-8 rounded-[8px] border-rose-200 text-rose-600 hover:bg-rose-50 text-[12px]"
+                          onClick={() => handleReject(decision.id)}
+                        >
+                          <X className="mr-1 h-3.5 w-3.5" /> Afvis
+                        </Button>
+                      </>
                     )}
-                    {currentUser?.id === decision.proposedBy && (
+                    {isMyProposal && (
                       <Button
                         size="sm"
                         variant="outline"
-                        className="flex-1 h-8 rounded-xl border-rose-200 text-rose-600 hover:bg-rose-50 text-[12px]"
+                        className="flex-1 h-8 rounded-[8px] border-rose-200 text-rose-600 hover:bg-rose-50 text-[12px]"
                         onClick={() => handleReject(decision.id)}
                       >
                         <X className="mr-1 h-3.5 w-3.5" /> Træk tilbage
@@ -246,7 +304,7 @@ export function Beslutningslog() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="h-8 rounded-xl px-2 text-[#c8c6bc] hover:text-rose-500"
+                      className="h-8 rounded-[8px] px-2 text-[#c8c6bc] hover:text-rose-500"
                       onClick={() => { deleteDecision(decision.id); toast.success('Beslutning slettet'); }}
                     >
                       <X className="h-3.5 w-3.5" />
@@ -259,157 +317,194 @@ export function Beslutningslog() {
         </div>
       )}
 
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
-          <DialogHeader>
-            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Ny beslutning</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2">
-            <div className="space-y-1">
-              <Label htmlFor="dec-title" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Titel</Label>
-              <Input
-                id="dec-title"
-                value={title}
-                onChange={e => setTitle(e.target.value)}
-                placeholder="f.eks. Skift af dagpleje"
-                className="rounded-xl border-[#d8d7cf] bg-white"
-              />
-            </div>
+      <ConfirmCloseDialog
+        open={confirmClose}
+        onCancel={() => setConfirmClose(false)}
+        onConfirm={() => { setConfirmClose(false); setAddOpen(false); setTitle(''); setDescription(''); setCategory('other'); setChildId(''); setValidFrom(''); setValidUntil(''); setNotes(''); setSelectedDocIds([]); }}
+      />
 
-            <div className="space-y-1">
-              <Label htmlFor="dec-desc" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Beskrivelse</Label>
-              <Textarea
-                id="dec-desc"
-                value={description}
-                onChange={e => setDescription(e.target.value)}
-                placeholder="Beskriv beslutningen og baggrunden..."
-                className="min-h-[80px] resize-none rounded-xl border-[#d8d7cf] bg-white text-sm"
-              />
-            </div>
+      {/* Ny beslutning — fullscreen page */}
+      {addOpen && (
+        <div
+          className="fixed inset-0 z-50 flex flex-col bg-[#f7f6f2]"
+          style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+        >
+          {/* Header: < | Ny beslutning | Gem */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[#e5e3dc]">
+            <button
+              onClick={() => {
+                if (title.trim() || description.trim() || notes.trim()) {
+                  setConfirmClose(true);
+                } else {
+                  setAddOpen(false);
+                }
+              }}
+              className="w-9 flex items-center justify-center text-[#2f2f2d]"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+            <h2 className="text-[17px] font-semibold text-[#2f2f2d]">Ny beslutning</h2>
+            <button
+              onClick={handleAdd}
+              disabled={!title.trim() || !description.trim() || isSaving}
+              className="text-[15px] font-semibold text-[#2f2f2f] disabled:opacity-30"
+            >
+              Gem
+            </button>
+          </div>
 
-            <div className="grid grid-cols-2 gap-2">
+          {/* Scrollable content */}
+          <div className="flex-1 overflow-y-auto px-4 py-6 mx-auto w-full max-w-[430px]">
+
+            <div className="space-y-3">
               <div className="space-y-1">
-                <Label htmlFor="dec-category" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Kategori</Label>
-                <Select value={category} onValueChange={v => setCategory(v as DecisionCategory)}>
-                  <SelectTrigger id="dec-category" className="rounded-xl border-[#d8d7cf] bg-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categoryOptions.map(c => (
-                      <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="dec-title" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Titel</Label>
+                <Input
+                  id="dec-title"
+                  value={title}
+                  onChange={e => setTitle(e.target.value)}
+                  placeholder="f.eks. Skift af dagpleje"
+                  className="rounded-[8px] border-[#d8d7cf] bg-white"
+                  autoFocus
+                />
               </div>
-              {children.length > 0 && (
+
+              <div className="space-y-1">
+                <Label htmlFor="dec-desc" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Beskrivelse</Label>
+                <Textarea
+                  id="dec-desc"
+                  value={description}
+                  onChange={e => setDescription(e.target.value)}
+                  placeholder="Beskriv beslutningen og baggrunden..."
+                  className="min-h-[80px] resize-none rounded-[8px] border-[#d8d7cf] bg-white text-sm"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1">
-                  <Label htmlFor="dec-child" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Barn</Label>
-                  <Select value={childId} onValueChange={setChildId}>
-                    <SelectTrigger id="dec-child" className="rounded-xl border-[#d8d7cf] bg-white">
-                      <SelectValue placeholder="Ingen" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Ingen</SelectItem>
-                      {children.map(c => (
-                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="dec-category" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Kategori</Label>
+                  <SelectSheet
+                    value={category}
+                    onValueChange={v => setCategory(v as DecisionCategory)}
+                    title="Kategori"
+                    options={categoryOptions.map(c => ({ value: c.value, label: c.label }))}
+                    className="rounded-[8px] border-[#d8d7cf] bg-white"
+                  />
                 </div>
+                {children.length > 0 && (
+                  <div className="space-y-1">
+                    <Label htmlFor="dec-child" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Barn</Label>
+                    <SelectSheet
+                      value={childId}
+                      onValueChange={setChildId}
+                      title="Barn"
+                      placeholder="Ingen"
+                      options={[{ value: 'none', label: 'Ingen' }, ...children.map(c => ({ value: c.id, label: c.name }))]}
+                      className="rounded-[8px] border-[#d8d7cf] bg-white"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 overflow-hidden">
+                <div className="space-y-1 min-w-0 overflow-hidden">
+                  <Label htmlFor="dec-from" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Gyldig fra</Label>
+                  <Input
+                    id="dec-from"
+                    type="date"
+                    value={validFrom}
+                    onChange={e => setValidFrom(e.target.value)}
+                    className="rounded-[8px] border-[#d8d7cf] bg-white"
+                  />
+                </div>
+                <div className="space-y-1 min-w-0 overflow-hidden">
+                  <Label htmlFor="dec-until" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Gyldig til</Label>
+                  <Input
+                    id="dec-until"
+                    type="date"
+                    value={validUntil}
+                    onChange={e => setValidUntil(e.target.value)}
+                    className="rounded-[8px] border-[#d8d7cf] bg-white"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="dec-notes" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Noter (valgfrit)</Label>
+                <Textarea
+                  id="dec-notes"
+                  value={notes}
+                  onChange={e => setNotes(e.target.value)}
+                  placeholder="Supplerende bemærkninger..."
+                  className="min-h-[50px] resize-none rounded-[8px] border-[#d8d7cf] bg-white text-sm"
+                />
+              </div>
+
+              {/* Vedhæft dokumenter */}
+              <div className="space-y-1.5">
+                <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Vedhæft dokumenter</Label>
+                {documents.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {documents.map(doc => {
+                      const isSelected = selectedDocIds.includes(doc.id);
+                      return (
+                        <button
+                          key={doc.id}
+                          type="button"
+                          onClick={() => setSelectedDocIds(prev =>
+                            isSelected ? prev.filter(id => id !== doc.id) : [...prev, doc.id]
+                          )}
+                          className={cn(
+                            "flex items-center gap-1.5 rounded-[8px] px-2.5 py-1.5 text-[12px] font-medium transition-all",
+                            isSelected
+                              ? "bg-[#fff2e6] border border-[#f3c59d] text-[#cc6f1f]"
+                              : "bg-[#f2f1ed] border border-transparent text-[#5f5d56] hover:bg-[#eae8e2]"
+                          )}
+                        >
+                          <FileText className="h-3 w-3" />
+                          {doc.title}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.heic"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  disabled={isUploading}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center gap-1.5 rounded-[8px] border border-dashed border-[#d8d7cf] bg-white px-3 py-2 text-[12px] font-medium text-[#5f5d56] hover:bg-[#f2f1ed] transition-all disabled:opacity-50"
+                >
+                  {isUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
+                  {isUploading ? 'Uploader...' : 'Upload dokument'}
+                </button>
+              </div>
+
+              {/* Co-parent status */}
+              {hasCoParentOnApp ? (
+                <p className="flex items-center gap-1.5 text-[12px] text-[#4caf50]">
+                  <Send className="h-3.5 w-3.5" />
+                  Beslutningen sendes automatisk til {otherParent?.name}
+                </p>
+              ) : (
+                <p className="text-[12px] text-[#b0ada4] italic">
+                  Co-parent ikke tilknyttet — beslutningen gemmes kun lokalt
+                </p>
               )}
             </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-1">
-                <Label htmlFor="dec-from" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Gyldig fra</Label>
-                <Input
-                  id="dec-from"
-                  type="date"
-                  value={validFrom}
-                  onChange={e => setValidFrom(e.target.value)}
-                  className="rounded-xl border-[#d8d7cf] bg-white"
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="dec-until" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Gyldig til</Label>
-                <Input
-                  id="dec-until"
-                  type="date"
-                  value={validUntil}
-                  onChange={e => setValidUntil(e.target.value)}
-                  className="rounded-xl border-[#d8d7cf] bg-white"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <Label htmlFor="dec-notes" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Noter (valgfrit)</Label>
-              <Textarea
-                id="dec-notes"
-                value={notes}
-                onChange={e => setNotes(e.target.value)}
-                placeholder="Supplerende bemærkninger..."
-                className="min-h-[50px] resize-none rounded-xl border-[#d8d7cf] bg-white text-sm"
-              />
-            </div>
-
-            {/* Vedhæft dokumenter */}
-            {documents.length > 0 && (
-              <div className="space-y-1">
-                <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Vedhæft dokumenter</Label>
-                <div className="flex flex-wrap gap-1.5">
-                  {documents.map(doc => {
-                    const isSelected = selectedDocIds.includes(doc.id);
-                    return (
-                      <button
-                        key={doc.id}
-                        type="button"
-                        onClick={() => setSelectedDocIds(prev =>
-                          isSelected ? prev.filter(id => id !== doc.id) : [...prev, doc.id]
-                        )}
-                        className={cn(
-                          "flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-medium transition-all",
-                          isSelected
-                            ? "bg-[#fff2e6] border border-[#f3c59d] text-[#cc6f1f]"
-                            : "bg-[#f2f1ed] border border-transparent text-[#5f5d56] hover:bg-[#eae8e2]"
-                        )}
-                      >
-                        <FileText className="h-3 w-3" />
-                        {doc.title}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Co-parent status */}
-            {hasCoParentOnApp ? (
-              <p className="flex items-center gap-1.5 text-[12px] text-[#4caf50]">
-                <Send className="h-3.5 w-3.5" />
-                Beslutningen sendes automatisk til {otherParent?.name}
-              </p>
-            ) : (
-              <p className="text-[12px] text-[#b0ada4] italic">
-                Co-parent ikke tilknyttet — beslutningen gemmes kun lokalt
-              </p>
-            )}
-
-            <div className="flex gap-2 pt-1">
-              <Button variant="outline" className="flex-1 rounded-2xl border-[#d8d7cf]" onClick={() => setAddOpen(false)}>
-                Annuller
-              </Button>
-              <Button
-                className="flex-1 rounded-2xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
-                onClick={handleAdd}
-                disabled={!title.trim() || !description.trim()}
-              >
-                Gem beslutning
-              </Button>
-            </div>
           </div>
-        </DialogContent>
-      </Dialog>
+
+          <SavingOverlay open={isSaving} />
+        </div>
+      )}
+
+      <SavingOverlay open={isSaving} />
     </div>
   );
 }

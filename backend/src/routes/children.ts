@@ -5,17 +5,15 @@ import { AuthRequest } from '../middleware/auth';
 export const childrenRouter = Router();
 
 // GET / - List children for the current user's household(s)
+// Optimeret: Én samlet query med nested relations i stedet for N+1
 childrenRouter.get('/', async (req: AuthRequest, res: Response) => {
   try {
-    const memberships = await prisma.householdMember.findMany({
-      where: { userId: req.userId },
-      select: { householdId: true },
-    });
-
-    const householdIds = memberships.map((m) => m.householdId);
-
     const children = await prisma.child.findMany({
-      where: { householdId: { in: householdIds } },
+      where: {
+        household: {
+          members: { some: { userId: req.userId } },
+        },
+      },
       include: {
         parent1: { select: { id: true, name: true, avatar: true } },
         parent2: { select: { id: true, name: true, avatar: true } },
