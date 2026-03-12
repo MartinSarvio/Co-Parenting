@@ -483,7 +483,7 @@ export function Kalender() {
           assignedTo: payload.assignedTo,
           childId: payload.childId,
           createdBy: users[0]?.id || 'u1'
-        }).catch(() => {});
+        });
         createdCount += 1;
       });
 
@@ -547,7 +547,7 @@ export function Kalender() {
               location: evt.location,
               description: evt.notes,
               createdBy: currentUser?.id || '',
-            }).catch(() => {});
+            });
             totalImported++;
           }
         }

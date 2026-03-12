@@ -51,6 +51,10 @@ import type {
   RiskAssessment,
   ProfessionalDepartment,
   CaseActivity,
+  RoutineItem,
+  RoutineLog,
+  RoutineNotificationConfig,
+  RoutineCategory,
 } from '@/types';
 
 interface AppStore {
@@ -87,6 +91,9 @@ interface AppStore {
   diaryEntries: DiaryEntry[];
   keyDates: KeyDate[];
   decisions: DecisionLog[];
+  routineItems: RoutineItem[];
+  routineLogs: RoutineLog[];
+  routineNotificationConfigs: RoutineNotificationConfig[];
   eventTemplates: EventTemplate[];
   calendarColorPreferences: CalendarColorPreferences;
   calendarSharing: CalendarSharing | null;
@@ -335,6 +342,16 @@ interface AppStore {
   rejectDecision: (id: string) => void;
   deleteDecision: (id: string) => void;
 
+  // Routines
+  addRoutineItem: (item: RoutineItem) => void;
+  updateRoutineItem: (id: string, item: Partial<RoutineItem>) => void;
+  deleteRoutineItem: (id: string) => void;
+  reorderRoutineItems: (category: RoutineCategory, orderedIds: string[]) => void;
+  addRoutineLog: (log: RoutineLog) => void;
+  updateRoutineLog: (id: string, log: Partial<RoutineLog>) => void;
+  deleteRoutineLog: (id: string) => void;
+  setRoutineNotificationConfig: (config: RoutineNotificationConfig) => void;
+
   // Event templates
   addEventTemplate: (template: EventTemplate) => void;
   deleteEventTemplate: (id: string) => void;
@@ -469,6 +486,9 @@ export const useAppStore = create<AppStore>()(
       diaryEntries: [],
       keyDates: [],
       decisions: [],
+      routineItems: [],
+      routineLogs: [],
+      routineNotificationConfigs: [],
       eventTemplates: [],
       calendarColorPreferences: {},
       calendarSharing: null,
@@ -929,6 +949,34 @@ export const useAppStore = create<AppStore>()(
       })),
       deleteDecision: (id) => set((state) => ({ decisions: state.decisions.filter(d => d.id !== id) })),
 
+      // Routines
+      addRoutineItem: (item) => set((state) => ({ routineItems: [...state.routineItems, item] })),
+      updateRoutineItem: (id, updates) => set((state) => ({
+        routineItems: state.routineItems.map(i => i.id === id ? { ...i, ...updates } : i)
+      })),
+      deleteRoutineItem: (id) => set((state) => ({
+        routineItems: state.routineItems.filter(i => i.id !== id),
+        routineLogs: state.routineLogs.filter(l => l.routineItemId !== id),
+      })),
+      reorderRoutineItems: (category, orderedIds) => set((state) => ({
+        routineItems: state.routineItems.map(item => {
+          if (item.category !== category) return item;
+          const idx = orderedIds.indexOf(item.id);
+          return idx >= 0 ? { ...item, order: idx } : item;
+        })
+      })),
+      addRoutineLog: (log) => set((state) => ({ routineLogs: [...state.routineLogs, log] })),
+      updateRoutineLog: (id, updates) => set((state) => ({
+        routineLogs: state.routineLogs.map(l => l.id === id ? { ...l, ...updates } : l)
+      })),
+      deleteRoutineLog: (id) => set((state) => ({ routineLogs: state.routineLogs.filter(l => l.id !== id) })),
+      setRoutineNotificationConfig: (config) => set((state) => ({
+        routineNotificationConfigs: [
+          ...state.routineNotificationConfigs.filter(c => c.childId !== config.childId),
+          config,
+        ],
+      })),
+
       // Event templates
       addEventTemplate: (template) => set((state) => ({ eventTemplates: [...state.eventTemplates, template] })),
       deleteEventTemplate: (id) => set((state) => ({ eventTemplates: state.eventTemplates.filter(t => t.id !== id) })),
@@ -1085,6 +1133,9 @@ export const useAppStore = create<AppStore>()(
         diaryEntries: [],
         keyDates: [],
         decisions: [],
+        routineItems: [],
+        routineLogs: [],
+        routineNotificationConfigs: [],
         eventTemplates: [],
         calendarColorPreferences: {},
         calendarSharing: null,

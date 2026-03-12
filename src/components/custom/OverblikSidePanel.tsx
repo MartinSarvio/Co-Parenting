@@ -11,6 +11,7 @@ import {
   CalendarHeart,
   ClipboardList,
   BookHeart,
+  ListChecks,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -20,6 +21,7 @@ const OVERBLIK_TABS = [
   { id: 'meeting-minutes', label: 'Referater', icon: FileText },
   { id: 'dokumenter', label: 'Dokumenter', icon: FolderOpen },
   { id: 'dagbog', label: 'Dagbog', icon: BookOpen },
+  { id: 'rutiner', label: 'Rutiner', icon: ListChecks },
   { id: 'vigtige-datoer', label: 'Vigtige datoer', icon: CalendarHeart },
   { id: 'beslutningslog', label: 'Beslutninger', icon: ClipboardList },
   { id: 'familie-og-boern', label: 'Familie & Børn', icon: BookHeart },

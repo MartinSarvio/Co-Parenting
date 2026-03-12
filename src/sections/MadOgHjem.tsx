@@ -1120,7 +1120,7 @@ export function MadOgHjem() {
         endDate: endAt.toISOString(),
         createdBy: currentUser?.id || users[0]?.id || 'p1',
         description: 'Kort planlægningsmøde om ugeplan, måltider og overleveringer.'
-      }).catch(() => {});
+      });
       toast.success('Check-in er lagt i kalenderen');
       return;
     }

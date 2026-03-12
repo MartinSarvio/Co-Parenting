@@ -514,7 +514,7 @@ export function Aarskalender() {
                       createdBy: currentUser.id,
                       childId: currentChild?.id,
                       location: newEventLocation.trim() || undefined,
-                    }).catch(() => {});
+                    });
                     setNewEventTitle('');
                     setNewEventDescription('');
                     setNewEventType('personal');

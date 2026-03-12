@@ -481,7 +481,7 @@ export function SettingsView() {
       url: evidenceDraft.url.trim(),
       sharedWith: [currentUser.id, ...support.lawyerIds],
       isOfficial: true,
-    }).catch(() => {});
+    });
 
     setEvidenceDraft({ title: '', url: '', description: '' });
     toast.success('Dokumentation gemt i arkivet');

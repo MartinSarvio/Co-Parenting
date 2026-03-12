@@ -74,6 +74,9 @@ const Fotoalbum = lazy(() =>
 const Dagbog = lazy(() =>
   import('@/sections/Dagbog').then((module) => ({ default: module.Dagbog }))
 );
+const RutinerView = lazy(() =>
+  import('@/sections/RutinerView').then((module) => ({ default: module.RutinerView }))
+);
 const VigtigeDatoer = lazy(() =>
   import('@/sections/VigtigeDatoer').then((module) => ({ default: module.VigtigeDatoer }))
 );
@@ -383,6 +386,8 @@ function App() {
         return <ErrorBoundary sectionName="Fotoalbum"><Fotoalbum /></ErrorBoundary>;
       case 'dagbog':
         return <ErrorBoundary sectionName="Dagbog"><Dagbog /></ErrorBoundary>;
+      case 'rutiner':
+        return <ErrorBoundary sectionName="Rutiner"><RutinerView /></ErrorBoundary>;
       case 'vigtige-datoer':
         return <ErrorBoundary sectionName="Vigtige datoer"><VigtigeDatoer /></ErrorBoundary>;
       case 'beslutningslog':

@@ -8,17 +8,12 @@ import { useCallback } from 'react';
 import { useAppStore } from '@/store';
 import { supabase } from '@/lib/supabase';
 import {
-  mapEvent,
   mapTask,
   mapExpense,
-  mapDocument,
   mapMealPlan,
   mapThread,
   mapMessage,
   mapChild,
-  mapDiaryEntry,
-  mapKeyDate,
-  mapDecisionLog,
   mapMilestone,
   mapShoppingItem,
   mapShoppingList,
@@ -28,17 +23,12 @@ import {
   mapCaseActivity,
 } from '@/lib/mappers';
 import type {
-  DbCalendarEvent,
   DbTask,
   DbExpense,
-  DbDocument,
   DbMealPlan,
   DbThread,
   DbMessage,
   DbChild,
-  DbDiaryEntry,
-  DbKeyDate,
-  DbDecisionLog,
   DbMilestone,
   DbShoppingItem,
   DbShoppingList,
@@ -48,7 +38,7 @@ import type {
   DbCaseActivity,
 } from '@/lib/mappers';
 import type { CalendarEvent, Task, Expense, MealPlan, Child, DiaryEntry, KeyDate, DecisionLog, Milestone, ShoppingItem, ShoppingList, Recipe, ProfessionalCase, RiskAssessment, CaseActivity } from '@/types';
-import { shoppingItemId, shoppingListId, generateId, professionalCaseId, riskAssessmentId, caseActivityId } from '@/lib/id';
+import { shoppingItemId, shoppingListId, generateId, professionalCaseId, riskAssessmentId, caseActivityId, diaryEntryId, keyDateId, decisionId, milestoneId, documentId, eventId } from '@/lib/id';
 import { toast } from 'sonner';
 
 function handleError(err: unknown, fallbackMsg: string) {
@@ -65,32 +55,52 @@ function getHouseholdId(): string {
   return useAppStore.getState().household?.id || '';
 }
 
+/** Fire-and-forget Supabase sync — item er allerede gemt lokalt i store */
+function syncToSupabase(table: string, payload: Record<string, unknown>, errorMsg: string) {
+  supabase.from(table).insert(payload).then(({ error }) => {
+    if (error) {
+      console.error(`Supabase sync failed for ${table}:`, error);
+      toast.error(`${errorMsg} (lokal kopi gemt)`);
+    }
+  });
+}
+
 export function useApiActions() {
   const store = useAppStore();
 
   // ── Events ──────────────────────────────────────────────
 
   const createEvent = useCallback(
-    async (data: Omit<CalendarEvent, 'id'>) => {
-      const { data: raw, error } = await supabase
-        .from('calendar_events')
-        .insert({
-          title: data.title,
-          description: data.description || null,
-          start_date: data.startDate,
-          end_date: data.endDate,
-          type: data.type,
-          child_id: data.childId || null,
-          created_by: getCurrentUserId(),
-          location: data.location || null,
-          assigned_to: data.assignedTo || [],
-          is_recurring: data.isRecurring || false,
-        })
-        .select()
-        .single();
-      if (error) throw error;
-      const event = mapEvent(raw as DbCalendarEvent);
+    (data: Omit<CalendarEvent, 'id'>) => {
+      const userId = getCurrentUserId();
+      if (!userId) { toast.error('Du skal være logget ind'); return null; }
+      const event: CalendarEvent = {
+        id: eventId(),
+        title: data.title,
+        description: data.description,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        type: data.type,
+        childId: data.childId,
+        createdBy: userId,
+        assignedTo: data.assignedTo || [],
+        location: data.location,
+        isRecurring: data.isRecurring || false,
+      };
       store.addEvent(event);
+      syncToSupabase('calendar_events', {
+        id: event.id,
+        title: event.title,
+        description: event.description || null,
+        start_date: event.startDate,
+        end_date: event.endDate,
+        type: event.type,
+        child_id: event.childId || null,
+        created_by: userId,
+        location: event.location || null,
+        assigned_to: event.assignedTo || [],
+        is_recurring: event.isRecurring || false,
+      }, 'Kunne ikke synkronisere begivenhed');
       return event;
     },
     [store],
@@ -308,42 +318,49 @@ export function useApiActions() {
   // ── Documents ───────────────────────────────────────────
 
   const createDocument = useCallback(
-    async (data: { title: string; type: string; url: string; sharedWith?: string[]; isOfficial?: boolean; validFrom?: string; validUntil?: string }) => {
-      const { data: raw, error } = await supabase
-        .from('documents')
-        .insert({
-          title: data.title,
-          type: data.type,
-          url: data.url,
-          uploaded_by: getCurrentUserId(),
-          shared_with: data.sharedWith || [],
-          is_official: data.isOfficial || false,
-          valid_from: data.validFrom || null,
-          valid_until: data.validUntil || null,
-        })
-        .select()
-        .single();
-      if (error) throw error;
-      const doc = mapDocument(raw as DbDocument);
+    (data: { title: string; type: string; url: string; sharedWith?: string[]; isOfficial?: boolean; validFrom?: string; validUntil?: string }) => {
+      const userId = getCurrentUserId();
+      if (!userId) { toast.error('Du skal være logget ind'); return null; }
+      const doc: import('@/types').Document = {
+        id: documentId(),
+        title: data.title,
+        type: data.type as import('@/types').DocumentType,
+        url: data.url,
+        uploadedBy: userId,
+        uploadedAt: new Date().toISOString(),
+        sharedWith: data.sharedWith || [],
+        isOfficial: data.isOfficial || false,
+        validFrom: data.validFrom,
+        validUntil: data.validUntil,
+      };
       store.addDocument(doc);
+      syncToSupabase('documents', {
+        id: doc.id,
+        title: doc.title,
+        type: doc.type,
+        url: doc.url,
+        uploaded_by: userId,
+        shared_with: doc.sharedWith,
+        is_official: doc.isOfficial || false,
+        valid_from: doc.validFrom || null,
+        valid_until: doc.validUntil || null,
+      }, 'Kunne ikke synkronisere dokument');
       return doc;
     },
     [store],
   );
 
   const deleteDocument = useCallback(
-    async (id: string) => {
-      try {
-        const { error } = await supabase.from('documents').delete().eq('id', id);
-        if (error) throw error;
-        // Reload documents
-        const { data: raw } = await supabase.from('documents').select('*');
-        if (raw) {
-          store.hydrateFromServer({ documents: (raw as DbDocument[]).map(mapDocument) });
+    (id: string) => {
+      // Optimistic: remove from store immediately
+      store.hydrateFromServer({ documents: store.documents.filter(d => d.id !== id) });
+      // Sync to Supabase in background
+      supabase.from('documents').delete().eq('id', id).then(({ error }) => {
+        if (error) {
+          console.error('Supabase sync failed for document delete:', error);
+          toast.error('Kunne ikke slette dokument fra serveren');
         }
-      } catch (err) {
-        handleError(err, 'Kunne ikke slette dokument');
-      }
+      });
     },
     [store],
   );
@@ -542,23 +559,32 @@ export function useApiActions() {
   // ── Diary Entries ─────────────────────────────────────────
 
   const createDiaryEntry = useCallback(
-    async (data: Omit<DiaryEntry, 'id' | 'createdAt' | 'writtenBy'>) => {
-      const { data: raw, error } = await supabase
-        .from('diary_entries')
-        .insert({
-          child_id: data.childId,
-          date: data.date,
-          mood: data.mood,
-          sleep: data.sleep,
-          appetite: data.appetite,
-          note: data.note || null,
-          written_by: getCurrentUserId(),
-        })
-        .select()
-        .single();
-      if (error) throw error;
-      const entry = mapDiaryEntry(raw as DbDiaryEntry);
+    (data: Omit<DiaryEntry, 'id' | 'createdAt' | 'writtenBy'>) => {
+      const userId = getCurrentUserId();
+      if (!userId) { toast.error('Du skal være logget ind'); return null; }
+      const entry: DiaryEntry = {
+        id: diaryEntryId(),
+        childId: data.childId,
+        handoverId: data.handoverId,
+        date: data.date,
+        mood: data.mood,
+        sleep: data.sleep,
+        appetite: data.appetite,
+        note: data.note,
+        writtenBy: userId,
+        createdAt: new Date().toISOString(),
+      };
       store.addDiaryEntry(entry);
+      syncToSupabase('diary_entries', {
+        id: entry.id,
+        child_id: entry.childId,
+        date: entry.date,
+        mood: entry.mood,
+        sleep: entry.sleep,
+        appetite: entry.appetite,
+        note: entry.note || null,
+        written_by: userId,
+      }, 'Kunne ikke synkronisere dagbogsindlæg');
       return entry;
     },
     [store],
@@ -600,25 +626,34 @@ export function useApiActions() {
   // ── Key Dates ───────────────────────────────────────────
 
   const createKeyDate = useCallback(
-    async (data: Omit<KeyDate, 'id' | 'createdAt' | 'addedBy'>) => {
-      const { data: raw, error } = await supabase
-        .from('key_dates')
-        .insert({
-          child_id: data.childId || null,
-          title: data.title,
-          date: data.date,
-          type: data.type,
-          recurrence: data.recurrence || 'once',
-          reminder_days_before: data.reminderDaysBefore ?? 7,
-          notes: data.notes || null,
-          added_by: getCurrentUserId(),
-        })
-        .select()
-        .single();
-      if (error) throw error;
-      const keyDate = mapKeyDate(raw as DbKeyDate);
-      store.addKeyDate(keyDate);
-      return keyDate;
+    (data: Omit<KeyDate, 'id' | 'createdAt' | 'addedBy'>) => {
+      const userId = getCurrentUserId();
+      if (!userId) { toast.error('Du skal være logget ind'); return null; }
+      const kd: KeyDate = {
+        id: keyDateId(),
+        childId: data.childId,
+        title: data.title,
+        date: data.date,
+        type: data.type,
+        recurrence: data.recurrence || 'once',
+        reminderDaysBefore: data.reminderDaysBefore ?? 7,
+        notes: data.notes,
+        addedBy: userId,
+        createdAt: new Date().toISOString(),
+      };
+      store.addKeyDate(kd);
+      syncToSupabase('key_dates', {
+        id: kd.id,
+        child_id: kd.childId || null,
+        title: kd.title,
+        date: kd.date,
+        type: kd.type,
+        recurrence: kd.recurrence,
+        reminder_days_before: kd.reminderDaysBefore,
+        notes: kd.notes || null,
+        added_by: userId,
+      }, 'Kunne ikke synkronisere vigtig dato');
+      return kd;
     },
     [store],
   );
@@ -660,25 +695,41 @@ export function useApiActions() {
   // ── Decisions ───────────────────────────────────────────
 
   const createDecision = useCallback(
-    async (data: Omit<DecisionLog, 'id' | 'createdAt' | 'proposedBy'>) => {
-      const { data: raw, error } = await supabase
-        .from('decision_logs')
-        .insert({
-          child_id: data.childId || null,
-          title: data.title,
-          description: data.description,
-          category: data.category,
-          decided_at: data.decidedAt,
-          proposed_by: getCurrentUserId(),
-          status: data.status || 'proposed',
-          notes: data.notes || null,
-          document_ids: data.documentIds || null,
-        })
-        .select()
-        .single();
-      if (error) throw error;
-      const decision = mapDecisionLog(raw as DbDecisionLog);
+    (data: Omit<DecisionLog, 'id' | 'createdAt' | 'proposedBy'>) => {
+      const userId = getCurrentUserId();
+      if (!userId) { toast.error('Du skal være logget ind'); return null; }
+      const decision: DecisionLog = {
+        id: decisionId(),
+        childId: data.childId,
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        decidedAt: data.decidedAt,
+        proposedBy: userId,
+        approvedBy: data.approvedBy || [],
+        status: data.status || 'proposed',
+        validFrom: data.validFrom,
+        validUntil: data.validUntil,
+        notes: data.notes,
+        documentIds: data.documentIds,
+        createdAt: new Date().toISOString(),
+      };
       store.addDecision(decision);
+      syncToSupabase('decision_logs', {
+        id: decision.id,
+        child_id: decision.childId || null,
+        title: decision.title,
+        description: decision.description,
+        category: decision.category,
+        decided_at: decision.decidedAt,
+        proposed_by: userId,
+        approved_by: decision.approvedBy,
+        status: decision.status,
+        valid_from: decision.validFrom || null,
+        valid_until: decision.validUntil || null,
+        notes: decision.notes || null,
+        document_ids: decision.documentIds || null,
+      }, 'Kunne ikke synkronisere beslutning');
       return decision;
     },
     [store],
@@ -720,23 +771,30 @@ export function useApiActions() {
   // ── Milestones ──────────────────────────────────────────
 
   const createMilestone = useCallback(
-    async (data: Omit<Milestone, 'id'>) => {
-      const { data: raw, error } = await supabase
-        .from('milestones')
-        .insert({
-          child_id: data.childId,
-          title: data.title,
-          description: data.description || null,
-          date: data.date,
-          category: data.category,
-          added_by: data.addedBy || getCurrentUserId(),
-          photos: data.photos || [],
-        })
-        .select()
-        .single();
-      if (error) throw error;
-      const milestone = mapMilestone(raw as DbMilestone);
+    (data: Omit<Milestone, 'id'>) => {
+      const userId = getCurrentUserId();
+      if (!userId) { toast.error('Du skal være logget ind'); return null; }
+      const milestone: Milestone = {
+        id: milestoneId(),
+        childId: data.childId,
+        title: data.title,
+        description: data.description,
+        date: data.date,
+        category: data.category,
+        addedBy: data.addedBy || userId,
+        photos: data.photos || [],
+      };
       store.addMilestone(milestone);
+      syncToSupabase('milestones', {
+        id: milestone.id,
+        child_id: milestone.childId,
+        title: milestone.title,
+        description: milestone.description || null,
+        date: milestone.date,
+        category: milestone.category,
+        added_by: milestone.addedBy,
+        photos: milestone.photos || [],
+      }, 'Kunne ikke synkronisere milepæl');
       return milestone;
     },
     [store],
@@ -1106,6 +1164,74 @@ export function useApiActions() {
     [store],
   );
 
+  // ── Routines ──────────────────────────────────────────────
+
+  const createRoutineItem = useCallback(
+    (data: import('@/types').RoutineItem) => {
+      store.addRoutineItem(data);
+      syncToSupabase('routine_items', {
+        id: data.id,
+        child_id: data.childId,
+        category: data.category,
+        type: data.type,
+        label: data.label,
+        emoji: data.emoji,
+        'order': data.order,
+        meal_key: data.mealKey || null,
+        is_active: data.isActive,
+        created_by: data.createdBy,
+      }, 'Kunne ikke synkronisere rutine');
+      return data;
+    },
+    [store],
+  );
+
+  const deleteRoutineItem = useCallback(
+    (id: string) => {
+      store.deleteRoutineItem(id);
+      supabase.from('routine_items').delete().eq('id', id).then(({ error }) => {
+        if (error) console.error('Supabase sync failed for routine_items delete:', error);
+      });
+    },
+    [store],
+  );
+
+  const createRoutineLog = useCallback(
+    (data: import('@/types').RoutineLog) => {
+      store.addRoutineLog(data);
+      syncToSupabase('routine_logs', {
+        id: data.id,
+        routine_item_id: data.routineItemId,
+        child_id: data.childId,
+        date: data.date,
+        completed: data.completed,
+        completed_at: data.completedAt || null,
+        completed_by: data.completedBy || null,
+        time: data.time || null,
+        note: data.note || null,
+        linked_food_log_id: data.linkedFoodLogId || null,
+      }, 'Kunne ikke synkronisere rutine-log');
+      return data;
+    },
+    [store],
+  );
+
+  const updateRoutineLog = useCallback(
+    (id: string, data: Partial<import('@/types').RoutineLog>) => {
+      store.updateRoutineLog(id, data);
+      const updateData: Record<string, unknown> = {};
+      if (data.completed !== undefined) updateData.completed = data.completed;
+      if (data.completedAt !== undefined) updateData.completed_at = data.completedAt;
+      if (data.completedBy !== undefined) updateData.completed_by = data.completedBy;
+      if (data.time !== undefined) updateData.time = data.time;
+      if (data.note !== undefined) updateData.note = data.note || null;
+      supabase.from('routine_logs').update(updateData).eq('id', id).then(({ error }) => {
+        if (error) console.error('Supabase sync failed for routine_logs update:', error);
+      });
+    },
+    [store],
+  );
+
   return {
     // Events
     createEvent,
@@ -1171,5 +1297,10 @@ export function useApiActions() {
     updateRiskAssessment,
     // Case Activities
     createCaseActivity,
+    // Routines
+    createRoutineItem,
+    deleteRoutineItem,
+    createRoutineLog,
+    updateRoutineLog,
   };
 }

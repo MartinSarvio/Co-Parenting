@@ -42,3 +42,5 @@ export const professionalCaseId = () => generateId('pcase');
 export const riskAssessmentId = () => generateId('rsk');
 export const caseActivityId = () => generateId('cact');
 export const departmentId = () => generateId('dept');
+export const routineItemId = () => generateId('ri');
+export const routineLogId = () => generateId('rl');

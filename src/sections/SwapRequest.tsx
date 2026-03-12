@@ -62,7 +62,7 @@ export function SwapRequest() {
       childId: currentChild.id,
       createdBy: currentUser.id,
       assignedTo: [currentUser.id, selectedRecipient],
-    }).catch(() => {});
+    });
 
     addNotification({
       id: notificationId(),

@@ -712,6 +712,48 @@ export interface DecisionLog {
   createdAt: string;
 }
 
+// ── Routine types ──────────────────────────────────────────
+export type RoutineCategory = 'morgen' | 'dag' | 'aften';
+export type RoutineItemType = 'meal' | 'diaper' | 'nap' | 'activity' | 'custom';
+
+/** A template item configured once during setup */
+export interface RoutineItem {
+  id: string;
+  childId: string;
+  category: RoutineCategory;
+  type: RoutineItemType;
+  label: string;
+  emoji: string;
+  order: number;
+  mealKey?: string;
+  isActive: boolean;
+  createdBy: string;
+  createdAt: string;
+}
+
+/** A daily check-off entry */
+export interface RoutineLog {
+  id: string;
+  routineItemId: string;
+  childId: string;
+  date: string; // YYYY-MM-DD
+  completed: boolean;
+  completedAt?: string;
+  completedBy?: string;
+  time?: string; // HH:mm
+  note?: string;
+  linkedFoodLogId?: string;
+}
+
+/** Notification schedule config per child */
+export interface RoutineNotificationConfig {
+  childId: string;
+  morgenTime?: string;
+  dagTime?: string;
+  aftenTime?: string;
+  enabled: boolean;
+}
+
 // Calendar event template
 export interface EventTemplate {
   id: string;
