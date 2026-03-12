@@ -4,11 +4,14 @@ import { BottomNav } from '@/components/custom/BottomNav';
 import { TopBar } from '@/components/custom/TopBar';
 import { Toaster } from '@/components/ui/sonner';
 import { ErrorBoundary } from '@/components/custom/ErrorBoundary';
+import { supabase } from '@/lib/supabase';
 import { fetchMe } from '@/lib/auth';
 import { loadInitialData } from '@/lib/dataSync';
-import { supabase } from '@/lib/supabase';
-// Push notifications temporarily disabled — plugin incompatible with Capacitor 8.1
-// import { initPushNotifications } from '@/lib/pushNotifications';
+import { initPushNotifications } from '@/lib/pushNotifications';
+import { startRealtimeSync, stopRealtimeSync } from '@/lib/realtime';
+import { Capacitor } from '@capacitor/core';
+import { App as CapApp } from '@capacitor/app';
+import { cn } from '@/lib/utils';
 import './App.css';
 
 const OnboardingFlow = lazy(() =>
@@ -50,6 +53,9 @@ const ProfessionalDashboard = lazy(() =>
 const MeetingMinutesView = lazy(() =>
   import('@/sections/MeetingMinutesView').then((module) => ({ default: module.MeetingMinutesView }))
 );
+const ProfessionalOverview = lazy(() =>
+  import('@/sections/ProfessionalOverview').then((module) => ({ default: module.ProfessionalOverview }))
+);
 const CustodyConfig = lazy(() =>
   import('@/sections/CustodyConfig').then((module) => ({ default: module.CustodyConfig }))
 );
@@ -68,6 +74,9 @@ const Fotoalbum = lazy(() =>
 const Dagbog = lazy(() =>
   import('@/sections/Dagbog').then((module) => ({ default: module.Dagbog }))
 );
+const RutinerView = lazy(() =>
+  import('@/sections/RutinerView').then((module) => ({ default: module.RutinerView }))
+);
 const VigtigeDatoer = lazy(() =>
   import('@/sections/VigtigeDatoer').then((module) => ({ default: module.VigtigeDatoer }))
 );
@@ -77,8 +86,38 @@ const Beslutningslog = lazy(() =>
 const Aarskalender = lazy(() =>
   import('@/sections/Aarskalender').then((module) => ({ default: module.Aarskalender }))
 );
+const FeedView = lazy(() =>
+  import('@/sections/FeedView').then((module) => ({ default: module.FeedView }))
+);
 const Dokumenter = lazy(() =>
   import('@/sections/Dokumenter').then((module) => ({ default: module.Dokumenter }))
+);
+const NotifikationsView = lazy(() =>
+  import('@/sections/NotifikationsView').then((module) => ({ default: module.NotifikationsView }))
+);
+const HistorikView = lazy(() =>
+  import('@/sections/HistorikView').then((module) => ({ default: module.HistorikView }))
+);
+const SwapRequest = lazy(() =>
+  import('@/sections/SwapRequest').then((module) => ({ default: module.SwapRequest }))
+);
+const KalenderWeekView = lazy(() =>
+  import('@/sections/KalenderWeekView').then((module) => ({ default: module.KalenderWeekView }))
+);
+const GroupDetailView = lazy(() =>
+  import('@/sections/GroupDetailView').then((module) => ({ default: module.GroupDetailView }))
+);
+const ProfileView = lazy(() =>
+  import('@/sections/ProfileView').then((module) => ({ default: module.ProfileView }))
+);
+const CreateGroupView = lazy(() =>
+  import('@/sections/CreateGroupView').then((module) => ({ default: module.CreateGroupView }))
+);
+const FlyerViewer = lazy(() =>
+  import('@/components/custom/FlyerViewer').then((module) => ({ default: module.FlyerViewer }))
+);
+const FamilieOgBoern = lazy(() =>
+  import('@/sections/FamilieOgBoern').then((module) => ({ default: module.FamilieOgBoern }))
 );
 
 function SectionLoading() {
@@ -97,10 +136,10 @@ function SectionLoading() {
 }
 
 function App() {
-  const { isAuthenticated, isProfessionalView, activeTab, household, setCurrentUser, setAuthenticated, hydrateFromServer, logout } = useAppStore();
+  const { isAuthenticated, isProfessionalView, activeTab, household, currentUser, setCurrentUser, setAuthenticated, hydrateFromServer, logout } = useAppStore();
   const [isReady, setIsReady] = useState(false);
   const [authScreen, setAuthScreen] = useState<'login' | 'register'>('login');
-  const canUseProfessionalView = household?.familyMode !== 'together';
+  const canUseProfessionalView = currentUser?.isAdmin === true;
   const showProfessionalView = isProfessionalView && canUseProfessionalView;
 
   // Session restore — check for existing Supabase session on mount
@@ -125,14 +164,21 @@ function App() {
       }
 
       setAuthenticated(true);
-    } catch (err: unknown) {
-      const apiErr = err as { status?: number; message?: string };
+
+      // Start realtime sync for live-opdateringer
+      startRealtimeSync();
+
+      // Initialize push notifications (non-blocking)
+      initPushNotifications().catch(console.warn);
+    } catch (err: any) {
       // Only logout if session is truly invalid (401), not on network errors
-      if (apiErr?.status === 401) {
+      if (err?.status === 401) {
+        stopRealtimeSync();
+        await supabase.auth.signOut();
         logout();
       } else {
         // Network error — keep user logged in with cached data
-        console.warn('Session restore failed (network?):', apiErr?.message);
+        console.warn('Session restore failed (network?):', err?.message);
         setAuthenticated(true);
       }
     } finally {
@@ -142,16 +188,73 @@ function App() {
 
   useEffect(() => {
     restoreSession();
+  }, [restoreSession]);
 
-    // Listen for auth state changes (login/logout from other tabs)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_OUT') {
-        logout();
+  // App lifecycle — refresh data on resume from background
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    let handle: { remove: () => Promise<void> } | null = null;
+    let backgroundedAt = 0;
+
+    CapApp.addListener('appStateChange', async ({ isActive }) => {
+      if (!isActive) {
+        backgroundedAt = Date.now();
+        return;
       }
-    });
+      // Resume: reset transient UI state
+      const s = useAppStore.getState();
+      if (s.sideMenuOpen) s.setSideMenuOpen(false);
+      if (s.fullScreenOverlayOpen) s.setFullScreenOverlayOpen(false);
+      // Refresh data if stale (>5 min)
+      if (Date.now() - backgroundedAt > 300_000 && s.isAuthenticated) {
+        try {
+          const data = await loadInitialData();
+          s.hydrateFromServer(data);
+        } catch { /* network error — keep cached data */ }
+      }
+    }).then(h => { handle = h; });
 
-    return () => subscription.unsubscribe();
-  }, [restoreSession, logout]);
+    return () => { handle?.remove(); };
+  }, []);
+
+  // Capacitor hardware back-button handler (Android + iOS swipe-back)
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    let backHandle: { remove: () => Promise<void> } | null = null;
+
+    CapApp.addListener('backButton', () => {
+      const s = useAppStore.getState();
+
+      // Priority 1: Close side menu
+      if (s.sideMenuOpen) { s.setSideMenuOpen(false); return; }
+      // Priority 2: Close fullscreen overlay
+      if (s.fullScreenOverlayOpen) { s.setFullScreenOverlayOpen(false); return; }
+      // Priority 3: Close kommunikation thread
+      if (s.kommunikationThreadId) { s.setKommunikationThreadId(null); return; }
+      // Priority 4: Close kalender week view
+      if (s.calendarWeekViewDate) { s.setCalendarWeekViewDate(null); s.setActiveTab('kalender'); return; }
+      // Priority 5: Close swap request
+      if (s.swapRequestDate) { s.setSwapRequestDate(null); s.setActiveTab('samversplan'); return; }
+      // Priority 6: Navigate back via stack
+      if (s.navigationStack.length > 0) { s.goBack(); return; }
+      // Priority 7: Exit app (Android only)
+      if (Capacitor.getPlatform() === 'android') { CapApp.exitApp(); }
+    }).then(h => { backHandle = h; });
+
+    return () => { backHandle?.remove(); };
+  }, []);
+
+  // Keyboard dismiss: tap outside input fields blurs active element
+  useEffect(() => {
+    const handler = (e: TouchEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('input, textarea, select, [contenteditable]')) {
+        (document.activeElement as HTMLElement)?.blur();
+      }
+    };
+    document.addEventListener('touchstart', handler, { passive: true });
+    return () => document.removeEventListener('touchstart', handler);
+  }, []);
 
   if (!isReady) {
     return (
@@ -207,7 +310,7 @@ function App() {
     return (
       <div className="app-shell min-h-[100svh] bg-transparent">
         <TopBar />
-        <main className="mx-auto w-full max-w-[430px] px-3 pb-[calc(env(safe-area-inset-bottom,0px)+104px)] pt-[calc(env(safe-area-inset-top,0px)+74px)] sm:px-4">
+        <main className="mx-auto w-full max-w-[430px] overflow-hidden px-3 pb-[calc(env(safe-area-inset-bottom,0px)+104px)] pt-[calc(env(safe-area-inset-top,0px)+74px)] sm:px-4">
           <Suspense fallback={<SectionLoading />}>
             {activeTab === 'cases' && (
               <ErrorBoundary sectionName="Sager">
@@ -221,7 +324,12 @@ function App() {
             )}
             {activeTab === 'dashboard' && (
               <ErrorBoundary sectionName="Overblik">
-                <Dashboard />
+                <ProfessionalOverview />
+              </ErrorBoundary>
+            )}
+            {activeTab === 'kommunikation' && (
+              <ErrorBoundary sectionName="Kommunikation">
+                <Kommunikation />
               </ErrorBoundary>
             )}
             {activeTab === 'settings' && (
@@ -248,6 +356,8 @@ function App() {
         return <ErrorBoundary sectionName="Samværskonfiguration"><CustodyConfig /></ErrorBoundary>;
       case 'kalender':
         return <ErrorBoundary sectionName="Kalender"><Kalender /></ErrorBoundary>;
+      case 'kalender-week':
+        return <ErrorBoundary sectionName="Kalender ugevisning"><KalenderWeekView /></ErrorBoundary>;
       case 'handover':
         return <ErrorBoundary sectionName="Aflevering"><HandoverView /></ErrorBoundary>;
       case 'opgaver':
@@ -257,10 +367,16 @@ function App() {
       case 'kommunikation':
         return <ErrorBoundary sectionName="Kommunikation"><Kommunikation /></ErrorBoundary>;
       case 'borneoverblik':
+      case 'milestones':
         return <ErrorBoundary sectionName="Børneoverblik"><Borneoverblik /></ErrorBoundary>;
       case 'meeting-minutes':
         return <ErrorBoundary sectionName="Referater"><MeetingMinutesView /></ErrorBoundary>;
       case 'expenses':
+      case 'balance':
+      case 'send-penge':
+      case 'budget':
+      case 'gaveoenskeliste':
+      case 'analyse':
         return <ErrorBoundary sectionName="Udgifter"><Expenses /></ErrorBoundary>;
       case 'children':
         return <ErrorBoundary sectionName="Børn"><ChildManagement /></ErrorBoundary>;
@@ -270,28 +386,56 @@ function App() {
         return <ErrorBoundary sectionName="Fotoalbum"><Fotoalbum /></ErrorBoundary>;
       case 'dagbog':
         return <ErrorBoundary sectionName="Dagbog"><Dagbog /></ErrorBoundary>;
+      case 'rutiner':
+        return <ErrorBoundary sectionName="Rutiner"><RutinerView /></ErrorBoundary>;
       case 'vigtige-datoer':
         return <ErrorBoundary sectionName="Vigtige datoer"><VigtigeDatoer /></ErrorBoundary>;
       case 'beslutningslog':
         return <ErrorBoundary sectionName="Beslutningslog"><Beslutningslog /></ErrorBoundary>;
       case 'aarskalender':
         return <ErrorBoundary sectionName="Årskalender"><Aarskalender /></ErrorBoundary>;
+      case 'feed':
+        return <ErrorBoundary sectionName="Feed"><FeedView /></ErrorBoundary>;
       case 'dokumenter':
         return <ErrorBoundary sectionName="Dokumenter"><Dokumenter /></ErrorBoundary>;
+      case 'notifikationer':
+        return <ErrorBoundary sectionName="Notifikationer"><NotifikationsView /></ErrorBoundary>;
+      case 'swap-request':
+        return <ErrorBoundary sectionName="Bytteanmodning"><SwapRequest /></ErrorBoundary>;
+      case 'historik':
+        return <ErrorBoundary sectionName="Historik"><HistorikView /></ErrorBoundary>;
+      case 'group-detail':
+        return <ErrorBoundary sectionName="Gruppedetalje"><GroupDetailView /></ErrorBoundary>;
+      case 'profile':
+        return <ErrorBoundary sectionName="Profil"><ProfileView /></ErrorBoundary>;
+      case 'create-group':
+        return <ErrorBoundary sectionName="Opret gruppe"><CreateGroupView /></ErrorBoundary>;
+      case 'familie-og-boern':
+        return <ErrorBoundary sectionName="Familie & Børn"><FamilieOgBoern /></ErrorBoundary>;
       default:
         return <ErrorBoundary sectionName="Overblik"><Dashboard /></ErrorBoundary>;
     }
   };
 
+  const hideChrome = activeTab === 'swap-request';
+
   return (
     <div className="app-shell min-h-[100svh] bg-transparent">
-      <TopBar />
-      <main className="mx-auto w-full max-w-[430px] px-3 pb-[calc(env(safe-area-inset-bottom,0px)+104px)] pt-[calc(env(safe-area-inset-top,0px)+74px)] sm:px-4">
+      {!hideChrome && <TopBar />}
+      <main className={cn(
+        "mx-auto w-full",
+        hideChrome
+          ? "max-w-[430px] px-0 pb-0"
+          : activeTab === 'kalender-week'
+            ? "max-w-none px-0 pb-0 pt-[calc(env(safe-area-inset-top,0px)+74px)]"
+            : "max-w-[430px] overflow-x-hidden px-3 pb-[calc(env(safe-area-inset-bottom,0px)+104px)] sm:px-4 pt-[calc(env(safe-area-inset-top,0px)+74px)]"
+      )}>
         <Suspense fallback={<SectionLoading />}>
           {renderContent()}
         </Suspense>
       </main>
-      <BottomNav />
+      {!hideChrome && <BottomNav />}
+      <Suspense fallback={null}><FlyerViewer /></Suspense>
       <Toaster position="top-center" />
     </div>
   );

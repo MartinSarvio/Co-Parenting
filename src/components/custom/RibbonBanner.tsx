@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 
 const WORDS = [
-  'Familie', 'Hygge', 'Hverdag', 'Samarbejde',
+  'Familie', 'Hygge', 'Huska', 'Samarbejde',
   'Kærlighed', 'Børn', 'Tryghed', 'Glæde',
   'Sammen', 'Omsorg', 'Tillid', 'Hjem',
 ];

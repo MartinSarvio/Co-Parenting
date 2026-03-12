@@ -1,4 +1,5 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
+import { OverblikSidePanel } from '@/components/custom/OverblikSidePanel';
 import { format, parseISO } from 'date-fns';
 import { da } from 'date-fns/locale';
 import {
@@ -14,11 +15,14 @@ import {
   Plus,
   Eye,
   FolderOpen,
+  Info,
 } from 'lucide-react';
+import { SavingOverlay } from '@/components/custom/SavingOverlay';
 import { toast } from 'sonner';
 import { useAppStore } from '@/store';
 import { useApiActions } from '@/hooks/useApiActions';
 import { cn } from '@/lib/utils';
+import { uploadDocument } from '@/lib/storage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -29,13 +33,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { SelectSheet } from '@/components/custom/SelectSheet';
 import {
   Sheet,
   SheetContent,
@@ -62,14 +60,14 @@ const documentTypeLabels: Record<string, string> = {
 };
 
 export function Dokumenter() {
-  const { documents, currentUser, users, children } = useAppStore();
+  const { documents, currentUser, users, children, docSection, docAction, setDocAction, docFormMode, setDocFormMode } = useAppStore();
   const { createDocument } = useApiActions();
-  const [activeSection, setActiveSection] = useState<'official' | 'family'>('official');
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [infoOpen, setInfoOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<FamilieretshusetDokument | null>(null);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
-  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [newDoc, setNewDoc] = useState({
     title: '',
     type: 'custody_agreement' as Document['type'],
@@ -79,6 +77,15 @@ export function Dokumenter() {
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploadedFileUrl, setUploadedFileUrl] = useState('');
   const [uploadedFileName, setUploadedFileName] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  // Listen to docAction from TopBar
+  useEffect(() => {
+    if (docAction === 'upload') {
+      setDocFormMode('upload');
+      setDocAction(null);
+    }
+  }, [docAction, setDocAction, setDocFormMode]);
 
   // Filter official templates
   const filteredTemplates = useMemo(() => {
@@ -109,31 +116,39 @@ export function Dokumenter() {
       toast.error('Filen er for stor (maks 10 MB)');
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => {
-      setUploadedFileUrl(reader.result as string);
-      setUploadedFileName(file.name);
-      if (!newDoc.title) {
-        setNewDoc((prev) => ({ ...prev, title: file.name.replace(/\.[^.]+$/, '') }));
-      }
-    };
-    reader.readAsDataURL(file);
+    setSelectedFile(file);
+    setUploadedFileUrl('pending'); // Marker som valgt (uploaderes ved gem)
+    setUploadedFileName(file.name);
+    if (!newDoc.title) {
+      setNewDoc((prev) => ({ ...prev, title: file.name.replace(/\.[^.]+$/, '') }));
+    }
   };
 
   const handleSaveDocument = async () => {
-    if (!newDoc.title.trim() || !uploadedFileUrl || !currentUser) return;
-    await createDocument({
-      title: newDoc.title.trim(),
-      type: newDoc.type,
-      url: uploadedFileUrl,
-      sharedWith: users.map((u) => u.id),
-      isOfficial: false,
-    });
-    setUploadDialogOpen(false);
-    setNewDoc({ title: '', type: 'custody_agreement', childId: '', notes: '' });
-    setUploadedFileUrl('');
-    setUploadedFileName('');
-    toast.success('Dokument gemt');
+    if (!newDoc.title.trim() || !selectedFile || !currentUser) return;
+    setIsSaving(true);
+    try {
+      // Upload til Supabase Storage
+      const publicUrl = await uploadDocument(selectedFile);
+      await createDocument({
+        title: newDoc.title.trim(),
+        type: newDoc.type,
+        url: publicUrl,
+        sharedWith: users.map((u) => u.id),
+        isOfficial: false,
+      });
+      toast.success('Dokument gemt');
+      setDocFormMode(null);
+      setNewDoc({ title: '', type: 'custody_agreement', childId: '', notes: '' });
+      setUploadedFileUrl('');
+      setUploadedFileName('');
+      setSelectedFile(null);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Kunne ikke gemme dokument';
+      toast.error(msg);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const getCategoryIcon = (category: string) => {
@@ -148,61 +163,140 @@ export function Dokumenter() {
     }
   };
 
+  // ─── Full-page upload form ───
+  if (docFormMode === 'upload') {
+    return (
+      <div className="space-y-3 py-1">
+        <OverblikSidePanel />
+        <div className="space-y-3">
+          {/* File picker */}
+          <div className="space-y-1.5">
+            <Label className="text-[12px] font-semibold text-[#78766d]">Fil</Label>
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+              onChange={handleFileUpload}
+              className="hidden"
+            />
+            <button
+              onClick={() => fileRef.current?.click()}
+              className="flex w-full items-center gap-3 rounded-[8px] border border-dashed border-[#d8d7cf] bg-white px-4 py-3 text-left active:bg-[#f0efe8]"
+            >
+              <Upload className="h-5 w-5 text-[#9b9a93]" />
+              <div className="flex-1">
+                {uploadedFileName ? (
+                  <p className="text-[13px] font-medium text-[#2f2f2d]">{uploadedFileName}</p>
+                ) : (
+                  <>
+                    <p className="text-[13px] text-[#78766d]">Vælg fil</p>
+                    <p className="text-[11px] text-[#9b9a93]">PDF, JPG, PNG, DOC (maks 10 MB)</p>
+                  </>
+                )}
+              </div>
+            </button>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-[12px] font-semibold text-[#78766d]">Titel</Label>
+            <Input
+              value={newDoc.title}
+              onChange={(e) => setNewDoc((prev) => ({ ...prev, title: e.target.value }))}
+              placeholder="f.eks. Samværsaftale 2025"
+              className="rounded-[8px] border-[#e5e3dc] bg-white"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-[12px] font-semibold text-[#78766d]">Type</Label>
+            <SelectSheet
+              value={newDoc.type}
+              onValueChange={(v) => setNewDoc((prev) => ({ ...prev, type: v as Document['type'] }))}
+              title="Type"
+              options={[
+                { value: 'custody_agreement', label: 'Samværsaftale' },
+                { value: 'court_order', label: 'Retsafgørelse' },
+                { value: 'authority_document', label: 'Myndighed' },
+                { value: 'medical', label: 'Medicinsk' },
+                { value: 'school', label: 'Skole' },
+                { value: 'contract', label: 'Kontrakt' },
+                { value: 'other', label: 'Andet' },
+              ]}
+              className="rounded-[8px] border-[#e5e3dc] bg-white"
+            />
+          </div>
+
+          {children.length > 0 && (
+            <div className="space-y-1.5">
+              <Label className="text-[12px] font-semibold text-[#78766d]">Barn (valgfri)</Label>
+              <SelectSheet
+                value={newDoc.childId}
+                onValueChange={(v) => setNewDoc((prev) => ({ ...prev, childId: v }))}
+                title="Barn"
+                placeholder="Valgfrit"
+                options={[{ value: 'none', label: 'Ingen' }, ...children.map((c) => ({ value: c.id, label: c.name }))]}
+                className="rounded-[8px] border-[#e5e3dc] bg-white"
+              />
+            </div>
+          )}
+
+          <Button
+            className="w-full rounded-[8px] bg-[#f58a2d] text-white hover:bg-[#e07b1e]"
+            onClick={handleSaveDocument}
+            disabled={!newDoc.title.trim() || !uploadedFileUrl || isSaving}
+          >
+            Gem dokument
+          </Button>
+        </div>
+        <SavingOverlay open={isSaving} />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-1.5 py-1">
-      <div>
-        <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Dokumenter</h1>
-        <p className="mt-0.5 text-[13px] text-[#78766d]">
-          Familieretshuset formularer og jeres underskrevne aftaler
-        </p>
+      <OverblikSidePanel />
+
+      {/* Search + Info icon */}
+      <div className="flex items-center gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9b9a93]" />
+          <Input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={docSection === 'official' ? 'Søg i blanketter...' : 'Søg i dokumenter...'}
+            className="rounded-[8px] border-[#d8d7cf] bg-white pl-10"
+          />
+        </div>
+        {docSection === 'official' && (
+          <button
+            onClick={() => setInfoOpen(true)}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] border border-[#d8d7cf] bg-white text-[#78766d] transition-colors active:bg-[#f0efe8]"
+            aria-label="Info"
+          >
+            <Info className="h-4.5 w-4.5" />
+          </button>
+        )}
       </div>
 
-      {/* Section toggle */}
-      <div className="flex rounded-xl border border-[#d8d7cf] bg-[#ecebe5] p-1">
-        <button
-          onClick={() => setActiveSection('official')}
-          className={cn(
-            'flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-semibold transition-all',
-            activeSection === 'official'
-              ? 'bg-white text-[#2f2f2d] shadow-sm'
-              : 'text-[#78766d] hover:text-[#4a4945]'
-          )}
-        >
-          <Building2 className="h-4 w-4" />
-          Officielle blanketter
-        </button>
-        <button
-          onClick={() => setActiveSection('family')}
-          className={cn(
-            'flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-semibold transition-all',
-            activeSection === 'family'
-              ? 'bg-white text-[#2f2f2d] shadow-sm'
-              : 'text-[#78766d] hover:text-[#4a4945]'
-          )}
-        >
-          <FolderOpen className="h-4 w-4" />
-          Vores dokumenter
-          {documents.length > 0 && (
-            <span className="ml-1 rounded-full bg-[#f58a2d] px-1.5 py-0.5 text-[10px] font-bold text-white">
-              {documents.length}
-            </span>
-          )}
-        </button>
-      </div>
-
-      {/* Search */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9b9a93]" />
-        <Input
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={activeSection === 'official' ? 'Søg i blanketter...' : 'Søg i dokumenter...'}
-          className="rounded-xl border-[#d8d7cf] bg-white pl-10"
-        />
-      </div>
+      {/* Info dialog */}
+      <Dialog open={infoOpen} onOpenChange={setInfoOpen}>
+        <DialogContent className="max-w-[360px] rounded-2xl" showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-[15px]">
+              <Shield className="h-4 w-4 text-[#2563eb]" />
+              Officielle Familieretshuset blanketter
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-[13px] leading-relaxed text-[#5f5d56]">
+            Disse blanketter bruges i forbindelse med sager om samvær, bopæl, forældremyndighed og mægling.
+            Tryk på en blanket for at se detaljer.
+          </p>
+        </DialogContent>
+      </Dialog>
 
       {/* === OFFICIAL TEMPLATES SECTION === */}
-      {activeSection === 'official' && (
+      {docSection === 'official' && (
         <>
           {/* Category filter */}
           <div className="flex gap-1.5 overflow-x-auto pb-1">
@@ -233,23 +327,9 @@ export function Dokumenter() {
             ))}
           </div>
 
-          {/* Info banner */}
-          <div className="rounded-2xl border border-[#d1e5f7] bg-[#f0f7ff] px-4 py-3">
-            <div className="flex items-start gap-2">
-              <Shield className="mt-0.5 h-4 w-4 shrink-0 text-[#2563eb]" />
-              <div>
-                <p className="text-[12px] font-semibold text-[#1e40af]">Officielle Familieretshuset blanketter</p>
-                <p className="mt-0.5 text-[11px] leading-relaxed text-[#3b7dd8]">
-                  Disse blanketter bruges i forbindelse med sager om samvær, bopæl, forældremyndighed og mægling.
-                  Tryk på en blanket for at se detaljer.
-                </p>
-              </div>
-            </div>
-          </div>
-
           {/* Template list */}
           {filteredTemplates.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-[#d8d7cf] bg-[#faf9f6] py-8 text-center">
+            <div className="rounded-[8px] border border-dashed border-[#d8d7cf] bg-[#faf9f6] py-8 text-center">
               <FileText className="mx-auto h-8 w-8 text-[#c8c6bc]" />
               <p className="mt-2 text-[13px] text-[#78766d]">Ingen blanketter matcher din søgning</p>
             </div>
@@ -261,9 +341,9 @@ export function Dokumenter() {
                   <button
                     key={template.id}
                     onClick={() => setSelectedTemplate(template)}
-                    className="flex w-full items-center gap-3 rounded-2xl border border-[#e8e7e0] bg-white px-4 py-3.5 text-left transition-colors hover:bg-[#faf9f6]"
+                    className="flex w-full items-center gap-3 rounded-[8px] border border-[#e8e7e0] bg-white px-4 py-3.5 text-left transition-colors hover:bg-[#faf9f6]"
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f0f7ff] text-[#2563eb]">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-[#f0f7ff] text-[#2563eb]">
                       <CategoryIcon className="h-5 w-5" />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -281,9 +361,10 @@ export function Dokumenter() {
 
           {/* Template detail sheet */}
           <Sheet open={!!selectedTemplate} onOpenChange={(open) => { if (!open) setSelectedTemplate(null); }}>
-            <SheetContent side="bottom" className="max-h-[80vh] overflow-y-auto rounded-t-3xl border-[#d8d7cf] bg-[#faf9f6] px-4 pb-8 pt-4">
+            <SheetContent side="bottom" hideClose className="max-h-[80vh] overflow-y-auto rounded-t-3xl border-[#d8d7cf] bg-[#faf9f6] px-4 pb-8 pt-4">
+              <div data-drag-handle className="mx-auto mb-3 h-1 w-10 rounded-full bg-[#d8d7cf]" />
               <SheetHeader className="pb-2">
-                <SheetTitle className="text-left text-lg font-bold text-[#2f2f2d]">
+                <SheetTitle className="text-center text-lg font-bold text-[#2f2f2d]">
                   {selectedTemplate?.title}
                 </SheetTitle>
               </SheetHeader>
@@ -304,18 +385,18 @@ export function Dokumenter() {
                       </Badge>
                     </div>
 
-                    <div className="rounded-2xl border border-[#e8e7e0] bg-white p-4">
+                    <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-4">
                       <p className="text-[13px] leading-relaxed text-[#4a4945]">
                         {selectedTemplate.description}
                       </p>
                     </div>
 
-                    <div className="rounded-2xl border border-[#e8e7e0] bg-white p-4">
+                    <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-4">
                       <p className="text-[12px] font-semibold text-[#78766d] uppercase tracking-[0.05em]">Filnavn</p>
                       <p className="mt-1 text-[13px] text-[#2f2f2d]">{selectedTemplate.filename}</p>
                     </div>
 
-                    <div className="rounded-2xl border border-[#d1e5f7] bg-[#f0f7ff] p-4">
+                    <div className="rounded-[8px] border border-[#d1e5f7] bg-[#f0f7ff] p-4">
                       <p className="text-[12px] font-semibold text-[#1e40af]">Sådan bruger du blanketten</p>
                       <ol className="mt-2 space-y-1.5 text-[12px] text-[#3b7dd8]">
                         <li className="flex items-start gap-2">
@@ -337,27 +418,15 @@ export function Dokumenter() {
                       </ol>
                     </div>
 
-                    <div className="flex gap-2">
-                      <Button
-                        className="flex-1 rounded-2xl bg-[#2563eb] text-white hover:bg-[#1d4ed8]"
-                        onClick={() => {
-                          toast.success(`${selectedTemplate.shortTitle} klar til visning`);
-                        }}
-                      >
-                        <Eye className="mr-2 h-4 w-4" />
-                        Vis blanket
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="flex-1 rounded-2xl border-[#d8d7cf]"
-                        onClick={() => {
-                          toast.success(`${selectedTemplate.shortTitle} klar til download`);
-                        }}
-                      >
-                        <Download className="mr-2 h-4 w-4" />
-                        Download
-                      </Button>
-                    </div>
+                    <Button
+                      className="w-full rounded-[8px] bg-[#2563eb] text-white hover:bg-[#1d4ed8]"
+                      onClick={() => {
+                        toast.success(`${selectedTemplate.shortTitle} klar til download`);
+                      }}
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Download
+                    </Button>
 
                     <a
                       href="https://www.familieretshuset.dk"
@@ -377,20 +446,10 @@ export function Dokumenter() {
       )}
 
       {/* === FAMILY DOCUMENTS SECTION === */}
-      {activeSection === 'family' && (
+      {docSection === 'family' && (
         <>
-          <div className="flex gap-2">
-            <Button
-              onClick={() => setUploadDialogOpen(true)}
-              className="rounded-2xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
-            >
-              <Upload className="mr-2 h-4 w-4" />
-              Upload dokument
-            </Button>
-          </div>
-
           {filteredFamilyDocs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-[#d8d7cf] bg-[#faf9f6] py-12 text-center">
+            <div className="flex flex-col items-center justify-center gap-3 rounded-[8px] border border-dashed border-[#d8d7cf] bg-[#faf9f6] py-12 text-center">
               <FolderOpen className="h-10 w-10 text-[#c8c6bc]" />
               <div>
                 <p className="text-[13px] font-semibold text-[#3f3e3a]">Ingen dokumenter endnu</p>
@@ -400,8 +459,8 @@ export function Dokumenter() {
               </div>
               <Button
                 variant="outline"
-                className="mt-1 rounded-2xl border-[#d8d7cf] text-sm"
-                onClick={() => setUploadDialogOpen(true)}
+                className="mt-1 rounded-[8px] border-[#d8d7cf] text-sm"
+                onClick={() => setDocFormMode('upload')}
               >
                 <Plus className="mr-1.5 h-4 w-4" />
                 Upload dit første dokument
@@ -415,7 +474,7 @@ export function Dokumenter() {
                   <button
                     key={doc.id}
                     onClick={() => setSelectedDocument(doc)}
-                    className="flex w-full items-center gap-3 rounded-2xl border border-[#e8e7e0] bg-white px-4 py-3.5 text-left transition-colors hover:bg-[#faf9f6]"
+                    className="flex w-full items-center gap-3 rounded-[8px] border border-[#e8e7e0] bg-white px-4 py-3.5 text-left transition-colors hover:bg-[#faf9f6]"
                   >
                     <div className={cn(
                       'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl',
@@ -441,9 +500,10 @@ export function Dokumenter() {
 
           {/* Family document detail sheet */}
           <Sheet open={!!selectedDocument} onOpenChange={(open) => { if (!open) setSelectedDocument(null); }}>
-            <SheetContent side="bottom" className="max-h-[70vh] overflow-y-auto rounded-t-3xl border-[#d8d7cf] bg-[#faf9f6] px-4 pb-8 pt-4">
+            <SheetContent side="bottom" hideClose className="max-h-[70vh] overflow-y-auto rounded-t-3xl border-[#d8d7cf] bg-[#faf9f6] px-4 pb-8 pt-4">
+              <div data-drag-handle className="mx-auto mb-3 h-1 w-10 rounded-full bg-[#d8d7cf]" />
               <SheetHeader className="pb-2">
-                <SheetTitle className="text-left text-lg font-bold text-[#2f2f2d]">
+                <SheetTitle className="text-center text-lg font-bold text-[#2f2f2d]">
                   {selectedDocument?.title}
                 </SheetTitle>
               </SheetHeader>
@@ -461,7 +521,7 @@ export function Dokumenter() {
                     )}
                   </div>
 
-                  <div className="rounded-2xl border border-[#e8e7e0] bg-white p-4 space-y-2">
+                  <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-4 space-y-2">
                     <div className="flex justify-between text-[12px]">
                       <span className="text-[#78766d]">Uploadet af</span>
                       <span className="font-medium text-[#2f2f2d]">
@@ -499,7 +559,7 @@ export function Dokumenter() {
                   </div>
 
                   <div className="flex gap-2">
-                    <Button className="flex-1 rounded-2xl bg-[#f58a2d] text-white hover:bg-[#e47921]">
+                    <Button className="flex-1 rounded-[8px] bg-[#f58a2d] text-white hover:bg-[#e47921]">
                       <Eye className="mr-2 h-4 w-4" />
                       Åbn dokument
                     </Button>
@@ -509,104 +569,9 @@ export function Dokumenter() {
             </SheetContent>
           </Sheet>
 
-          {/* Upload dialog */}
-          <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
-            <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
-              <DialogHeader>
-                <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Upload dokument</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-2">
-                {/* File picker */}
-                <div className="space-y-1">
-                  <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Fil</Label>
-                  <input
-                    ref={fileRef}
-                    type="file"
-                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                  <button
-                    onClick={() => fileRef.current?.click()}
-                    className="flex w-full items-center gap-3 rounded-xl border border-dashed border-[#d8d7cf] bg-white px-4 py-3 text-left hover:bg-[#faf9f6]"
-                  >
-                    <Upload className="h-5 w-5 text-[#9b9a93]" />
-                    <div className="flex-1">
-                      {uploadedFileName ? (
-                        <p className="text-[13px] font-medium text-[#2f2f2d]">{uploadedFileName}</p>
-                      ) : (
-                        <>
-                          <p className="text-[13px] text-[#78766d]">Vælg fil</p>
-                          <p className="text-[11px] text-[#9b9a93]">PDF, JPG, PNG, DOC (maks 10 MB)</p>
-                        </>
-                      )}
-                    </div>
-                  </button>
-                </div>
-
-                <div className="space-y-1">
-                  <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Titel</Label>
-                  <Input
-                    value={newDoc.title}
-                    onChange={(e) => setNewDoc((prev) => ({ ...prev, title: e.target.value }))}
-                    placeholder="f.eks. Samværsaftale 2025"
-                    className="rounded-xl border-[#d8d7cf] bg-white"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-1">
-                    <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Type</Label>
-                    <Select value={newDoc.type} onValueChange={(v) => setNewDoc((prev) => ({ ...prev, type: v as Document['type'] }))}>
-                      <SelectTrigger className="rounded-xl border-[#d8d7cf] bg-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="custody_agreement">Samværsaftale</SelectItem>
-                        <SelectItem value="court_order">Retsafgørelse</SelectItem>
-                        <SelectItem value="authority_document">Myndighed</SelectItem>
-                        <SelectItem value="medical">Medicinsk</SelectItem>
-                        <SelectItem value="school">Skole</SelectItem>
-                        <SelectItem value="contract">Kontrakt</SelectItem>
-                        <SelectItem value="other">Andet</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {children.length > 0 && (
-                    <div className="space-y-1">
-                      <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Barn</Label>
-                      <Select value={newDoc.childId} onValueChange={(v) => setNewDoc((prev) => ({ ...prev, childId: v }))}>
-                        <SelectTrigger className="rounded-xl border-[#d8d7cf] bg-white">
-                          <SelectValue placeholder="Valgfrit" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">Ingen</SelectItem>
-                          {children.map((c) => (
-                            <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex gap-2 pt-1">
-                  <Button variant="outline" className="flex-1 rounded-2xl border-[#d8d7cf]" onClick={() => setUploadDialogOpen(false)}>
-                    Annuller
-                  </Button>
-                  <Button
-                    className="flex-1 rounded-2xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
-                    onClick={handleSaveDocument}
-                    disabled={!newDoc.title.trim() || !uploadedFileUrl}
-                  >
-                    Gem dokument
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
         </>
       )}
+      <SavingOverlay open={isSaving} />
     </div>
   );
 }

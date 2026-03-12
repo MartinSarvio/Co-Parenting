@@ -20,10 +20,9 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { registerUser } from '@/lib/auth';
-import { api } from '@/lib/api';
-import { mapChild, mapHousehold, extractUsersFromHousehold } from '@/lib/mappers';
-import { ApiError } from '@/lib/api';
-import type { ApiHousehold, ApiChild } from '@/lib/mappers';
+import { supabase } from '@/lib/supabase';
+import { mapChild, mapHousehold, extractUsersFromMembers } from '@/lib/mappers';
+import type { DbChild, DbHouseholdMember } from '@/lib/mappers';
 import { RibbonBanner } from '@/components/custom/RibbonBanner';
 
 type FamilyType = 'co-parents-fixed' | 'co-parents-flex' | 'same-household' | 'blended';
@@ -155,14 +154,30 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
 
       setCurrentUser(user);
 
-      // 2. Create household on backend
-      const householdRaw = await api.post<ApiHousehold>('/api/household', {
-        name: `${data.childName}'s Familie`,
-        familyMode,
+      // 2. Create household in Supabase
+      const { data: householdRow, error: hhErr } = await supabase
+        .from('households')
+        .insert({ name: `${data.childName}'s Familie`, family_mode: familyMode })
+        .select()
+        .single();
+      if (hhErr || !householdRow) throw new Error(hhErr?.message || 'Kunne ikke oprette husstand');
+
+      // Add creator as member
+      await supabase.from('household_members').insert({
+        user_id: user.id,
+        household_id: householdRow.id,
+        role: 'parent',
       });
 
-      const householdMapped = mapHousehold(householdRaw);
-      const users = extractUsersFromHousehold(householdRaw);
+      // Fetch members for mapping
+      const { data: membersRaw } = await supabase
+        .from('household_members')
+        .select('*, user:profiles(*)')
+        .eq('household_id', householdRow.id);
+
+      const members = (membersRaw || []) as unknown as DbHouseholdMember[];
+      const householdMapped = mapHousehold(householdRow, members);
+      const users = extractUsersFromMembers(members);
 
       // Enrich household with local subscription info
       const household = {
@@ -184,22 +199,38 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
       setHousehold(household);
       hydrateFromServer({ users });
 
-      // 3. Create child on backend
-      const childRaw = await api.post<ApiChild>('/api/children', {
-        name: data.childName,
-        birthDate: data.childBirthDate,
-        parent1Id: user.id,
-        parent2Id: user.id, // Same user initially until partner joins
-        householdId: householdRaw.id,
-      });
+      // 3. Create child in Supabase
+      const { data: childRow, error: childErr } = await supabase
+        .from('children')
+        .insert({
+          name: data.childName,
+          birth_date: data.childBirthDate,
+          parent1_id: user.id,
+          parent2_id: user.id,
+          household_id: householdRow.id,
+        })
+        .select()
+        .single();
+      if (childErr || !childRow) throw new Error(childErr?.message || 'Kunne ikke oprette barn');
 
-      const child = mapChild(childRaw);
+      const child = mapChild(childRow as DbChild);
       addChild(child);
 
       // 4. Create local custody plan (no backend route yet)
-      const selectedCustodyPattern = data.familyType === 'same-household'
+      const selectedCustodyPattern: CustodyPattern = data.familyType === 'same-household'
         ? 'custom'
         : data.custodyPattern || '7/7';
+
+      // Generer uge-tildelinger baseret på valgt mønster
+      const p1 = user.id;
+      const p2 = '__parent2__'; // Placeholder indtil forælder 2 tilknyttes
+      const weekAssignments = (() => {
+        switch (selectedCustodyPattern) {
+          case '7/7': return { even: Array(7).fill(p1) as string[], odd: Array(7).fill(p2) as string[] };
+          case '10/4': return { even: Array(7).fill(p1) as string[], odd: [p1, p1, p1, p2, p2, p2, p2] };
+          default: return { even: Array(7).fill(p1) as string[], odd: Array(7).fill(p2) as string[] };
+        }
+      })();
 
       const custodyPlan = {
         id: `cp-${Date.now()}`,
@@ -210,9 +241,16 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
         swapTime: '18:00',
         parent1Weeks: 1,
         parent2Weeks: 1,
-        parent1Days: [0, 1, 2, 3, 4, 5, 6],
-        parent2Days: data.familyType === 'same-household' ? [0, 1, 2, 3, 4, 5, 6] : [] as number[],
+        parent1Days: weekAssignments.even.flatMap((pid: string, day: number) => pid === p1 ? [day] : []),
+        parent2Days: weekAssignments.even.flatMap((pid: string, day: number) => pid === p2 ? [day] : []),
         childId: child.id,
+        customWeekConfig: {
+          handoverDays: [4],
+          handoverTime: '18:00',
+          handoverContext: 'after_daycare' as const,
+          evenWeekAssignments: weekAssignments.even,
+          oddWeekAssignments: weekAssignments.odd,
+        },
       };
 
       addCustodyPlan(custodyPlan);
@@ -220,12 +258,20 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
       // 5. If other parent email provided, try invite
       if (data.otherParentEmail) {
         try {
-          await api.post(`/api/household/${householdRaw.id}/invite`, {
-            email: data.otherParentEmail,
-            role: 'parent',
-          });
+          // Find partner by email and add to household
+          const { data: partner } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('email', data.otherParentEmail.toLowerCase().trim())
+            .single();
+          if (partner) {
+            await supabase.from('household_members').insert({
+              user_id: partner.id,
+              household_id: householdRow.id,
+              role: 'parent',
+            });
+          }
         } catch {
-          // Invite failure is non-fatal — partner may not have registered yet
           console.log('Partner invitation pending — they need to register first');
         }
       }
@@ -233,11 +279,8 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
       setAuthenticated(true);
       toast.success('Velkommen! Din konto er oprettet.');
     } catch (err) {
-      if (err instanceof ApiError) {
-        toast.error(err.message);
-      } else {
-        toast.error('Noget gik galt. Prøv igen.');
-      }
+      const message = err instanceof Error ? err.message : 'Noget gik galt. Prøv igen.';
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -257,9 +300,9 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
               <Users className="w-12 h-12 text-white" />
             </div>
             <div>
-              <h1 className="text-[2rem] font-bold text-[#2f2f2d] tracking-tight mb-2">Velkommen</h1>
+              <h1 className="text-[2.2rem] font-extrabold tracking-[-0.04em] bg-gradient-to-br from-[#f7a95c] via-[#f58a2d] to-[#e8773f] bg-clip-text text-transparent mb-1">Huska</h1>
               <p className="text-[0.85rem] text-[#78766d] max-w-sm mx-auto">
-                Én sandhedskilde for hele familien. Overblik, struktur og mindre friktion.
+                Husk alt det vigtige i familien. Overblik, struktur og mindre friktion.
               </p>
             </div>
             <div className="flex justify-center gap-4 text-[13px] text-[#9a978f]">
@@ -279,7 +322,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
             <div className="space-y-2">
               <button
                 onClick={handleNext}
-                className="w-full h-[50px] rounded-xl text-white font-semibold text-[1rem] tracking-[-0.01em] transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2"
+                className="w-full h-[50px] rounded-[8px] text-white font-semibold text-[1rem] tracking-[-0.01em] transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2"
                 style={{
                   background: 'linear-gradient(135deg, #f7a95c 0%, #f58a2d 50%, #e8773f 100%)',
                   boxShadow: '0 6px 20px rgba(245, 138, 45, 0.35)',
@@ -322,14 +365,14 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
                 <Label
                   key={type.value}
                   htmlFor={type.value}
-                  className={`flex items-start gap-3 p-3.5 rounded-2xl border-2 cursor-pointer transition-all ${
+                  className={`flex items-start gap-3 p-3.5 rounded-[8px] border-2 cursor-pointer transition-all ${
                     data.familyType === type.value
                       ? 'border-[#f58a2d] bg-[#fff8f0]'
                       : 'border-[#e5e3dc] hover:border-[#d4d1c9]'
                   }`}
                 >
                   <RadioGroupItem value={type.value} id={type.value} className="mt-1" />
-                  <div className={`p-2 rounded-xl ${data.familyType === type.value ? 'bg-[#f58a2d] text-white' : 'bg-[#f2f1ed] text-[#78766d]'}`}>
+                  <div className={`p-2 rounded-[8px] ${data.familyType === type.value ? 'bg-[#f58a2d] text-white' : 'bg-[#f2f1ed] text-[#78766d]'}`}>
                     {type.icon}
                   </div>
                   <div className="flex-1">
@@ -362,7 +405,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
                   value={data.parentName}
                   onChange={(e) => updateData('parentName', e.target.value)}
                   placeholder="F.eks. Sarah"
-                  className="h-[50px] text-[15px] bg-white/80 border-[#e5e3dc] rounded-xl placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
+                  className="h-[50px] text-[15px] bg-white/80 border-[#e5e3dc] rounded-[8px] placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
                 />
               </div>
               <div className="space-y-1.5">
@@ -373,7 +416,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
                   value={data.parentEmail}
                   onChange={(e) => updateData('parentEmail', e.target.value)}
                   placeholder="sarah@example.com"
-                  className="h-[50px] text-[15px] bg-white/80 border-[#e5e3dc] rounded-xl placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
+                  className="h-[50px] text-[15px] bg-white/80 border-[#e5e3dc] rounded-[8px] placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
                   autoCapitalize="none"
                   autoCorrect="off"
                 />
@@ -388,7 +431,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
                     value={data.parentPassword}
                     onChange={(e) => updateData('parentPassword', e.target.value)}
                     placeholder="Mindst 6 tegn"
-                    className="h-[50px] pl-11 text-[15px] bg-white/80 border-[#e5e3dc] rounded-xl placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
+                    className="h-[50px] pl-11 text-[15px] bg-white/80 border-[#e5e3dc] rounded-[8px] placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
                   />
                 </div>
               </div>
@@ -416,7 +459,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
                   value={data.childName}
                   onChange={(e) => updateData('childName', e.target.value)}
                   placeholder="F.eks. Emma"
-                  className="h-[50px] text-[15px] bg-white/80 border-[#e5e3dc] rounded-xl placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
+                  className="h-[50px] text-[15px] bg-white/80 border-[#e5e3dc] rounded-[8px] placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
                 />
               </div>
               <div className="space-y-1.5">
@@ -426,7 +469,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
                   type="date"
                   value={data.childBirthDate}
                   onChange={(e) => updateData('childBirthDate', e.target.value)}
-                  className="h-[50px] text-[15px] bg-white/80 border-[#e5e3dc] rounded-xl placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
+                  className="h-[50px] text-[15px] bg-white/80 border-[#e5e3dc] rounded-[8px] placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
                 />
               </div>
             </div>
@@ -454,12 +497,12 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
                   value={data.otherParentEmail}
                   onChange={(e) => updateData('otherParentEmail', e.target.value)}
                   placeholder="michael@example.com"
-                  className="h-[50px] text-[15px] bg-white/80 border-[#e5e3dc] rounded-xl placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
+                  className="h-[50px] text-[15px] bg-white/80 border-[#e5e3dc] rounded-[8px] placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
                   autoCapitalize="none"
                   autoCorrect="off"
                 />
               </div>
-              <div className="rounded-2xl bg-[#fff2e6] border border-[#f3c59d] p-4">
+              <div className="rounded-[8px] bg-[#fff2e6] border border-[#f3c59d] p-4">
                 <div className="flex items-start gap-3">
                   <MessageCircle className="w-5 h-5 text-[#f58a2d] mt-0.5 shrink-0" />
                   <div className="text-[13px] text-[#9a622f]">
@@ -491,7 +534,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
                 <h2 className="text-[1.4rem] font-bold text-[#2f2f2d] tracking-tight mb-1">Hverdagsopsætning</h2>
                 <p className="text-[13px] text-[#78766d]">I får fokus på madplan, kalender, indkøb og opgaver.</p>
               </div>
-              <div className="rounded-2xl bg-[#fff2e6] border border-[#f3c59d] p-4">
+              <div className="rounded-[8px] bg-[#fff2e6] border border-[#f3c59d] p-4">
                 <div className="flex items-start gap-3">
                   <Heart className="w-5 h-5 text-[#f58a2d] mt-0.5 shrink-0" />
                   <div className="text-[13px] text-[#9a622f]">
@@ -524,7 +567,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
                 <Label
                   key={pattern.value}
                   htmlFor={pattern.value}
-                  className={`flex items-center gap-3 p-3.5 rounded-2xl border-2 cursor-pointer transition-all ${
+                  className={`flex items-center gap-3 p-3.5 rounded-[8px] border-2 cursor-pointer transition-all ${
                     data.custodyPattern === pattern.value
                       ? 'border-[#f58a2d] bg-[#fff8f0]'
                       : 'border-[#e5e3dc] hover:border-[#d4d1c9]'
@@ -557,7 +600,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
               <p className="text-[13px] text-[#78766d]">Her er et overblik over din opsætning</p>
             </div>
             <div className="space-y-2.5">
-              <div className="flex items-center gap-3 p-3 bg-white/80 rounded-2xl border border-[#e5e3dc]">
+              <div className="flex items-center gap-3 p-3 bg-white/80 rounded-[8px] border border-[#e5e3dc]">
                 <div className="w-10 h-10 rounded-full bg-[#fff2e6] flex items-center justify-center">
                   <Users className="w-5 h-5 text-[#f58a2d]" />
                 </div>
@@ -566,7 +609,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
                   <p className="text-[12px] text-[#9a978f]">Forælder</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-white/80 rounded-2xl border border-[#e5e3dc]">
+              <div className="flex items-center gap-3 p-3 bg-white/80 rounded-[8px] border border-[#e5e3dc]">
                 <div className="w-10 h-10 rounded-full bg-[#fff2e6] flex items-center justify-center">
                   <Heart className="w-5 h-5 text-[#f58a2d]" />
                 </div>
@@ -575,7 +618,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
                   <p className="text-[12px] text-[#9a978f]">Barn</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-white/80 rounded-2xl border border-[#e5e3dc]">
+              <div className="flex items-center gap-3 p-3 bg-white/80 rounded-[8px] border border-[#e5e3dc]">
                 <div className="w-10 h-10 rounded-full bg-[#f2f1ed] flex items-center justify-center">
                   <Calendar className="w-5 h-5 text-[#78766d]" />
                 </div>
@@ -653,7 +696,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
                     <button
                       onClick={handleBack}
                       disabled={isSubmitting}
-                      className="flex-1 h-[48px] rounded-xl border-2 border-[#e5e3dc] bg-white/80 text-[#5f5d56] font-semibold text-[15px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
+                      className="flex-1 h-[48px] rounded-[8px] border-2 border-[#e5e3dc] bg-white/80 text-[#5f5d56] font-semibold text-[15px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
                     >
                       <ChevronLeft className="w-4 h-4" />
                       Tilbage
@@ -662,7 +705,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
                   <button
                     onClick={handleNext}
                     disabled={isSubmitting}
-                    className={`${step === 1 ? 'w-full' : 'flex-1'} h-[48px] rounded-xl text-white font-semibold text-[15px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-60`}
+                    className={`${step === 1 ? 'w-full' : 'flex-1'} h-[48px] rounded-[8px] text-white font-semibold text-[15px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-60`}
                     style={{
                       background: 'linear-gradient(135deg, #f7a95c 0%, #f58a2d 50%, #e8773f 100%)',
                       boxShadow: '0 6px 20px rgba(245, 138, 45, 0.35)',

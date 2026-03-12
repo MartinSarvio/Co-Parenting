@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { Calendar, Clock, Heart, Users, Home, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { api, ApiError } from '@/lib/api';
+import { supabase } from '@/lib/supabase';
 import { useAppStore } from '@/store';
 import type { Household, User } from '@/types';
 
@@ -50,25 +50,6 @@ const familyModeMap: Record<FamilyType, string> = {
   'blended': 'co_parenting',
 };
 
-interface ApiHouseholdResponse {
-  id: string;
-  name: string;
-  familyMode: string;
-  members: Array<{
-    id: string;
-    role: string;
-    user: {
-      id: string;
-      name: string;
-      email: string;
-      avatar?: string | null;
-      role: string;
-      color: string;
-    };
-  }>;
-  children: unknown[];
-}
-
 export function HouseholdSetup({ onComplete }: HouseholdSetupProps) {
   const { currentUser, setHousehold, hydrateFromServer } = useAppStore();
   const [selectedType, setSelectedType] = useState<FamilyType | null>(null);
@@ -76,7 +57,7 @@ export function HouseholdSetup({ onComplete }: HouseholdSetupProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleCreate = async () => {
-    if (!selectedType) {
+    if (!selectedType || !currentUser) {
       toast.error('Vælg venligst en familietype');
       return;
     }
@@ -84,29 +65,41 @@ export function HouseholdSetup({ onComplete }: HouseholdSetupProps) {
     setIsLoading(true);
     try {
       const familyMode = familyModeMap[selectedType];
-      const raw = await api.post<ApiHouseholdResponse>('/api/household', {
-        name: householdName.trim() || `${currentUser?.name}s Familie`,
-        familyMode,
+      const name = householdName.trim() || `${currentUser.name}s Familie`;
+
+      // Create household
+      const { data: householdRow, error: hhErr } = await supabase
+        .from('households')
+        .insert({ name, family_mode: familyMode })
+        .select()
+        .single();
+      if (hhErr || !householdRow) throw new Error(hhErr?.message || 'Kunne ikke oprette husstand');
+
+      // Add current user as member
+      await supabase.from('household_members').insert({
+        user_id: currentUser.id,
+        household_id: householdRow.id,
+        role: 'parent',
       });
 
       // Map to store format
       const household: Household = {
-        id: raw.id,
-        name: raw.name,
-        familyMode: raw.familyMode as Household['familyMode'],
-        members: raw.members.map((m) => m.user.id),
+        id: householdRow.id,
+        name: householdRow.name,
+        familyMode: familyMode as Household['familyMode'],
+        members: [currentUser.id],
         children: [],
         subscription: { plan: 'free', billingModel: 'shared', status: 'active', startedAt: new Date().toISOString() },
       };
 
-      const users: User[] = raw.members.map((m) => ({
-        id: m.user.id,
-        name: m.user.name,
-        email: m.user.email,
-        avatar: m.user.avatar ?? undefined,
-        color: (m.user.color as User['color']) || 'warm',
-        role: (m.user.role as User['role']) || 'parent',
-      }));
+      const users: User[] = [{
+        id: currentUser.id,
+        name: currentUser.name,
+        email: currentUser.email,
+        avatar: currentUser.avatar,
+        color: currentUser.color || 'warm',
+        role: currentUser.role || 'parent',
+      }];
 
       setHousehold(household);
       hydrateFromServer({ users });
@@ -114,11 +107,8 @@ export function HouseholdSetup({ onComplete }: HouseholdSetupProps) {
       toast.success('Husstand oprettet!');
       onComplete();
     } catch (err) {
-      if (err instanceof ApiError) {
-        toast.error(err.message);
-      } else {
-        toast.error('Kunne ikke oprette husstand. Prøv igen.');
-      }
+      const message = err instanceof Error ? err.message : 'Kunne ikke oprette husstand. Prøv igen.';
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -135,7 +125,7 @@ export function HouseholdSetup({ onComplete }: HouseholdSetupProps) {
           >
             {/* Header */}
             <div className="text-center space-y-2">
-              <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-[#f7a95c] to-[#f58a2d] flex items-center justify-center shadow-lg">
+              <div className="w-16 h-16 mx-auto rounded-[8px] bg-gradient-to-br from-[#f7a95c] to-[#f58a2d] flex items-center justify-center shadow-lg">
                 <Home className="w-8 h-8 text-white" />
               </div>
               <div>
@@ -152,13 +142,13 @@ export function HouseholdSetup({ onComplete }: HouseholdSetupProps) {
                 <button
                   key={type.value}
                   onClick={() => setSelectedType(type.value)}
-                  className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all text-left ${
+                  className={`w-full flex items-center gap-3 p-3 rounded-[8px] border transition-all text-left ${
                     selectedType === type.value
                       ? 'border-[#f7a95c] bg-orange-50 shadow-sm'
                       : 'border-slate-200 bg-white hover:border-slate-300'
                   }`}
                 >
-                  <div className={`p-2 rounded-lg ${selectedType === type.value ? 'bg-orange-100 text-orange-600' : 'bg-slate-100 text-slate-500'}`}>
+                  <div className={`p-2 rounded-[8px] ${selectedType === type.value ? 'bg-orange-100 text-orange-600' : 'bg-slate-100 text-slate-500'}`}>
                     {type.icon}
                   </div>
                   <div className="flex-1 min-w-0">

@@ -4,6 +4,7 @@
 
 @layer base {
   :root {
+    --radius-control: 4px;
     --background: 42 14% 93%;
     --foreground: 220 11% 16%;
     --card: 42 20% 97%;
@@ -75,6 +76,25 @@
   }
 }
 
+/* Skjul scrollbar globalt */
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+*::-webkit-scrollbar {
+  display: none;
+}
+
+/* Force iOS date/time inputs to respect container width */
+input[type="date"],
+input[type="time"] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -98,10 +118,3 @@
   }
 }
 
-/* Barcode scanner: make app background transparent so camera shows through */
-body.scanner-active {
-  background: transparent !important;
-}
-body.scanner-active #root {
-  background: transparent !important;
-}

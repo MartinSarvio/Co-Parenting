@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { normalizeSubscription } from '@/lib/subscription';
+import { categorizeFoodItem } from '@/lib/foodCategorizer';
 import type {
   User,
   Child,
@@ -10,7 +11,9 @@ import type {
   CalendarEvent,
   Task,
   ShoppingItem,
+  ShoppingList,
   MealPlan,
+  MealPlanOverride,
   Message,
   MessageThread,
   Milestone,
@@ -30,8 +33,28 @@ import type {
   CalendarColorPreferences,
   CalendarSharing,
   FridgeItem,
+  FridgeHistoryEntry,
   Recipe,
-  MealPlanOverride,
+  BudgetGoal,
+  WishItem,
+  CoParentLink,
+  ShareGrant,
+  SharePermission,
+  ChildMembership,
+  InviteCode,
+  QuickAction,
+  SharePermissionLevel,
+  NutritionGoals,
+  NotificationPreferences,
+  MemberDisplayPrefs,
+  ProfessionalCase,
+  RiskAssessment,
+  ProfessionalDepartment,
+  CaseActivity,
+  RoutineItem,
+  RoutineLog,
+  RoutineNotificationConfig,
+  RoutineCategory,
 } from '@/types';
 
 interface AppStore {
@@ -52,6 +75,7 @@ interface AppStore {
   events: CalendarEvent[];
   tasks: Task[];
   shoppingItems: ShoppingItem[];
+  shoppingLists: ShoppingList[];
   mealPlans: MealPlan[];
   mealPlanOverrides: MealPlanOverride[];
   messages: Message[];
@@ -61,21 +85,102 @@ interface AppStore {
   expenses: Expense[];
   handovers: Handover[];
   notifications: Notification[];
+  notificationPreferences: NotificationPreferences;
   meetingMinutes: MeetingMinutes[];
   photos: FamilyPhoto[];
   diaryEntries: DiaryEntry[];
   keyDates: KeyDate[];
   decisions: DecisionLog[];
+  routineItems: RoutineItem[];
+  routineLogs: RoutineLog[];
+  routineNotificationConfigs: RoutineNotificationConfig[];
   eventTemplates: EventTemplate[];
   calendarColorPreferences: CalendarColorPreferences;
   calendarSharing: CalendarSharing | null;
   fridgeItems: FridgeItem[];
+  fridgeHistory: FridgeHistoryEntry[];
   userRecipes: Recipe[];
+  memberNutritionGoals: Record<string, NutritionGoals>;
+  memberDisplayPrefs: Record<string, MemberDisplayPrefs>;
+  budgetGoals: BudgetGoal[];
+  wishItems: WishItem[];
+
+  // Professional
+  professionalCases: ProfessionalCase[];
+  riskAssessments: RiskAssessment[];
+  departments: ProfessionalDepartment[];
+  caseActivities: CaseActivity[];
+  professionalCaseFilter: 'all' | 'active' | 'pending';
+
+  // Linking & sharing
+  coParentLink: CoParentLink | null;
+  shareGrants: ShareGrant[];
+  sharePermissions: SharePermission[];
+  childMemberships: ChildMembership[];
+  inviteCode: InviteCode | null;
+
+  // Dashboard
+  dashboardQuickActions: QuickAction[];
+  dashboardScheduleView: 'day' | 'week' | 'month';
+  dashboardFamilyLabel: string | null;
 
   // UI state
   activeTab: string;
+  previousTab: string | null;
+  navigationStack: string[];
   isLoading: boolean;
   sideMenuOpen: boolean;
+  sideMenuContext: 'overblik' | 'samversplan' | 'madoghjem' | 'kalender' | 'opgaver' | 'expenses' | 'settings' | null;
+  pendingCalendarAction: string | null;
+  calendarDate: Date;
+  calendarAddOpen: boolean;
+  fullScreenOverlayOpen: boolean;
+  madSubTab: string | null;
+  feedTab: 'nyheder' | 'tilbud' | 'forum';
+  showGrupper: boolean;
+  madAction: 'open-recipes' | 'add-meal' | 'generate-shopping' | 'from-meal-plan' | 'templates-add' | 'quick-setup-add' | null;
+  kommunikationAction: 'new-thread' | null;
+  handoverAction: 'add-pakkeliste' | null;
+  opgaverAction: 'add' | null;
+  milestonesAction: 'add' | null;
+  milestoneFormMode: 'add' | 'edit' | null;
+  meetingAction: 'add' | null;
+  meetingFormMode: 'add' | null;
+  docSection: 'official' | 'family';
+  docAction: 'upload' | null;
+  docFormMode: 'upload' | null;
+  expenseFilter: string;
+  showExpenseForm: boolean;
+  budgetPeriod: 'monthly' | 'yearly';
+  showBudgetEdit: boolean;
+  budgetEditCategory: string | null;
+  wishPersonFilter: string;
+  wishCoverImage: string | null;
+  wishCoverImageOpen: boolean;
+  showWishForm: boolean;
+  analysePersonId: string | null;
+  kommunikationThreadId: string | null;
+  adminSearchOpen: boolean;
+  isAdminVisible: boolean;
+  adminRefreshTrigger: boolean;
+  adminCreateOpen: boolean;
+  adminCategoryFilter: string;
+  swapRequestDate: Date | null;
+  calendarWeekViewDate: Date | null;
+  activeSettingsTab: string;
+  settingsDetailView: string | null;
+  viewerFlyerId: string | null;
+  tilbudStoreId: string | null;
+  uploadedBatchMeta: { store: string; storeColor: string; validFrom: string; validUntil: string; totalProducts: number } | null;
+  activeShoppingListId: string | null;
+  viewGroupId: string | null;
+  viewGroupName: string | null;
+  groupDetailSearchOpen: boolean;
+  viewProfileUserId: string | null;
+  analyticsPeriod: 'today' | 'week' | 'month' | 'all';
+  tilbudAdminTab: 'affiliates' | 'pdf-import';
+  tilbudAdminCreateOpen: boolean;
+  nyhederAdminCreateOpen: boolean;
 
   // Actions
   setCurrentUser: (user: User | null) => void;
@@ -83,8 +188,76 @@ interface AppStore {
   setProfessionalView: (value: boolean) => void;
   setCurrentChildId: (id: string | null) => void;
   setActiveTab: (tab: string) => void;
+  goBack: () => void;
   setSideMenuOpen: (value: boolean) => void;
-  
+  setSideMenuContext: (ctx: 'overblik' | 'samversplan' | 'madoghjem' | 'kalender' | 'opgaver' | 'expenses' | 'settings' | null) => void;
+  setPendingCalendarAction: (action: string | null) => void;
+  setCalendarDate: (date: Date) => void;
+  setCalendarAddOpen: (open: boolean) => void;
+  setFullScreenOverlayOpen: (open: boolean) => void;
+  setMadSubTab: (tab: string | null) => void;
+  setFeedTab: (tab: 'nyheder' | 'tilbud' | 'forum') => void;
+  setShowGrupper: (v: boolean) => void;
+  setMadAction: (action: 'open-recipes' | 'add-meal' | 'generate-shopping' | 'from-meal-plan' | 'templates-add' | 'quick-setup-add' | null) => void;
+  setKommunikationAction: (action: 'new-thread' | null) => void;
+  setHandoverAction: (action: 'add-pakkeliste' | null) => void;
+  setOpgaverAction: (action: 'add' | null) => void;
+  setMilestonesAction: (action: 'add' | null) => void;
+  setMilestoneFormMode: (mode: 'add' | 'edit' | null) => void;
+  setMeetingAction: (action: 'add' | null) => void;
+  setMeetingFormMode: (mode: 'add' | null) => void;
+  setDocSection: (section: 'official' | 'family') => void;
+  setDocAction: (action: 'upload' | null) => void;
+  setDocFormMode: (mode: 'upload' | null) => void;
+  setExpenseFilter: (filter: string) => void;
+  setShowExpenseForm: (show: boolean) => void;
+  setBudgetPeriod: (period: 'monthly' | 'yearly') => void;
+  setShowBudgetEdit: (show: boolean) => void;
+  setBudgetEditCategory: (cat: string | null) => void;
+  setWishPersonFilter: (filter: string) => void;
+  setWishCoverImage: (image: string | null) => void;
+  setWishCoverImageOpen: (open: boolean) => void;
+  setShowWishForm: (show: boolean) => void;
+  setAnalysePersonId: (id: string | null) => void;
+  setKommunikationThreadId: (id: string | null) => void;
+  setAdminSearchOpen: (open: boolean) => void;
+  setAdminVisible: (visible: boolean) => void;
+  setAdminRefresh: (v: boolean) => void;
+  setAdminCreateOpen: (v: boolean) => void;
+  setAdminCategoryFilter: (v: string) => void;
+  setSwapRequestDate: (date: Date | null) => void;
+  setCalendarWeekViewDate: (date: Date | null) => void;
+  setActiveSettingsTab: (tab: string) => void;
+  setSettingsDetailView: (view: string | null) => void;
+  setViewerFlyerId: (id: string | null) => void;
+  setTilbudStoreId: (id: string | null) => void;
+  setUploadedBatchMeta: (meta: { store: string; storeColor: string; validFrom: string; validUntil: string; totalProducts: number } | null) => void;
+  setActiveShoppingListId: (id: string | null) => void;
+  setViewGroupId: (id: string | null) => void;
+  setViewGroupName: (name: string | null) => void;
+  setGroupDetailSearchOpen: (open: boolean) => void;
+  setViewProfileUserId: (id: string | null) => void;
+  setAnalyticsPeriod: (period: 'today' | 'week' | 'month' | 'all') => void;
+  setTilbudAdminTab: (tab: 'affiliates' | 'pdf-import') => void;
+  setTilbudAdminCreateOpen: (open: boolean) => void;
+  setNyhederAdminCreateOpen: (open: boolean) => void;
+
+  // Linking & sharing actions
+  setCoParentLink: (link: CoParentLink | null) => void;
+  setInviteCode: (code: InviteCode | null) => void;
+  addShareGrant: (grant: ShareGrant) => void;
+  updateShareGrant: (id: string, updates: Partial<ShareGrant>) => void;
+  addSharePermission: (perm: SharePermission) => void;
+  updateSharePermission: (id: string, level: SharePermissionLevel) => void;
+  addChildMembership: (membership: ChildMembership) => void;
+
+  // Dashboard actions
+  setDashboardQuickActions: (actions: QuickAction[]) => void;
+  addDashboardQuickAction: (action: QuickAction) => void;
+  removeDashboardQuickAction: (id: string) => void;
+  setDashboardScheduleView: (view: 'day' | 'week' | 'month') => void;
+  setDashboardFamilyLabel: (label: string | null) => void;
+
   // Child management
   addChild: (child: Child) => void;
   updateChild: (id: string, child: Partial<Child>) => void;
@@ -115,17 +288,19 @@ interface AppStore {
   addShoppingItem: (item: ShoppingItem) => void;
   updateShoppingItem: (id: string, item: Partial<ShoppingItem>) => void;
   deleteShoppingItem: (id: string) => void;
+  addShoppingList: (list: ShoppingList) => void;
+  removeShoppingList: (id: string) => void;
   addMealPlan: (mealPlan: MealPlan) => void;
   updateMealPlan: (id: string, mealPlan: Partial<MealPlan>) => void;
   deleteMealPlan: (id: string) => void;
   addMealPlanOverride: (override: MealPlanOverride) => void;
-  updateMealPlanOverride: (id: string, override: Partial<MealPlanOverride>) => void;
-  deleteMealPlanOverride: (id: string) => void;
   addMessage: (message: Message) => void;
   addThread: (thread: MessageThread) => void;
   deleteMessage: (messageId: string, userId: string) => void;
   deleteThread: (threadId: string, userId: string) => void;
   addMilestone: (milestone: Milestone) => void;
+  updateMilestone: (id: string, milestone: Partial<Milestone>) => void;
+  deleteMilestone: (id: string) => void;
   addDocument: (document: Document) => void;
   
   // Expense actions
@@ -141,6 +316,7 @@ interface AppStore {
   addHandoverWellbeing: (handoverId: string, note: ChildWellbeingNote) => void;
   addNotification: (notification: Notification) => void;
   markNotificationRead: (id: string) => void;
+  updateNotificationPreferences: (prefs: Partial<NotificationPreferences>) => void;
   addMeetingMinutes: (minutes: MeetingMinutes) => void;
   updateMeetingMinutes: (id: string, minutes: Partial<MeetingMinutes>) => void;
   approveMeetingMinutes: (id: string, userId: string) => void;
@@ -166,6 +342,16 @@ interface AppStore {
   rejectDecision: (id: string) => void;
   deleteDecision: (id: string) => void;
 
+  // Routines
+  addRoutineItem: (item: RoutineItem) => void;
+  updateRoutineItem: (id: string, item: Partial<RoutineItem>) => void;
+  deleteRoutineItem: (id: string) => void;
+  reorderRoutineItems: (category: RoutineCategory, orderedIds: string[]) => void;
+  addRoutineLog: (log: RoutineLog) => void;
+  updateRoutineLog: (id: string, log: Partial<RoutineLog>) => void;
+  deleteRoutineLog: (id: string) => void;
+  setRoutineNotificationConfig: (config: RoutineNotificationConfig) => void;
+
   // Event templates
   addEventTemplate: (template: EventTemplate) => void;
   deleteEventTemplate: (id: string) => void;
@@ -182,11 +368,35 @@ interface AppStore {
   addFridgeItem: (item: FridgeItem) => void;
   removeFridgeItem: (id: string) => void;
   clearFridge: () => void;
+  archiveFridgeItem: (id: string, reason: 'used' | 'thrown_away') => void;
+  updateFridgeItem: (id: string, updates: Partial<Pick<FridgeItem, 'name' | 'expiresAt'>>) => void;
 
   // User recipes
   addUserRecipe: (recipe: Recipe) => void;
   removeUserRecipe: (id: string) => void;
   toggleRecipeShared: (id: string) => void;
+  // Nutrition goals per member
+  setMemberNutritionGoals: (memberId: string, goals: NutritionGoals) => void;
+  setMemberDisplayPrefs: (memberId: string, prefs: MemberDisplayPrefs) => void;
+
+  // Budget
+  setBudgetGoals: (goals: BudgetGoal[]) => void;
+  updateBudgetGoal: (category: string, amount: number) => void;
+
+  // Wish list
+  addWishItem: (item: WishItem) => void;
+  updateWishItem: (id: string, updates: Partial<WishItem>) => void;
+  deleteWishItem: (id: string) => void;
+
+  // Professional
+  addProfessionalCase: (c: ProfessionalCase) => void;
+  updateProfessionalCase: (id: string, data: Partial<ProfessionalCase>) => void;
+  deleteProfessionalCase: (id: string) => void;
+  addRiskAssessment: (a: RiskAssessment) => void;
+  updateRiskAssessment: (id: string, data: Partial<RiskAssessment>) => void;
+  setDepartments: (deps: ProfessionalDepartment[]) => void;
+  addCaseActivity: (a: CaseActivity) => void;
+  setProfessionalCaseFilter: (f: 'all' | 'active' | 'pending') => void;
 
   // Family members
   addFamilyMember: (user: User) => void;
@@ -207,6 +417,13 @@ interface AppStore {
     keyDates?: KeyDate[];
     diaryEntries?: DiaryEntry[];
     milestones?: Milestone[];
+    shoppingItems?: ShoppingItem[];
+    shoppingLists?: ShoppingList[];
+    userRecipes?: Recipe[];
+    professionalCases?: ProfessionalCase[];
+    riskAssessments?: RiskAssessment[];
+    departments?: ProfessionalDepartment[];
+    caseActivities?: CaseActivity[];
   }) => void;
 
   // Auth
@@ -235,6 +452,7 @@ export const useAppStore = create<AppStore>()(
       events: [],
       tasks: [],
       shoppingItems: [],
+      shoppingLists: [],
       mealPlans: [],
       mealPlanOverrides: [],
       messages: [],
@@ -244,29 +462,214 @@ export const useAppStore = create<AppStore>()(
       expenses: [],
       handovers: [],
       notifications: [],
+      notificationPreferences: {
+        handoverReminders: true,
+        handoverReminderMinutes: 30,
+        scheduleChanges: true,
+        eventReminders: true,
+        importantDates: true,
+        taskAssigned: true,
+        taskDeadline: true,
+        expensePending: true,
+        expenseUpdates: true,
+        newMessages: true,
+        professionalMessages: true,
+        mealPlanReminder: true,
+        shoppingReminder: true,
+        cleaningReminder: true,
+        documentShared: true,
+        decisionProposed: true,
+        diaryReminder: true,
+      },
       meetingMinutes: [],
       photos: [],
       diaryEntries: [],
       keyDates: [],
       decisions: [],
+      routineItems: [],
+      routineLogs: [],
+      routineNotificationConfigs: [],
       eventTemplates: [],
       calendarColorPreferences: {},
       calendarSharing: null,
       fridgeItems: [],
+      fridgeHistory: [],
       userRecipes: [],
+      memberNutritionGoals: {},
+      memberDisplayPrefs: {},
+      budgetGoals: [],
+      wishItems: [],
+      professionalCases: [],
+      riskAssessments: [],
+      departments: [],
+      caseActivities: [],
+      professionalCaseFilter: 'all',
+      coParentLink: null,
+      shareGrants: [],
+      sharePermissions: [],
+      childMemberships: [],
+      inviteCode: null,
+      dashboardQuickActions: [],
+      dashboardScheduleView: 'day',
+      dashboardFamilyLabel: null,
       activeTab: 'dashboard',
+      previousTab: null,
+      navigationStack: [],
       isLoading: false,
       sideMenuOpen: false,
+      sideMenuContext: null,
+      pendingCalendarAction: null,
+      calendarDate: new Date(),
+      calendarAddOpen: false,
+      fullScreenOverlayOpen: false,
+      madSubTab: null,
+      feedTab: 'nyheder',
+      showGrupper: false,
+      madAction: null,
+      kommunikationAction: null,
+      handoverAction: null,
+      opgaverAction: null,
+      milestonesAction: null,
+      milestoneFormMode: null,
+      meetingAction: null,
+      meetingFormMode: null,
+      docSection: 'official',
+      docAction: null,
+      docFormMode: null,
+      expenseFilter: 'all',
+      showExpenseForm: false,
+      budgetPeriod: 'monthly',
+      showBudgetEdit: false,
+      budgetEditCategory: null,
+      wishPersonFilter: 'all',
+      wishCoverImage: null,
+      wishCoverImageOpen: false,
+      showWishForm: false,
+      analysePersonId: null,
+      kommunikationThreadId: null,
+      adminSearchOpen: false,
+      isAdminVisible: false,
+      adminRefreshTrigger: false,
+      adminCreateOpen: false,
+      adminCategoryFilter: 'all',
+      swapRequestDate: null,
+      calendarWeekViewDate: null,
+      activeSettingsTab: 'profile',
+      settingsDetailView: null,
+      viewerFlyerId: null,
+      tilbudStoreId: null,
+      uploadedBatchMeta: null,
+      activeShoppingListId: null,
+      viewGroupId: null,
+      viewGroupName: null,
+      groupDetailSearchOpen: false,
+      viewProfileUserId: null,
+      analyticsPeriod: 'month',
+      tilbudAdminTab: 'affiliates',
+      tilbudAdminCreateOpen: false,
+      nyhederAdminCreateOpen: false,
 
       // Actions
       setCurrentUser: (user) => set({ currentUser: user }),
       setAuthenticated: (value) => set({ isAuthenticated: value }),
       setProfessionalView: (value) => set((state) => ({
-        isProfessionalView: state.household?.familyMode === 'together' ? false : value
+        isProfessionalView: state.currentUser?.isAdmin ? value : false
       })),
       setCurrentChildId: (id) => set({ currentChildId: id }),
-      setActiveTab: (tab) => set({ activeTab: tab }),
-      setSideMenuOpen: (value) => set({ sideMenuOpen: value }),
+      setActiveTab: (tab) => set((state) => ({
+        activeTab: tab,
+        previousTab: state.activeTab,
+        navigationStack: [...state.navigationStack, state.activeTab].slice(-20),
+        kommunikationThreadId: tab === 'kommunikation' ? state.kommunikationThreadId : null,
+      })),
+      goBack: () => set((state) => {
+        const stack = [...state.navigationStack];
+        const prev = stack.pop();
+        if (!prev) return state;
+        return {
+          activeTab: prev,
+          navigationStack: stack,
+          kommunikationThreadId: null,
+          calendarWeekViewDate: null,
+          swapRequestDate: null,
+        };
+      }),
+      setSideMenuOpen: (value) => set({ sideMenuOpen: value, ...(value ? {} : { sideMenuContext: null }) }),
+      setSideMenuContext: (ctx) => set({ sideMenuContext: ctx }),
+      setPendingCalendarAction: (action) => set({ pendingCalendarAction: action }),
+      setCalendarDate: (date) => set({ calendarDate: date }),
+      setCalendarAddOpen: (open) => set({ calendarAddOpen: open }),
+      setFullScreenOverlayOpen: (open) => set({ fullScreenOverlayOpen: open }),
+      setMadSubTab: (tab) => set({ madSubTab: tab }),
+      setFeedTab: (tab) => set({ feedTab: tab }),
+      setShowGrupper: (v) => set({ showGrupper: v }),
+      setMadAction: (action) => set({ madAction: action }),
+      setKommunikationAction: (action) => set({ kommunikationAction: action }),
+      setHandoverAction: (action) => set({ handoverAction: action }),
+      setOpgaverAction: (action) => set({ opgaverAction: action }),
+      setMilestonesAction: (action) => set({ milestonesAction: action }),
+      setMilestoneFormMode: (mode) => set({ milestoneFormMode: mode }),
+      setMeetingAction: (action) => set({ meetingAction: action }),
+      setMeetingFormMode: (mode) => set({ meetingFormMode: mode }),
+      setDocSection: (section) => set({ docSection: section }),
+      setDocAction: (action) => set({ docAction: action }),
+      setDocFormMode: (mode) => set({ docFormMode: mode }),
+      setExpenseFilter: (filter) => set({ expenseFilter: filter }),
+      setShowExpenseForm: (show) => set({ showExpenseForm: show }),
+      setBudgetPeriod: (period) => set({ budgetPeriod: period }),
+      setShowBudgetEdit: (show) => set({ showBudgetEdit: show }),
+      setBudgetEditCategory: (cat) => set({ budgetEditCategory: cat }),
+      setWishPersonFilter: (filter) => set({ wishPersonFilter: filter }),
+      setWishCoverImage: (image) => set({ wishCoverImage: image }),
+      setWishCoverImageOpen: (open) => set({ wishCoverImageOpen: open }),
+      setShowWishForm: (show) => set({ showWishForm: show }),
+      setAnalysePersonId: (id) => set({ analysePersonId: id }),
+      setKommunikationThreadId: (id) => set({ kommunikationThreadId: id }),
+      setAdminSearchOpen: (open) => set({ adminSearchOpen: open }),
+      setAdminVisible: (visible) => set({ isAdminVisible: visible }),
+      setAdminRefresh: (v) => set({ adminRefreshTrigger: v }),
+      setAdminCreateOpen: (v) => set({ adminCreateOpen: v }),
+      setAdminCategoryFilter: (v) => set({ adminCategoryFilter: v }),
+      setSwapRequestDate: (date) => set({ swapRequestDate: date }),
+      setCalendarWeekViewDate: (date) => set({ calendarWeekViewDate: date }),
+      setActiveSettingsTab: (tab) => set({ activeSettingsTab: tab }),
+      setSettingsDetailView: (view) => set({ settingsDetailView: view }),
+      setViewerFlyerId: (id) => set({ viewerFlyerId: id }),
+      setTilbudStoreId: (id) => set({ tilbudStoreId: id }),
+      setUploadedBatchMeta: (meta) => set({ uploadedBatchMeta: meta }),
+      setActiveShoppingListId: (id) => set({ activeShoppingListId: id }),
+      setViewGroupId: (id) => set({ viewGroupId: id }),
+      setViewGroupName: (name) => set({ viewGroupName: name }),
+      setGroupDetailSearchOpen: (open) => set({ groupDetailSearchOpen: open }),
+      setViewProfileUserId: (id) => set({ viewProfileUserId: id }),
+      setAnalyticsPeriod: (period) => set({ analyticsPeriod: period }),
+      setTilbudAdminTab: (tab) => set({ tilbudAdminTab: tab }),
+      setTilbudAdminCreateOpen: (open) => set({ tilbudAdminCreateOpen: open }),
+      setNyhederAdminCreateOpen: (open) => set({ nyhederAdminCreateOpen: open }),
+
+      // Linking & sharing actions
+      setCoParentLink: (link) => set({ coParentLink: link }),
+      setInviteCode: (code) => set({ inviteCode: code }),
+      addShareGrant: (grant) => set((state) => ({ shareGrants: [...state.shareGrants, grant] })),
+      updateShareGrant: (id, updates) => set((state) => ({
+        shareGrants: state.shareGrants.map(g => g.id === id ? { ...g, ...updates } : g)
+      })),
+      addSharePermission: (perm) => set((state) => ({ sharePermissions: [...state.sharePermissions, perm] })),
+      updateSharePermission: (id, level) => set((state) => ({
+        sharePermissions: state.sharePermissions.map(p => p.id === id ? { ...p, level } : p)
+      })),
+      addChildMembership: (membership) => set((state) => ({ childMemberships: [...state.childMemberships, membership] })),
+
+      // Dashboard actions
+      setDashboardQuickActions: (actions) => set({ dashboardQuickActions: actions }),
+      addDashboardQuickAction: (action) => set((state) => ({
+        dashboardQuickActions: [...state.dashboardQuickActions, action]
+      })),
+      removeDashboardQuickAction: (id) => set((state) => ({
+        dashboardQuickActions: state.dashboardQuickActions.filter(a => a.id !== id)
+      })),
+      setDashboardScheduleView: (view) => set({ dashboardScheduleView: view }),
+      setDashboardFamilyLabel: (label) => set({ dashboardFamilyLabel: label }),
 
       // Child management
       addChild: (child) => set((state) => ({ 
@@ -307,8 +710,8 @@ export const useAppStore = create<AppStore>()(
           ...household,
           subscription: normalizeSubscription(household)
         },
-        isProfessionalView: household.familyMode === 'together' ? false : state.isProfessionalView,
-        activeTab: household.familyMode === 'together' && state.activeTab === 'cases' ? 'dashboard' : state.activeTab
+        isProfessionalView: state.currentUser?.isAdmin ? state.isProfessionalView : false,
+        activeTab: !state.currentUser?.isAdmin && state.activeTab === 'cases' ? 'dashboard' : state.activeTab
       })),
       addPaymentAccount: (account) => set((state) => ({
         paymentAccounts: [
@@ -369,6 +772,13 @@ export const useAppStore = create<AppStore>()(
       deleteShoppingItem: (id) => set((state) => ({
         shoppingItems: state.shoppingItems.filter(i => i.id !== id)
       })),
+      addShoppingList: (list) => set((state) => ({
+        shoppingLists: [...state.shoppingLists, list]
+      })),
+      removeShoppingList: (id) => set((state) => ({
+        shoppingLists: state.shoppingLists.filter(l => l.id !== id),
+        shoppingItems: state.shoppingItems.filter(i => i.listId !== id)
+      })),
 
       addMealPlan: (mealPlan) => set((state) => ({
         mealPlans: [...state.mealPlans, mealPlan]
@@ -379,15 +789,8 @@ export const useAppStore = create<AppStore>()(
       deleteMealPlan: (id) => set((state) => ({
         mealPlans: state.mealPlans.filter(m => m.id !== id)
       })),
-
       addMealPlanOverride: (override) => set((state) => ({
         mealPlanOverrides: [...state.mealPlanOverrides, override]
-      })),
-      updateMealPlanOverride: (id, updated) => set((state) => ({
-        mealPlanOverrides: state.mealPlanOverrides.map(o => o.id === id ? { ...o, ...updated } : o)
-      })),
-      deleteMealPlanOverride: (id) => set((state) => ({
-        mealPlanOverrides: state.mealPlanOverrides.filter(o => o.id !== id)
       })),
 
       addMessage: (message) => set((state) => ({ messages: [...state.messages, message] })),
@@ -406,8 +809,14 @@ export const useAppStore = create<AppStore>()(
             : t
         ),
       })),
-      addMilestone: (milestone) => set((state) => ({ 
-        milestones: [...state.milestones, milestone] 
+      addMilestone: (milestone) => set((state) => ({
+        milestones: [...state.milestones, milestone]
+      })),
+      updateMilestone: (id, updated) => set((state) => ({
+        milestones: state.milestones.map(m => m.id === id ? { ...m, ...updated } : m)
+      })),
+      deleteMilestone: (id) => set((state) => ({
+        milestones: state.milestones.filter(m => m.id !== id)
       })),
       addDocument: (document) => set((state) => ({ 
         documents: [...state.documents, document] 
@@ -455,9 +864,15 @@ export const useAppStore = create<AppStore>()(
         expenses: state.expenses.filter(e => e.id !== id)
       })),
       
-      addHandover: (handover) => set((state) => ({ 
-        handovers: [...state.handovers, handover] 
-      })),
+      addHandover: (handover) => {
+        if (handover.fromParentId === handover.toParentId) {
+          console.error('Cannot create handover: fromParentId === toParentId');
+          return;
+        }
+        set((state) => ({
+          handovers: [...state.handovers, handover]
+        }));
+      },
       updateHandover: (id, updatedHandover) => set((state) => ({
         handovers: state.handovers.map(h => h.id === id ? { ...h, ...updatedHandover } : h)
       })),
@@ -473,11 +888,14 @@ export const useAppStore = create<AppStore>()(
         notifications: [...state.notifications, notification] 
       })),
       markNotificationRead: (id) => set((state) => ({
-        notifications: state.notifications.map(n => 
+        notifications: state.notifications.map(n =>
           n.id === id ? { ...n, read: true } : n
         )
       })),
-      
+      updateNotificationPreferences: (prefs) => set((state) => ({
+        notificationPreferences: { ...state.notificationPreferences, ...prefs }
+      })),
+
       addMeetingMinutes: (minutes) => set((state) => ({
         meetingMinutes: [...state.meetingMinutes, minutes]
       })),
@@ -531,6 +949,34 @@ export const useAppStore = create<AppStore>()(
       })),
       deleteDecision: (id) => set((state) => ({ decisions: state.decisions.filter(d => d.id !== id) })),
 
+      // Routines
+      addRoutineItem: (item) => set((state) => ({ routineItems: [...state.routineItems, item] })),
+      updateRoutineItem: (id, updates) => set((state) => ({
+        routineItems: state.routineItems.map(i => i.id === id ? { ...i, ...updates } : i)
+      })),
+      deleteRoutineItem: (id) => set((state) => ({
+        routineItems: state.routineItems.filter(i => i.id !== id),
+        routineLogs: state.routineLogs.filter(l => l.routineItemId !== id),
+      })),
+      reorderRoutineItems: (category, orderedIds) => set((state) => ({
+        routineItems: state.routineItems.map(item => {
+          if (item.category !== category) return item;
+          const idx = orderedIds.indexOf(item.id);
+          return idx >= 0 ? { ...item, order: idx } : item;
+        })
+      })),
+      addRoutineLog: (log) => set((state) => ({ routineLogs: [...state.routineLogs, log] })),
+      updateRoutineLog: (id, updates) => set((state) => ({
+        routineLogs: state.routineLogs.map(l => l.id === id ? { ...l, ...updates } : l)
+      })),
+      deleteRoutineLog: (id) => set((state) => ({ routineLogs: state.routineLogs.filter(l => l.id !== id) })),
+      setRoutineNotificationConfig: (config) => set((state) => ({
+        routineNotificationConfigs: [
+          ...state.routineNotificationConfigs.filter(c => c.childId !== config.childId),
+          config,
+        ],
+      })),
+
       // Event templates
       addEventTemplate: (template) => set((state) => ({ eventTemplates: [...state.eventTemplates, template] })),
       deleteEventTemplate: (id) => set((state) => ({ eventTemplates: state.eventTemplates.filter(t => t.id !== id) })),
@@ -555,6 +1001,27 @@ export const useAppStore = create<AppStore>()(
       addFridgeItem: (item) => set((state) => ({ fridgeItems: [...state.fridgeItems, item] })),
       removeFridgeItem: (id) => set((state) => ({ fridgeItems: state.fridgeItems.filter(f => f.id !== id) })),
       clearFridge: () => set({ fridgeItems: [] }),
+      archiveFridgeItem: (id, reason) => set((state) => {
+        const item = state.fridgeItems.find(f => f.id === id);
+        if (!item) return state;
+        return {
+          fridgeItems: state.fridgeItems.filter(f => f.id !== id),
+          fridgeHistory: [...state.fridgeHistory, {
+            id: item.id,
+            itemName: item.name,
+            reason,
+            removedAt: new Date().toISOString(),
+            removedBy: state.currentUser?.id ?? '',
+            addedAt: item.addedAt,
+            expiresAt: item.expiresAt,
+            nutritionPer100g: item.nutritionPer100g,
+            category: categorizeFoodItem(item.name),
+          }],
+        };
+      }),
+      updateFridgeItem: (id, updates) => set((state) => ({
+        fridgeItems: state.fridgeItems.map(f => f.id === id ? { ...f, ...updates } : f),
+      })),
 
       // User recipes
       addUserRecipe: (recipe) => set((state) => ({ userRecipes: [...state.userRecipes, recipe] })),
@@ -562,6 +1029,39 @@ export const useAppStore = create<AppStore>()(
       toggleRecipeShared: (id) => set((state) => ({
         userRecipes: state.userRecipes.map(r => r.id === id ? { ...r, isShared: !r.isShared } : r),
       })),
+      setMemberNutritionGoals: (memberId, goals) => set((state) => ({
+        memberNutritionGoals: { ...state.memberNutritionGoals, [memberId]: goals },
+      })),
+      setMemberDisplayPrefs: (memberId, prefs) => set((state) => ({
+        memberDisplayPrefs: { ...state.memberDisplayPrefs, [memberId]: prefs },
+      })),
+
+      // Budget
+      setBudgetGoals: (goals) => set({ budgetGoals: goals }),
+      updateBudgetGoal: (category, amount) => set((state) => {
+        const existing = state.budgetGoals.find(g => g.category === category);
+        if (existing) {
+          return { budgetGoals: state.budgetGoals.map(g => g.category === category ? { ...g, monthlyAmount: amount } : g) };
+        }
+        return { budgetGoals: [...state.budgetGoals, { category, monthlyAmount: amount }] };
+      }),
+
+      // Wish list
+      addWishItem: (item) => set((state) => ({ wishItems: [...state.wishItems, item] })),
+      updateWishItem: (id, updates) => set((state) => ({
+        wishItems: state.wishItems.map(w => w.id === id ? { ...w, ...updates } : w),
+      })),
+      deleteWishItem: (id) => set((state) => ({ wishItems: state.wishItems.filter(w => w.id !== id) })),
+
+      // Professional
+      addProfessionalCase: (c) => set((state) => ({ professionalCases: [...state.professionalCases, c] })),
+      updateProfessionalCase: (id, data) => set((state) => ({ professionalCases: state.professionalCases.map(c => c.id === id ? { ...c, ...data } : c) })),
+      deleteProfessionalCase: (id) => set((state) => ({ professionalCases: state.professionalCases.filter(c => c.id !== id) })),
+      addRiskAssessment: (a) => set((state) => ({ riskAssessments: [...state.riskAssessments, a] })),
+      updateRiskAssessment: (id, data) => set((state) => ({ riskAssessments: state.riskAssessments.map(a => a.id === id ? { ...a, ...data } : a) })),
+      setDepartments: (deps) => set({ departments: deps }),
+      addCaseActivity: (a) => set((state) => ({ caseActivities: [...state.caseActivities, a] })),
+      setProfessionalCaseFilter: (f) => set({ professionalCaseFilter: f }),
 
       // Family members
       addFamilyMember: (user) => set((state) => ({
@@ -588,6 +1088,13 @@ export const useAppStore = create<AppStore>()(
         keyDates: data.keyDates ?? state.keyDates,
         diaryEntries: data.diaryEntries ?? state.diaryEntries,
         milestones: data.milestones ?? state.milestones,
+        shoppingItems: data.shoppingItems ?? state.shoppingItems,
+        shoppingLists: data.shoppingLists ?? state.shoppingLists,
+        userRecipes: data.userRecipes ?? state.userRecipes,
+        professionalCases: data.professionalCases ?? state.professionalCases,
+        riskAssessments: data.riskAssessments ?? state.riskAssessments,
+        departments: data.departments ?? state.departments,
+        caseActivities: data.caseActivities ?? state.caseActivities,
         currentChildId: data.children !== undefined && data.children.length > 0
           ? (state.currentChildId && data.children.some(c => c.id === state.currentChildId)
               ? state.currentChildId
@@ -611,6 +1118,7 @@ export const useAppStore = create<AppStore>()(
         events: [],
         tasks: [],
         shoppingItems: [],
+        shoppingLists: [],
         mealPlans: [],
         mealPlanOverrides: [],
         messages: [],
@@ -625,12 +1133,68 @@ export const useAppStore = create<AppStore>()(
         diaryEntries: [],
         keyDates: [],
         decisions: [],
+        routineItems: [],
+        routineLogs: [],
+        routineNotificationConfigs: [],
         eventTemplates: [],
         calendarColorPreferences: {},
         calendarSharing: null,
         fridgeItems: [],
+        fridgeHistory: [],
         userRecipes: [],
+        memberNutritionGoals: {},
+        memberDisplayPrefs: {},
+        budgetGoals: [],
+        wishItems: [],
+        professionalCases: [],
+        riskAssessments: [],
+        departments: [],
+        caseActivities: [],
+        professionalCaseFilter: 'all',
+        coParentLink: null,
+        shareGrants: [],
+        sharePermissions: [],
+        childMemberships: [],
+        inviteCode: null,
+        dashboardQuickActions: [],
+        dashboardScheduleView: 'day',
+        dashboardFamilyLabel: null,
+        swapRequestDate: null,
+        calendarWeekViewDate: null,
         activeTab: 'dashboard',
+        navigationStack: [],
+        madSubTab: null,
+        feedTab: 'nyheder',
+        showGrupper: false,
+        madAction: null,
+        kommunikationAction: null,
+        opgaverAction: null,
+        milestonesAction: null,
+        milestoneFormMode: null,
+        meetingAction: null,
+        meetingFormMode: null,
+        docSection: 'official',
+        docAction: null,
+        docFormMode: null,
+        expenseFilter: 'all',
+        showExpenseForm: false,
+        budgetPeriod: 'monthly',
+        showBudgetEdit: false,
+        budgetEditCategory: null,
+        wishPersonFilter: 'all',
+        wishCoverImage: null,
+        wishCoverImageOpen: false,
+        showWishForm: false,
+        analysePersonId: null,
+        kommunikationThreadId: null,
+        adminSearchOpen: false,
+        isAdminVisible: false,
+        adminRefreshTrigger: false,
+        adminCreateOpen: false,
+        adminCategoryFilter: 'all',
+        tilbudStoreId: null,
+        uploadedBatchMeta: null,
+        activeShoppingListId: null,
       }),
 
       // Initialize demo data for parents
@@ -737,8 +1301,15 @@ export const useAppStore = create<AppStore>()(
           },
           parent1Weeks: 1,
           parent2Weeks: 1,
-          parent1Days: [0, 1, 2, 3, 4, 5, 6],
-          parent2Days: [],
+          parent1Days: [0, 1, 4, 5, 6],  // Man, Tirs, Fre, Lør, Søn
+          parent2Days: [2, 3],              // Ons, Tors
+          customWeekConfig: {
+            handoverDays: [0, 2, 4],
+            handoverTime: '07:30',
+            handoverContext: 'after_daycare' as const,
+            evenWeekAssignments: ['p1', 'p1', 'p2', 'p2', 'p1', 'p1', 'p1'],
+            oddWeekAssignments: ['p1', 'p1', 'p2', 'p2', 'p1', 'p1', 'p1'],
+          },
           weeklySchedule: [
             {
               dayOfWeek: 0, // Monday
@@ -1024,6 +1595,7 @@ export const useAppStore = create<AppStore>()(
           tasks,
           shoppingItems,
           mealPlans,
+          mealPlanOverrides: [],
           messages: [],
           threads: [],
           milestones: [],
@@ -1075,6 +1647,7 @@ export const useAppStore = create<AppStore>()(
         events: state.events,
         tasks: state.tasks,
         shoppingItems: state.shoppingItems,
+        shoppingLists: state.shoppingLists,
         mealPlans: state.mealPlans,
         mealPlanOverrides: state.mealPlanOverrides,
         messages: state.messages,
@@ -1084,6 +1657,7 @@ export const useAppStore = create<AppStore>()(
         expenses: state.expenses,
         handovers: state.handovers,
         notifications: state.notifications,
+        notificationPreferences: state.notificationPreferences,
         meetingMinutes: state.meetingMinutes,
         photos: state.photos,
         diaryEntries: state.diaryEntries,
@@ -1093,9 +1667,24 @@ export const useAppStore = create<AppStore>()(
         calendarColorPreferences: state.calendarColorPreferences,
         calendarSharing: state.calendarSharing,
         fridgeItems: state.fridgeItems,
+        fridgeHistory: state.fridgeHistory,
         userRecipes: state.userRecipes,
+        memberNutritionGoals: state.memberNutritionGoals,
+        memberDisplayPrefs: state.memberDisplayPrefs,
+        budgetGoals: state.budgetGoals,
+        wishItems: state.wishItems,
+        coParentLink: state.coParentLink,
+        shareGrants: state.shareGrants,
+        sharePermissions: state.sharePermissions,
+        childMemberships: state.childMemberships,
+        inviteCode: state.inviteCode,
+        dashboardQuickActions: state.dashboardQuickActions,
         activeTab: state.activeTab
-      })
+      }),
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        ...(persistedState as object),
+      }),
     }
   )
 );

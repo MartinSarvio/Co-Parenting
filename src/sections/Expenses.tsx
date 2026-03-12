@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useAppStore } from '@/store';
 import { useApiActions } from '@/hooks/useApiActions';
@@ -13,7 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SelectSheet } from '@/components/custom/SelectSheet';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -40,12 +40,18 @@ import {
   Printer,
   ChevronLeft,
   ChevronRight,
-  Filter,
-  BarChart3
+  BarChart3,
+  Gift,
+  Search
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import type { Expense, MoneyTransfer } from '@/types';
+import type { Expense, MoneyTransfer, WishItem } from '@/types';
+import { SavingOverlay } from '@/components/custom/SavingOverlay';
+import { ExpensesSidePanel } from '@/components/custom/ExpensesSidePanel';
+import { AnalyseView } from '@/sections/AnalyseView';
+import { searchProducts } from '@/lib/openFoodFacts';
+import { ProductCard, type ProductCardData } from '@/components/custom/ProductCard';
 
 const expenseCategories = [
   { value: 'institution', label: 'Institution', icon: Building2, color: 'bg-[#eceae2] text-[#2f2f2f]' },
@@ -131,11 +137,18 @@ export function Expenses() {
     addTransfer,
     updateTransfer,
     addDocument,
-    setActiveTab: setAppTab
+    setActiveTab: setAppTab,
+    activeTab,
+    budgetGoals,
+    updateBudgetGoal,
+    wishItems,
+    addWishItem,
+    updateWishItem,
+    deleteWishItem,
   } = useAppStore();
   const { createExpense, updateExpense, approveExpense } = useApiActions();
 
-  const features = getPlanFeatures(household);
+  const features = getPlanFeatures(household, currentUser?.isAdmin);
   const canUseExpenses = features.expenses;
   const canUsePayments = features.inAppPayments;
   const canUseRecurring = features.recurringExpenses;
@@ -143,13 +156,17 @@ export function Expenses() {
     household?.singleParentSupport?.autoArchiveReceipts && features.singleParentEvidence
   );
 
-  const [activeFilter, setActiveFilter] = useState('all');
+  const { expenseFilter, wishPersonFilter, wishCoverImage, wishCoverImageOpen, setWishCoverImage, setWishCoverImageOpen, budgetPeriod, showBudgetEdit, setShowBudgetEdit, showWishForm, setShowWishForm } = useAppStore();
   const [showStats, setShowStats] = useState(false);
   const [periodYear, setPeriodYear] = useState(new Date().getFullYear());
   const [periodMonth, setPeriodMonth] = useState<number | null>(null); // null = all months
   const [detailExpenseId, setDetailExpenseId] = useState<string | null>(null);
-  const [isAddOpen, setIsAddOpen] = useState(false);
+  const showAddExpenseForm = useAppStore(s => s.showExpenseForm);
+  const setShowAddExpenseForm = useAppStore(s => s.setShowExpenseForm);
+  const showAddWishForm = showWishForm;
+  const setShowAddWishForm = setShowWishForm;
   const [isTransferOpen, setIsTransferOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [transferMode, setTransferMode] = useState<TransferMode>('request');
   const [newExpense, setNewExpense] = useState<NewExpenseState>(getDefaultExpenseState());
   const [splitMode, setSplitMode] = useState<'equal' | 'amount' | 'percentage' | 'full_request'>('equal');
@@ -166,7 +183,7 @@ export function Expenses() {
   const [resolveNoteInput, setResolveNoteInput] = useState('');
 
   const currentChild = children[0];
-  const parentUsers = users.filter((user) => user.role === 'parent');
+  const parentUsers = useMemo(() => users.filter((user) => user.role === 'parent'), [users]);
 
   const myAccounts = useMemo(() => {
     if (!currentUser) return [];
@@ -205,13 +222,13 @@ export function Expenses() {
     if (periodMonth !== null && expDate.getMonth() !== periodMonth) return false;
 
     // Status/type filter
-    if (activeFilter === 'all') return true;
-    if (activeFilter === 'pending') return expense.status === 'pending';
-    if (activeFilter === 'paid') return expense.status === 'paid';
-    if (activeFilter === 'disputed') return expense.status === 'disputed';
-    if (activeFilter === 'recurring') return Boolean(expense.isRecurring);
-    if (activeFilter === 'unexpected') return Boolean(expense.isUnexpected);
-    return expense.category === activeFilter;
+    if (expenseFilter === 'all') return true;
+    if (expenseFilter === 'pending') return expense.status === 'pending';
+    if (expenseFilter === 'paid') return expense.status === 'paid';
+    if (expenseFilter === 'disputed') return expense.status === 'disputed';
+    if (expenseFilter === 'recurring') return Boolean(expense.isRecurring);
+    if (expenseFilter === 'unexpected') return Boolean(expense.isUnexpected);
+    return expense.category === expenseFilter;
   });
 
   const detailExpense = detailExpenseId ? expenses.find(e => e.id === detailExpenseId) : null;
@@ -304,7 +321,7 @@ export function Expenses() {
     });
   };
 
-  const handleAddExpense = () => {
+  const handleAddExpense = async () => {
     if (!newExpense.title.trim() || !newExpense.amount || !currentUser) {
       toast.error('Tilføj titel og beløb');
       return;
@@ -321,6 +338,8 @@ export function Expenses() {
       toast.error('Ingen forældre fundet til fordeling');
       return;
     }
+    setIsSaving(true);
+    try {
 
     const splitAmounts: Record<string, number> = {};
     let resolvedSplitType: Expense['splitType'] = 'equal';
@@ -395,9 +414,8 @@ export function Expenses() {
       isUnexpected: newExpense.isUnexpected,
     };
 
-    void createExpense(expense).then((created) => {
-      if (created) archiveReceiptAsEvidence(created);
-    });
+    const created = await createExpense(expense);
+    if (created) archiveReceiptAsEvidence(created);
 
     if (splitMode === 'full_request' && canUsePayments && splitTargetUserId && splitTargetUserId !== currentUser.id) {
       const transferId = generateTransferId();
@@ -415,11 +433,16 @@ export function Expenses() {
       void updateExpense(expenseId, { linkedTransferId: transferId });
     }
 
-    setIsAddOpen(false);
+    toast.success('Udgift tilføjet');
+    setShowAddExpenseForm(false);
     setNewExpense(getDefaultExpenseState());
     setSplitMode('equal');
     setCustomShares({});
-    toast.success('Udgift tilføjet');
+    } catch {
+      toast.error('Kunne ikke tilføje udgift');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const requestPaymentForExpense = (expense: Expense) => {
@@ -462,7 +485,7 @@ export function Expenses() {
     toast.success(`Betalingsanmodning sendt til ${debtor.name}`);
   };
 
-  const handleCreateTransfer = () => {
+  const handleCreateTransfer = async () => {
     if (!canUsePayments) {
       toast.error('Send/anmod penge kræver abonnement');
       return;
@@ -488,21 +511,28 @@ export function Expenses() {
       return;
     }
 
-    const transfer: MoneyTransfer = {
-      id: generateTransferId(),
-      fromUserId: transferMode === 'request' ? transferDraft.peerUserId : currentUser.id,
-      toUserId: transferMode === 'request' ? currentUser.id : transferDraft.peerUserId,
-      amount,
-      currency: 'DKK',
-      status: transferMode === 'request' ? 'requested' : 'sent',
-      note: transferDraft.note.trim() || undefined,
-      createdAt: new Date().toISOString(),
-    };
+    setIsSaving(true);
+    try {
+      const transfer: MoneyTransfer = {
+        id: generateTransferId(),
+        fromUserId: transferMode === 'request' ? transferDraft.peerUserId : currentUser.id,
+        toUserId: transferMode === 'request' ? currentUser.id : transferDraft.peerUserId,
+        amount,
+        currency: 'DKK',
+        status: transferMode === 'request' ? 'requested' : 'sent',
+        note: transferDraft.note.trim() || undefined,
+        createdAt: new Date().toISOString(),
+      };
 
-    addTransfer(transfer);
-    setTransferDraft({ peerUserId: '', amount: '', note: '' });
-    setIsTransferOpen(false);
-    toast.success(transferMode === 'request' ? 'Betalingsanmodning sendt' : 'Betaling markeret som sendt');
+      addTransfer(transfer);
+      toast.success(transferMode === 'request' ? 'Betalingsanmodning sendt' : 'Betaling markeret som sendt');
+      setTransferDraft({ peerUserId: '', amount: '', note: '' });
+      setIsTransferOpen(false);
+    } catch {
+      toast.error('Kunne ikke oprette overførsel');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const respondToTransfer = (transferId: string, status: 'completed' | 'declined') => {
@@ -545,13 +575,164 @@ export function Expenses() {
     setResolveNoteInput('');
   };
 
+  const meUser = currentUser;
+  const otherUser = users.find(u => u.id !== currentUser?.id && u.role === 'parent');
+  const totalBalance = Object.values(balance).reduce((sum, b) => sum + Math.abs(b), 0) / 2;
+
+  // Budget state
+  const [budgetEditCategory, setBudgetEditCategory] = useState<string | null>(null);
+  const [budgetEditAmount, setBudgetEditAmount] = useState('');
+  // budgetPeriod is now from store
+
+  // Wish list state
+  const [wishChildFilter, setWishChildFilter] = useState<string>('all');
+  const [newWish, setNewWish] = useState({ title: '', priceEstimate: '', link: '', childId: '', description: '' });
+  const wishImageInputRef = useRef<HTMLInputElement>(null);
+  const wishCoverInputRef = useRef<HTMLInputElement>(null);
+  const [wishImagePreview, setWishImagePreview] = useState<string | null>(null);
+  const [isLinkLoading, setIsLinkLoading] = useState(false);
+  const [wishProductQuery, setWishProductQuery] = useState('');
+  const [wishProductResults, setWishProductResults] = useState<ProductCardData[]>([]);
+  const [isWishSearching, setIsWishSearching] = useState(false);
+
+  const handleWishCoverChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) { toast.error('Max 10 MB'); return; }
+    const reader = new FileReader();
+    reader.onload = () => setWishCoverImage(reader.result as string);
+    reader.readAsDataURL(file);
+  }, [setWishCoverImage]);
+
+  // Open cover image file picker when triggered from TopBar
+  useEffect(() => {
+    if (wishCoverImageOpen) {
+      wishCoverInputRef.current?.click();
+      setWishCoverImageOpen(false);
+    }
+  }, [wishCoverImageOpen, setWishCoverImageOpen]);
+
+  // Debounced product search for wishlist
+  useEffect(() => {
+    if (!wishProductQuery.trim()) {
+      setWishProductResults([]);
+      return;
+    }
+    setIsWishSearching(true);
+    const timer = setTimeout(async () => {
+      const { products } = await searchProducts(wishProductQuery, 1, 12);
+      setWishProductResults(
+        products.map((p, i) => ({
+          id: p.barcode || `off-${i}-${Date.now()}`,
+          name: p.name,
+          brand: p.brand,
+          imageUrl: p.imageUrl,
+          quantity: p.quantity,
+          category: p.categories?.split(',')[0]?.trim(),
+          barcode: p.barcode,
+          nutriscoreGrade: p.nutriscoreGrade,
+        }))
+      );
+      setIsWishSearching(false);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [wishProductQuery]);
+
+  const handleWishImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) { toast.error('Max 10 MB'); return; }
+    const reader = new FileReader();
+    reader.onload = () => setWishImagePreview(reader.result as string);
+    reader.readAsDataURL(file);
+  }, []);
+
+  const fetchLinkPreview = useCallback(async (url: string) => {
+    if (!url.startsWith('http')) return;
+    setIsLinkLoading(true);
+    try {
+      const res = await fetch(url);
+      const html = await res.text();
+
+      const getMetaContent = (property: string) => {
+        const match = html.match(new RegExp(`<meta[^>]*(?:property|name)=["']${property}["'][^>]*content=["']([^"']*)["']`, 'i'))
+          || html.match(new RegExp(`<meta[^>]*content=["']([^"']*)["'][^>]*(?:property|name)=["']${property}["']`, 'i'));
+        return match?.[1] || '';
+      };
+
+      // Rens titel — fjern hashtags, site-navne, "Køb online" suffixer, HTML entities
+      const cleanTitle = (raw: string): string => {
+        return raw
+          .replace(/#\w+/g, '')
+          .replace(/\|.*$/g, '')
+          .replace(/\s*[-–—]\s*(?:Køb|Shop|Buy|Bestil).*$/i, '')
+          .replace(/&amp;/g, '&')
+          .replace(/&#x27;/g, "'")
+          .replace(/&#39;/g, "'")
+          .replace(/&quot;/g, '"')
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+          .replace(/\s+/g, ' ')
+          .trim();
+      };
+
+      // Rens beskrivelse
+      const cleanDescription = (raw: string): string => {
+        return raw
+          .replace(/&amp;/g, '&')
+          .replace(/&#x27;/g, "'")
+          .replace(/&#39;/g, "'")
+          .replace(/&quot;/g, '"')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .slice(0, 200);
+      };
+
+      // Hent pris fra flere kilder
+      const extractPrice = (): string => {
+        const metaPrice = getMetaContent('product:price:amount')
+          || getMetaContent('og:price:amount')
+          || getMetaContent('product:price');
+        if (metaPrice) return metaPrice;
+
+        // Søg i JSON-LD structured data
+        const jsonLdMatch = html.match(/"price"\s*:\s*"?(\d+[\.,]?\d*)/);
+        if (jsonLdMatch) return jsonLdMatch[1].replace(',', '.');
+
+        // Søg i HTML pris-elementer
+        const priceMatch = html.match(/class="[^"]*price[^"]*"[^>]*>[^<]*?(\d{1,6}[\.,]\d{2})/i);
+        if (priceMatch) return priceMatch[1].replace(',', '.');
+
+        return '';
+      };
+
+      const rawTitle = getMetaContent('og:title') || html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1] || '';
+      const rawDescription = getMetaContent('og:description') || getMetaContent('description');
+      const image = getMetaContent('og:image');
+      const priceStr = extractPrice();
+
+      setNewWish(prev => ({
+        ...prev,
+        title: prev.title || cleanTitle(rawTitle),
+        description: cleanDescription(rawDescription) || prev.description,
+        priceEstimate: priceStr || prev.priceEstimate,
+      }));
+      if (image) setWishImagePreview(image);
+    } catch {
+      // Silently fail — user can fill in manually
+    } finally {
+      setIsLinkLoading(false);
+    }
+  }, []);
+
   if (!canUseExpenses) {
     return (
       <div className="space-y-1.5 py-1">
+        <ExpensesSidePanel />
         <Card className="border-[#f3c59d] bg-[#fff2e6]">
           <CardContent className="space-y-2 p-4">
             <div className="flex items-start gap-3">
-              <div className="rounded-xl bg-[#f58a2d] p-2 text-white">
+              <div className="rounded-[8px] bg-[#f58a2d] p-2 text-white">
                 <Lock className="h-5 w-5" />
               </div>
               <div>
@@ -570,78 +751,128 @@ export function Expenses() {
     );
   }
 
-  return (
-    <div className="space-y-1.5 py-1">
-      <motion.div
-        initial={{ opacity: 0, y: -16 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center"
-      >
-        <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#fff2e6] text-[#f58a2d]">
-          <Receipt className="h-7 w-7" />
-        </div>
-        <h1 className="text-2xl font-semibold text-[#2f2f2d]">Udgifter</h1>
-        <p className="text-sm text-[#75736b]">Del faste og uventede udgifter i familien</p>
-      </motion.div>
+  // ─── Balance page ───
+  if (activeTab === 'balance') {
+    const meBalance = meUser ? (balance[meUser.id] || 0) : 0;
+    const otherBalance = otherUser ? (balance[otherUser.id] || 0) : 0;
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <Card className="border-[#d8d7cf] bg-[#f8f7f3]">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <ArrowRightLeft className="h-4 w-4 text-[#666359]" />
-              Balance
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 pt-0">
-            {users.map((user) => {
-              const userBalance = balance[user.id] || 0;
-              const isPositive = userBalance > 0;
-              return (
-                <div key={user.id} className="flex items-center justify-between rounded-xl border border-[#dfddd6] bg-white p-3">
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-9 w-9">
-                      <AvatarImage src={user.avatar} />
-                      <AvatarFallback>{user.name[0]}</AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm font-medium text-[#2f2f2d]">{user.name}</span>
+    return (
+      <div className="relative">
+        <ExpensesSidePanel />
+        {/* Orange background extending behind header/status bar */}
+        <div
+          className="absolute inset-x-0 rounded-b-3xl bg-[#f58a2d] -mx-3 sm:-mx-4"
+          style={{
+            top: 'calc(-1 * (env(safe-area-inset-top, 0px) + 74px))',
+            height: otherUser
+              ? 'calc(env(safe-area-inset-top, 0px) + 74px + 360px)'
+              : 'calc(env(safe-area-inset-top, 0px) + 74px + 260px)',
+          }}
+        />
+
+        {/* Content — relative z to sit above the orange backdrop */}
+        <div className="relative z-[1]">
+          {/* Balance hero */}
+          <div className="text-center pt-2 pb-6">
+            <p className="text-sm font-medium text-white/80">Samlet balance</p>
+            <p className="text-3xl font-bold text-white mt-1">{formatCurrency(totalBalance)}</p>
+          </div>
+
+          {/* Parent rows — overlap bottom of orange */}
+          <div className="space-y-2">
+            <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
+                    <AvatarImage src={meUser?.avatar} />
+                    <AvatarFallback>{meUser?.name?.[0]}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-semibold text-[#2f2f2d]">{meUser?.name}</p>
+                    <p className="text-[11px] text-[#78766d]">Dig</p>
                   </div>
-                  <span
-                    className={cn(
-                      'text-sm font-semibold',
-                      isPositive ? 'text-[#b96424]' : userBalance < 0 ? 'text-[#2f2f2f]' : 'text-[#75736b]'
-                    )}
-                  >
-                    {isPositive ? '+' : ''}{formatCurrency(userBalance)}
-                  </span>
                 </div>
-              );
-            })}
-          </CardContent>
-        </Card>
-      </motion.div>
+                <span className={cn('text-lg font-bold', meBalance > 0 ? 'text-green-600' : meBalance < 0 ? 'text-red-500' : 'text-[#75736b]')}>
+                  {meBalance > 0 ? '+' : ''}{formatCurrency(meBalance)}
+                </span>
+              </div>
+            </div>
+            {otherUser && (
+              <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-4 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <span className={cn('text-lg font-bold', otherBalance > 0 ? 'text-green-600' : otherBalance < 0 ? 'text-red-500' : 'text-[#75736b]')}>
+                    {otherBalance > 0 ? '+' : ''}{formatCurrency(otherBalance)}
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <p className="text-sm font-semibold text-[#2f2f2d]">{otherUser.name}</p>
+                      <p className="text-[11px] text-[#78766d]">Medforælder</p>
+                    </div>
+                    <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
+                      <AvatarImage src={otherUser.avatar} />
+                      <AvatarFallback>{otherUser.name[0]}</AvatarFallback>
+                    </Avatar>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
-      >
-        <Card className="border-[#d8d7cf] bg-[#faf9f6]">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <CreditCard className="h-4 w-4 text-[#666359]" />
-              Send / anmod penge
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 pt-0">
+          {/* Recent payments */}
+          {transferHistory.length > 0 && (
+            <div className="mt-4 space-y-2">
+              <p className="text-[0.95rem] font-semibold text-[#2f2f2d]">Seneste betalinger</p>
+              {transferHistory.slice(0, 8).map((transfer) => {
+                const from = users.find(u => u.id === transfer.fromUserId);
+                const to = users.find(u => u.id === transfer.toUserId);
+                return (
+                  <div key={transfer.id} className="flex items-center justify-between rounded-[8px] border border-[#e8e7e0] bg-white px-3 py-2.5">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-[#2f2f2d] truncate">{from?.name} → {to?.name}</p>
+                      {transfer.note && <p className="text-xs text-[#78766d] truncate">{transfer.note}</p>}
+                    </div>
+                    <div className="text-right shrink-0 ml-2">
+                      <p className="text-sm font-semibold text-[#2f2f2d]">{formatCurrency(transfer.amount)}</p>
+                      <Badge variant="outline" className="text-[10px]">{transfer.status === 'completed' ? 'Betalt' : transfer.status === 'requested' ? 'Anmodet' : transfer.status}</Badge>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Send/modtag penge page ───
+  if (activeTab === 'send-penge') {
+    return (
+      <div className="relative">
+        <ExpensesSidePanel />
+        {/* Green background extending behind header/status bar */}
+        <div
+          className="absolute inset-x-0 rounded-b-3xl bg-[#43a047] -mx-3 sm:-mx-4"
+          style={{
+            top: 'calc(-1 * (env(safe-area-inset-top, 0px) + 74px))',
+            height: 'calc(env(safe-area-inset-top, 0px) + 74px + 180px)',
+          }}
+        />
+
+        <div className="relative z-[1] space-y-3">
+          <div className="text-center pt-2 pb-6">
+            <p className="text-sm font-medium text-white/80">Betalinger</p>
+            <h1 className="text-2xl font-bold text-white mt-1">Send / modtag penge</h1>
+            <p className="text-sm text-white/70 mt-1">Opret betalinger og anmodninger</p>
+          </div>
+
+          <Card className="border-[#d8d7cf] bg-[#faf9f6]">
+          <CardContent className="space-y-2 pt-4">
             {!canUsePayments && (
-              <p className="rounded-xl border border-[#f3c59d] bg-[#fff2e6] px-3 py-2 text-sm text-[#a7632c]">
+              <p className="rounded-[8px] border border-[#f3c59d] bg-[#fff2e6] px-3 py-2 text-sm text-[#a7632c]">
                 Denne funktion kræver Family Plus eller Enlig Plus.
               </p>
             )}
-
             <p className="text-xs text-[#75736b]">
               Din primære konto: {myAccounts.find((account) => account.isPrimary)?.accountLabel || 'Ikke sat'}
             </p>
@@ -658,59 +889,28 @@ export function Expenses() {
                 </DialogHeader>
                 <div className="space-y-2 pt-2">
                   <div className="grid grid-cols-2 gap-2">
-                    <Button
-                      type="button"
-                      variant={transferMode === 'request' ? 'default' : 'outline'}
-                      onClick={() => setTransferMode('request')}
-                    >
-                      Anmod
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={transferMode === 'send' ? 'default' : 'outline'}
-                      onClick={() => setTransferMode('send')}
-                    >
-                      Send
-                    </Button>
+                    <Button type="button" variant={transferMode === 'request' ? 'default' : 'outline'} onClick={() => setTransferMode('request')}>Anmod</Button>
+                    <Button type="button" variant={transferMode === 'send' ? 'default' : 'outline'} onClick={() => setTransferMode('send')}>Send</Button>
                   </div>
-
                   <div className="space-y-2">
                     <Label>Modpart</Label>
-                    <Select
+                    <SelectSheet
                       value={transferDraft.peerUserId}
                       onValueChange={(value) => setTransferDraft((prev) => ({ ...prev, peerUserId: value }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Vælg forælder" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {partnerUsers.map((user) => (
-                          <SelectItem key={user.id} value={user.id}>{user.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      title="Modpart"
+                      placeholder="Vælg forælder"
+                      options={partnerUsers.map((user) => ({ value: user.id, label: user.name }))}
+                    />
                   </div>
-
                   <div className="space-y-2">
                     <Label>Beløb (DKK)</Label>
-                    <Input
-                      type="number"
-                      value={transferDraft.amount}
-                      onChange={(event) => setTransferDraft((prev) => ({ ...prev, amount: event.target.value }))}
-                    />
+                    <Input type="number" value={transferDraft.amount} onChange={(event) => setTransferDraft((prev) => ({ ...prev, amount: event.target.value }))} />
                   </div>
-
                   <div className="space-y-2">
                     <Label>Note</Label>
-                    <Textarea
-                      rows={2}
-                      value={transferDraft.note}
-                      onChange={(event) => setTransferDraft((prev) => ({ ...prev, note: event.target.value }))}
-                      placeholder="Fx andel af institution"
-                    />
+                    <Textarea rows={2} value={transferDraft.note} onChange={(event) => setTransferDraft((prev) => ({ ...prev, note: event.target.value }))} placeholder="Fx andel af institution" />
                   </div>
-
-                  <Button type="button" className="w-full" onClick={handleCreateTransfer}>
+                  <Button type="button" className="w-full flex items-center justify-center gap-2" disabled={isSaving} onClick={handleCreateTransfer}>
                     {transferMode === 'request' ? 'Send anmodning' : 'Registrer sendt betaling'}
                   </Button>
                 </div>
@@ -719,21 +919,15 @@ export function Expenses() {
 
             {incomingRequests.length > 0 && (
               <div className="space-y-2">
-                {incomingRequests.slice(0, 2).map((transfer) => {
+                {incomingRequests.map((transfer) => {
                   const sender = users.find((user) => user.id === transfer.fromUserId);
                   return (
-                    <div key={transfer.id} className="rounded-xl border border-[#dfddd6] bg-white p-3">
-                      <p className="text-sm font-medium text-[#2f2f2d]">
-                        {sender?.name || 'Ukendt'} anmoder om {formatCurrency(transfer.amount)}
-                      </p>
+                    <div key={transfer.id} className="rounded-[8px] border border-[#dfddd6] bg-white p-3">
+                      <p className="text-sm font-medium text-[#2f2f2d]">{sender?.name || 'Ukendt'} anmoder om {formatCurrency(transfer.amount)}</p>
                       <p className="text-xs text-[#75736b]">{transfer.note || 'Ingen note'}</p>
                       <div className="mt-2 flex gap-2">
-                        <Button size="sm" variant="outline" onClick={() => respondToTransfer(transfer.id, 'declined')}>
-                          Afvis
-                        </Button>
-                        <Button size="sm" onClick={() => respondToTransfer(transfer.id, 'completed')}>
-                          Bekræft betalt
-                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => respondToTransfer(transfer.id, 'declined')}>Afvis</Button>
+                        <Button size="sm" onClick={() => respondToTransfer(transfer.id, 'completed')}>Bekræft betalt</Button>
                       </div>
                     </div>
                   );
@@ -742,343 +936,754 @@ export function Expenses() {
             )}
           </CardContent>
         </Card>
-      </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-      >
-        <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-          <DialogTrigger asChild>
-            <Button className="w-full">
-              <Plus className="mr-2 h-4 w-4" />
-              Tilføj udgift
+        {/* All transfers */}
+        {transferHistory.length > 0 && (
+          <Card className="border-[#d8d7cf] bg-[#faf9f6]">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Betalingshistorik</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-2 pt-0">
+              {transferHistory.map((transfer) => {
+                const from = users.find(u => u.id === transfer.fromUserId);
+                const to = users.find(u => u.id === transfer.toUserId);
+                return (
+                  <div key={transfer.id} className="flex items-center justify-between rounded-[8px] border border-[#e8e7e0] bg-white px-3 py-2.5">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-[#2f2f2d] truncate">{from?.name} → {to?.name}</p>
+                      {transfer.note && <p className="text-xs text-[#78766d] truncate">{transfer.note}</p>}
+                    </div>
+                    <div className="text-right shrink-0 ml-2">
+                      <p className="text-sm font-semibold text-[#2f2f2d]">{formatCurrency(transfer.amount)}</p>
+                      <Badge variant="outline" className="text-[10px]">{transfer.status === 'completed' ? 'Betalt' : transfer.status === 'requested' ? 'Anmodet' : transfer.status}</Badge>
+                    </div>
+                  </div>
+                );
+              })}
+            </CardContent>
+          </Card>
+        )}
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Budget page ───
+  if (activeTab === 'budget' && showBudgetEdit && budgetEditCategory) {
+    const catLabel = expenseCategories.find(c => c.value === budgetEditCategory)?.label ?? budgetEditCategory;
+    return (
+      <div className="relative">
+        <ExpensesSidePanel />
+        <div className="pt-4 space-y-4">
+          <div className="space-y-2 rounded-2xl bg-white p-4 border border-[#e8e7e0]">
+            <p className="text-sm font-medium text-[#78766d]">Kategori: {catLabel}</p>
+            <div className="space-y-2">
+              <Label>Månedligt beløb (DKK)</Label>
+              <Input type="number" value={budgetEditAmount} onChange={(e) => setBudgetEditAmount(e.target.value)} placeholder="0" />
+            </div>
+            <Button className="w-full mt-2" onClick={() => {
+              updateBudgetGoal(budgetEditCategory, Number(budgetEditAmount) || 0);
+              setShowBudgetEdit(false);
+              setBudgetEditCategory(null);
+              toast.success('Budget opdateret');
+            }}>
+              Gem budget
             </Button>
-          </DialogTrigger>
-          <DialogContent className="max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Ny udgift</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-2 pt-2">
-              <div className="space-y-2">
-                <Label>Hvad er der betalt for?</Label>
-                <Input
-                  value={newExpense.title}
-                  onChange={(event) => setNewExpense((prev) => ({ ...prev, title: event.target.value }))}
-                  placeholder="Fx Institution, forsikring eller medicin"
-                />
-              </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label>Beløb (DKK)</Label>
-                  <Input
-                    type="number"
-                    value={newExpense.amount}
-                    onChange={(event) => setNewExpense((prev) => ({ ...prev, amount: event.target.value }))}
-                    placeholder="0,00"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Dato</Label>
-                  <Input
-                    type="date"
-                    value={newExpense.date}
-                    onChange={(event) => setNewExpense((prev) => ({ ...prev, date: event.target.value }))}
-                  />
-                </div>
-              </div>
+  if (activeTab === 'budget') {
+    const multiplier = budgetPeriod === 'yearly' ? 12 : 1;
+    const totalBudget = budgetGoals.reduce((sum, g) => sum + g.monthlyAmount, 0) * multiplier;
+    const monthKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+    const totalSpent = budgetPeriod === 'monthly'
+      ? expenses.filter(e => e.date.startsWith(monthKey)).reduce((sum, e) => sum + e.amount, 0)
+      : expenses.filter(e => e.date.startsWith(String(new Date().getFullYear()))).reduce((sum, e) => sum + e.amount, 0);
 
-              <div className="space-y-2">
-                <Label>Kategori</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  {expenseCategories.map((category) => (
-                    <button
-                      key={category.value}
-                      type="button"
-                      onClick={() => setNewExpense((prev) => ({ ...prev, category: category.value }))}
-                      className={cn(
-                        'flex items-center gap-2 rounded-xl border p-2.5 text-left transition-colors',
-                        newExpense.category === category.value
-                          ? 'border-[#f3c59d] bg-[#fff2e6]'
-                          : 'border-[#d8d7cf] bg-[#faf9f6] hover:bg-[#f2f1ec]'
-                      )}
-                    >
-                      <div className={cn('rounded-lg p-1.5', category.color)}>
-                        <category.icon className="h-4 w-4" />
-                      </div>
-                      <span className="text-sm font-medium text-[#35342f]">{category.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
+    return (
+      <div className="relative">
+        <ExpensesSidePanel />
+        {/* White background extending behind header/status bar */}
+        <div
+          className="absolute inset-x-0 rounded-b-3xl bg-white border-b border-[#e5e3dc] -mx-3 sm:-mx-4"
+          style={{
+            top: 'calc(-1 * (env(safe-area-inset-top, 0px) + 74px))',
+            height: 'calc(env(safe-area-inset-top, 0px) + 74px + 180px)',
+          }}
+        />
 
-              <div className="space-y-2">
-                <Label>Fordelingsmodel</Label>
-                <Select
-                  value={splitMode}
-                  onValueChange={(value: 'equal' | 'amount' | 'percentage' | 'full_request') => setSplitMode(value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="equal">Lige fordeling</SelectItem>
-                    <SelectItem value="amount">Beløb pr. person</SelectItem>
-                    <SelectItem value="percentage">Procent pr. person</SelectItem>
-                    <SelectItem value="full_request">Anmod én person om hele beløbet</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+        <div className="relative z-[1] space-y-3">
+          <div className="text-center pt-1 pb-4">
+            <h1 className="text-2xl font-bold text-[#2f2f2d] mt-1">Budget</h1>
+            <p className="text-sm text-[#78766d] mt-1">{budgetPeriod === 'monthly' ? 'Månedligt overblik' : 'Årligt overblik'}</p>
+          </div>
 
-              {splitMode === 'full_request' ? (
-                <div className="space-y-2">
-                  <Label>Hele beløbet anmodes hos</Label>
-                  <Select
-                    value={splitTargetUserId}
-                    onValueChange={setSplitTargetUserId}
+        {/* Summary */}
+        <Card className="border-[#d8d7cf] bg-[#f8f7f3]">
+          <CardContent className="pt-4 space-y-1">
+            <div className="flex justify-between text-sm">
+              <span className="text-[#78766d]">Budget total</span>
+              <span className="font-semibold text-[#2f2f2d]">{formatCurrency(totalBudget)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-[#78766d]">Brugt</span>
+              <span className="font-semibold text-[#2f2f2d]">{formatCurrency(totalSpent)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-[#78766d]">Resterende</span>
+              <span className={cn('font-semibold', totalBudget - totalSpent >= 0 ? 'text-green-600' : 'text-red-500')}>
+                {formatCurrency(totalBudget - totalSpent)}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Per-category cards */}
+        <div className="space-y-2">
+          {expenseCategories.map(cat => {
+            const CatIcon = cat.icon;
+            const goal = budgetGoals.find(g => g.category === cat.value);
+            const budgetAmount = (goal?.monthlyAmount || 0) * multiplier;
+            const spent = budgetPeriod === 'monthly'
+              ? expenses.filter(e => e.category === cat.value && e.date.startsWith(monthKey)).reduce((sum, e) => sum + e.amount, 0)
+              : expenses.filter(e => e.category === cat.value && e.date.startsWith(String(new Date().getFullYear()))).reduce((sum, e) => sum + e.amount, 0);
+            const progress = budgetAmount > 0 ? Math.min((spent / budgetAmount) * 100, 100) : 0;
+
+            return (
+              <div key={cat.value} className="rounded-[8px] border border-[#e8e7e0] bg-white p-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div className={cn('flex h-8 w-8 items-center justify-center rounded-xl', cat.color)}>
+                      <CatIcon className="h-4 w-4" />
+                    </div>
+                    <span className="text-sm font-semibold text-[#2f2f2d]">{cat.label}</span>
+                  </div>
+                  <button
+                    onClick={() => { setBudgetEditCategory(cat.value); setBudgetEditAmount(String(goal?.monthlyAmount || 0)); setShowBudgetEdit(true); }}
+                    className="text-xs text-[#78766d] hover:text-[#2f2f2d] transition-colors"
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Vælg forælder" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {parentUsers
-                        .filter((user) => user.id !== currentUser?.id)
-                        .map((user) => (
-                          <SelectItem key={user.id} value={user.id}>
-                            {user.name}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
+                    {budgetAmount > 0 ? formatCurrency(budgetAmount) : 'Sæt budget'}
+                  </button>
                 </div>
-              ) : null}
-
-              {(splitMode === 'amount' || splitMode === 'percentage') ? (
-                <div className="space-y-2 rounded-xl border border-[#dfddd6] bg-[#faf9f6] p-3">
-                  {parentUsers.map((user) => (
-                    <div key={user.id} className="grid grid-cols-[1fr_120px] items-center gap-2">
-                      <p className="text-sm text-[#47443d]">{user.name}</p>
-                      <Input
-                        type="number"
-                        value={customShares[user.id] || ''}
-                        onChange={(event) => {
-                          const value = event.target.value;
-                          setCustomShares((prev) => ({ ...prev, [user.id]: value }));
-                        }}
-                        placeholder={splitMode === 'percentage' ? '%' : 'kr'}
+                {budgetAmount > 0 && (
+                  <>
+                    <div className="h-2 w-full rounded-full bg-[#f0efe8] overflow-hidden">
+                      <div
+                        className={cn('h-full rounded-full transition-all', progress >= 90 ? 'bg-red-400' : progress >= 70 ? 'bg-yellow-400' : 'bg-green-400')}
+                        style={{ width: `${progress}%` }}
                       />
                     </div>
-                  ))}
-                  <p className="text-xs text-[#75736b]">
-                    {splitMode === 'percentage'
-                      ? 'Procenter skal tilsammen være 100.'
-                      : 'Beløb skal tilsammen være lig totalbeløbet.'}
-                  </p>
-                </div>
-              ) : null}
+                    <div className="flex justify-between mt-1 text-[11px] text-[#78766d]">
+                      <span>Brugt: {formatCurrency(spent)}</span>
+                      <span>Rest: {formatCurrency(Math.max(budgetAmount - spent, 0))}</span>
+                    </div>
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
 
-              {newExpense.category === 'institution' && institutions.length > 0 && (
-                <div className="space-y-2">
-                  <Label>Institution</Label>
-                  <Select
-                    value={newExpense.institutionId}
-                    onValueChange={(value) => setNewExpense((prev) => ({ ...prev, institutionId: value }))}
+        {/* Budget edit is now a full-page form */}
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Full-page: Add wish form ───
+  if (activeTab === 'gaveoenskeliste' && showAddWishForm) {
+    return (
+      <div className="relative">
+        <ExpensesSidePanel />
+        <input
+          ref={wishImageInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={handleWishImageChange}
+        />
+        <div
+          className="absolute inset-x-0 rounded-b-3xl -mx-3 sm:-mx-4 bg-cover bg-center"
+          style={{
+            top: 'calc(-1 * (env(safe-area-inset-top, 0px) + 74px))',
+            height: 'calc(env(safe-area-inset-top, 0px) + 74px + 40px)',
+            backgroundColor: wishImagePreview ? undefined : '#1e88e5',
+            backgroundImage: wishImagePreview ? `url(${wishImagePreview})` : undefined,
+          }}
+        />
+        <div className="relative z-[1] pt-4">
+          <div className="space-y-3 rounded-2xl bg-white p-4 border border-[#e8e7e0]">
+            <div className="space-y-2">
+              <Label>Link (valgfrit)</Label>
+              <Input
+                value={newWish.link}
+                onChange={(e) => setNewWish(prev => ({ ...prev, link: e.target.value }))}
+                onBlur={(e) => fetchLinkPreview(e.target.value)}
+                placeholder="https://..."
+              />
+              {isLinkLoading && <p className="text-xs text-[#78766d]">Henter produktinfo...</p>}
+            </div>
+            <div className="space-y-2">
+              <Label>Titel</Label>
+              <Input value={newWish.title} onChange={(e) => setNewWish(prev => ({ ...prev, title: e.target.value }))} placeholder="Fx LEGO sæt" />
+            </div>
+            <div className="space-y-2">
+              <Label>Beskrivelse (valgfrit)</Label>
+              <Input value={newWish.description} onChange={(e) => setNewWish(prev => ({ ...prev, description: e.target.value }))} placeholder="Kort beskrivelse" />
+            </div>
+            <div className="space-y-2">
+              <Label>Pris (valgfrit)</Label>
+              <Input type="number" value={newWish.priceEstimate} onChange={(e) => setNewWish(prev => ({ ...prev, priceEstimate: e.target.value }))} placeholder="DKK" />
+            </div>
+            <div className="space-y-2">
+              <Label>Barn</Label>
+              <SelectSheet
+                value={newWish.childId}
+                onValueChange={(value) => setNewWish(prev => ({ ...prev, childId: value }))}
+                title="Barn"
+                placeholder="Vælg barn"
+                options={children.map(child => ({ value: child.id, label: child.name }))}
+              />
+            </div>
+            <Button className="w-full flex items-center justify-center gap-2" disabled={isSaving} onClick={async () => {
+              if (!newWish.title.trim() || !newWish.childId) {
+                toast.error('Tilføj titel og vælg barn');
+                return;
+              }
+              setIsSaving(true);
+              try {
+                const item: WishItem = {
+                  id: `wish-${Date.now()}`,
+                  title: newWish.title.trim(),
+                  priceEstimate: newWish.priceEstimate ? Number(newWish.priceEstimate) : undefined,
+                  link: newWish.link || undefined,
+                  imageUrl: wishImagePreview || undefined,
+                  description: newWish.description || undefined,
+                  childId: newWish.childId,
+                  addedBy: currentUser?.id || '',
+                  status: 'wanted',
+                  createdAt: new Date().toISOString(),
+                };
+                addWishItem(item);
+                toast.success('Ønske tilføjet');
+                setNewWish({ title: '', priceEstimate: '', link: '', childId: '', description: '' });
+                setWishImagePreview(null);
+                setShowAddWishForm(false);
+              } catch {
+                toast.error('Kunne ikke tilføje ønske');
+              } finally {
+                setIsSaving(false);
+              }
+            }}>
+              Tilføj ønske
+            </Button>
+          </div>
+        </div>
+
+        <SavingOverlay open={isSaving} />
+      </div>
+    );
+  }
+
+  // ─── Gave/ønskeliste page ───
+  if (activeTab === 'gaveoenskeliste') {
+    const filteredWishes = wishItems
+      .filter(w => wishChildFilter === 'all' || w.childId === wishChildFilter)
+      .filter(w => wishPersonFilter === 'all' || w.addedBy === wishPersonFilter);
+
+    return (
+      <div className="relative">
+        <ExpensesSidePanel />
+        {/* Blue background / cover image extending behind header/status bar */}
+        <div
+          className={cn(
+            "absolute inset-x-0 rounded-b-3xl -mx-3 sm:-mx-4 overflow-hidden",
+            !wishCoverImage && "bg-[#1e88e5]"
+          )}
+          style={{
+            top: 'calc(-1 * (env(safe-area-inset-top, 0px) + 74px))',
+            height: 'calc(env(safe-area-inset-top, 0px) + 74px + 180px)',
+          }}
+        >
+          {wishCoverImage && (
+            <img src={wishCoverImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
+          )}
+        </div>
+        <input
+          ref={wishCoverInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleWishCoverChange}
+        />
+
+        <div className="relative z-[1] space-y-3">
+          <div className="text-center pt-2 pb-6">
+            <p className="text-sm font-medium text-white/80">Hold styr på ønsker</p>
+            <h1 className="text-2xl font-bold text-white mt-1">Gave / ønskeliste</h1>
+          </div>
+
+        {/* Child filter */}
+        {children.length > 1 && (
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            <Button
+              variant={wishChildFilter === 'all' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setWishChildFilter('all')}
+            >
+              Alle
+            </Button>
+            {children.map(child => (
+              <Button
+                key={child.id}
+                variant={wishChildFilter === child.id ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setWishChildFilter(child.id)}
+              >
+                {child.name}
+              </Button>
+            ))}
+          </div>
+        )}
+
+        {/* Add wish */}
+        <Button variant="outline" className="w-full" onClick={() => setShowAddWishForm(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Tilføj ønske
+        </Button>
+
+        {/* Product search */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9a978f]" />
+          <input
+            value={wishProductQuery}
+            onChange={e => setWishProductQuery(e.target.value)}
+            placeholder="Søg produkt..."
+            className="w-full rounded-[8px] border border-[#e5e3dc] bg-white py-3 pl-9 pr-3 text-[14px] text-[#2f2f2d] placeholder:text-[#9a978f] outline-none focus:border-[#c5c3bb]"
+          />
+          {wishProductQuery && (
+            <button
+              onClick={() => { setWishProductQuery(''); setWishProductResults([]); }}
+              className="absolute right-3 top-1/2 -translate-y-1/2"
+            >
+              <X className="h-4 w-4 text-[#9a978f]" />
+            </button>
+          )}
+        </div>
+
+        {/* Product search results */}
+        {isWishSearching && (
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="min-w-[155px] max-w-[155px] shrink-0 rounded-2xl border border-[#e8e7e0] bg-white overflow-hidden">
+                <div className="aspect-[4/3] bg-[#f0efe8] animate-pulse" />
+                <div className="p-2.5 space-y-2">
+                  <div className="h-3 w-3/4 rounded bg-[#e8e7e0] animate-pulse" />
+                  <div className="h-3 w-1/2 rounded bg-[#e8e7e0] animate-pulse" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        {!isWishSearching && wishProductResults.length > 0 && (
+          <div className="flex gap-2 overflow-x-auto snap-x pb-2 scrollbar-hide -mx-1 px-1">
+            {wishProductResults.map(product => (
+              <div key={product.id} className="min-w-[155px] max-w-[155px] snap-start shrink-0">
+                <ProductCard
+                  product={product}
+                  mode="wishlist"
+                  childId={wishChildFilter !== 'all' ? wishChildFilter : children[0]?.id}
+                />
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Wish list */}
+        {filteredWishes.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <Gift className="mx-auto mb-3 h-11 w-11 text-[#c5c3bb]" />
+            <p className="text-sm text-[#78766d]">Ingen ønsker endnu</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3">
+            {filteredWishes.map(wish => {
+              const child = children.find(c => c.id === wish.childId);
+              const addedByUser = users.find(u => u.id === wish.addedBy);
+              return (
+                <div key={wish.id} className={cn('rounded-2xl border border-[#e8e7e0] bg-white overflow-hidden', wish.status === 'bought' && 'opacity-60')}>
+                  {wish.imageUrl && (
+                    <div className="aspect-[4/3] w-full bg-[#f5f4f0]">
+                      <img src={wish.imageUrl} alt={wish.title} className="h-full w-full object-cover" />
+                    </div>
+                  )}
+                  <div className="p-3">
+                    <p className={cn('text-sm font-semibold text-[#2f2f2d] line-clamp-2', wish.status === 'bought' && 'line-through')}>{wish.title}</p>
+                    {wish.description && <p className="text-xs text-[#78766d] mt-0.5 line-clamp-2">{wish.description}</p>}
+                    <div className="flex items-center gap-1.5 mt-1">
+                      {wish.priceEstimate && <span className="text-sm font-bold text-[#2f2f2d]">{formatCurrency(wish.priceEstimate)}</span>}
+                    </div>
+                    {child && <Badge variant="outline" className="text-[10px] mt-1">{child.name}</Badge>}
+                    {addedByUser && <p className="text-[10px] text-[#a09e96] mt-0.5">Tilføjet af {addedByUser.name?.split(' ')[0]}</p>}
+                    <div className="flex items-center gap-0.5 mt-2 border-t border-[#e8e7e0] pt-2">
+                      {wish.link && (
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-[#1e88e5]" onClick={() => window.open(wish.link, '_blank')}>
+                          <ArrowRightLeft className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
+                      {wish.status === 'wanted' ? (
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-green-600" onClick={() => updateWishItem(wish.id, { status: 'bought', boughtBy: currentUser?.id })}>
+                          <Check className="h-3.5 w-3.5" />
+                        </Button>
+                      ) : (
+                        <Badge variant="secondary" className="text-[10px]">Købt</Badge>
+                      )}
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-red-400 ml-auto" onClick={() => deleteWishItem(wish.id)}>
+                        <X className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+        </div>
+
+        {/* FAB — tilføj ønske */}
+        <button
+          onClick={() => setShowAddWishForm(true)}
+          className="fixed left-4 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-[#f58a2d] text-white shadow-lg hover:bg-[#e07b1f] transition-colors"
+          style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }}
+          aria-label="Tilføj ønske"
+        >
+          <Plus className="h-5 w-5" />
+        </button>
+      </div>
+    );
+  }
+
+  // ─── Analyse page ───
+  if (activeTab === 'analyse') {
+    return <AnalyseView />;
+  }
+
+  // ─── Full-page: Add expense form ───
+  if (showAddExpenseForm) {
+    return (
+      <div className="relative">
+        <ExpensesSidePanel />
+        <div
+          className="absolute inset-x-0 rounded-b-3xl bg-[#e53935] -mx-3 sm:-mx-4"
+          style={{
+            top: 'calc(-1 * (env(safe-area-inset-top, 0px) + 74px))',
+            height: 'calc(env(safe-area-inset-top, 0px) + 74px + 40px)',
+          }}
+        />
+        <div className="relative z-[1] pt-4">
+          <div className="space-y-2 rounded-2xl bg-white p-4 border border-[#e8e7e0]">
+            <div className="space-y-2">
+              <Label>Hvad er der betalt for?</Label>
+              <Input
+                value={newExpense.title}
+                onChange={(event) => setNewExpense((prev) => ({ ...prev, title: event.target.value }))}
+                placeholder="Fx Institution, forsikring eller medicin"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label>Beløb (DKK)</Label>
+                <Input
+                  type="number"
+                  value={newExpense.amount}
+                  onChange={(event) => setNewExpense((prev) => ({ ...prev, amount: event.target.value }))}
+                  placeholder="0,00"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Dato</Label>
+                <Input
+                  type="date"
+                  className="h-11"
+                  value={newExpense.date}
+                  onChange={(event) => setNewExpense((prev) => ({ ...prev, date: event.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Kategori</Label>
+              <div className="grid grid-cols-2 gap-2">
+                {expenseCategories.map((category) => (
+                  <button
+                    key={category.value}
+                    type="button"
+                    onClick={() => setNewExpense((prev) => ({ ...prev, category: category.value }))}
+                    className={cn(
+                      'flex items-center gap-2 rounded-[8px] border p-2.5 text-left transition-colors',
+                      newExpense.category === category.value
+                        ? 'border-[#f3c59d] bg-[#fff2e6]'
+                        : 'border-[#d8d7cf] bg-[#faf9f6] hover:bg-[#f2f1ec]'
+                    )}
                   >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Vælg institution" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {institutions.map((institution) => (
-                        <SelectItem key={institution.id} value={institution.id}>
-                          {institution.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                    <div className={cn('rounded-lg p-1.5', category.color)}>
+                      <category.icon className="h-4 w-4" />
+                    </div>
+                    <span className="text-sm font-medium text-[#35342f]">{category.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Fordelingsmodel</Label>
+              <SelectSheet
+                value={splitMode}
+                onValueChange={(value) => setSplitMode(value as 'equal' | 'amount' | 'percentage' | 'full_request')}
+                title="Fordelingsmodel"
+                options={[
+                  { value: 'equal', label: 'Lige fordeling' },
+                  { value: 'amount', label: 'Beløb pr. person' },
+                  { value: 'percentage', label: 'Procent pr. person' },
+                  { value: 'full_request', label: 'Anmod én person om hele beløbet' },
+                ]}
+              />
+            </div>
+
+            {splitMode === 'full_request' ? (
+              <div className="space-y-2">
+                <Label>Hele beløbet anmodes hos</Label>
+                <SelectSheet
+                  value={splitTargetUserId}
+                  onValueChange={setSplitTargetUserId}
+                  title="Hele beløbet anmodes hos"
+                  placeholder="Vælg forælder"
+                  options={parentUsers
+                    .filter((user) => user.id !== currentUser?.id)
+                    .map((user) => ({ value: user.id, label: user.name }))}
+                />
+              </div>
+            ) : null}
+
+            {(splitMode === 'amount' || splitMode === 'percentage') ? (
+              <div className="space-y-2 rounded-[8px] border border-[#dfddd6] bg-[#faf9f6] p-3">
+                {parentUsers.map((user) => (
+                  <div key={user.id} className="grid grid-cols-[1fr_120px] items-center gap-2">
+                    <p className="text-sm text-[#47443d]">{user.name}</p>
+                    <Input
+                      type="number"
+                      value={customShares[user.id] || ''}
+                      onChange={(event) => {
+                        const value = event.target.value;
+                        setCustomShares((prev) => ({ ...prev, [user.id]: value }));
+                      }}
+                      placeholder={splitMode === 'percentage' ? '%' : 'kr'}
+                    />
+                  </div>
+                ))}
+                <p className="text-xs text-[#75736b]">
+                  {splitMode === 'percentage'
+                    ? 'Procenter skal tilsammen være 100.'
+                    : 'Beløb skal tilsammen være lig totalbeløbet.'}
+                </p>
+              </div>
+            ) : null}
+
+            {newExpense.category === 'institution' && institutions.length > 0 && (
+              <div className="space-y-2">
+                <Label>Institution</Label>
+                <SelectSheet
+                  value={newExpense.institutionId}
+                  onValueChange={(value) => setNewExpense((prev) => ({ ...prev, institutionId: value }))}
+                  title="Institution"
+                  placeholder="Vælg institution"
+                  options={institutions.map((institution) => ({ value: institution.id, label: institution.name }))}
+                />
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label>Kvittering link (valgfri)</Label>
+              <Input
+                value={newExpense.receiptUrl}
+                onChange={(event) => setNewExpense((prev) => ({ ...prev, receiptUrl: event.target.value }))}
+                placeholder="https://..."
+              />
+              {shouldAutoArchiveReceipts && (
+                <p className="text-xs text-[#75736b]">
+                  Kvitteringer bliver automatisk gemt i dokumentation.
+                </p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 rounded-[8px] border border-[#dfddd6] bg-[#faf9f6] p-4">
+              <label className="flex min-h-[44px] items-center gap-3 text-base text-[#47443d]">
+                <Checkbox
+                  className="h-5 w-5"
+                  checked={newExpense.isUnexpected}
+                  onCheckedChange={(checked) => setNewExpense((prev) => ({ ...prev, isUnexpected: checked as boolean }))}
+                />
+                Uventet udgift
+              </label>
+
+              <label className="flex min-h-[44px] items-center gap-3 text-base text-[#47443d]">
+                <Checkbox
+                  className="h-5 w-5"
+                  checked={newExpense.isRecurring}
+                  onCheckedChange={(checked) => setNewExpense((prev) => ({ ...prev, isRecurring: checked as boolean }))}
+                  disabled={!canUseRecurring}
+                />
+                Fast (gentagende) udgift
+              </label>
+
+              {newExpense.isRecurring && canUseRecurring && (
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <SelectSheet
+                    value={newExpense.recurringInterval}
+                    onValueChange={(value) => setNewExpense((prev) => ({ ...prev, recurringInterval: value as 'weekly' | 'monthly' | 'yearly' }))}
+                    title="Hyppighed"
+                    options={recurringIntervals.map((option) => ({ value: option.value, label: option.label }))}
+                  />
+                  <Input
+                    type="date"
+                    value={newExpense.nextDueDate}
+                    onChange={(event) => setNewExpense((prev) => ({ ...prev, nextDueDate: event.target.value }))}
+                    placeholder="Næste betaling"
+                  />
                 </div>
               )}
 
-              <div className="space-y-2">
-                <Label>Kvittering link (valgfri)</Label>
-                <Input
-                  value={newExpense.receiptUrl}
-                  onChange={(event) => setNewExpense((prev) => ({ ...prev, receiptUrl: event.target.value }))}
-                  placeholder="https://..."
-                />
-                {shouldAutoArchiveReceipts && (
-                  <p className="text-xs text-[#75736b]">
-                    Kvitteringer bliver automatisk gemt i dokumentation.
-                  </p>
-                )}
-              </div>
-
-              <div className="grid grid-cols-1 gap-2 rounded-xl border border-[#dfddd6] bg-[#faf9f6] p-3">
-                <label className="flex items-center gap-2 text-sm text-[#47443d]">
-                  <Checkbox
-                    checked={newExpense.isUnexpected}
-                    onCheckedChange={(checked) => setNewExpense((prev) => ({ ...prev, isUnexpected: checked as boolean }))}
-                  />
-                  Uventet udgift
-                </label>
-
-                <label className="flex items-center gap-2 text-sm text-[#47443d]">
-                  <Checkbox
-                    checked={newExpense.isRecurring}
-                    onCheckedChange={(checked) => setNewExpense((prev) => ({ ...prev, isRecurring: checked as boolean }))}
-                    disabled={!canUseRecurring}
-                  />
-                  Fast (gentagende) udgift
-                </label>
-
-                {newExpense.isRecurring && canUseRecurring && (
-                  <div className="grid grid-cols-2 gap-2 pt-1">
-                    <Select
-                      value={newExpense.recurringInterval}
-                      onValueChange={(value: 'weekly' | 'monthly' | 'yearly') => setNewExpense((prev) => ({ ...prev, recurringInterval: value }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {recurringIntervals.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Input
-                      type="date"
-                      value={newExpense.nextDueDate}
-                      onChange={(event) => setNewExpense((prev) => ({ ...prev, nextDueDate: event.target.value }))}
-                      placeholder="Næste betaling"
-                    />
-                  </div>
-                )}
-
-                {newExpense.isRecurring && !canUseRecurring && (
-                  <p className="text-xs text-[#b3662f]">
-                    Faste udgifter kræver Family Plus eller Enlig Plus.
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label>Beskrivelse (valgfri)</Label>
-                <Textarea
-                  rows={3}
-                  value={newExpense.description}
-                  onChange={(event) => setNewExpense((prev) => ({ ...prev, description: event.target.value }))}
-                  placeholder="Yderligere detaljer..."
-                />
-              </div>
-
-              <Button
-                type="button"
-                className="w-full"
-                disabled={!newExpense.title || !newExpense.amount}
-                onClick={handleAddExpense}
-              >
-                Gem udgift
-              </Button>
+              {newExpense.isRecurring && !canUseRecurring && (
+                <p className="text-xs text-[#b3662f]">
+                  Faste udgifter kræver Family Plus eller Enlig Plus.
+                </p>
+              )}
             </div>
-          </DialogContent>
-        </Dialog>
-      </motion.div>
 
-      {/* Filter bar: dropdown + period + stats toggle */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15 }}
-        className="space-y-2"
-      >
-        <div className="flex items-center gap-2">
-          <div className="flex-1">
-            <Select value={activeFilter} onValueChange={setActiveFilter}>
-              <SelectTrigger className="h-10 rounded-xl border-[#d8d7cf] bg-[#f8f7f3]">
-                <div className="flex items-center gap-2">
-                  <Filter className="h-3.5 w-3.5 text-[#78766d]" />
-                  <SelectValue />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle udgifter</SelectItem>
-                <SelectItem value="pending">Afventer</SelectItem>
-                <SelectItem value="paid">Betalt</SelectItem>
-                <SelectItem value="disputed">Anfægtet</SelectItem>
-                <SelectItem value="recurring">Faste</SelectItem>
-                <SelectItem value="unexpected">Uventet</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="space-y-2">
+              <Label>Beskrivelse (valgfri)</Label>
+              <Textarea
+                rows={3}
+                value={newExpense.description}
+                onChange={(event) => setNewExpense((prev) => ({ ...prev, description: event.target.value }))}
+                placeholder="Yderligere detaljer..."
+              />
+            </div>
+
+            <Button
+              type="button"
+              className="w-full flex items-center justify-center gap-2"
+              disabled={!newExpense.title || !newExpense.amount || isSaving}
+              onClick={handleAddExpense}
+            >
+              Gem udgift
+            </Button>
           </div>
-          <Button
-            variant={showStats ? 'default' : 'outline'}
-            size="icon"
-            className="h-10 w-10 shrink-0 rounded-xl border-[#d8d7cf]"
-            onClick={() => setShowStats(!showStats)}
-          >
-            <BarChart3 className="h-4 w-4" />
-          </Button>
         </div>
 
-        {/* Period selector */}
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setPeriodYear(y => y - 1)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#d8d7cf] bg-[#f8f7f3] text-[#5f5d56] hover:bg-[#efeee9]"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => { setPeriodMonth(null); }}
-            className={cn(
-              'h-8 rounded-lg border px-3 text-sm font-semibold transition-colors',
-              periodMonth === null
-                ? 'border-[#f3c59d] bg-[#fff2e6] text-[#b96424]'
-                : 'border-[#d8d7cf] bg-[#f8f7f3] text-[#4a4945] hover:bg-[#efeee9]'
-            )}
-          >
-            {periodYear}
-          </button>
-          <div className="flex flex-1 gap-1 overflow-x-auto scrollbar-hide">
-            {danishMonths.map((m, i) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => setPeriodMonth(periodMonth === i ? null : i)}
-                className={cn(
-                  'shrink-0 rounded-lg px-2 py-1 text-xs font-medium transition-colors',
-                  periodMonth === i
-                    ? 'bg-[#f58a2d] text-white'
-                    : 'text-[#78766d] hover:bg-[#ecebe5]'
-                )}
-              >
-                {m}
-              </button>
-            ))}
-          </div>
-          <button
-            type="button"
-            onClick={() => setPeriodYear(y => y + 1)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#d8d7cf] bg-[#f8f7f3] text-[#5f5d56] hover:bg-[#efeee9]"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        </div>
+        <SavingOverlay open={isSaving} />
+      </div>
+    );
+  }
 
-        {/* Period summary */}
-        <div className="flex items-center justify-between rounded-xl border border-[#e8e7e0] bg-white px-4 py-2.5">
-          <span className="text-sm text-[#78766d]">
-            {periodMonth !== null ? `${danishMonthsFull[periodMonth]} ${periodYear}` : `Hele ${periodYear}`}
-          </span>
-          <span className="text-sm font-semibold text-[#2f2f2d]">
+  // ─── Default: Expenses list page ───
+  return (
+    <div className="relative">
+      <ExpensesSidePanel />
+      {/* Red background extending behind header/status bar */}
+      <div
+        className="absolute inset-x-0 rounded-b-3xl bg-[#e53935] -mx-3 sm:-mx-4"
+        style={{
+          top: 'calc(-1 * (env(safe-area-inset-top, 0px) + 74px))',
+          height: 'calc(env(safe-area-inset-top, 0px) + 74px + 180px)',
+        }}
+      />
+
+      <div className="relative z-[1] space-y-1.5" style={{ minHeight: '180px', paddingBottom: '2px' }}>
+        <div className="text-center pt-1 pb-6">
+          <p className="text-3xl font-bold text-white mt-1">
             {formatCurrency(filteredExpenses.reduce((s, e) => s + e.amount, 0))}
-          </span>
+          </p>
         </div>
-      </motion.div>
+
+        <Button variant="outline" className="w-full border-[#d8d7cf] bg-white" onClick={() => setShowAddExpenseForm(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Tilføj udgift
+        </Button>
+      </div>
+
+      {/* Period selector - below the red field */}
+      <div className="relative z-[1] pt-[2px]">
+      <div className="flex items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => setPeriodYear(y => y - 1)}
+          className="flex h-9 w-9 shrink-0 items-center justify-center text-[#5f5d56] hover:text-[#2f2f2d] transition-colors"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+        <button
+          type="button"
+          onClick={() => { setPeriodMonth(null); }}
+          className={cn(
+            'h-9 shrink-0 px-2.5 text-sm font-semibold transition-colors rounded-[8px]',
+            periodMonth === null
+              ? 'text-[#b96424] bg-[#fff2e6]'
+              : 'text-[#4a4945] hover:text-[#2f2f2d]'
+          )}
+        >
+          {periodYear}
+        </button>
+        <div className="flex flex-1 gap-1 overflow-x-auto scrollbar-hide">
+          {danishMonths.map((m, i) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => setPeriodMonth(periodMonth === i ? null : i)}
+              className={cn(
+                'shrink-0 rounded-[8px] px-2.5 py-1.5 text-sm font-medium transition-colors',
+                periodMonth === i
+                  ? 'bg-[#f58a2d] text-white'
+                  : 'text-[#78766d] hover:bg-[#ecebe5]'
+              )}
+            >
+              {m}
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowStats(!showStats)}
+          className={cn(
+            'flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] transition-colors',
+            showStats ? 'text-[#f58a2d]' : 'text-[#78766d] hover:text-[#2f2f2d]'
+          )}
+        >
+          <BarChart3 className="h-5 w-5" />
+        </button>
+        <button
+          type="button"
+          onClick={() => setPeriodYear(y => y + 1)}
+          className="flex h-9 w-9 shrink-0 items-center justify-center text-[#5f5d56] hover:text-[#2f2f2d] transition-colors"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
+      </div>
+
+      {/* Period total */}
+      <div className="flex items-center justify-between px-1 py-1">
+        <span className="text-sm text-[#78766d]">
+          {periodMonth !== null ? `${danishMonthsFull[periodMonth]} ${periodYear}` : `Hele ${periodYear}`}
+        </span>
+        <span className="text-sm font-semibold text-[#2f2f2d]">
+          {formatCurrency(filteredExpenses.reduce((s, e) => s + e.amount, 0))}
+        </span>
+      </div>
 
       {/* Stats view */}
       {showStats && (
@@ -1094,7 +1699,7 @@ export function Expenses() {
             </div>
           ) : (
             <>
-              <div className="rounded-2xl border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+              <div className="rounded-[8px] border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
                 <p className="mb-3 text-[0.95rem] font-semibold tracking-[-0.01em] text-[#2f2f2d]">Månedlig udgift (6 mdr.)</p>
                 <ResponsiveContainer width="100%" height={180}>
                   <BarChart data={monthlyStats} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
@@ -1113,7 +1718,7 @@ export function Expenses() {
                 </ResponsiveContainer>
               </div>
 
-              <div className="rounded-2xl border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+              <div className="rounded-[8px] border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
                 <p className="mb-3 text-[0.95rem] font-semibold tracking-[-0.01em] text-[#2f2f2d]">Udgifter pr. kategori</p>
                 {categoryStats.length === 0 ? (
                   <p className="text-sm text-[#78766d]">Ingen kategoriserede udgifter</p>
@@ -1138,7 +1743,7 @@ export function Expenses() {
                 )}
               </div>
 
-              <div className="rounded-2xl border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+              <div className="rounded-[8px] border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
                 <p className="mb-3 text-[0.95rem] font-semibold tracking-[-0.01em] text-[#2f2f2d]">Betalt pr. forælder</p>
                 <div className="space-y-2">
                   {parentUsers.map(u => {
@@ -1267,7 +1872,7 @@ export function Expenses() {
                 const toUser = users.find((user) => user.id === transfer.toUserId);
 
                 return (
-                  <div key={transfer.id} className="rounded-xl border border-[#e0ded7] bg-[#faf9f6] p-2.5">
+                  <div key={transfer.id} className="rounded-[8px] border border-[#e0ded7] bg-[#faf9f6] p-2.5">
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-sm font-medium text-[#2f2f2d]">
                         {fromUser?.name} → {toUser?.name}
@@ -1301,7 +1906,7 @@ export function Expenses() {
         >
           <Button
             variant="outline"
-            className="flex-1 h-11 rounded-2xl border-[#d8d7cf] bg-[#f8f7f3] text-sm font-medium text-[#4a4945] hover:bg-[#efeee9]"
+            className="flex-1 h-11 rounded-[8px] border-[#d8d7cf] bg-[#f8f7f3] text-sm font-medium text-[#4a4945] hover:bg-[#efeee9]"
             onClick={() => exportExpensesCSV(filteredExpenses, users)}
           >
             <Download className="mr-2 h-4 w-4" />
@@ -1309,7 +1914,7 @@ export function Expenses() {
           </Button>
           <Button
             variant="outline"
-            className="flex-1 h-11 rounded-2xl border-[#d8d7cf] bg-[#f8f7f3] text-sm font-medium text-[#4a4945] hover:bg-[#efeee9]"
+            className="flex-1 h-11 rounded-[8px] border-[#d8d7cf] bg-[#f8f7f3] text-sm font-medium text-[#4a4945] hover:bg-[#efeee9]"
             onClick={() => printExpenses(filteredExpenses, users)}
           >
             <Printer className="mr-2 h-4 w-4" />
@@ -1364,7 +1969,7 @@ export function Expenses() {
                   )}
 
                   {/* Payment info */}
-                  <div className="rounded-2xl border border-[#e8e7e0] bg-white p-4 space-y-2">
+                  <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-4 space-y-2">
                     <p className="text-xs font-semibold uppercase tracking-wide text-[#9b9a93]">Betalingsdetaljer</p>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-[#78766d]">Betalt af</span>
@@ -1399,7 +2004,7 @@ export function Expenses() {
                   </div>
 
                   {/* Split breakdown */}
-                  <div className="rounded-2xl border border-[#e8e7e0] bg-white p-4 space-y-2">
+                  <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-4 space-y-2">
                     <p className="text-xs font-semibold uppercase tracking-wide text-[#9b9a93]">Fordeling</p>
                     {Object.entries(detailExpense.splitAmounts).map(([userId, amount]) => {
                       const user = users.find(u => u.id === userId);
@@ -1424,7 +2029,7 @@ export function Expenses() {
 
                   {/* Linked transfer info */}
                   {linkedTransfer && (
-                    <div className="rounded-2xl border border-[#e8e7e0] bg-white p-4 space-y-2">
+                    <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-4 space-y-2">
                       <p className="text-xs font-semibold uppercase tracking-wide text-[#9b9a93]">Betalingsstatus</p>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-[#78766d]">Status</span>
@@ -1446,7 +2051,7 @@ export function Expenses() {
                       href={detailExpense.receiptUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="block rounded-2xl border border-[#e8e7e0] bg-white p-3 text-center text-sm font-medium text-[#b96424]"
+                      className="block rounded-[8px] border border-[#e8e7e0] bg-white p-3 text-center text-sm font-medium text-[#b96424]"
                     >
                       Åbn kvittering
                     </a>
@@ -1542,6 +2147,9 @@ export function Expenses() {
           </div>
         </DialogContent>
       </Dialog>
+      </div>
+
+      <SavingOverlay open={isSaving} />
     </div>
   );
 }

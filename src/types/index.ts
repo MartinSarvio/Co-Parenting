@@ -18,6 +18,14 @@ export interface User {
   address?: Address;
   familyMemberRole?: FamilyMemberRole;
   invitedBy?: string;
+  municipality?: string; // Kommune-tilhørsforhold (professionelle)
+  allergies?: string[];
+  profileVisibility?: {
+    showEmail?: boolean;
+    showPhone?: boolean;
+    showAddress?: boolean;
+    bio?: string;
+  };
 }
 
 export interface Address {
@@ -78,9 +86,33 @@ export interface Household {
   assignedProfessionals?: string[]; // IDs of professionals with access
   caseNumber?: string; // Official case number from authorities
   institutions?: string[];
+  sharedMeals?: boolean; // Co-parent opt-in for delt madplan
 }
 
 export type HouseholdMode = 'co_parenting' | 'together' | 'blended' | 'single_parent';
+
+export interface NutritionGoals {
+  kcal: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  fiber: number;
+  water: number;
+}
+
+export interface CustomMealDef {
+  key: string;
+  emoji: string;
+  label: string;
+  color: string;
+}
+
+export interface MemberDisplayPrefs {
+  numberFormat: 'decimal' | 'fraction';
+  displayFormat: 'absolute' | 'percent';
+  macroDisplayMode: 'gram' | 'percent';
+  customMeals: CustomMealDef[];
+}
 
 export type SubscriptionPlan = 'free' | 'family_plus' | 'single_parent_plus';
 export type BillingModel = 'shared' | 'separate';
@@ -201,7 +233,7 @@ export interface CustomWeekConfig {
   // 0=Monday, 6=Sunday
   handoverDays: number[];
   handoverTime: string;
-  handoverContext: 'after_daycare' | 'specific_time';
+  handoverContext: 'after_daycare' | 'specific_time' | 'public_place' | 'specific_days';
   // Weekday -> parentId for even/odd week numbers
   evenWeekAssignments: string[];
   oddWeekAssignments: string[];
@@ -232,6 +264,7 @@ export interface HolidayArrangement {
   endDate: string;
   parentId: string;
   description?: string;
+  alternateYears?: boolean;
 }
 
 export interface SpecialDay {
@@ -400,7 +433,7 @@ export interface Task {
   recurringPattern?: string;
   plannedWeekday?: number; // 0=Monday, 6=Sunday
   area?: string;
-  createdAt?: string;
+  participants?: string[]; // user IDs for together-mode multi-assignment
 }
 
 // Shopping list types
@@ -429,6 +462,15 @@ export interface ShoppingItem {
     salt?: number;
   };
   allergens?: string[];
+  listId?: string;  // references ShoppingList.id
+}
+
+export interface ShoppingList {
+  id: string;
+  name: string;
+  scheduledDate?: string; // YYYY-MM-DD — hvornår indkøbet skal foretages
+  createdAt: string;
+  createdBy: string;
 }
 
 // Meal planning types
@@ -454,20 +496,19 @@ export interface MealPlan {
   };
 }
 
-// Per-member override of a shared meal plan suggestion
+// Meal plan override (calorie diary tracking)
 export interface MealPlanOverride {
   id: string;
-  mealPlanId: string;         // references MealPlan.id
-  memberId: string;           // which household member this override belongs to
-  date: string;               // YYYY-MM-DD
+  mealPlanId: string;
+  memberId: string;
+  date: string;
   action: 'accepted' | 'rejected' | 'replaced';
-  // If action === 'replaced', these hold the replacement food logged instead
   replacementFood?: string;
   replacementKcal?: number;
   replacementProtein?: number;
   replacementCarbs?: number;
   replacementFat?: number;
-  replacedAt: string;         // ISO datetime
+  replacedAt: string;
 }
 
 // Message types
@@ -571,7 +612,8 @@ export type NotificationType =
   | 'document_shared'
   | 'meal_plan'
   | 'shopping_reminder'
-  | 'cleaning_reminder';
+  | 'cleaning_reminder'
+  | 'group_request_approved';
 
 export interface Notification {
   id: string;
@@ -583,6 +625,34 @@ export interface Notification {
   createdAt: string;
   relatedId?: string;
   relatedType?: string;
+}
+
+export interface NotificationPreferences {
+  // Samvær & Afleveringer
+  handoverReminders: boolean;
+  handoverReminderMinutes: number;
+  scheduleChanges: boolean;
+  // Kalender & Datoer
+  eventReminders: boolean;
+  importantDates: boolean;
+  // Opgaver
+  taskAssigned: boolean;
+  taskDeadline: boolean;
+  // Økonomi
+  expensePending: boolean;
+  expenseUpdates: boolean;
+  // Beskeder
+  newMessages: boolean;
+  professionalMessages: boolean;
+  // Hjem & Mad
+  mealPlanReminder: boolean;
+  shoppingReminder: boolean;
+  cleaningReminder: boolean;
+  // Dokumenter & Beslutninger
+  documentShared: boolean;
+  decisionProposed: boolean;
+  // Dagbog & Trivsel
+  diaryReminder: boolean;
 }
 
 // Photo album types
@@ -642,6 +712,48 @@ export interface DecisionLog {
   createdAt: string;
 }
 
+// ── Routine types ──────────────────────────────────────────
+export type RoutineCategory = 'morgen' | 'dag' | 'aften';
+export type RoutineItemType = 'meal' | 'diaper' | 'nap' | 'activity' | 'custom';
+
+/** A template item configured once during setup */
+export interface RoutineItem {
+  id: string;
+  childId: string;
+  category: RoutineCategory;
+  type: RoutineItemType;
+  label: string;
+  emoji: string;
+  order: number;
+  mealKey?: string;
+  isActive: boolean;
+  createdBy: string;
+  createdAt: string;
+}
+
+/** A daily check-off entry */
+export interface RoutineLog {
+  id: string;
+  routineItemId: string;
+  childId: string;
+  date: string; // YYYY-MM-DD
+  completed: boolean;
+  completedAt?: string;
+  completedBy?: string;
+  time?: string; // HH:mm
+  note?: string;
+  linkedFoodLogId?: string;
+}
+
+/** Notification schedule config per child */
+export interface RoutineNotificationConfig {
+  childId: string;
+  morgenTime?: string;
+  dagTime?: string;
+  aftenTime?: string;
+  enabled: boolean;
+}
+
 // Calendar event template
 export interface EventTemplate {
   id: string;
@@ -688,6 +800,19 @@ export interface FridgeItem {
   allergens?: string[];
 }
 
+// Fridge history (tracking used/thrown away items)
+export interface FridgeHistoryEntry {
+  id: string;
+  itemName: string;
+  reason: 'used' | 'thrown_away';
+  removedAt: string;
+  removedBy: string;
+  addedAt: string;
+  expiresAt?: string;
+  nutritionPer100g?: FridgeItem['nutritionPer100g'];
+  category?: string;
+}
+
 // Recipe system
 export type RecipeUnit = 'g' | 'kg' | 'ml' | 'dl' | 'l' | 'stk' | 'spsk' | 'tsk' | 'knivspids';
 
@@ -729,6 +854,176 @@ export interface Recipe {
   createdBy?: string; // user id
   isUserRecipe?: boolean;
   isShared?: boolean; // shared with all household members
+}
+
+// Budget
+export interface BudgetGoal {
+  category: string;
+  monthlyAmount: number;
+}
+
+// Wish list
+export interface WishItem {
+  id: string;
+  title: string;
+  priceEstimate?: number;
+  link?: string;
+  imageUrl?: string;
+  description?: string;
+  childId: string;
+  addedBy: string;
+  status: 'wanted' | 'bought';
+  boughtBy?: string;
+  createdAt: string;
+}
+
+// Permission types
+export type SharePermissionLevel = 'none' | 'busy_only' | 'titles_only' | 'full';
+
+export interface FamilyPermissions {
+  canShareCalendar: boolean;
+  canLinkCoParent: boolean;
+  canRequestSwap: boolean;
+  canSeePartnerEvents: boolean;
+  calendarSharingDefault: SharePermissionLevel;
+  requiresLinkingForSharing: boolean;
+  maxShareTargets: number; // 0=ingen, 1=co-parent, -1=ubegrænset
+}
+
+// Co-parent linking types
+export interface InviteCode {
+  id: string;
+  code: string;
+  createdBy: string;
+  householdId: string;
+  expiresAt: string;
+  usedBy?: string;
+  usedAt?: string;
+  status: 'pending' | 'used' | 'expired';
+}
+
+export interface CoParentLink {
+  id: string;
+  householdId: string;
+  user1Id: string;
+  user2Id: string;
+  linkedAt: string;
+  status: 'active' | 'revoked';
+  inviteCodeId: string;
+}
+
+// Calendar sharing grant types
+export interface ShareGrant {
+  id: string;
+  grantorId: string;
+  granteeId: string;
+  householdId: string;
+  createdAt: string;
+  status: 'pending' | 'active' | 'revoked';
+}
+
+export interface SharePermission {
+  id: string;
+  shareGrantId: string;
+  calendarSourceId: string | null; // null = hovedkalender
+  level: SharePermissionLevel;
+}
+
+export interface ChildMembership {
+  id: string;
+  childId: string;
+  userId: string;
+  role: 'parent' | 'step_parent' | 'guardian';
+  householdId: string;
+  linkedAt: string;
+  status: 'pending' | 'active';
+}
+
+// Dashboard quick action type
+export interface QuickAction {
+  id: string;
+  label: string;
+  icon: string;
+  tab: string;
+  accent: boolean;
+  order: number;
+}
+
+// ── Professional case types ──────────────────────────────────
+export type CaseStatus = 'active' | 'closed' | 'paused';
+export type CasePriority = 'normal' | 'high' | 'urgent';
+export type RiskLevel = 'low' | 'medium' | 'high';
+
+export interface ProfessionalCase {
+  id: string;
+  caseNumber: string;
+  departmentId: string;
+  municipality: string;
+  familyName: string;
+  parents: string[];
+  childName: string;
+  childAge: number;
+  status: CaseStatus;
+  priority: CasePriority;
+  riskLevel: RiskLevel;
+  lastContact: string;
+  nextMeeting: string;
+  unreadMessages: number;
+  pendingApprovals: number;
+  notes: string;
+  assignedTo: string;
+  householdId?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ── Risk assessment types ────────────────────────────────────
+export type RiskAssessmentStatus = 'draft' | 'sent' | 'archived';
+
+export interface RiskFactor {
+  category: string;
+  description: string;
+  severity: RiskLevel;
+}
+
+export interface RiskAssessment {
+  id: string;
+  caseId: string;
+  assessorId: string;
+  assessmentDate: string;
+  riskLevel: RiskLevel;
+  riskFactors: RiskFactor[];
+  protectiveFactors: string;
+  summary: string;
+  recommendations: string;
+  status: RiskAssessmentStatus;
+  sentTo: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ── Department types ─────────────────────────────────────────
+export interface ProfessionalDepartment {
+  id: string;
+  municipality: string;
+  departmentCode: string;
+  departmentName: string;
+  region: string;
+}
+
+// ── Activity log types ───────────────────────────────────────
+export type ActivityType = 'meeting' | 'note' | 'message' | 'document' | 'assessment' | 'status_change';
+
+export interface CaseActivity {
+  id: string;
+  caseId: string;
+  type: ActivityType;
+  title: string;
+  description: string;
+  relatedId?: string;
+  relatedType?: string;
+  createdBy: string;
+  createdAt: string;
 }
 
 // App state

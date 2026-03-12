@@ -1,4 +1,5 @@
 import path from "path"
+import { resolve } from "path"
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 import { inspectAttr } from 'kimi-plugin-inspect-react'
@@ -36,9 +37,9 @@ export default defineConfig({
         ],
       },
       manifest: {
-        name: 'Familiekoordinering',
-        short_name: 'Hverdag',
-        description: 'Koordiner hverdagen med co-parenting og familieplanægning',
+        name: 'Huska',
+        short_name: 'Huska',
+        description: 'Huska — husk alt det vigtige i familien',
         theme_color: '#f2f1ed',
         background_color: '#f2f1ed',
         display: 'standalone',
@@ -73,12 +74,19 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
+      input: {
+        app: resolve(__dirname, 'index.html'),
+        web: resolve(__dirname, 'web.html'),
+      },
       output: {
         manualChunks(id) {
           if (!id.includes('node_modules')) return undefined;
           if (/node_modules\/(react|react-dom|scheduler)\//.test(id)) return 'react-vendor';
           if (id.includes('date-fns')) return 'date-vendor';
           if (id.includes('recharts') || id.includes('d3-')) return 'charts-vendor';
+          if (id.includes('@supabase')) return 'supabase-vendor';
+          if (id.includes('framer-motion')) return 'motion-vendor';
+          if (id.includes('@radix-ui')) return 'radix-vendor';
           return 'vendor';
         }
       }

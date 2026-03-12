@@ -1,17 +1,20 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { addDays, format, isToday, isTomorrow, parseISO, setDay, startOfToday } from 'date-fns';
 import { da } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
+import { BottomSheet } from '@/components/custom/BottomSheet';
+import { ConfirmCloseDialog } from '@/components/custom/ConfirmCloseDialog';
+import { SavingOverlay } from '@/components/custom/SavingOverlay';
+import { KaloriedagbogView } from './KaloriedagbogView';
+import { KoleskabView } from './KoleskabView';
 import {
   Baby,
-  Bell,
-  Camera,
+  Calendar,
   CalendarDays,
   CheckCircle2,
   Home,
   Lightbulb,
   Loader2,
-  PackageSearch,
   Plus,
   RefreshCw,
   Repeat2,
@@ -22,6 +25,7 @@ import {
   UtensilsCrossed,
   BookOpen,
   ChefHat,
+  ChevronDown,
   ChevronRight,
   Clock,
   Flame,
@@ -37,29 +41,41 @@ import {
   Coffee,
   Beef,
   CakeSlice,
-  Leaf,
   LayoutGrid,
+  Package,
+  X,
+  Globe,
+  Play,
   type LucideIcon,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAppStore } from '@/store';
 import { useApiActions } from '@/hooks/useApiActions';
-import { getPlanFeatures } from '@/lib/subscription';
 import { cn, getMealTypeLabel } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 // Tabs replaced by underline-style tabs
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SelectSheet } from '@/components/custom/SelectSheet';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { shoppingItemId, notificationId } from '@/lib/id';
+import { notificationId } from '@/lib/id';
 import { recipes, recipeCategories } from '@/data/recipes';
-import type { Recipe } from '@/types';
+import { getRecipeVideoUrl } from '@/data/recipeVideos';
+import { MadOgHjemSidePanel } from '@/components/custom/MadOgHjemSidePanel';
+import { startBarcodeScanner, fetchFromOpenFoodFacts, searchProducts, type OFFResult } from '@/lib/openFoodFacts';
+import type { ProductCardData } from '@/components/custom/ProductCard';
+import { scrapeRecipe } from '@/lib/recipeScraper';
+import type { Recipe, MealType, ShoppingItem } from '@/types';
+import { FOOD_ITEMS } from '@/data/foodItems';
+import { useNutriScoreMap, matchNutriScore } from '@/hooks/useNutriScoreMap';
+import { useAllergenMap, matchAllergens } from '@/hooks/useAllergenMap';
+import { matchFamilyAllergens } from '@/lib/allergenMatch';
+import { NutriScoreBadge } from '@/components/custom/NutriScoreBadge';
+import { AlertTriangle } from 'lucide-react';
 
 // Category → Lucide icon map for recipe browser
 const recipeCategoryIcons: Record<string, LucideIcon> = {
@@ -207,53 +223,15 @@ const autoMealCandidates: AutoMealCandidate[] = [
   { title: 'Wok med nudler og grønt', ingredients: ['Nudler', 'Grøntsager', 'Soja'], instructions: 'Wok grønt hurtigt og vend med nudler.', childFriendly: true }
 ];
 
-const barcodeProductHints: Record<string, string> = {
-  '5701090083754': 'Mælk',
-  '5701090332746': 'Smør',
-  '5701090731013': 'Yoghurt',
-  '5701090741043': 'Rugbrød',
-  '5701090749001': 'Havregryn'
-};
 
-interface BarcodeDetectorResultItem {
-  rawValue?: string;
-}
-
-interface BarcodeDetectorLike {
-  detect: (source: ImageBitmapSource) => Promise<BarcodeDetectorResultItem[]>;
-}
-
-interface BarcodeDetectorConstructor {
-  new (options?: { formats?: string[] }): BarcodeDetectorLike;
-}
-
-type WindowWithBarcodeDetector = Window & {
-  BarcodeDetector?: BarcodeDetectorConstructor;
-};
-
-type OpenFoodFactsProduct = {
-  barcode: string;
-  name: string;
-  ingredientsText?: string;
-  allergens: string[];
-  nutritionPer100g?: {
-    energyKcal?: number;
-    protein?: number;
-    carbs?: number;
-    fat?: number;
-    fiber?: number;
-    sugar?: number;
-    salt?: number;
-  };
-};
-
+/* Cleaning templates — reserved for future cleaning tab UI
 const cleaningTemplates = [
   { title: 'Støvsug fællesrum', area: 'Stue', weekday: 5, recurringPattern: 'weekly' },
   { title: 'Tør støv af overflader', area: 'Hele hjemmet', weekday: 2, recurringPattern: 'weekly' },
   { title: 'Vask bad og toilet', area: 'Badeværelse', weekday: 6, recurringPattern: 'weekly' }
 ];
-
 const weekdays = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag'];
+*/
 
 const todayString = format(new Date(), 'yyyy-MM-dd');
 
@@ -267,6 +245,7 @@ function sortMealType(a: string, b: string): number {
   return (order[a] ?? 99) - (order[b] ?? 99);
 }
 
+/* Reserved for future cleaning tab UI
 function getRecurringLabel(pattern?: string): string {
   const labels: Record<string, string> = {
     weekly: 'Hver uge',
@@ -275,6 +254,7 @@ function getRecurringLabel(pattern?: string): string {
   };
   return labels[pattern || ''] || 'Efter behov';
 }
+*/
 
 function normalizeLegacyAiText(value?: string): string | undefined {
   if (!value) return value;
@@ -540,32 +520,63 @@ export function MadOgHjem() {
     household,
     mealPlans,
     shoppingItems,
+    shoppingLists,
     tasks,
-    events,
     notifications,
-    addShoppingItem,
-    updateShoppingItem,
-    deleteShoppingItem,
     addNotification,
     userRecipes,
-    addUserRecipe,
-    setActiveTab: setAppTab
+    memberNutritionGoals,
+    activeShoppingListId,
+    setActiveShoppingListId,
   } = useAppStore();
   const {
     createEvent,
     createTask,
-    updateTask,
-    deleteTask,
     createMealPlan,
     updateMealPlan,
     deleteMealPlan,
+    createShoppingItem,
+    deleteShoppingItem: apiDeleteShoppingItem,
+    updateShoppingItem: apiUpdateShoppingItem,
+    createShoppingList,
+    deleteShoppingList,
+    createUserRecipe,
   } = useApiActions();
 
+  const nutriScoreMap = useNutriScoreMap();
+  const allergenMap = useAllergenMap();
+  const familyAllergenProfiles = useMemo(() => {
+    const profiles: { name: string; allergens: string[] }[] = [];
+    for (const child of children) {
+      if (child.allergies?.length) profiles.push({ name: child.name, allergens: child.allergies });
+    }
+    for (const user of users) {
+      if (user.allergies?.length) profiles.push({ name: user.name, allergens: user.allergies });
+    }
+    return profiles;
+  }, [children, users]);
+
   const [activeTab, setActiveTab] = useState('meal-plan');
+  const [kaloriedagbogOpen, setKaloriedagbogOpen] = useState(false);
   const [isAddMealOpen, setIsAddMealOpen] = useState(false);
   const [isAddShoppingOpen, setIsAddShoppingOpen] = useState(false);
-  const [isAddCleaningOpen, setIsAddCleaningOpen] = useState(false);
-  const [shoppingFilterDate, setShoppingFilterDate] = useState('all');
+  const [createListOpen, setCreateListOpen] = useState(false);
+  const [showAllLists, setShowAllLists] = useState(false);
+  const [isAddTemplateOpen, setIsAddTemplateOpen] = useState(false);
+  const [newTemplateName, setNewTemplateName] = useState('');
+  const [newTemplateMeals, setNewTemplateMeals] = useState<Record<string, string>>({});
+  const [isAddQuickSetupOpen, setIsAddQuickSetupOpen] = useState(false);
+  const [newQuickSetup, setNewQuickSetup] = useState({ title: '', description: '' });
+  const [newListName, setNewListName] = useState('Indkøbsliste');
+  const [newListDate, setNewListDate] = useState('');
+  const [detailItem, setDetailItem] = useState<ShoppingItem | null>(null);
+  const [detailNutrition, setDetailNutrition] = useState<ShoppingItem['nutritionPer100g'] | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [productQuery, setProductQuery] = useState('');
+  const [productResults, setProductResults] = useState<ProductCardData[]>([]);
+  const [isProductSearching, setIsProductSearching] = useState(false);
+  const searchCache = useRef<Record<string, ProductCardData[]>>({});
+  const searchAbort = useRef<AbortController | null>(null);
   const [newMeal, setNewMeal] = useState({
     date: todayString,
     mealType: 'dinner',
@@ -582,13 +593,6 @@ export function MadOgHjem() {
     priority: 'normal',
     neededForMealId: 'none'
   });
-  const [newCleaning, setNewCleaning] = useState({
-    title: '',
-    area: '',
-    assignedTo: currentUser?.id || users[0]?.id || '',
-    weekday: '5',
-    recurringPattern: 'weekly'
-  });
   const [autoPlannerSettings, setAutoPlannerSettings] = useState({
     childFriendly: true,
     replaceExisting: true,
@@ -597,299 +601,195 @@ export function MadOgHjem() {
     useChildAllergies: true
   });
   const [liveSyncEnabled] = useState(true);
-  const [isScanDialogOpen, setIsScanDialogOpen] = useState(false);
-  const [isScanning, setIsScanning] = useState(false);
-  const [scanSupported, setScanSupported] = useState(false);
-  const [scannedCode, setScannedCode] = useState('');
-  const [scannedName, setScannedName] = useState('');
-  const [scannedQuantity, setScannedQuantity] = useState('');
-  const [scanError, setScanError] = useState('');
-  const [isProductLookupLoading, setIsProductLookupLoading] = useState(false);
-  const [scannedProduct, setScannedProduct] = useState<OpenFoodFactsProduct | null>(null);
-  const [fridgeItems, setFridgeItems] = useState<OpenFoodFactsProduct[]>([]);
-  const [fridgeQuickInput, setFridgeQuickInput] = useState('');
   const [selectedMealGuideId, setSelectedMealGuideId] = useState<string | null>(null);
   const [guideCompletedSteps, setGuideCompletedSteps] = useState<Set<number>>(new Set());
+  const [mealGuideVideoPlaying, setMealGuideVideoPlaying] = useState(false);
   // Recipe browser
   const [recipeBrowserOpen, setRecipeBrowserOpen] = useState(false);
   const [recipeCategory, setRecipeCategory] = useState('Alle');
   const [recipeSearch, setRecipeSearch] = useState('');
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [recipeServings, setRecipeServings] = useState(4);
+  const [servingsInput, setServingsInput] = useState('4');
+  const [nutritionUnit, setNutritionUnit] = useState<'portion' | '100g' | '1g' | 'total'>('portion');
+  const [activeStepIndex, setActiveStepIndex] = useState(0);
+  const [videoPlaying, setVideoPlaying] = useState(false);
   // Recipe creation
   const [createRecipeOpen, setCreateRecipeOpen] = useState(false);
   const [newRecipe, setNewRecipe] = useState({
     name: '', description: '', category: 'Aftensmad', servings: 4,
     prepTime: 15, cookTime: 30, difficulty: 'easy' as 'easy' | 'medium' | 'hard',
-    ingredientsText: '', stepsText: '', tags: '', childFriendly: true, shareWithFamily: true,
+    ingredientsText: '', stepsText: '', tags: [] as string[], childFriendly: true, shareWithFamily: true,
   });
-  // Shopping sub-tabs
-  const [shoppingSubTab, setShoppingSubTab] = useState<'koleskab' | 'indkobsliste'>('indkobsliste');
-
+  const [recipeCategorySheetOpen, setRecipeCategorySheetOpen] = useState(false);
+  const [recipeDifficultySheetOpen, setRecipeDifficultySheetOpen] = useState(false);
+  const [tagInput, setTagInput] = useState('');
+  const [scrapeUrl, setScrapeUrl] = useState('');
+  const [scrapeLoading, setScrapeLoading] = useState(false);
+  const [recipeHeaderVisible, setRecipeHeaderVisible] = useState(true);
+  const recipeLastScrollY = useRef(0);
+  // Madplan from recipe detail
+  const [mealPlanDate, setMealPlanDate] = useState(todayString);
+  const [datePickerOpen, setDatePickerOpen] = useState(false);
+  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [addingToMealPlan, setAddingToMealPlan] = useState(false);
+  const [selectedMealType, setSelectedMealType] = useState<MealType>('dinner');
+  const [isSaving, setIsSaving] = useState(false);
+  const [confirmClose, setConfirmClose] = useState(false);
   // Kaloriedagbog state
-  const [dagbogView, setDagbogView] = useState<'self' | 'family'>('self');
   const [dagbogSelectedChild, setDagbogSelectedChild] = useState<string | null>(null);
   const [dagbogDate, setDagbogDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [foodLog, setFoodLog] = useState<FoodLogEntry[]>([]);
-  const [dailyCalorieGoal] = useState(2000);
+  const dailyCalorieGoal = memberNutritionGoals[currentUser?.id ?? '']?.kcal || 2000;
   const [isAddFoodOpen, setIsAddFoodOpen] = useState(false);
   const [addFoodMeal, setAddFoodMeal] = useState('morgenmad');
   const [newFoodEntry, setNewFoodEntry] = useState({ food: '', kcal: '', protein: '', carbs: '', fat: '' });
+  const [shopScanLoading, setShopScanLoading] = useState(false);
+  const [scannedProduct, setScannedProduct] = useState<OFFResult | null>(null);
+  const [scannedBarcode, setScannedBarcode] = useState<string | null>(null);
 
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  const scannerStreamRef = useRef<MediaStream | null>(null);
-  const scannerRafRef = useRef<number | null>(null);
+  // Sync servingsInput string when recipeServings changes from +/- buttons or unit switch
+  useEffect(() => { setServingsInput(String(recipeServings)); }, [recipeServings]);
+
+  // Auto-select first shopping list (only if user hasn't explicitly opened "Alle lister")
+  useEffect(() => {
+    if (!activeShoppingListId && shoppingLists.length > 0 && !showAllLists) {
+      setActiveShoppingListId(shoppingLists[0].id);
+    }
+  }, [shoppingLists, activeShoppingListId, showAllLists]);
+
+  // Sync local activeTab to store so TopBar can read it
+  useEffect(() => {
+    useAppStore.getState().setMadSubTab(activeTab);
+    return () => { useAppStore.getState().setMadSubTab(null); };
+  }, [activeTab]);
+
+  // Product search: FOOD_ITEMS first (instant), then OpenFoodFacts API (debounced)
+  useEffect(() => {
+    const q = productQuery.trim().toLowerCase();
+    if (!q) {
+      setProductResults([]);
+      setIsProductSearching(false);
+      return;
+    }
+    // 1. Instant local FOOD_ITEMS search
+    const localMatches: ProductCardData[] = FOOD_ITEMS
+      .filter(f => f.name.toLowerCase().includes(q) || (f.brand?.toLowerCase().includes(q) ?? false))
+      .slice(0, 12)
+      .map(f => ({
+        id: f.id,
+        name: f.name,
+        brand: f.brand,
+        category: f.category,
+        nutritionPer100g: {
+          energyKcal: f.kcalPer100g,
+          protein: f.proteinPer100g,
+          carbs: f.carbsPer100g,
+          fat: f.fatPer100g,
+          fiber: f.fiberPer100g,
+          sugar: f.sugarPer100g,
+          salt: f.saltPer100g,
+        },
+      }));
+    if (localMatches.length > 0) {
+      setProductResults(localMatches);
+      setIsProductSearching(false);
+      return;
+    }
+    // 2. Check cache
+    if (searchCache.current[q]) {
+      setProductResults(searchCache.current[q]);
+      setIsProductSearching(false);
+      return;
+    }
+    // 3. Debounced OpenFoodFacts API search
+    const timer = setTimeout(async () => {
+      searchAbort.current?.abort();
+      const controller = new AbortController();
+      searchAbort.current = controller;
+      setIsProductSearching(true);
+      const { products } = await searchProducts(q, 1, 8, controller.signal);
+      if (controller.signal.aborted) return;
+      const mapped = products.map((p, i) => ({
+        id: p.barcode || `off-${i}-${Date.now()}`,
+        name: p.name,
+        brand: p.brand,
+        imageUrl: p.imageUrl,
+        quantity: p.quantity,
+        category: p.categories?.split(',')[0]?.trim(),
+        barcode: p.barcode,
+        nutriscoreGrade: p.nutriscoreGrade,
+        nutritionPer100g: {
+          energyKcal: p.kcalPer100g,
+          protein: p.proteinPer100g,
+          carbs: p.carbsPer100g,
+          fat: p.fatPer100g,
+          fiber: p.fiberPer100g,
+          sugar: p.sugarPer100g,
+          salt: p.saltPer100g,
+        },
+      }));
+      searchCache.current[q] = mapped;
+      setProductResults(mapped);
+      setIsProductSearching(false);
+    }, 400);
+    return () => { clearTimeout(timer); searchAbort.current?.abort(); };
+  }, [productQuery]);
+
+  // Auto-fetch nutrition when product detail opens
+  useEffect(() => {
+    if (!detailItem) {
+      setDetailNutrition(null);
+      setDetailLoading(false);
+      return;
+    }
+    // 1. Check item's own nutrition
+    if (detailItem.nutritionPer100g && detailItem.nutritionPer100g.energyKcal != null) {
+      setDetailNutrition(detailItem.nutritionPer100g);
+      setDetailLoading(false);
+      return;
+    }
+    // 2. Check FOOD_ITEMS fuzzy match
+    const itemName = detailItem.name.toLowerCase().replace(/\s*\(.*?\)\s*/g, '').trim();
+    const match = FOOD_ITEMS.find(f => {
+      const fName = f.name.toLowerCase();
+      const fFull = f.brand ? `${f.brand.toLowerCase()} ${fName}` : fName;
+      return fName === itemName || itemName.includes(fName) || fFull === itemName || itemName.includes(fFull);
+    });
+    if (match) {
+      const n = { energyKcal: match.kcalPer100g, protein: match.proteinPer100g, carbs: match.carbsPer100g, fat: match.fatPer100g, fiber: match.fiberPer100g, sugar: match.sugarPer100g, salt: match.saltPer100g };
+      setDetailNutrition(n);
+      setDetailLoading(false);
+      return;
+    }
+    // 3. Search OpenFoodFacts by name
+    let cancelled = false;
+    setDetailLoading(true);
+    setDetailNutrition(null);
+    searchProducts(detailItem.name, 1, 3).then(({ products }) => {
+      if (cancelled) return;
+      const best = products[0];
+      if (best && best.kcalPer100g > 0) {
+        const n = { energyKcal: best.kcalPer100g, protein: best.proteinPer100g, carbs: best.carbsPer100g, fat: best.fatPer100g, fiber: best.fiberPer100g, sugar: best.sugarPer100g, salt: best.saltPer100g };
+        setDetailNutrition(n);
+        // Persist nutrition on the item so it's cached for next time
+        apiUpdateShoppingItem(detailItem.id, { nutritionPer100g: n }).catch(() => {});
+      }
+      setDetailLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, [detailItem]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const weekDates = useMemo(() => {
     const start = startOfToday();
     return Array.from({ length: 7 }, (_, index) => format(addDays(start, index), 'yyyy-MM-dd'));
   }, []);
   const currentChild = children[0];
-  const features = getPlanFeatures(household);
-  const canUseScanner = features.shoppingScanner;
-
   const parseKeywordList = (input: string): string[] => {
     return input
       .split(',')
       .map((entry) => entry.trim().toLowerCase())
       .filter(Boolean);
-  };
-
-  const getBarcodeDetector = () => {
-    const detectorCtor = (window as WindowWithBarcodeDetector).BarcodeDetector;
-    if (!detectorCtor) return null;
-    return new detectorCtor({
-      formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39']
-    });
-  };
-
-  const fetchProductFromOpenFoodFacts = async (barcode: string): Promise<OpenFoodFactsProduct | null> => {
-    const sanitizedBarcode = barcode.trim();
-    if (!sanitizedBarcode) return null;
-
-    try {
-      setIsProductLookupLoading(true);
-      const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(sanitizedBarcode)}.json`);
-      if (!response.ok) return null;
-      const data = await response.json();
-      const product = data?.product;
-
-      if (!product) return null;
-
-      const extractName = () => {
-        const candidates = [
-          product.product_name_da,
-          product.product_name_nb,
-          product.product_name_en,
-          product.product_name,
-          product.generic_name_da,
-          product.generic_name,
-        ];
-        return candidates.find((value: string | undefined) => value && value.trim().length > 0) || '';
-      };
-
-      const name = extractName().trim();
-      if (!name) return null;
-
-      const allergens = Array.isArray(product.allergens_tags)
-        ? product.allergens_tags.map((entry: string) => entry.replace(/^.+:/, '')).filter(Boolean)
-        : [];
-
-      return {
-        barcode: sanitizedBarcode,
-        name,
-        ingredientsText: product.ingredients_text_da || product.ingredients_text || undefined,
-        allergens,
-        nutritionPer100g: {
-          energyKcal: product.nutriments?.['energy-kcal_100g'],
-          protein: product.nutriments?.proteins_100g,
-          carbs: product.nutriments?.carbohydrates_100g,
-          fat: product.nutriments?.fat_100g,
-          fiber: product.nutriments?.fiber_100g,
-          sugar: product.nutriments?.sugars_100g,
-          salt: product.nutriments?.salt_100g,
-        }
-      };
-    } catch {
-      return null;
-    } finally {
-      setIsProductLookupLoading(false);
-    }
-  };
-
-  const hydrateScannedProduct = async (barcode: string) => {
-    const fromDatabase = await fetchProductFromOpenFoodFacts(barcode);
-    if (fromDatabase) {
-      setScannedProduct(fromDatabase);
-      setScannedName(fromDatabase.name);
-      return;
-    }
-
-    setScannedProduct(null);
-    setScannedName(barcodeProductHints[barcode] || `Vare (${barcode})`);
-  };
-
-  // Stable callback so cleanup effects always reference the same function instance
-  const stopScanner = useCallback(() => {
-    if (scannerRafRef.current) {
-      window.cancelAnimationFrame(scannerRafRef.current);
-      scannerRafRef.current = null;
-    }
-    if (scannerStreamRef.current) {
-      scannerStreamRef.current.getTracks().forEach((track) => track.stop());
-      scannerStreamRef.current = null;
-    }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
-    setIsScanning(false);
-  }, []); // Refs are stable - no deps needed
-
-  const handleBarcodeDetected = (rawValue: string) => {
-    setScannedCode(rawValue);
-    void hydrateScannedProduct(rawValue);
-    setScanError('');
-    stopScanner();
-  };
-
-  const startScanner = async () => {
-    setScanError('');
-    setScannedCode('');
-    setScannedName('');
-    setScannedQuantity('');
-    setScannedProduct(null);
-
-    if (!navigator.mediaDevices?.getUserMedia) {
-      setScanError('Kamera understøttes ikke på denne enhed/browser');
-      return;
-    }
-
-    const detector = getBarcodeDetector();
-    if (!detector) {
-      setScanError('Stregkodescanner understøttes ikke i denne browser. Skriv varen manuelt.');
-      return;
-    }
-
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' }
-      });
-      scannerStreamRef.current = stream;
-
-      if (!videoRef.current) {
-        setScanError('Kunne ikke starte kameraet');
-        stopScanner();
-        return;
-      }
-
-      videoRef.current.srcObject = stream;
-      await videoRef.current.play();
-      setIsScanning(true);
-
-      const detectLoop = async () => {
-        if (!videoRef.current || !scannerStreamRef.current) return;
-
-        try {
-          const detections = await detector.detect(videoRef.current);
-          const firstCode = detections.find((entry) => Boolean(entry.rawValue))?.rawValue;
-          if (firstCode) {
-            handleBarcodeDetected(firstCode);
-            return;
-          }
-        } catch {
-          setScanError('Kunne ikke læse stregkoden endnu. Prøv at holde varen tættere på kameraet.');
-        }
-
-        scannerRafRef.current = window.requestAnimationFrame(detectLoop);
-      };
-
-      scannerRafRef.current = window.requestAnimationFrame(detectLoop);
-    } catch {
-      setScanError('Kameraadgang blev afvist. Tillad kamera for at scanne varer.');
-      stopScanner();
-    }
-  };
-
-  const addScannedShoppingItem = () => {
-    const name = scannedName.trim();
-    if (!name) {
-      toast.error('Skriv et varenavn før du tilføjer');
-      return;
-    }
-
-    addShoppingItem({
-      id: shoppingItemId(),
-      name,
-      quantity: scannedQuantity.trim() || undefined,
-      purchased: false,
-      addedBy: currentUser?.id || users[0]?.id || 'p1',
-      category: 'Scannet',
-      priority: 'normal',
-      barcode: scannedCode || undefined,
-      source: scannedProduct ? 'open_food_facts' : 'scanner',
-      nutritionPer100g: scannedProduct?.nutritionPer100g,
-      allergens: scannedProduct?.allergens
-    });
-
-    toast.success('Scannet vare tilføjet');
-    setIsScanDialogOpen(false);
-    stopScanner();
-  };
-
-  const addScannedToFridge = () => {
-    const normalizedName = scannedName.trim();
-    if (!normalizedName) {
-      toast.error('Scan en vare først');
-      return;
-    }
-
-    const product: OpenFoodFactsProduct = scannedProduct || {
-      barcode: scannedCode.trim(),
-      name: normalizedName,
-      allergens: []
-    };
-
-    const exists = fridgeItems.some((item) => (
-      (product.barcode && item.barcode === product.barcode) ||
-      item.name.toLowerCase() === product.name.toLowerCase()
-    ));
-    if (exists) {
-      toast.message('Varen findes allerede i køleskabet');
-      return;
-    }
-
-    setFridgeItems((prev) => [...prev, product]);
-    toast.success('Vare tilføjet til køleskab');
-  };
-
-  const addQuickFridgeItem = () => {
-    const name = fridgeQuickInput.trim();
-    if (!name) return;
-
-    const exists = fridgeItems.some((item) => item.name.toLowerCase() === name.toLowerCase());
-    if (exists) {
-      toast.message('Varen findes allerede i køleskabet');
-      return;
-    }
-
-    setFridgeItems((prev) => [
-      ...prev,
-      {
-        barcode: '',
-        name,
-        allergens: []
-      }
-    ]);
-    setFridgeQuickInput('');
-  };
-
-  const openScanDialog = () => {
-    if (!canUseScanner) {
-      toast.error('Scanning er en abonnementsfunktion (Family Plus/Enlig Plus)');
-      setAppTab('settings');
-      return;
-    }
-    setIsScanDialogOpen(true);
   };
 
   const rehydrateSharedState = async () => {
@@ -929,32 +829,6 @@ export function MadOgHjem() {
     };
   }, [liveSyncEnabled]);
 
-  useEffect(() => {
-    setScanSupported(Boolean((window as WindowWithBarcodeDetector).BarcodeDetector));
-    return () => {
-      stopScanner();
-    };
-  }, [stopScanner]);
-
-  useEffect(() => {
-    if (!isScanDialogOpen) {
-      stopScanner();
-      setScanError('');
-      return;
-    }
-
-    if (!canUseScanner) {
-      setIsScanDialogOpen(false);
-      stopScanner();
-      return;
-    }
-
-    void startScanner();
-    return () => {
-      stopScanner();
-    };
-  }, [isScanDialogOpen, canUseScanner, stopScanner]);
-
   const upcomingMealPlans = useMemo(() => {
     return mealPlans
       .filter((meal) => weekDates.includes(meal.date))
@@ -965,17 +839,19 @@ export function MadOgHjem() {
       });
   }, [mealPlans, weekDates]);
 
-  const cleaningTasks = useMemo(() => {
-    return tasks.filter((task) => task.category === 'cleaning');
-  }, [tasks]);
+  // Filter items by active list
+  const activeListItems = useMemo(() => {
+    if (!activeShoppingListId) return shoppingItems;
+    return shoppingItems.filter((item) => item.listId === activeShoppingListId);
+  }, [shoppingItems, activeShoppingListId]);
 
   const pendingShopping = useMemo(() => {
-    return shoppingItems.filter((item) => !item.purchased);
-  }, [shoppingItems]);
+    return activeListItems.filter((item) => !item.purchased);
+  }, [activeListItems]);
 
   const purchasedShopping = useMemo(() => {
-    return shoppingItems.filter((item) => item.purchased);
-  }, [shoppingItems]);
+    return activeListItems.filter((item) => item.purchased);
+  }, [activeListItems]);
 
   const parseIngredients = (ingredientsText: string): string[] => {
     return ingredientsText
@@ -995,30 +871,35 @@ export function MadOgHjem() {
     });
   };
 
-  const handleAddMeal = () => {
+  const handleAddMeal = async () => {
     if (!newMeal.title.trim() || !newMeal.date) {
       toast.error('Skriv titel og vælg dag');
       return;
     }
-
-    const ingredients = parseIngredients(newMeal.ingredientsText);
-    void createMealPlan({
-      date: newMeal.date,
-      mealType: newMeal.mealType as 'breakfast' | 'lunch' | 'dinner' | 'snack',
-      title: newMeal.title.trim(),
-      notes: newMeal.notes.trim() || undefined,
-      recipe: ingredients.length > 0 || newMeal.instructions.trim()
-        ? {
-            name: newMeal.title.trim(),
-            ingredients,
-            instructions: newMeal.instructions.trim()
-          }
-        : undefined
-    });
-
-    setIsAddMealOpen(false);
-    resetMealForm();
-    toast.success('Ret tilføjet til madplanen');
+    setIsSaving(true);
+    try {
+      const ingredients = parseIngredients(newMeal.ingredientsText);
+      await createMealPlan({
+        date: newMeal.date,
+        mealType: newMeal.mealType as 'breakfast' | 'lunch' | 'dinner' | 'snack',
+        title: newMeal.title.trim(),
+        notes: newMeal.notes.trim() || undefined,
+        recipe: ingredients.length > 0 || newMeal.instructions.trim()
+          ? {
+              name: newMeal.title.trim(),
+              ingredients,
+              instructions: newMeal.instructions.trim()
+            }
+          : undefined
+      });
+      toast.success('Ret tilføjet til madplanen');
+      setIsAddMealOpen(false);
+      resetMealForm();
+    } catch {
+      toast.error('Kunne ikke tilføje ret');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const fillMealFromSuggestion = () => {
@@ -1056,7 +937,7 @@ export function MadOgHjem() {
 
       if (exists) continue;
 
-      void createMealPlan({
+      createMealPlan({
         date: targetDate,
         mealType: meal.mealType,
         title: meal.title,
@@ -1072,7 +953,7 @@ export function MadOgHjem() {
               instructions: meal.recipe.instructions
             }
           : undefined
-      });
+      }).catch(() => {});
       added += 1;
     }
 
@@ -1098,16 +979,16 @@ export function MadOgHjem() {
 
       if (alreadyExists) return;
 
-      addShoppingItem({
-        id: shoppingItemId(),
+      createShoppingItem({
         name: ingredient.trim(),
         purchased: false,
         addedBy: currentUser?.id || users[0]?.id || 'p1',
         category: 'Dagligvarer',
         neededForDate: meal.date,
         neededForMealId: meal.id,
-        priority: 'normal'
-      });
+        priority: 'normal',
+        listId: activeShoppingListId || shoppingLists[0]?.id || undefined,
+      }).catch(() => {});
       addedCount += 1;
     });
 
@@ -1130,16 +1011,16 @@ export function MadOgHjem() {
 
         if (alreadyExists) return;
 
-        addShoppingItem({
-          id: shoppingItemId(),
+        createShoppingItem({
           name: ingredient.trim(),
           purchased: false,
           addedBy: currentUser?.id || users[0]?.id || 'p1',
           category: 'Dagligvarer',
           neededForDate: meal.date,
           neededForMealId: meal.id,
-          priority: 'normal'
-        });
+          priority: 'normal',
+          listId: activeShoppingListId || shoppingLists[0]?.id || undefined,
+        }).catch(() => {});
         addedCount += 1;
       });
     });
@@ -1152,42 +1033,47 @@ export function MadOgHjem() {
     toast.success(`${addedCount} varer tilføjet fra madplanen`);
   };
 
-  const handleAddShopping = () => {
+  const handleAddShopping = async () => {
     if (!newShopping.name.trim()) {
       toast.error('Skriv en vare');
       return;
     }
-
-    addShoppingItem({
-      id: shoppingItemId(),
-      name: newShopping.name.trim(),
-      quantity: newShopping.quantity.trim() || undefined,
-      purchased: false,
-      addedBy: currentUser?.id || users[0]?.id || 'p1',
-      category: newShopping.category,
-      neededForDate: newShopping.neededForDate || undefined,
-      neededForMealId: newShopping.neededForMealId !== 'none' ? newShopping.neededForMealId : undefined,
-      priority: newShopping.priority as 'low' | 'normal' | 'high'
-    });
-
-    setIsAddShoppingOpen(false);
-    setNewShopping({
-      name: '',
-      quantity: '',
-      category: 'Dagligvarer',
-      neededForDate: '',
-      priority: 'normal',
-      neededForMealId: 'none'
-    });
-    toast.success('Vare tilføjet');
+    setIsSaving(true);
+    try {
+      await createShoppingItem({
+        name: newShopping.name.trim(),
+        quantity: newShopping.quantity.trim() || undefined,
+        purchased: false,
+        addedBy: currentUser?.id || users[0]?.id || 'p1',
+        category: newShopping.category,
+        neededForDate: newShopping.neededForDate || undefined,
+        neededForMealId: newShopping.neededForMealId !== 'none' ? newShopping.neededForMealId : undefined,
+        priority: newShopping.priority as 'low' | 'normal' | 'high',
+        listId: activeShoppingListId || shoppingLists[0]?.id || undefined,
+      });
+      toast.success('Vare tilføjet');
+      setIsAddShoppingOpen(false);
+      setNewShopping({
+        name: '',
+        quantity: '',
+        category: 'Dagligvarer',
+        neededForDate: '',
+        priority: 'normal',
+        neededForMealId: 'none'
+      });
+    } catch {
+      toast.error('Kunne ikke tilføje vare');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const toggleShoppingItem = (itemId: string, purchased: boolean) => {
-    updateShoppingItem(itemId, {
+    apiUpdateShoppingItem(itemId, {
       purchased,
       purchasedBy: purchased ? currentUser?.id : undefined,
       purchasedAt: purchased ? new Date().toISOString() : undefined
-    });
+    }).catch(() => {});
   };
 
   const markAllVisibleShoppingPurchased = () => {
@@ -1195,77 +1081,27 @@ export function MadOgHjem() {
     const purchasedAt = new Date().toISOString();
     const purchasedBy = currentUser?.id || users[0]?.id || 'p1';
     visiblePendingShopping.forEach((item) => {
-      updateShoppingItem(item.id, { purchased: true, purchasedAt, purchasedBy });
+      apiUpdateShoppingItem(item.id, { purchased: true, purchasedAt, purchasedBy }).catch(() => {});
     });
     toast.success(`${visiblePendingShopping.length} varer markeret som købt`);
-  };
-
-  const markShoppingGroupPurchased = (dateKey: string) => {
-    const groupItems = visiblePendingShopping.filter((item) => (item.neededForDate || 'unscheduled') === dateKey);
-    if (groupItems.length === 0) return;
-    const purchasedAt = new Date().toISOString();
-    const purchasedBy = currentUser?.id || users[0]?.id || 'p1';
-    groupItems.forEach((item) => {
-      updateShoppingItem(item.id, { purchased: true, purchasedAt, purchasedBy });
-    });
-    toast.success(`${groupItems.length} varer markeret som købt`);
   };
 
   const resetPurchasedShoppingItems = () => {
     if (purchasedShopping.length === 0) return;
     purchasedShopping.forEach((item) => {
-      updateShoppingItem(item.id, {
+      apiUpdateShoppingItem(item.id, {
         purchased: false,
         purchasedAt: undefined,
         purchasedBy: undefined
-      });
+      }).catch(() => {});
     });
     toast.success('Købte varer nulstillet');
   };
 
-  const handleAddCleaningTask = () => {
-    if (!newCleaning.title.trim() || !newCleaning.assignedTo) {
-      toast.error('Skriv opgave og vælg person');
-      return;
-    }
-
-    void createTask({
-      title: newCleaning.title.trim(),
-      area: newCleaning.area.trim() || undefined,
-      assignedTo: newCleaning.assignedTo,
-      createdBy: currentUser?.id || users[0]?.id || 'p1',
-      completed: false,
-      category: 'cleaning',
-      isRecurring: true,
-      recurringPattern: newCleaning.recurringPattern,
-      plannedWeekday: Number(newCleaning.weekday)
-    });
-
-    setIsAddCleaningOpen(false);
-    setNewCleaning({
-      title: '',
-      area: '',
-      assignedTo: currentUser?.id || users[0]?.id || '',
-      weekday: '5',
-      recurringPattern: 'weekly'
-    });
-    toast.success('Rengøringsopgave oprettet');
-  };
-
-  const addTemplateCleaningTask = (template: { title: string; area: string; weekday: number; recurringPattern: string }) => {
-    void createTask({
-      title: template.title,
-      area: template.area,
-      assignedTo: currentUser?.id || users[0]?.id || 'p1',
-      createdBy: currentUser?.id || users[0]?.id || 'p1',
-      completed: false,
-      category: 'cleaning',
-      isRecurring: true,
-      recurringPattern: template.recurringPattern,
-      plannedWeekday: template.weekday
-    });
-    toast.success(`${template.title} tilføjet`);
-  };
+  /* Cleaning handlers — reserved for cleaning tab UI
+  const handleAddCleaningTask = () => { ... };
+  const addTemplateCleaningTask = (template) => { ... };
+  */
 
   const applyIdea = (ideaId: string) => {
     if (ideaId === 'weekly-check-in') {
@@ -1277,7 +1113,7 @@ export function MadOgHjem() {
       const endAt = new Date(targetDay);
       endAt.setHours(20, 0, 0, 0);
 
-      void createEvent({
+      createEvent({
         title: 'Ugentlig familie check-in',
         type: 'meeting',
         startDate: startAt.toISOString(),
@@ -1290,7 +1126,7 @@ export function MadOgHjem() {
     }
 
     if (ideaId === 'meal-routine') {
-      void createTask({
+      createTask({
         title: 'Lav madplan for næste uge',
         assignedTo: currentUser?.id || users[0]?.id || 'p1',
         createdBy: currentUser?.id || users[0]?.id || 'p1',
@@ -1299,7 +1135,7 @@ export function MadOgHjem() {
         isRecurring: true,
         recurringPattern: 'weekly',
         plannedWeekday: 6
-      });
+      }).catch(() => {});
       toast.success('Madplan-rutine oprettet');
       return;
     }
@@ -1308,21 +1144,21 @@ export function MadOgHjem() {
       ['Havregryn', 'Mælk', 'Frugt', 'Rugbrød', 'Toiletpapir'].forEach((name) => {
         const exists = shoppingItems.some((item) => item.name.toLowerCase() === name.toLowerCase() && !item.purchased);
         if (exists) return;
-        addShoppingItem({
-          id: shoppingItemId(),
+        createShoppingItem({
           name,
           purchased: false,
           addedBy: currentUser?.id || users[0]?.id || 'p1',
           category: 'Basis',
-          priority: 'normal'
-        });
+          priority: 'normal',
+          listId: activeShoppingListId || shoppingLists[0]?.id || undefined,
+        }).catch(() => {});
       });
       toast.success('Basisliste tilføjet');
       return;
     }
 
     if (ideaId === 'monthly-deep-clean') {
-      void createTask({
+      createTask({
         title: 'Månedlig dybderengøring af køkken og bad',
         area: 'Køkken + badeværelse',
         assignedTo: currentUser?.id || users[0]?.id || 'p1',
@@ -1332,7 +1168,7 @@ export function MadOgHjem() {
         isRecurring: true,
         recurringPattern: 'monthly',
         plannedWeekday: 5
-      });
+      }).catch(() => {});
       toast.success('Månedlig rengøringsrutine oprettet');
     }
   };
@@ -1363,76 +1199,7 @@ export function MadOgHjem() {
     return true;
   };
 
-  const setupHomeReminders = () => {
-    const ownerId = currentUser?.id || users[0]?.id || 'p1';
-    const baseDate = startOfToday();
-    const sunday = setDay(baseDate, 0, { weekStartsOn: 1 });
-    const targetDay = sunday < baseDate ? addDays(sunday, 7) : sunday;
-    const startAt = new Date(targetDay);
-    startAt.setHours(17, 30, 0, 0);
-    const endAt = new Date(targetDay);
-    endAt.setHours(17, 50, 0, 0);
-
-    const hasWeeklyMealEvent = events.some((event) => (
-      event.title === 'Madplan check-in' && event.isRecurring
-    ));
-    if (!hasWeeklyMealEvent) {
-      void createEvent({
-        title: 'Madplan check-in',
-        description: 'Planlæg den kommende uge: måltider, indkøb og opgaver.',
-        type: 'meeting',
-        startDate: startAt.toISOString(),
-        endDate: endAt.toISOString(),
-        createdBy: ownerId,
-        assignedTo: users.map((user) => user.id),
-        isRecurring: true,
-        recurringPattern: 'WEEKLY'
-      });
-    }
-
-    const hasShoppingTask = tasks.some((task) => (
-      task.title === 'Tjek indkøb for de næste 2 dage' && task.isRecurring
-    ));
-    if (!hasShoppingTask) {
-      void createTask({
-        title: 'Tjek indkøb for de næste 2 dage',
-        assignedTo: ownerId,
-        createdBy: ownerId,
-        completed: false,
-        category: 'shopping',
-        isRecurring: true,
-        recurringPattern: 'weekly',
-        plannedWeekday: 0
-      });
-    }
-
-    const hasCleaningTask = tasks.some((task) => (
-      task.title === 'Gennemgå ugens rengøringsplan' && task.isRecurring
-    ));
-    if (!hasCleaningTask) {
-      void createTask({
-        title: 'Gennemgå ugens rengøringsplan',
-        assignedTo: ownerId,
-        createdBy: ownerId,
-        completed: false,
-        category: 'cleaning',
-        isRecurring: true,
-        recurringPattern: 'weekly',
-        plannedWeekday: 0
-      });
-    }
-
-    const notificationCount = [
-      pushNotification('meal_plan', 'Madplan-påmindelse', 'Husk at opdatere næste uges madplan.'),
-      pushNotification('shopping_reminder', 'Indkøb-påmindelse', 'Tjek hvad I mangler til de kommende dage.'),
-      pushNotification('cleaning_reminder', 'Rengøring-påmindelse', 'Fordel ugens huslige pligter.')
-    ].filter(Boolean).length;
-
-    toast.success(
-      `${notificationCount} påmindelser oprettet` +
-      (!hasWeeklyMealEvent || !hasShoppingTask || !hasCleaningTask ? ' og faste rutiner tilføjet' : '')
-    );
-  };
+  /* setupHomeReminders — reserved for future reminders feature */
 
   const applyWeekTemplate = (templateId: string) => {
     const template = weekTemplates.find((entry) => entry.id === templateId);
@@ -1452,7 +1219,7 @@ export function MadOgHjem() {
       ));
       if (exists) return;
 
-      void createMealPlan({
+      createMealPlan({
         date,
         mealType: meal.mealType,
         title: meal.title,
@@ -1462,7 +1229,7 @@ export function MadOgHjem() {
           ingredients: meal.ingredients,
           instructions: meal.instructions
         }
-      });
+      }).catch(() => {});
       mealsAdded += 1;
     });
 
@@ -1474,7 +1241,7 @@ export function MadOgHjem() {
       ));
       if (exists) return;
 
-      void createTask({
+      createTask({
         title: item.title,
         area: item.area,
         assignedTo: ownerId,
@@ -1484,7 +1251,7 @@ export function MadOgHjem() {
         isRecurring: true,
         recurringPattern: item.recurringPattern,
         plannedWeekday: item.weekday
-      });
+      }).catch(() => {});
       cleaningAdded += 1;
     });
 
@@ -1576,7 +1343,7 @@ export function MadOgHjem() {
       const suggestion = rankedCandidates[dayOffset % rankedCandidates.length];
       const suggestionText = `${suggestion.title} ${suggestion.ingredients.join(' ')}`.toLowerCase();
       const matchingFavorites = favoriteKeywords.filter((keyword) => suggestionText.includes(keyword));
-      void createMealPlan({
+      createMealPlan({
         date,
         mealType: 'dinner',
         title: suggestion.title,
@@ -1590,7 +1357,7 @@ export function MadOgHjem() {
           ingredients: suggestion.ingredients,
           instructions: suggestion.instructions
         }
-      });
+      }).catch(() => {});
       added += 1;
     }
 
@@ -1620,92 +1387,8 @@ export function MadOgHjem() {
   }, [selectedMealGuideId, mealPlans]);
 
   const visiblePendingShopping = useMemo(() => {
-    return pendingShopping
-      .filter((item) => (
-        shoppingFilterDate === 'all' || (item.neededForDate || 'unscheduled') === shoppingFilterDate
-      ))
-      .sort((a, b) => (a.neededForDate || 'zzzz').localeCompare(b.neededForDate || 'zzzz'));
-  }, [pendingShopping, shoppingFilterDate]);
-
-  const shoppingGroups = useMemo(() => {
-    const groups = visiblePendingShopping.reduce<Record<string, typeof visiblePendingShopping>>((acc, item) => {
-      const key = item.neededForDate || 'unscheduled';
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(item);
-      return acc;
-    }, {});
-
-    return Object.entries(groups).sort(([a], [b]) => a.localeCompare(b));
-  }, [visiblePendingShopping]);
-
-  const cleaningByWeekday = useMemo(() => {
-    const groups = cleaningTasks.reduce<Record<string, typeof cleaningTasks>>((acc, task) => {
-      const key = String(task.plannedWeekday ?? 0);
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(task);
-      return acc;
-    }, {});
-
-    return Object.entries(groups).sort(([a], [b]) => Number(a) - Number(b));
-  }, [cleaningTasks]);
-
-  const completedCleaning = cleaningTasks.filter((task) => task.completed).length;
-  const fridgeIngredientPool = useMemo(() => {
-    return fridgeItems.flatMap((item) => {
-      const tokens = item.name
-        .toLowerCase()
-        .split(/[\s,/-]+/)
-        .map((value) => value.trim())
-        .filter((value) => value.length > 1);
-      return [item.name.toLowerCase(), ...tokens];
-    });
-  }, [fridgeItems]);
-
-  const fridgeMealSuggestions = useMemo(() => {
-    if (fridgeItems.length === 0) return [];
-
-    return [...autoMealCandidates]
-      .map((candidate) => {
-        const candidateIngredients = candidate.ingredients.map((ingredient) => ingredient.toLowerCase());
-        const matchedIngredients = candidateIngredients.filter((ingredient) => (
-          fridgeIngredientPool.some((token) => ingredient.includes(token) || token.includes(ingredient))
-        ));
-
-        const score = matchedIngredients.length * 3 + (candidate.childFriendly ? 1 : 0);
-        return {
-          candidate,
-          matchedIngredients,
-          score
-        };
-      })
-      .filter((entry) => entry.score > 0)
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 5);
-  }, [fridgeIngredientPool, fridgeItems.length]);
-
-  const fridgeNutritionStats = useMemo(() => {
-    const productsWithNutrition = fridgeItems.filter((item) => item.nutritionPer100g);
-    if (productsWithNutrition.length === 0) return null;
-
-    const sum = productsWithNutrition.reduce(
-      (acc, product) => {
-        acc.energy += product.nutritionPer100g?.energyKcal || 0;
-        acc.protein += product.nutritionPer100g?.protein || 0;
-        acc.carbs += product.nutritionPer100g?.carbs || 0;
-        acc.fat += product.nutritionPer100g?.fat || 0;
-        return acc;
-      },
-      { energy: 0, protein: 0, carbs: 0, fat: 0 }
-    );
-
-    return {
-      count: productsWithNutrition.length,
-      avgEnergy: sum.energy / productsWithNutrition.length,
-      avgProtein: sum.protein / productsWithNutrition.length,
-      avgCarbs: sum.carbs / productsWithNutrition.length,
-      avgFat: sum.fat / productsWithNutrition.length,
-    };
-  }, [fridgeItems]);
+    return [...pendingShopping].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+  }, [pendingShopping]);
 
   // Filtered recipes for the browser
   const allRecipes = useMemo(() => [...recipes, ...userRecipes], [userRecipes]);
@@ -1719,174 +1402,460 @@ export function MadOgHjem() {
     });
   }, [recipeCategory, recipeSearch]);
 
-  const applyFridgeSuggestionAsMeal = (suggestion: AutoMealCandidate) => {
-    setNewMeal((prev) => ({
-      ...prev,
-      title: suggestion.title,
-      mealType: 'dinner',
-      ingredientsText: suggestion.ingredients.join('\n'),
-      instructions: suggestion.instructions,
-      notes: 'Forslag baseret på køleskab'
-    }));
-    setIsAddMealOpen(true);
+  // Eligible household members for meal plan (respects family mode + GDPR)
+  const eligibleMembers = useMemo(() => {
+    const members: { id: string; name: string; isChild: boolean; canConfigure: boolean; kcalGoal?: number }[] = [];
+    // Always add current user
+    if (currentUser) {
+      members.push({
+        id: currentUser.id,
+        name: 'Mig',
+        isChild: false,
+        canConfigure: true,
+        kcalGoal: memberNutritionGoals[currentUser.id]?.kcal,
+      });
+    }
+    // Add children
+    children.forEach(c => {
+      members.push({
+        id: c.id,
+        name: c.name,
+        isChild: true,
+        canConfigure: true, // Parents can configure children's goals
+        kcalGoal: memberNutritionGoals[c.id]?.kcal,
+      });
+    });
+    // Other adults: only if not co_parenting, OR co-parent has opted in
+    if (household?.familyMode !== 'co_parenting' || household?.sharedMeals) {
+      users.filter(u => u.id !== currentUser?.id && u.role !== 'professional').forEach(u => {
+        members.push({
+          id: u.id,
+          name: u.name,
+          isChild: false,
+          canConfigure: false, // GDPR: cannot configure other adults
+          kcalGoal: memberNutritionGoals[u.id]?.kcal,
+        });
+      });
+    }
+    return members;
+  }, [currentUser, children, users, household, memberNutritionGoals]);
+
+  // Approximate gram weights for non-gram units
+  const UNIT_TO_GRAMS: Record<string, number> = {
+    g: 1, kg: 1000, ml: 1, dl: 100, l: 1000,
+    stk: 80, spsk: 12, tsk: 5, knivspids: 1,
   };
+
+  // Base portion weight (from recipe ingredients at base serving count)
+  const basePortionWeight = useMemo(() => {
+    if (!selectedRecipe) return 0;
+    return selectedRecipe.ingredients.reduce(
+      (sum, ing) => sum + ing.amount * (UNIT_TO_GRAMS[ing.unit] ?? 10), 0
+    ) / selectedRecipe.servings;
+  }, [selectedRecipe]);
+
+  // Total grams for current selection (unit × recipeServings)
+  const totalGrams = useMemo(() => {
+    switch (nutritionUnit) {
+      case 'portion': return basePortionWeight * recipeServings;
+      case '100g': return 100 * recipeServings;
+      case '1g': return recipeServings;
+      case 'total': return basePortionWeight * (selectedRecipe?.servings ?? 4);
+    }
+  }, [nutritionUnit, recipeServings, basePortionWeight, selectedRecipe]);
+
+  // Equivalent recipe servings for ingredient scaling
+  const equivalentServings = basePortionWeight > 0
+    ? totalGrams / basePortionWeight
+    : recipeServings;
+
+  // Nutrition for the selected amount (unit × portioner)
+  function getNutritionValue(perServing: number): number | string {
+    const perGram = basePortionWeight > 0 ? perServing / basePortionWeight : 0;
+    switch (nutritionUnit) {
+      case 'portion': return Math.round(perServing * recipeServings);
+      case '100g': return Math.round(perGram * 100 * recipeServings);
+      case '1g': return Math.round(perGram * recipeServings * 10) / 10;
+      case 'total': {
+        const baseTotal = selectedRecipe ? perServing * selectedRecipe.servings : 0;
+        return Math.round(baseTotal);
+      }
+    }
+  }
+
+  // Portion calculation based on calorie goals — uses total nutrition
+  const portionCalculation = useMemo(() => {
+    if (!selectedRecipe || basePortionWeight <= 0) return [];
+    const selected = eligibleMembers.filter(m => selectedMembers.includes(m.id));
+    if (selected.length === 0) return [];
+
+    const kcalPerGram = selectedRecipe.nutrition.kcal / basePortionWeight;
+    const protPerGram = selectedRecipe.nutrition.protein / basePortionWeight;
+    const carbsPerGram = selectedRecipe.nutrition.carbs / basePortionWeight;
+    const fatPerGram = selectedRecipe.nutrition.fat / basePortionWeight;
+    const totalRecipeKcal = kcalPerGram * totalGrams;
+
+    const maaltidsAndel = 0.33;
+    const allHaveGoals = selected.every(m => m.kcalGoal);
+
+    if (!allHaveGoals) {
+      const equalPercent = Math.round(100 / selected.length);
+      return selected.map(m => ({
+        name: m.name,
+        kcal: Math.round(totalRecipeKcal / selected.length),
+        protein: Math.round(protPerGram * totalGrams / selected.length),
+        carbs: Math.round(carbsPerGram * totalGrams / selected.length),
+        fat: Math.round(fatPerGram * totalGrams / selected.length),
+        grams: Math.round(totalGrams / selected.length),
+        percent: equalPercent,
+      }));
+    }
+
+    const personsWithNeeds = selected.map(m => ({
+      ...m,
+      mealKcal: (m.kcalGoal ?? 2000) * maaltidsAndel,
+    }));
+    const totalMealKcal = personsWithNeeds.reduce((s, p) => s + p.mealKcal, 0);
+
+    return personsWithNeeds.map(p => {
+      const share = p.mealKcal / totalMealKcal;
+      return {
+        name: p.name,
+        kcal: Math.round(totalRecipeKcal * share),
+        protein: Math.round(protPerGram * totalGrams * share),
+        carbs: Math.round(carbsPerGram * totalGrams * share),
+        fat: Math.round(fatPerGram * totalGrams * share),
+        grams: Math.round(totalGrams * share),
+        percent: Math.round(share * 100),
+      };
+    });
+  }, [selectedMembers, eligibleMembers, selectedRecipe, recipeServings, basePortionWeight, totalGrams]);
+
+  // Handle TopBar-triggered actions via store
+  const madAction = useAppStore(s => s.madAction);
+  useEffect(() => {
+    if (!madAction) return;
+    switch (madAction) {
+      case 'open-recipes': setRecipeBrowserOpen(true); break;
+      case 'add-meal': setIsAddMealOpen(true); break;
+      case 'generate-shopping': handleGenerateShoppingFromWeek(); break;
+      case 'from-meal-plan': { setNewShopping({ name: '', quantity: '', category: 'Dagligvarer', neededForDate: '', priority: 'normal', neededForMealId: 'none' }); setIsAddShoppingOpen(true); break; }
+      case 'templates-add': { setNewTemplateName(''); setNewTemplateMeals({}); setIsAddTemplateOpen(true); break; }
+      case 'quick-setup-add': { setNewQuickSetup({ title: '', description: '' }); setIsAddQuickSetupOpen(true); break; }
+    }
+    useAppStore.getState().setMadAction(null);
+  }, [madAction]);
+
+  // Fullscreen barcode scan for shopping list (same as Køleskab)
+  async function handleScanShopping() {
+    setShopScanLoading(true);
+    const barcode = await startBarcodeScanner();
+    if (!barcode) { setShopScanLoading(false); return; }
+    const product = await fetchFromOpenFoodFacts(barcode);
+    setShopScanLoading(false);
+    if (product) {
+      setScannedProduct(product);
+      setScannedBarcode(barcode);
+    } else {
+      toast.error(`Vare ikke fundet for stregkode ${barcode}`);
+      setIsAddShoppingOpen(true);
+    }
+  }
+
+  function handleAddScannedToShopping() {
+    if (!scannedProduct) return;
+    const productName = scannedProduct.brand
+      ? `${scannedProduct.brand} ${scannedProduct.name}`
+      : scannedProduct.name;
+    createShoppingItem({
+      name: productName,
+      quantity: scannedProduct.quantity || undefined,
+      purchased: false,
+      addedBy: currentUser?.id || users[0]?.id || 'p1',
+      category: 'Dagligvarer',
+      priority: 'normal',
+      listId: activeShoppingListId || undefined,
+    }).catch(() => {});
+    toast.success(`${productName} tilføjet til indkøbslisten`);
+    setScannedProduct(null);
+    setScannedBarcode(null);
+  }
 
   return (
     <div className="space-y-1.5 py-1">
-      <motion.div
-        initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <h1 className="text-2xl font-semibold text-[#2f2f2d]">Mad & Indkøb</h1>
-        <p className="text-[#75736b]">Madplan, indkøbsliste og opskrifter</p>
-      </motion.div>
+      <MadOgHjemSidePanel activeSubTab={activeTab} onSelectSubTab={setActiveTab} />
 
-      {/* Underline-style Tabs */}
-      <div className="sticky top-0 z-10 bg-[#faf9f6] pb-0">
-        <div className="flex items-center border-b border-[#e5e3dc] overflow-x-auto scrollbar-hide">
-          {[
-            { value: 'meal-plan', label: 'Madplan' },
-            { value: 'shopping', label: 'Indkøb' },
-            { value: 'dagbog', label: 'Dagbog' },
-            { value: 'ideas', label: 'Flere ting' },
-          ].map((tab) => (
-            <button
-              key={tab.value}
-              onClick={() => setActiveTab(tab.value)}
-              className={cn(
-                'relative flex-1 py-3 text-center text-[14px] font-semibold transition-colors whitespace-nowrap',
-                activeTab === tab.value ? 'text-[#2f2f2d]' : 'text-[#b0ada4]'
-              )}
-            >
-              {tab.label}
-              {activeTab === tab.value && (
-                <motion.div
-                  layoutId="madhjem-underline"
-                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#2f2f2d] rounded-full"
-                  transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                />
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* Confirm close dialog for all forms */}
+      <ConfirmCloseDialog
+        open={confirmClose}
+        onCancel={() => setConfirmClose(false)}
+        onConfirm={() => {
+          setConfirmClose(false);
+          if (isAddMealOpen) { setIsAddMealOpen(false); resetMealForm(); }
+          if (isAddShoppingOpen) { setIsAddShoppingOpen(false); setNewShopping({ name: '', quantity: '', category: 'Dagligvarer', neededForDate: '', priority: 'normal', neededForMealId: 'none' }); }
+        }}
+      />
+
+      {/* Full-screen product detail after barcode scan */}
+      <AnimatePresence>
+        {scannedProduct && (
+          <motion.div
+            key="product-detail"
+            className="fixed inset-0 z-[55] bg-[#faf9f6] flex flex-col overflow-hidden"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', stiffness: 380, damping: 38 }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.15}
+            onDragEnd={(_: unknown, info: { offset: { x: number } }) => { if (info.offset.x > 100) { setScannedProduct(null); setScannedBarcode(null); } }}
+          >
+            {/* Header */}
+            <div className="shrink-0 flex items-center justify-between px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-[#faf9f6]">
+              <button
+                onClick={() => { setScannedProduct(null); setScannedBarcode(null); }}
+                className="flex h-9 w-9 items-center justify-center text-[#2f2f2d] active:scale-[0.92] transition-transform"
+              >
+                <ArrowLeft className="h-[18px] w-[18px]" />
+              </button>
+              <h1 className="text-[17px] font-bold text-[#2f2f2d]">Produktdetaljer</h1>
+              <div className="w-9" />
+            </div>
+
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="px-4 pt-4 pb-8 max-w-[430px] mx-auto space-y-5">
+
+                {/* Product image */}
+                {scannedProduct.imageUrl ? (
+                  <div className="flex justify-center">
+                    <img
+                      src={scannedProduct.imageUrl}
+                      alt={scannedProduct.name}
+                      className="h-48 w-48 rounded-[8px] object-contain bg-white border border-[#e5e3dc]"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                    />
+                  </div>
+                ) : (
+                  <div className="flex justify-center">
+                    <div className="flex h-48 w-48 items-center justify-center rounded-[8px] bg-[#f2f1ed] border border-[#e5e3dc]">
+                      <Package className="h-16 w-16 text-[#b0ada4]" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Name + brand + quantity */}
+                <div className="text-center space-y-1">
+                  <h2 className="text-[20px] font-black text-[#2f2f2d] leading-tight">
+                    {scannedProduct.name}
+                  </h2>
+                  {scannedProduct.brand && (
+                    <p className="text-[14px] text-[#78766d]">{scannedProduct.brand}</p>
+                  )}
+                  {scannedProduct.quantity && (
+                    <p className="text-[13px] text-[#9a978f]">{scannedProduct.quantity}</p>
+                  )}
+                </div>
+
+                {/* Nutrition per 100g label */}
+                <p className="text-[12px] font-semibold uppercase tracking-wide text-[#75736b]">
+                  Næringsindhold pr. 100g
+                </p>
+
+                {/* 4-column nutrition grid */}
+                <div className="grid grid-cols-4 gap-2">
+                  {[
+                    { label: 'Kcal', value: Math.round(scannedProduct.kcalPer100g), unit: '', color: '#f58a2d' },
+                    { label: 'Protein', value: Math.round(scannedProduct.proteinPer100g * 10) / 10, unit: 'g', color: '#3b82f6' },
+                    { label: 'Kulh.', value: Math.round(scannedProduct.carbsPer100g * 10) / 10, unit: 'g', color: '#f59e0b' },
+                    { label: 'Fedt', value: Math.round(scannedProduct.fatPer100g * 10) / 10, unit: 'g', color: '#ef4444' },
+                  ].map(n => (
+                    <div key={n.label} className="rounded-[8px] bg-white border border-[#e5e3dc] p-2.5 text-center">
+                      <p className="text-[16px] font-black leading-tight" style={{ color: n.color }}>{n.value}{n.unit}</p>
+                      <p className="text-[10px] text-[#9a978f] mt-0.5">{n.label}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Additional nutrition (fiber, sugar, salt) */}
+                {(scannedProduct.fiberPer100g != null || scannedProduct.sugarPer100g != null || scannedProduct.saltPer100g != null) && (
+                  <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-4 space-y-2.5">
+                    {[
+                      { label: 'Kostfibre', value: scannedProduct.fiberPer100g, unit: 'g' },
+                      { label: 'Sukker', value: scannedProduct.sugarPer100g, unit: 'g' },
+                      { label: 'Salt', value: scannedProduct.saltPer100g, unit: 'g' },
+                    ].filter(n => n.value != null).map(n => (
+                      <div key={n.label} className="flex items-center justify-between">
+                        <span className="text-[13px] text-[#78766d]">{n.label}</span>
+                        <span className="text-[13px] font-semibold text-[#2f2f2d]">
+                          {Math.round(n.value! * 10) / 10}{n.unit}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Barcode display */}
+                {scannedBarcode && (
+                  <p className="text-[11px] text-[#b0ada4] text-center">Stregkode: {scannedBarcode}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Fixed bottom button */}
+            <div className="shrink-0 px-4 pb-[env(safe-area-inset-bottom,24px)] pt-3 bg-[#faf9f6]">
+              <button
+                onClick={handleAddScannedToShopping}
+                className="w-full rounded-[8px] bg-[#f58a2d] py-4 text-[15px] font-bold text-white active:scale-[0.98] transition-transform"
+              >
+                Tilføj til indkøbsliste
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Full-screen new meal page — triggered from TopBar */}
+      <AnimatePresence>
+        {isAddMealOpen && (
+          <motion.div
+            key="new-meal"
+            className="fixed inset-0 z-[55] bg-[#faf9f6] flex flex-col overflow-hidden"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', stiffness: 380, damping: 38 }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.15}
+            onDragEnd={(_: unknown, info: { offset: { x: number } }) => {
+              if (info.offset.x > 100) {
+                if (newMeal.title.trim()) { setConfirmClose(true); } else { setIsAddMealOpen(false); resetMealForm(); }
+              }
+            }}
+          >
+            {/* Header */}
+            <div className="shrink-0 flex items-center justify-between px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-[#faf9f6]">
+              <button
+                onClick={() => {
+                  if (newMeal.title.trim()) { setConfirmClose(true); } else { setIsAddMealOpen(false); resetMealForm(); }
+                }}
+                className="flex h-9 w-9 items-center justify-center text-[#2f2f2d] active:scale-[0.92] transition-transform"
+              >
+                <ArrowLeft className="h-[18px] w-[18px]" />
+              </button>
+              <h1 className="text-[17px] font-bold text-[#2f2f2d]">Ny ret</h1>
+              <div className="w-9" />
+            </div>
+
+            {/* Scrollable form */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="px-4 pt-4 pb-8 max-w-[430px] mx-auto space-y-4">
+                {/* Date + Meal type */}
+                <div className="grid grid-cols-2 gap-3 overflow-hidden">
+                  <div className="space-y-1.5 min-w-0 overflow-hidden">
+                    <label className="text-[12px] font-semibold text-[#78766d]">Dag</label>
+                    <input
+                      type="date"
+                      value={newMeal.date}
+                      onChange={(e) => setNewMeal((prev) => ({ ...prev, date: e.target.value }))}
+                      className="w-full min-w-0 max-w-full rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-3 text-[14px] text-[#2f2f2d] outline-none focus:border-[#f58a2d]"
+                    />
+                  </div>
+                  <div className="space-y-1.5 min-w-0 overflow-hidden">
+                    <label className="text-[12px] font-semibold text-[#78766d]">Måltid</label>
+                    <SelectSheet
+                      value={newMeal.mealType}
+                      onValueChange={(value) => setNewMeal((prev) => ({ ...prev, mealType: value }))}
+                      title="Måltid"
+                      options={[
+                        { value: 'breakfast', label: 'Morgenmad' },
+                        { value: 'lunch', label: 'Frokost' },
+                        { value: 'dinner', label: 'Aftensmad' },
+                        { value: 'snack', label: 'Snack' },
+                      ]}
+                      className="rounded-[8px] border border-[#e5e3dc] bg-white text-[#2f2f2d]"
+                    />
+                  </div>
+                </div>
+
+                {/* Dish title */}
+                <div className="space-y-1.5">
+                  <label className="text-[12px] font-semibold text-[#78766d]">Ret *</label>
+                  <input
+                    type="text"
+                    value={newMeal.title}
+                    onChange={(e) => setNewMeal((prev) => ({ ...prev, title: e.target.value }))}
+                    placeholder="Fx lasagne med salat"
+                    autoFocus
+                    className="w-full rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d]"
+                  />
+                </div>
+
+                {/* Ingredients */}
+                <div className="space-y-1.5">
+                  <label className="text-[12px] font-semibold text-[#78766d]">Ingredienser (én pr. linje)</label>
+                  <textarea
+                    value={newMeal.ingredientsText}
+                    onChange={(e) => setNewMeal((prev) => ({ ...prev, ingredientsText: e.target.value }))}
+                    rows={4}
+                    placeholder={'500 g hakket oksekød\n1 løg\n2 dåser tomat'}
+                    className="w-full rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d] resize-none"
+                  />
+                </div>
+
+                {/* Instructions */}
+                <div className="space-y-1.5">
+                  <label className="text-[12px] font-semibold text-[#78766d]">Opskrift / fremgangsmåde</label>
+                  <textarea
+                    value={newMeal.instructions}
+                    onChange={(e) => setNewMeal((prev) => ({ ...prev, instructions: e.target.value }))}
+                    rows={3}
+                    placeholder="Skriv korte trin..."
+                    className="w-full rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d] resize-none"
+                  />
+                </div>
+
+                {/* Notes */}
+                <div className="space-y-1.5">
+                  <label className="text-[12px] font-semibold text-[#78766d]">Noter</label>
+                  <input
+                    type="text"
+                    value={newMeal.notes}
+                    onChange={(e) => setNewMeal((prev) => ({ ...prev, notes: e.target.value }))}
+                    placeholder="Fx barnets favorit, kan fryses osv."
+                    className="w-full rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d]"
+                  />
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={fillMealFromSuggestion}
+                    className="flex flex-1 items-center justify-center gap-2 rounded-[8px] border-2 border-[#e5e3dc] bg-white py-4 text-[14px] font-bold text-[#2f2f2d] active:scale-[0.98] transition-transform"
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                    Foreslå ret
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleAddMeal}
+                    disabled={!newMeal.title.trim() || isSaving}
+                    className="flex-1 flex items-center justify-center gap-2 rounded-[8px] bg-[#2f2f2f] py-4 text-[15px] font-bold text-white active:scale-[0.98] transition-transform disabled:opacity-40"
+                  >
+                    Gem ret
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {activeTab === 'meal-plan' && (
         <div className="space-y-2">
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              onClick={() => setRecipeBrowserOpen(true)}
-              className="flex items-center gap-2 rounded-2xl border-2 border-[#e5e3dc] bg-white px-3 py-2.5 text-left transition-all active:scale-[0.97] hover:border-[#cccbc3]"
-            >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#f2f1ed]">
-                <BookOpen className="h-3.5 w-3.5 text-[#7a786f]" />
-              </div>
-              <span className="text-[12px] font-semibold text-[#4a4945] leading-tight">Opskrifter</span>
-            </button>
-            <Dialog open={isAddMealOpen} onOpenChange={setIsAddMealOpen}>
-              <DialogTrigger asChild>
-                <button className="flex items-center gap-2 rounded-2xl border-2 border-[#f3c59d] bg-[#fff2e6] px-3 py-2.5 text-left shadow-[0_2px_12px_rgba(245,138,45,0.12)] transition-all active:scale-[0.97]">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#f58a2d]">
-                    <Plus className="h-3.5 w-3.5 text-white" />
-                  </div>
-                  <span className="text-[12px] font-bold text-[#bf6722] leading-tight">Tilføj ret</span>
-                </button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Ny ret i madplanen</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-2 pt-2">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <Label>Dag</Label>
-                      <Input
-                        type="date"
-                        value={newMeal.date}
-                        onChange={(e) => setNewMeal((prev) => ({ ...prev, date: e.target.value }))}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Måltid</Label>
-                      <Select
-                        value={newMeal.mealType}
-                        onValueChange={(value) => setNewMeal((prev) => ({ ...prev, mealType: value }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="breakfast">Morgenmad</SelectItem>
-                          <SelectItem value="lunch">Frokost</SelectItem>
-                          <SelectItem value="dinner">Aftensmad</SelectItem>
-                          <SelectItem value="snack">Snack</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Ret</Label>
-                    <Input
-                      value={newMeal.title}
-                      onChange={(e) => setNewMeal((prev) => ({ ...prev, title: e.target.value }))}
-                      placeholder="Fx lasagne med salat"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Ingredienser (én pr. linje)</Label>
-                    <Textarea
-                      value={newMeal.ingredientsText}
-                      onChange={(e) => setNewMeal((prev) => ({ ...prev, ingredientsText: e.target.value }))}
-                      rows={4}
-                      placeholder={'500 g hakket oksekød\n1 løg\n2 dåser tomat'}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Opskrift / fremgangsmåde</Label>
-                    <Textarea
-                      value={newMeal.instructions}
-                      onChange={(e) => setNewMeal((prev) => ({ ...prev, instructions: e.target.value }))}
-                      rows={3}
-                      placeholder="Skriv korte trin..."
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Noter</Label>
-                    <Input
-                      value={newMeal.notes}
-                      onChange={(e) => setNewMeal((prev) => ({ ...prev, notes: e.target.value }))}
-                      placeholder="Fx barnets favorit, kan fryses osv."
-                    />
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button type="button" variant="outline" className="flex-1" onClick={fillMealFromSuggestion}>
-                      <RefreshCw className="mr-2 h-4 w-4" />
-                      Foreslå ret
-                    </Button>
-                    <Button type="button" className="flex-1" onClick={handleAddMeal}>
-                      Gem ret
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-
-            <button
-              onClick={handleGenerateShoppingFromWeek}
-              className="flex items-center gap-2 rounded-2xl border-2 border-[#e5e3dc] bg-white px-3 py-2.5 text-left transition-all active:scale-[0.97] hover:border-[#cccbc3]"
-            >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#f2f1ed]">
-                <ShoppingCart className="h-3.5 w-3.5 text-[#7a786f]" />
-              </div>
-              <span className="text-[12px] font-semibold text-[#4a4945] leading-tight">Generer indkøb</span>
-            </button>
-          </div>
-
           <div className="grid gap-3">
             {mealsByDate.map(({ date, meals }) => {
               const parsedDate = parseISO(date);
@@ -1908,7 +1877,7 @@ export function MadOgHjem() {
                     {meals.map((meal) => (
                       <div
                         key={meal.id}
-                        className="rounded-xl border border-slate-200 p-3"
+                        className="rounded-[8px] border border-slate-200 p-3"
                         onClick={() => setSelectedMealGuideId(meal.id)}
                         role="button"
                         tabIndex={0}
@@ -1989,605 +1958,544 @@ export function MadOgHjem() {
             })}
           </div>
 
-          <Sheet
-            open={Boolean(selectedMealGuide)}
-            onOpenChange={(open) => {
-              if (!open) {
-                setSelectedMealGuideId(null);
-                setGuideCompletedSteps(new Set());
-              }
-            }}
-          >
-            <SheetContent side="bottom" className="max-h-[92vh] overflow-y-auto rounded-t-3xl border-[#d8d7cf] bg-[#faf9f6] px-4 pb-8 pt-4">
-              <SheetHeader className="pb-2">
-                <SheetTitle className="text-left text-lg font-bold text-[#2f2f2d]">
-                  {selectedMealGuide?.title || 'Opskrift'}
-                </SheetTitle>
-              </SheetHeader>
-              {selectedMealGuide && (() => {
-                const richSteps = buildRichPreparationSteps(
-                  selectedMealGuide.recipe?.instructions,
-                  selectedMealGuide.recipe?.ingredients || [],
-                  selectedMealGuide.title
-                );
-                const totalDuration = richSteps.reduce((sum, s) => sum + (s.duration || 0), 0);
-                const completedCount = guideCompletedSteps.size;
-                const progressPercent = richSteps.length > 0 ? Math.round((completedCount / richSteps.length) * 100) : 0;
+          <AnimatePresence>
+            {selectedMealGuide && (() => {
+              const richSteps = buildRichPreparationSteps(
+                selectedMealGuide.recipe?.instructions,
+                selectedMealGuide.recipe?.ingredients || [],
+                selectedMealGuide.title
+              );
+              const totalDuration = richSteps.reduce((sum, s) => sum + (s.duration || 0), 0);
+              const completedCount = guideCompletedSteps.size;
+              const progressPercent = richSteps.length > 0 ? Math.round((completedCount / richSteps.length) * 100) : 0;
+              const matchedRecipe = findMatchingRecipe(selectedMealGuide.title);
+              const guideVideoUrl = matchedRecipe ? getRecipeVideoUrl(matchedRecipe.id) : null;
 
-                return (
-                  <div className="space-y-2 pt-1">
-                    {/* Header badges + time estimate */}
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge variant="outline" className="border-[#e8e7e0] bg-white text-[#4a4944]">
-                        {getMealTypeLabel(selectedMealGuide.mealType)}
-                      </Badge>
-                      <Badge variant="secondary" className="bg-[#ecebe5] text-[#4a4944]">
-                        {format(parseISO(selectedMealGuide.date), 'EEEE d. MMMM', { locale: da })}
-                      </Badge>
-                      {totalDuration > 0 && (
-                        <Badge className="bg-[#fff2e6] text-[#a8662f]">
-                          <Clock className="mr-1 h-3 w-3" />
-                          ca. {totalDuration} min
+              return (
+                <motion.div
+                  key="meal-guide"
+                  className="fixed inset-0 z-[55] bg-[#faf9f6] flex flex-col overflow-hidden"
+                  initial={{ x: '100%' }}
+                  animate={{ x: 0 }}
+                  exit={{ x: '100%' }}
+                  transition={{ type: 'spring', stiffness: 380, damping: 38 }}
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.15}
+                  onDragEnd={(_: unknown, info: { offset: { x: number } }) => {
+                    if (info.offset.x > 100) {
+                      setSelectedMealGuideId(null);
+                      setGuideCompletedSteps(new Set());
+                      setMealGuideVideoPlaying(false);
+                    }
+                  }}
+                >
+                  {/* Header */}
+                  <div className="shrink-0 flex items-center justify-between px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-[#faf9f6]">
+                    <button
+                      onClick={() => {
+                        setSelectedMealGuideId(null);
+                        setGuideCompletedSteps(new Set());
+                        setMealGuideVideoPlaying(false);
+                      }}
+                      className="flex h-9 w-9 items-center justify-center text-[#2f2f2d] active:scale-[0.92] transition-transform"
+                    >
+                      <ArrowLeft className="h-[18px] w-[18px]" />
+                    </button>
+                    <h1 className="text-[17px] font-bold text-[#2f2f2d] truncate max-w-[260px]">
+                      {selectedMealGuide.title}
+                    </h1>
+                    <div className="w-9" />
+                  </div>
+
+                  {/* Scrollable content */}
+                  <div className="flex-1 overflow-y-auto">
+                    <div className="px-4 pt-2 pb-8 max-w-[430px] mx-auto space-y-3">
+                      {/* Badges + time estimate */}
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge variant="outline" className="border-[#e8e7e0] bg-white text-[#4a4944]">
+                          {getMealTypeLabel(selectedMealGuide.mealType)}
                         </Badge>
-                      )}
-                      {selectedMealGuide.notes?.toLowerCase().includes('auto-plan') && (
-                        <Badge className="bg-[#e6f0ff] text-[#2563eb]">
-                          <Sparkles className="mr-1 h-3 w-3" />
-                          Auto-plan
+                        <Badge variant="secondary" className="bg-[#ecebe5] text-[#4a4944]">
+                          {format(parseISO(selectedMealGuide.date), 'EEEE d. MMMM', { locale: da })}
                         </Badge>
-                      )}
-                    </div>
-
-                    {/* Progress bar */}
-                    <div className="space-y-1">
-                      <div className="flex items-center justify-between text-[11px] text-[#78766d]">
-                        <span>Fremskridt</span>
-                        <span>{completedCount} af {richSteps.length} trin · {progressPercent}%</span>
+                        {totalDuration > 0 && (
+                          <Badge className="bg-[#fff2e6] text-[#a8662f]">
+                            <Clock className="mr-1 h-3 w-3" />
+                            ca. {totalDuration} min
+                          </Badge>
+                        )}
+                        {selectedMealGuide.notes?.toLowerCase().includes('auto-plan') && (
+                          <Badge className="bg-[#e6f0ff] text-[#2563eb]">
+                            <Sparkles className="mr-1 h-3 w-3" />
+                            Auto-plan
+                          </Badge>
+                        )}
                       </div>
-                      <div className="h-2 w-full overflow-hidden rounded-full bg-[#ecebe5]">
-                        <div
-                          className="h-full rounded-full bg-[#f58a2d] transition-all duration-500 ease-out"
-                          style={{ width: `${progressPercent}%` }}
-                        />
-                      </div>
-                    </div>
 
-                    {/* Ingredients card */}
-                    {selectedMealGuide.recipe?.ingredients?.length ? (
-                      <div className="rounded-2xl border border-[#e8e7e0] bg-white p-3">
-                        <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">
-                          Ingredienser ({selectedMealGuide.recipe.ingredients.length})
-                        </p>
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                          {selectedMealGuide.recipe.ingredients.map((ingredient, index) => (
-                            <div
-                              key={`${selectedMealGuide.id}-ingredient-${index}`}
-                              className="flex items-center gap-2 py-0.5 text-[12px] text-[#2f2f2d]"
-                            >
-                              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#f58a2d]" />
-                              {ingredient}
+                      {/* Video card — only shown if recipe has a video */}
+                      {guideVideoUrl && (
+                        mealGuideVideoPlaying ? (
+                          <div className="rounded-[8px] overflow-hidden border-2 border-[#e5e3dc] bg-black">
+                            <video
+                              src={guideVideoUrl}
+                              controls
+                              autoPlay
+                              playsInline
+                              className="w-full aspect-video"
+                              onEnded={() => setMealGuideVideoPlaying(false)}
+                            />
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setMealGuideVideoPlaying(true)}
+                            className="flex w-full items-center gap-3 rounded-[8px] border-2 border-[#e5e3dc] bg-[#2f2f2d] px-4 py-3.5 text-left transition-all active:scale-[0.98]"
+                          >
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f58a2d]">
+                              <Play className="h-5 w-5 text-white ml-0.5" />
                             </div>
-                          ))}
+                            <div>
+                              <p className="text-[14px] font-bold text-white">Se tilberedningsvideo</p>
+                              <p className="text-[11px] text-[#9a978f]">Trin-for-trin video</p>
+                            </div>
+                          </button>
+                        )
+                      )}
+
+                      {/* Progress bar */}
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-[11px] text-[#78766d]">
+                          <span>Fremskridt</span>
+                          <span>{completedCount} af {richSteps.length} trin · {progressPercent}%</span>
+                        </div>
+                        <div className="h-2 w-full overflow-hidden rounded-full bg-[#ecebe5]">
+                          <div
+                            className="h-full rounded-full bg-[#f58a2d] transition-all duration-500 ease-out"
+                            style={{ width: `${progressPercent}%` }}
+                          />
                         </div>
                       </div>
-                    ) : null}
 
-                    {/* Rich step-by-step guide */}
-                    <div>
-                      <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">
-                        Trin-for-trin tilberedning
-                      </p>
-                      <div className="space-y-2">
-                        {richSteps.map((step, index) => {
-                          const isCompleted = guideCompletedSteps.has(index);
-                          return (
-                            <div
-                              key={`${selectedMealGuide.id}-rstep-${index}`}
-                              className={cn(
-                                "rounded-2xl border bg-white p-3.5 transition-all duration-300",
-                                isCompleted
-                                  ? "border-green-200 bg-green-50/50 opacity-75"
-                                  : "border-[#e8e7e0]"
-                              )}
-                            >
-                              {/* Step header */}
-                              <div className="flex items-start gap-3">
-                                <button
-                                  onClick={() => {
-                                    setGuideCompletedSteps(prev => {
-                                      const next = new Set(prev);
-                                      if (next.has(index)) next.delete(index);
-                                      else next.add(index);
-                                      return next;
-                                    });
-                                  }}
-                                  className={cn(
-                                    "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-bold transition-all",
-                                    isCompleted
-                                      ? "bg-green-500 text-white"
-                                      : "bg-[#f58a2d] text-white"
-                                  )}
-                                >
-                                  {isCompleted ? '✓' : index + 1}
-                                </button>
-                                <div className="min-w-0 flex-1">
-                                  <div className="flex items-center gap-2">
-                                    <p className={cn(
-                                      "text-[13px] font-semibold",
-                                      isCompleted ? "text-green-700 line-through" : "text-[#2f2f2d]"
-                                    )}>
-                                      {step.title}
-                                    </p>
-                                    {step.duration && (
-                                      <span className="inline-flex items-center gap-0.5 rounded-full bg-[#f0efe8] px-2 py-0.5 text-[10px] font-medium text-[#5f5d56]">
-                                        <Timer className="h-2.5 w-2.5" />
-                                        {step.duration} min
+                      {/* Ingredients card */}
+                      {selectedMealGuide.recipe?.ingredients?.length ? (
+                        <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-3">
+                          <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">
+                            Ingredienser ({selectedMealGuide.recipe.ingredients.length})
+                          </p>
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                            {selectedMealGuide.recipe.ingredients.map((ingredient, index) => (
+                              <div
+                                key={`${selectedMealGuide.id}-ingredient-${index}`}
+                                className="flex items-center gap-2 py-0.5 text-[12px] text-[#2f2f2d]"
+                              >
+                                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#f58a2d]" />
+                                {ingredient}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ) : null}
+
+                      {/* Rich step-by-step guide */}
+                      <div>
+                        <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">
+                          Trin-for-trin tilberedning
+                        </p>
+                        <div className="space-y-2">
+                          {richSteps.map((step, index) => {
+                            const isCompleted = guideCompletedSteps.has(index);
+                            return (
+                              <div
+                                key={`${selectedMealGuide.id}-rstep-${index}`}
+                                className={cn(
+                                  "rounded-[8px] border bg-white p-3.5 transition-all duration-300",
+                                  isCompleted
+                                    ? "border-green-200 bg-green-50/50 opacity-75"
+                                    : "border-[#e8e7e0]"
+                                )}
+                              >
+                                {/* Step header */}
+                                <div className="flex items-start gap-3">
+                                  <button
+                                    onClick={() => {
+                                      setGuideCompletedSteps(prev => {
+                                        const next = new Set(prev);
+                                        if (next.has(index)) next.delete(index);
+                                        else next.add(index);
+                                        return next;
+                                      });
+                                    }}
+                                    className={cn(
+                                      "flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-bold transition-all",
+                                      isCompleted
+                                        ? "bg-green-500 text-white"
+                                        : "bg-[#f58a2d] text-white"
+                                    )}
+                                  >
+                                    {isCompleted ? '✓' : index + 1}
+                                  </button>
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-center gap-2">
+                                      <p className={cn(
+                                        "text-[13px] font-semibold",
+                                        isCompleted ? "text-green-700 line-through" : "text-[#2f2f2d]"
+                                      )}>
+                                        {step.title}
+                                      </p>
+                                      {step.duration && (
+                                        <span className="inline-flex items-center gap-0.5 rounded-full bg-[#f0efe8] px-2 py-0.5 text-[10px] font-medium text-[#5f5d56]">
+                                          <Timer className="h-2.5 w-2.5" />
+                                          {step.duration} min
+                                        </span>
+                                      )}
+                                      {step.temperature && (
+                                        <span className="inline-flex items-center gap-0.5 rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-medium text-red-600">
+                                          <Flame className="h-2.5 w-2.5" />
+                                          {step.temperature}
+                                        </span>
+                                      )}
+                                    </div>
+
+                                    {/* Technique badge */}
+                                    {step.technique && (
+                                      <span className="mt-1 inline-block rounded-md bg-[#f0efe8] px-1.5 py-0.5 text-[10px] text-[#67645c]">
+                                        {step.technique}
                                       </span>
                                     )}
-                                    {step.temperature && (
-                                      <span className="inline-flex items-center gap-0.5 rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-medium text-red-600">
-                                        <Flame className="h-2.5 w-2.5" />
-                                        {step.temperature}
-                                      </span>
+
+                                    {/* Step description */}
+                                    <p className={cn(
+                                      "mt-1.5 text-[12px] leading-relaxed",
+                                      isCompleted ? "text-green-600" : "text-[#4a4945]"
+                                    )}>
+                                      {step.description}
+                                    </p>
+
+                                    {/* Referenced ingredients */}
+                                    {step.ingredients && step.ingredients.length > 0 && (
+                                      <div className="mt-2 flex flex-wrap gap-1">
+                                        {step.ingredients.map((ing, i) => (
+                                          <span
+                                            key={i}
+                                            className="rounded-full bg-[#fff8f0] px-2 py-0.5 text-[10px] font-medium text-[#a8662f]"
+                                          >
+                                            {ing}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    )}
+
+                                    {/* Helpful tip */}
+                                    {step.tip && (
+                                      <div className="mt-2 flex items-start gap-1.5 rounded-[8px] bg-[#fdf8ef] px-2.5 py-2">
+                                        <Lightbulb className="mt-0.5 h-3 w-3 shrink-0 text-[#e5a73b]" />
+                                        <p className="text-[11px] leading-relaxed text-[#7a6b3e]">{step.tip}</p>
+                                      </div>
                                     )}
                                   </div>
-
-                                  {/* Technique badge */}
-                                  {step.technique && (
-                                    <span className="mt-1 inline-block rounded-md bg-[#f0efe8] px-1.5 py-0.5 text-[10px] text-[#67645c]">
-                                      {step.technique}
-                                    </span>
-                                  )}
-
-                                  {/* Step description */}
-                                  <p className={cn(
-                                    "mt-1.5 text-[12px] leading-relaxed",
-                                    isCompleted ? "text-green-600" : "text-[#4a4945]"
-                                  )}>
-                                    {step.description}
-                                  </p>
-
-                                  {/* Referenced ingredients */}
-                                  {step.ingredients && step.ingredients.length > 0 && (
-                                    <div className="mt-2 flex flex-wrap gap-1">
-                                      {step.ingredients.map((ing, i) => (
-                                        <span
-                                          key={i}
-                                          className="rounded-full bg-[#fff8f0] px-2 py-0.5 text-[10px] font-medium text-[#a8662f]"
-                                        >
-                                          {ing}
-                                        </span>
-                                      ))}
-                                    </div>
-                                  )}
-
-                                  {/* Helpful tip */}
-                                  {step.tip && (
-                                    <div className="mt-2 flex items-start gap-1.5 rounded-lg bg-[#fdf8ef] px-2.5 py-2">
-                                      <Lightbulb className="mt-0.5 h-3 w-3 shrink-0 text-[#e5a73b]" />
-                                      <p className="text-[11px] leading-relaxed text-[#7a6b3e]">{step.tip}</p>
-                                    </div>
-                                  )}
                                 </div>
                               </div>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Done button */}
-                    {progressPercent === 100 && (
-                      <div className="rounded-2xl border border-green-200 bg-green-50 p-4 text-center">
-                        <p className="text-sm font-semibold text-green-700">🎉 Alle trin fuldført!</p>
-                        <p className="mt-0.5 text-xs text-green-600">Velbekomme — nyd maden!</p>
-                      </div>
-                    )}
+                      {/* Done message */}
+                      {progressPercent === 100 && (
+                        <div className="rounded-[8px] border border-green-200 bg-green-50 p-4 text-center">
+                          <p className="text-sm font-semibold text-green-700">Alle trin fuldført!</p>
+                          <p className="mt-0.5 text-xs text-green-600">Velbekomme — nyd maden!</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                );
-              })()}
-            </SheetContent>
-          </Sheet>
+                </motion.div>
+              );
+            })()}
+          </AnimatePresence>
         </div>
       )}
 
-      {activeTab === 'shopping' && (
-        <div className="space-y-2">
-          {/* Sub-tabs: Køleskab / Indkøbsliste */}
-          <div className="flex rounded-xl border border-[#d8d7cf] bg-[#ecebe5] p-1">
-            <button
-              onClick={() => setShoppingSubTab('koleskab')}
-              className={cn(
-                "flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-semibold transition-all",
-                shoppingSubTab === 'koleskab'
-                  ? "bg-white text-[#2f2f2d] shadow-sm"
-                  : "text-[#78766d] hover:text-[#4a4945]"
-              )}
-            >
-              <PackageSearch className="h-4 w-4" />
-              Køleskab
-            </button>
-            <button
-              onClick={() => setShoppingSubTab('indkobsliste')}
-              className={cn(
-                "flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-semibold transition-all",
-                shoppingSubTab === 'indkobsliste'
-                  ? "bg-white text-[#2f2f2d] shadow-sm"
-                  : "text-[#78766d] hover:text-[#4a4945]"
-              )}
-            >
-              <ShoppingCart className="h-4 w-4" />
-              Indkøbsliste
-            </button>
-          </div>
+      {activeTab === 'fridge' && (
+        <KoleskabView />
+      )}
 
-          {shoppingSubTab === 'koleskab' && (
-          <Card className="border-[#d8d7cf] bg-[#faf9f6]">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <PackageSearch className="h-4 w-4 text-[#67645c]" />
-                Køleskabsscanning og madforslag
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 pt-0">
-              <div className="flex gap-2">
-                <Input
-                  value={fridgeQuickInput}
-                  onChange={(event) => setFridgeQuickInput(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter') {
-                      event.preventDefault();
-                      addQuickFridgeItem();
-                    }
-                  }}
-                  placeholder="Tilføj vare i køleskab (fx æg, spinat)"
-                />
-                <Button type="button" variant="outline" onClick={addQuickFridgeItem}>
-                  Tilføj
-                </Button>
-              </div>
-
-              {fridgeItems.length === 0 ? (
-                <p className="rounded-xl border border-dashed border-[#d8d7cf] bg-[#f7f6f2] p-3 text-xs text-[#75736b]">
-                  Tilføj varer fra scanner eller manuelt. Så får du forslag baseret på det, du allerede har.
-                </p>
-              ) : (
-                <div className="space-y-2">
-                  <div className="flex flex-wrap gap-2">
-                    {fridgeItems.map((item, index) => (
-                      <Badge key={`${item.barcode || item.name}-${index}`} variant="outline" className="bg-white">
-                        {item.name}
-                      </Badge>
-                    ))}
-                  </div>
-                  {fridgeNutritionStats && (
-                    <div className="rounded-xl border border-[#e0ded7] bg-white p-3 text-xs text-[#5f5c53]">
-                      <p className="font-medium text-[#2f2f2d]">Nærings-estimat (pr. 100g på registrerede produkter)</p>
-                      <p className="mt-1">
-                        {Math.round(fridgeNutritionStats.avgEnergy)} kcal ·
-                        {' '}P {fridgeNutritionStats.avgProtein.toFixed(1)}g ·
-                        {' '}K {fridgeNutritionStats.avgCarbs.toFixed(1)}g ·
-                        {' '}F {fridgeNutritionStats.avgFat.toFixed(1)}g
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <p className="text-xs font-medium text-[#5f5c53]">Forslag ud fra køleskab</p>
-                {fridgeMealSuggestions.length === 0 ? (
-                  <p className="text-xs text-[#75736b]">Ingen match endnu. Tilføj flere varer for bedre forslag.</p>
-                ) : (
-                  fridgeMealSuggestions.map((entry) => (
-                    <div key={entry.candidate.title} className="rounded-xl border border-[#dfddd6] bg-white p-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <p className="text-sm font-semibold text-[#2f2f2d]">{entry.candidate.title}</p>
-                          <p className="text-xs text-[#75736b]">
-                            Matcher: {entry.matchedIngredients.slice(0, 3).join(', ') || 'basisvarer'}
-                          </p>
-                        </div>
-                        <Button size="sm" variant="outline" onClick={() => applyFridgeSuggestionAsMeal(entry.candidate)}>
-                          <Sparkles className="mr-1 h-3.5 w-3.5" />
-                          Brug
-                        </Button>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </CardContent>
-          </Card>
-          )}
-
-          {shoppingSubTab === 'indkobsliste' && (<>
-
-          {/* ── Action cards ── */}
-          <div className="grid grid-cols-2 gap-2.5">
-            <Dialog open={isAddShoppingOpen} onOpenChange={setIsAddShoppingOpen}>
-              <DialogTrigger asChild>
-                <button className="flex items-center gap-2.5 rounded-2xl border-2 border-[#f3c59d] bg-[#fff2e6] p-3 text-left shadow-[0_2px_12px_rgba(245,138,45,0.12)] transition-all active:scale-[0.98]">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f58a2d]">
-                    <Plus className="h-4 w-4 text-white" />
-                  </div>
-                  <span className="text-[13px] font-bold text-[#bf6722]">Tilføj vare</span>
-                </button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Ny vare til indkøb</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-2 pt-2">
-                  <div className="space-y-2">
-                    <Label>Vare</Label>
-                    <Input
-                      value={newShopping.name}
-                      onChange={(e) => setNewShopping((prev) => ({ ...prev, name: e.target.value }))}
-                      placeholder="Fx gulerødder"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <Label>Mængde</Label>
-                      <Input
-                        value={newShopping.quantity}
-                        onChange={(e) => setNewShopping((prev) => ({ ...prev, quantity: e.target.value }))}
-                        placeholder="Fx 1 kg"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Prioritet</Label>
-                      <Select
-                        value={newShopping.priority}
-                        onValueChange={(value) => setNewShopping((prev) => ({ ...prev, priority: value }))}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="low">Lav</SelectItem>
-                          <SelectItem value="normal">Normal</SelectItem>
-                          <SelectItem value="high">Høj</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <Label>Kategori</Label>
-                      <Input
-                        value={newShopping.category}
-                        onChange={(e) => setNewShopping((prev) => ({ ...prev, category: e.target.value }))}
-                        placeholder="Fx Dagligvarer"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Dag (valgfri)</Label>
-                      <Input
-                        type="date"
-                        value={newShopping.neededForDate}
-                        onChange={(e) => setNewShopping((prev) => ({ ...prev, neededForDate: e.target.value }))}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Knyt til ret (valgfri)</Label>
-                    <Select
-                      value={newShopping.neededForMealId}
-                      onValueChange={(value) => setNewShopping((prev) => ({ ...prev, neededForMealId: value }))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Vælg ret" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Ingen ret valgt</SelectItem>
-                        {upcomingMealPlans.map((meal) => (
-                          <SelectItem key={meal.id} value={meal.id}>
-                            {format(parseISO(meal.date), 'd. MMM', { locale: da })} - {meal.title}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Button onClick={handleAddShopping} className="w-full">
-                    Tilføj vare
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-
-            <Dialog
-              open={isScanDialogOpen}
-              onOpenChange={(open) => {
-                if (!open) {
-                  setIsScanDialogOpen(false);
-                  return;
-                }
-                openScanDialog();
+      {/* Add shopping item — bottom sheet popup */}
+      <AnimatePresence>
+        {isAddShoppingOpen && (
+          <>
+            <motion.div
+              className="fixed inset-0 z-[60] bg-black/40"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => {
+                if (newShopping.name.trim()) { setConfirmClose(true); } else { setIsAddShoppingOpen(false); }
               }}
+            />
+            <motion.div
+              className="fixed bottom-0 left-0 right-0 z-[61] bg-white rounded-t-3xl shadow-2xl pb-[env(safe-area-inset-bottom,24px)] max-h-[90vh] flex flex-col"
+              initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
+              transition={{ type: 'spring', stiffness: 400, damping: 40 }}
             >
-              <DialogTrigger asChild>
-                <button disabled={!canUseScanner} onClick={openScanDialog} className="flex items-center gap-2.5 rounded-2xl border-2 border-[#e5e3dc] bg-white p-3 text-left transition-all hover:border-[#cccbc3] active:scale-[0.98] disabled:opacity-50">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f0efe8]">
-                    <ScanLine className="h-4 w-4 text-[#75736b]" />
-                  </div>
-                  <span className="text-[13px] font-bold text-[#2f2f2d]">Scan vare</span>
-                </button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Scan stregkode til indkøbsliste</DialogTitle>
-                </DialogHeader>
-                <div className="space-y-2 pt-2">
-                  <div className="overflow-hidden rounded-2xl border border-slate-200 bg-black">
-                    <video
-                      ref={videoRef}
-                      className="h-56 w-full object-cover"
-                      playsInline
-                      muted
+              <div className="flex justify-center pt-3 pb-1">
+                <div className="h-1 w-10 rounded-full bg-[#d8d7cf]" />
+              </div>
+              <div className="text-center pb-2">
+                <h2 className="text-[17px] font-bold text-[#2f2f2d]">Tilføj til indkøbsliste</h2>
+              </div>
+              <div className="px-4 pt-4 pb-[300px] space-y-4 flex-1 overflow-y-auto">
+                <div className="space-y-1.5">
+                  <label className="text-[12px] font-semibold text-[#78766d]">Vare *</label>
+                  <input
+                    type="text"
+                    value={newShopping.name}
+                    onChange={(e) => setNewShopping((prev) => ({ ...prev, name: e.target.value }))}
+                    placeholder="Fx gulerødder"
+                    autoFocus
+                    className="w-full rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d]"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="text-[12px] font-semibold text-[#78766d]">Mængde</label>
+                    <input
+                      type="text"
+                      value={newShopping.quantity}
+                      onChange={(e) => setNewShopping((prev) => ({ ...prev, quantity: e.target.value }))}
+                      placeholder="Fx 1 kg"
+                      className="w-full rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d]"
                     />
                   </div>
-
-                  {!scanSupported && (
-                    <p className="rounded-xl border border-[#f3c59d] bg-[#fff2e6] px-3 py-2 text-sm text-[#9a622f]">
-                      Din browser understøtter ikke stregkodescanner. Du kan stadig tilføje varen manuelt.
-                    </p>
-                  )}
-
-                  {scanError && (
-                    <p className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">
-                      {scanError}
-                    </p>
-                  )}
-
-                  <div className="flex items-center gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => {
-                        void startScanner();
-                      }}
-                      disabled={isScanning}
-                    >
-                      <Camera className="mr-2 h-4 w-4" />
-                      {isScanning ? 'Scanner...' : 'Start scanning'}
-                    </Button>
-                    <Button type="button" variant="ghost" onClick={stopScanner}>
-                      Stop
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      disabled={!scannedCode.trim() || isProductLookupLoading}
-                      onClick={() => {
-                        void hydrateScannedProduct(scannedCode);
-                      }}
-                    >
-                      {isProductLookupLoading ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}
-                      Hent produktdata
-                    </Button>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Stregkode</Label>
-                    <Input
-                      value={scannedCode}
-                      onChange={(e) => {
-                        setScannedCode(e.target.value);
-                        setScannedProduct(null);
-                      }}
-                      placeholder="Scannes automatisk eller skriv selv"
+                  <div className="space-y-1.5">
+                    <label className="text-[12px] font-semibold text-[#78766d]">Prioritet</label>
+                    <SelectSheet
+                      value={newShopping.priority}
+                      onValueChange={(value) => setNewShopping((prev) => ({ ...prev, priority: value }))}
+                      title="Prioritet"
+                      options={[
+                        { value: 'low', label: 'Lav' },
+                        { value: 'normal', label: 'Normal' },
+                        { value: 'high', label: 'Høj' },
+                      ]}
+                      className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] text-[#2f2f2d]"
                     />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Varenavn</Label>
-                    <Input
-                      value={scannedName}
-                      onChange={(e) => setScannedName(e.target.value)}
-                      placeholder="Fx Mælk 1L"
-                    />
-                  </div>
-
-                  {scannedProduct && (
-                    <div className="rounded-xl border border-[#dfddd6] bg-[#faf9f6] p-3">
-                      <p className="text-xs font-medium text-[#2f2f2d]">Open Food Facts data</p>
-                      <p className="mt-1 text-xs text-[#666359]">
-                        {scannedProduct.nutritionPer100g?.energyKcal
-                          ? `${Math.round(scannedProduct.nutritionPer100g.energyKcal)} kcal/100g`
-                          : 'Ingen energi-data'}
-                        {scannedProduct.allergens.length > 0 ? ` · Allergener: ${scannedProduct.allergens.join(', ')}` : ''}
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="space-y-2">
-                    <Label>Mængde (valgfri)</Label>
-                    <Input
-                      value={scannedQuantity}
-                      onChange={(e) => setScannedQuantity(e.target.value)}
-                      placeholder="Fx 2 stk"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    <Button type="button" className="w-full" onClick={addScannedShoppingItem}>
-                      Tilføj til indkøb
-                    </Button>
-                    <Button type="button" variant="outline" className="w-full" onClick={addScannedToFridge}>
-                      Tilføj til køleskab
-                    </Button>
                   </div>
                 </div>
-              </DialogContent>
-            </Dialog>
-
-            <button onClick={handleGenerateShoppingFromWeek} className="flex items-center gap-2.5 rounded-2xl border-2 border-[#e5e3dc] bg-white p-3 text-left transition-all hover:border-[#cccbc3] active:scale-[0.98]">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f0efe8]">
-                <RefreshCw className="h-4 w-4 text-[#75736b]" />
-              </div>
-              <span className="text-[13px] font-bold text-[#2f2f2d]">Fra madplan</span>
-            </button>
-            <button
-              onClick={async () => {
-                await rehydrateSharedState();
-                toast.success('Synkroniseret');
-              }}
-              className="flex items-center gap-2.5 rounded-2xl border-2 border-[#e5e3dc] bg-white p-3 text-left transition-all hover:border-[#cccbc3] active:scale-[0.98]"
-            >
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f0efe8]">
-                <RefreshCw className="h-4 w-4 text-[#75736b]" />
-              </div>
-              <span className="text-[13px] font-bold text-[#2f2f2d]">Synk nu</span>
-            </button>
-          </div>
-
-          {/* ── Day filter pills ── */}
-          <div className="rounded-2xl border border-[#e5e3dc] bg-white p-3.5 space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Vis efter dag</p>
-            <div className="flex gap-2 overflow-x-auto pb-0.5">
-              <button
-                type="button"
-                onClick={() => setShoppingFilterDate('all')}
-                className={cn(
-                  'shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-all whitespace-nowrap',
-                  shoppingFilterDate === 'all'
-                    ? 'bg-[#2f2f2f] text-white shadow-[0_2px_8px_rgba(0,0,0,0.12)]'
-                    : 'border border-[#e5e3dc] bg-[#faf9f6] text-[#75736b] hover:border-[#cccbc3]'
-                )}
-              >
-                Alle
-              </button>
-              {weekDates.map((date) => (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="text-[12px] font-semibold text-[#78766d]">Kategori</label>
+                    <input
+                      type="text"
+                      value={newShopping.category}
+                      onChange={(e) => setNewShopping((prev) => ({ ...prev, category: e.target.value }))}
+                      placeholder="Fx Dagligvarer"
+                      className="w-full rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d]"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[12px] font-semibold text-[#78766d]">Dag</label>
+                    <input
+                      type="date"
+                      value={newShopping.neededForDate}
+                      onChange={(e) => setNewShopping((prev) => ({ ...prev, neededForDate: e.target.value }))}
+                      className="w-full rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] px-3 py-3 text-[14px] text-[#2f2f2d] outline-none focus:border-[#f58a2d]"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[12px] font-semibold text-[#78766d]">Knyt til ret</label>
+                  <SelectSheet
+                    value={newShopping.neededForMealId}
+                    onValueChange={(value) => setNewShopping((prev) => ({ ...prev, neededForMealId: value }))}
+                    title="Knyt til ret"
+                    placeholder="Vælg ret"
+                    options={[
+                      { value: 'none', label: 'Ingen ret valgt' },
+                      ...upcomingMealPlans.map((meal) => ({
+                        value: meal.id,
+                        label: `${format(parseISO(meal.date), 'd. MMM', { locale: da })} - ${meal.title}`,
+                      })),
+                    ]}
+                    className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] text-[#2f2f2d]"
+                  />
+                </div>
                 <button
-                  key={date}
-                  type="button"
-                  onClick={() => setShoppingFilterDate(date)}
-                  className={cn(
-                    'shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-all whitespace-nowrap',
-                    shoppingFilterDate === date
-                      ? 'bg-[#f58a2d] text-white shadow-[0_2px_8px_rgba(245,138,45,0.25)]'
-                      : 'border border-[#e5e3dc] bg-[#faf9f6] text-[#75736b] hover:border-[#cccbc3]'
-                  )}
+                  onClick={handleAddShopping}
+                  disabled={!newShopping.name.trim() || isSaving}
+                  className="w-full flex items-center justify-center gap-2 rounded-[8px] bg-[#f58a2d] py-4 text-[15px] font-bold text-white active:scale-[0.98] transition-transform disabled:opacity-40"
                 >
-                  {format(parseISO(date), 'EEE d/M', { locale: da })}
+                  Tilføj vare
                 </button>
-              ))}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {activeTab === 'shopping' && (
+        <div className="space-y-3">
+
+          {/* ── Shopping list selector ── */}
+          {shoppingLists.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-10 gap-4 text-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-[8px] bg-[#f2f1ed]">
+                <ShoppingCart className="h-8 w-8 text-[#b0ada4]" />
+              </div>
+              <div>
+                <p className="text-[15px] font-semibold text-[#2f2f2d]">Ingen indkøbsliste endnu</p>
+                <p className="text-[13px] text-[#9a978f] mt-1">Opret en indkøbsliste for at samle dine varer</p>
+              </div>
               <button
-                type="button"
-                onClick={() => setShoppingFilterDate('unscheduled')}
-                className={cn(
-                  'shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-all whitespace-nowrap',
-                  shoppingFilterDate === 'unscheduled'
-                    ? 'bg-[#2f2f2f] text-white shadow-[0_2px_8px_rgba(0,0,0,0.12)]'
-                    : 'border border-[#e5e3dc] bg-[#faf9f6] text-[#75736b] hover:border-[#cccbc3]'
-                )}
+                onClick={() => { setNewListName('Indkøbsliste'); setNewListDate(''); setCreateListOpen(true); }}
+                className="flex items-center gap-2 rounded-[8px] bg-[#f58a2d] px-6 py-3 text-[15px] font-bold text-white active:scale-[0.98] transition-transform"
               >
-                Uden dag
+                <Plus className="h-4 w-4" /> Opret indkøbsliste
               </button>
             </div>
+          ) : !activeShoppingListId ? (
+            /* ── Card-based list overview (no list selected) ── */
+            <div className="space-y-3">
+              {/* Create new list */}
+              <button
+                onClick={() => { setNewListName('Indkøbsliste'); setNewListDate(''); setCreateListOpen(true); }}
+                className="flex w-full items-center justify-center gap-2 rounded-[8px] border-2 border-dashed border-[#d8d7cf] py-4 text-[14px] font-semibold text-[#9a978f] transition-all active:scale-[0.98] hover:border-[#f58a2d] hover:text-[#f58a2d]"
+              >
+                <Plus className="h-4 w-4" /> Opret indkøbsliste
+              </button>
+
+              {/* List cards */}
+              {shoppingLists.map(list => {
+                const listItems = shoppingItems.filter(i => i.listId === list.id);
+                const totalCount = listItems.length;
+                const purchasedCount = listItems.filter(i => i.purchased).length;
+                const pct = totalCount > 0 ? Math.round((purchasedCount / totalCount) * 100) : 0;
+                return (
+                  <div key={list.id} className="relative overflow-hidden rounded-[8px]">
+                    {/* Swipe-to-delete background */}
+                    <div className="absolute inset-0 flex items-center justify-end bg-red-500 px-4 rounded-[8px]">
+                      <Trash2 className="h-5 w-5 text-white" />
+                    </div>
+                    <motion.div
+                      drag="x"
+                      dragConstraints={{ left: -120, right: 0 }}
+                      dragElastic={0.1}
+                      onDragEnd={(_: unknown, info: { offset: { x: number } }) => {
+                        if (info.offset.x < -100) {
+                          deleteShoppingList(list.id).catch(() => {});
+                          toast.success(`"${list.name}" slettet`);
+                        }
+                      }}
+                    >
+                      <button
+                        onClick={() => setActiveShoppingListId(list.id)}
+                        className="relative w-full rounded-[8px] border border-[#e5e3dc] bg-white px-4 py-4 text-left transition-all active:scale-[0.99]"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-[15px] font-bold text-[#2f2f2d]">{list.name}</p>
+                            <p className="text-[12px] text-[#9a978f] mt-0.5">{purchasedCount}/{totalCount} varer afkrydset</p>
+                          </div>
+                          <span className="text-[14px] font-semibold text-[#9a978f]">{pct}%</span>
+                        </div>
+                        <div className="mt-2.5 h-1.5 w-full rounded-full bg-[#f0efe8] overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-[#f58a2d] transition-all"
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                      </button>
+                    </motion.div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <>
+              {/* ── Back to list overview ── */}
+              <button
+                onClick={() => { setShowAllLists(true); setActiveShoppingListId(null); }}
+                className="flex items-center gap-1.5 text-[13px] font-medium text-[#78766d] transition-colors active:text-[#2f2f2d]"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" />
+                Alle lister
+              </button>
+
+          {/* ── Scan stregkode button ── */}
+          <button
+            onClick={handleScanShopping}
+            disabled={shopScanLoading}
+            className="flex w-full items-center justify-center gap-2 rounded-[8px] bg-[#2f2f2d] py-3.5 text-[14px] font-bold text-white active:scale-[0.98] transition-transform disabled:opacity-50"
+          >
+            {shopScanLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <ScanLine className="h-4 w-4" />
+            )}
+            Scan stregkode
+          </button>
+
+          {/* ── Product search ── */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9a978f]" />
+            <input
+              value={productQuery}
+              onChange={e => setProductQuery(e.target.value)}
+              placeholder="Søg produkter..."
+              className="w-full rounded-[8px] border border-[#e5e3dc] bg-white py-3 pl-9 pr-3 text-[14px] text-[#2f2f2d] placeholder:text-[#9a978f] outline-none focus:border-[#c5c3bb]"
+            />
+            {productQuery && (
+              <button
+                onClick={() => { setProductQuery(''); setProductResults([]); }}
+                className="absolute right-3 top-1/2 -translate-y-1/2"
+              >
+                <X className="h-4 w-4 text-[#9a978f]" />
+              </button>
+            )}
           </div>
+
+          {/* Product search results */}
+          {isProductSearching && (
+            <p className="text-[12px] text-[#9a978f] py-2">Søger produkter...</p>
+          )}
+          {!isProductSearching && productResults.length > 0 && (
+            <div className="rounded-[8px] border border-[#e5e3dc] bg-white divide-y divide-[#f2f1ed]">
+              {productResults.map(product => (
+                <button
+                  key={product.id}
+                  onClick={() => {
+                    createShoppingItem({
+                      name: product.brand ? `${product.brand} ${product.name}` : product.name,
+                      quantity: product.quantity || undefined,
+                      purchased: false,
+                      addedBy: currentUser?.id || users[0]?.id || 'p1',
+                      category: product.category || 'Dagligvarer',
+                      priority: 'normal',
+                      listId: activeShoppingListId || undefined,
+                    }).catch(() => {});
+                    toast.success(`${product.name} tilføjet`);
+                  }}
+                  className="w-full flex items-center justify-between px-3 py-3 text-left hover:bg-[#faf9f6] transition-colors active:bg-[#f2f1ed]"
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-[13px] font-semibold text-[#2f2f2d] truncate">{product.name}</p>
+                      {product.brand && <span className="shrink-0 text-[10px] text-[#9a978f]">{product.brand}</span>}
+                    </div>
+                    {product.nutritionPer100g && (
+                      <p className="text-[10px] text-[#9a978f] mt-0.5">
+                        {product.category ?? ''}{product.category ? ' · ' : ''}P {product.nutritionPer100g.protein?.toFixed(0) ?? '?'}g · K {product.nutritionPer100g.carbs?.toFixed(0) ?? '?'}g · F {product.nutritionPer100g.fat?.toFixed(0) ?? '?'}g per 100g
+                      </p>
+                    )}
+                  </div>
+                  {product.nutritionPer100g?.energyKcal != null && (
+                    <div className="text-right ml-2 shrink-0">
+                      <p className="text-[14px] font-black text-[#f58a2d]">{Math.round(product.nutritionPer100g.energyKcal)}</p>
+                      <p className="text-[9px] text-[#b0ada4]">kcal/100g</p>
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* ── Count + bulk actions ── */}
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -2608,85 +2516,79 @@ export function MadOgHjem() {
             </div>
           </div>
 
-          {shoppingGroups.length === 0 ? (
-            <Card>
-              <CardContent className="py-8 text-center text-slate-500">
-                Ingen varer på listen for det valgte filter.
-              </CardContent>
-            </Card>
+          {visiblePendingShopping.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-[8px] bg-[#f2f1ed]">
+                <ShoppingCart className="h-8 w-8 text-[#b0ada4]" />
+              </div>
+              <div>
+                <p className="text-[15px] font-semibold text-[#2f2f2d]">Ingen varer på listen</p>
+                <p className="text-[13px] text-[#9a978f] mt-1">Scan en stregkode eller tilføj varer manuelt</p>
+              </div>
+            </div>
           ) : (
-            <div className="space-y-2">
-              {shoppingGroups.map(([dateKey, items]) => (
-                <div key={dateKey}>
-                  {/* Date header */}
-                  <div className="mb-1.5 flex items-center justify-between">
-                    <p className="text-[13px] font-semibold text-[#2f2f2d]">
-                      {dateKey === 'unscheduled'
-                        ? 'Uden dato'
-                        : format(parseISO(dateKey), 'EEEE d. MMMM', { locale: da })}
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] text-[#78766d]">{items.length} varer</span>
-                      {items.length > 1 && (
-                        <button
-                          onClick={() => markShoppingGroupPurchased(dateKey)}
-                          className="text-[11px] font-medium text-[#f58a2d] hover:underline"
-                        >
-                          Afkryds alle
-                        </button>
-                      )}
+            <div className="rounded border border-[#e5e3dc] bg-white overflow-hidden">
+              {visiblePendingShopping.map((item) => {
+                const meal = item.neededForMealId ? mealPlans.find((m) => m.id === item.neededForMealId) : null;
+                const nutriGrade = matchNutriScore(item.name, nutriScoreMap);
+                const itemAllergens = item.allergens ?? matchAllergens(item.name, allergenMap);
+                const allergenMatches = matchFamilyAllergens(itemAllergens, familyAllergenProfiles);
+                return (
+                  <div key={item.id} className="relative overflow-hidden">
+                    {/* Swipe-to-delete background */}
+                    <div className="absolute inset-0 flex items-center justify-end bg-red-500 px-4">
+                      <Trash2 className="h-4 w-4 text-white" />
                     </div>
-                  </div>
-                  {/* List items */}
-                  <div className="rounded-2xl border border-[#e8e7e0] bg-white">
-                    {items.map((item, idx) => {
-                      const meal = item.neededForMealId ? mealPlans.find((m) => m.id === item.neededForMealId) : null;
-                      return (
-                        <div
-                          key={item.id}
-                          className={cn(
-                            "flex items-center gap-3 px-3 py-2.5",
-                            idx < items.length - 1 && "border-b border-[#f0efe8]"
-                          )}
-                        >
-                          <Checkbox
-                            checked={item.purchased}
-                            onCheckedChange={(checked) => toggleShoppingItem(item.id, checked as boolean)}
-                            className="h-5 w-5 shrink-0 rounded-md"
-                          />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-baseline gap-2">
-                              <span className={cn(
-                                "text-[14px] font-medium text-[#2f2f2d]",
-                                item.purchased && "line-through text-[#9b9a93]"
-                              )}>
-                                {item.name}
-                              </span>
-                              {item.quantity && (
-                                <span className="text-[12px] text-[#78766d]">{item.quantity}</span>
-                              )}
-                              {item.priority === 'high' && (
-                                <span className="text-[10px] font-semibold text-[#f58a2d]">!</span>
-                              )}
-                            </div>
-                            {(item.category || meal) && (
-                              <p className="text-[11px] text-[#9b9a93]">
-                                {item.category}{item.category && meal ? ' · ' : ''}{meal ? `Til: ${meal.title}` : ''}
-                              </p>
+                    <motion.div
+                      drag="x"
+                      dragConstraints={{ left: -100, right: 0 }}
+                      dragElastic={0.1}
+                      onDragEnd={(_: unknown, info: { offset: { x: number } }) => {
+                        if (info.offset.x < -80) apiDeleteShoppingItem(item.id).catch(() => {});
+                      }}
+                      className="relative bg-white"
+                    >
+                      <div className="p-3 flex items-start gap-2">
+                        <Checkbox
+                          checked={item.purchased}
+                          onCheckedChange={(checked) => toggleShoppingItem(item.id, checked as boolean)}
+                          className="size-4 shrink-0 rounded-[8px] mt-0.5"
+                        />
+                        <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setDetailItem(item)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter') setDetailItem(item); }}>
+                          <div className="flex items-center gap-1.5">
+                            <span className={cn(
+                              "text-[14px] font-semibold text-[#2f2f2d]",
+                              item.purchased && "line-through text-[#9b9a93]"
+                            )}>
+                              {item.name}
+                            </span>
+                            {item.quantity && (
+                              <span className="text-[11px] text-[#78766d]">{item.quantity}</span>
+                            )}
+                            {nutriGrade && <NutriScoreBadge grade={nutriGrade} size="sm" />}
+                            {item.priority === 'high' && (
+                              <span className="text-[10px] font-semibold text-[#f58a2d]">!</span>
                             )}
                           </div>
-                          <button
-                            onClick={() => deleteShoppingItem(item.id)}
-                            className="shrink-0 p-1.5 text-[#c5c4be] hover:text-[#ef4444] transition-colors"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
+                          {allergenMatches.length > 0 && (
+                            <div className="flex items-center gap-1 mt-0.5">
+                              <AlertTriangle className="h-3 w-3 text-amber-500 shrink-0" />
+                              <span className="text-[10px] font-semibold text-amber-600 truncate">
+                                {allergenMatches.map(m => `${m.allergenLabel} (${m.affectedMembers.join(', ')})`).join(' · ')}
+                              </span>
+                            </div>
+                          )}
+                          {(item.category || meal) && (
+                            <p className="text-[11px] text-[#9a978f] mt-0.5">
+                              {item.category}{item.category && meal ? ' · ' : ''}{meal ? `Til: ${meal.title}` : ''}
+                            </p>
+                          )}
                         </div>
-                      );
-                    })}
+                      </div>
+                    </motion.div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
 
@@ -2697,7 +2599,7 @@ export function MadOgHjem() {
               </CardHeader>
               <CardContent className="space-y-2 pt-0">
                 {purchasedShopping.slice(0, 5).map((item) => (
-                  <div key={item.id} className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2">
+                  <div key={item.id} className="flex items-center justify-between rounded-[8px] border border-slate-200 bg-white px-3 py-2">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-green-600" />
                       <div>
@@ -2713,7 +2615,7 @@ export function MadOgHjem() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => updateShoppingItem(item.id, { purchased: false, purchasedAt: undefined, purchasedBy: undefined })}
+                      onClick={() => apiUpdateShoppingItem(item.id, { purchased: false, purchasedAt: undefined, purchasedBy: undefined }).catch(() => {})}
                     >
                       Gendan
                     </Button>
@@ -2722,11 +2624,18 @@ export function MadOgHjem() {
               </CardContent>
             </Card>
           ) : null}
-          </>)}
+            </>
+          )}
         </div>
       )}
 
-      {activeTab === 'dagbog' && (() => {
+      {/* Dagbog — vis KaloriedagbogView direkte */}
+      {activeTab === 'dagbog' && (
+        <KaloriedagbogView onBack={() => setActiveTab('meal-plan')} />
+      )}
+
+      {/* Dagbog intermediary (kept for variable references) */}
+      {activeTab === '__disabled_dagbog__' && (() => {
         const meals = [
           { key: 'morgenmad', label: 'Morgenmad', emoji: '☀️' },
           { key: 'mellemmåltid', label: 'Mellemmåltid', emoji: '🍎' },
@@ -2749,56 +2658,33 @@ export function MadOgHjem() {
 
         return (
           <div className="space-y-2">
-            {/* View toggle: Mig / Familie */}
-            <div className="flex rounded-xl border border-[#d8d7cf] bg-[#ecebe5] p-1">
-              <button
-                onClick={() => setDagbogView('self')}
-                className={cn(
-                  "flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-semibold transition-all",
-                  dagbogView === 'self' ? "bg-white text-[#2f2f2d] shadow-sm" : "text-[#78766d]"
-                )}
-              >
-                Mig
-              </button>
-              <button
-                onClick={() => setDagbogView('family')}
-                className={cn(
-                  "flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-semibold transition-all",
-                  dagbogView === 'family' ? "bg-white text-[#2f2f2d] shadow-sm" : "text-[#78766d]"
-                )}
-              >
-                Familie
-              </button>
+            {/* Family member chips */}
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+              {familyMembers.map(member => (
+                <button
+                  key={member.id}
+                  onClick={() => setDagbogSelectedChild(member.id === currentUser?.id ? null : member.id)}
+                  className={cn(
+                    "shrink-0 rounded-[8px] border-2 px-4 py-2 text-[13px] font-semibold transition-all",
+                    (member.id === currentUser?.id ? dagbogSelectedChild === null : dagbogSelectedChild === member.id)
+                      ? "border-[#f58a2d] bg-[#fff2e6] text-[#b96424]"
+                      : "border-[#e5e3dc] bg-white text-[#78766d]"
+                  )}
+                >
+                  {member.name}
+                </button>
+              ))}
             </div>
-
-            {dagbogView === 'family' && (
-              <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-                {familyMembers.map(member => (
-                  <button
-                    key={member.id}
-                    onClick={() => setDagbogSelectedChild(member.id === currentUser?.id ? null : member.id)}
-                    className={cn(
-                      "shrink-0 rounded-2xl border-2 px-4 py-2 text-[13px] font-semibold transition-all",
-                      (member.id === currentUser?.id ? dagbogSelectedChild === null : dagbogSelectedChild === member.id)
-                        ? "border-[#f58a2d] bg-[#fff2e6] text-[#b96424]"
-                        : "border-[#e5e3dc] bg-white text-[#78766d]"
-                    )}
-                  >
-                    {member.name}
-                  </button>
-                ))}
-              </div>
-            )}
 
             {/* Dato-vælger */}
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setDagbogDate(format(addDays(new Date(dagbogDate), -1), 'yyyy-MM-dd'))}
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#e5e3dc] bg-white text-[#78766d] transition-all active:scale-95"
+                className="flex h-9 w-9 items-center justify-center rounded-[8px] border border-[#e5e3dc] bg-white text-[#78766d] transition-all active:scale-95"
               >
                 ‹
               </button>
-              <div className="flex-1 rounded-xl border border-[#e5e3dc] bg-white px-3 py-2 text-center text-[14px] font-semibold text-[#2f2f2d]">
+              <div className="flex-1 rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-2 text-center text-[14px] font-semibold text-[#2f2f2d]">
                 {dagbogDate === format(new Date(), 'yyyy-MM-dd') ? 'I dag' :
                   dagbogDate === format(addDays(new Date(), -1), 'yyyy-MM-dd') ? 'I går' :
                   format(new Date(dagbogDate), 'd. MMMM', { locale: da })}
@@ -2806,14 +2692,14 @@ export function MadOgHjem() {
               <button
                 onClick={() => setDagbogDate(format(addDays(new Date(dagbogDate), 1), 'yyyy-MM-dd'))}
                 disabled={dagbogDate >= format(new Date(), 'yyyy-MM-dd')}
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#e5e3dc] bg-white text-[#78766d] transition-all active:scale-95 disabled:opacity-30"
+                className="flex h-9 w-9 items-center justify-center rounded-[8px] border border-[#e5e3dc] bg-white text-[#78766d] transition-all active:scale-95 disabled:opacity-30"
               >
                 ›
               </button>
             </div>
 
-            {/* Kalorieoverigt */}
-            <div className="rounded-2xl border border-[#e5e3dc] bg-white p-4">
+            {/* Kalorieoverigt — tryk for fuld kaloriedagbog */}
+            <button onClick={() => setKaloriedagbogOpen(true)} className="w-full text-left rounded-[8px] border border-[#e5e3dc] bg-white p-4 active:scale-[0.98] transition-transform">
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <p className="text-[13px] text-[#78766d]">Kalorier i dag</p>
@@ -2858,7 +2744,7 @@ export function MadOgHjem() {
                   ))}
                 </div>
               )}
-            </div>
+            </button>
 
             {/* Måltider */}
             <div className="space-y-2">
@@ -2866,7 +2752,7 @@ export function MadOgHjem() {
                 const mealEntries = todayEntries.filter(e => e.meal === meal.key);
                 const mealKcal = mealEntries.reduce((s, e) => s + e.kcal, 0);
                 return (
-                  <div key={meal.key} className="rounded-2xl border border-[#e5e3dc] bg-white overflow-hidden">
+                  <div key={meal.key} className="rounded-[8px] border border-[#e5e3dc] bg-white overflow-hidden">
                     <div className="flex items-center justify-between px-4 py-3">
                       <div className="flex items-center gap-2.5">
                         <span className="text-lg">{meal.emoji}</span>
@@ -2879,7 +2765,7 @@ export function MadOgHjem() {
                       </div>
                       <button
                         onClick={() => { setAddFoodMeal(meal.key); setIsAddFoodOpen(true); }}
-                        className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#f2f1ed] text-[#78766d] transition-all active:scale-95 hover:bg-[#e5e3dc]"
+                        className="flex h-8 w-8 items-center justify-center text-[#78766d] transition-all active:scale-95"
                       >
                         <Plus className="h-4 w-4" />
                       </button>
@@ -2922,16 +2808,13 @@ export function MadOgHjem() {
                 <div className="space-y-2 pt-2">
                   <div className="space-y-1.5">
                     <Label>Måltid</Label>
-                    <Select value={addFoodMeal} onValueChange={setAddFoodMeal}>
-                      <SelectTrigger className="rounded-xl">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {meals.map(m => (
-                          <SelectItem key={m.key} value={m.key}>{m.emoji} {m.label}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <SelectSheet
+                      value={addFoodMeal}
+                      onValueChange={setAddFoodMeal}
+                      title="Måltid"
+                      options={meals.map(m => ({ value: m.key, label: `${m.emoji} ${m.label}` }))}
+                      className="rounded-xl"
+                    />
                   </div>
                   <div className="space-y-1.5">
                     <Label>Mad / Drik</Label>
@@ -3003,7 +2886,7 @@ export function MadOgHjem() {
                       setIsAddFoodOpen(false);
                       toast.success('Mad logget!');
                     }}
-                    className="w-full rounded-2xl bg-[#f58a2d] py-3 text-[14px] font-bold text-white disabled:opacity-40 transition-all active:scale-[0.98]"
+                    className="w-full rounded-[8px] bg-[#f58a2d] py-3 text-[14px] font-bold text-white disabled:opacity-40 transition-all active:scale-[0.98]"
                   >
                     Log mad
                   </button>
@@ -3014,142 +2897,290 @@ export function MadOgHjem() {
         );
       })()}
 
-      {activeTab === 'ideas' && (
-        <div className="space-y-5">
-
-          {/* ─── Uge-skabeloner ─── */}
-          <div>
-            <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] mb-2">Uge-skabeloner</p>
-            <div className="space-y-2">
-              {weekTemplates.map((template) => (
-                <div key={template.id} className="flex items-center gap-3.5 rounded-2xl border-2 border-[#e5e3dc] bg-white px-4 py-3.5">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#f2f1ed]">
-                    <CalendarDays className="h-5 w-5 text-[#7a786f]" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[14px] font-semibold text-[#2f2f2d]">{template.name}</p>
-                    <p className="text-[11px] text-[#9a978f] mt-0.5 line-clamp-1">{template.description}</p>
-                  </div>
-                  <button
-                    onClick={() => applyWeekTemplate(template.id)}
-                    className="shrink-0 rounded-xl border-2 border-[#e5e3dc] bg-white px-4 py-2 text-[12px] font-semibold text-[#4a4945] transition-all active:scale-[0.96] hover:border-[#cccbc3]"
-                  >
-                    Brug
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* ─── Auto-planlæg uge (regelbaseret) ─── */}
-          <div>
-            <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] mb-2">Auto-planlæg uge</p>
-            <div className="rounded-2xl border-2 border-[#e5e3dc] bg-white overflow-hidden">
-              <div className="px-4 pt-4 pb-1">
-                <p className="text-[11px] text-[#9a978f]">Regelbaseret madplan-generator</p>
+      {activeTab === 'templates' && (
+        <div className="space-y-3">
+          {weekTemplates.map((template) => (
+            <div key={template.id} className="flex items-center gap-3.5 py-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-[#f2f1ed]">
+                <CalendarDays className="h-5 w-5 text-[#7a786f]" />
               </div>
-              <div className="px-4 py-3 space-y-2">
-                <div className="space-y-1.5">
-                  <p className="text-[12px] font-semibold text-[#5f5d56]">Favoritter (kommasepareret)</p>
-                  <Input
-                    value={autoPlannerSettings.favoriteKeywords}
-                    onChange={(e) => setAutoPlannerSettings((prev) => ({ ...prev, favoriteKeywords: e.target.value }))}
-                    placeholder="fx pasta, frikadeller, kylling"
-                    className="rounded-xl border-[#e5e3dc] bg-[#faf9f6] text-[13px] placeholder:text-[#c5c4be]"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <p className="text-[12px] font-semibold text-[#5f5d56]">Undgå ingredienser (kommasepareret)</p>
-                  <Input
-                    value={autoPlannerSettings.avoidIngredients}
-                    onChange={(e) => setAutoPlannerSettings((prev) => ({ ...prev, avoidIngredients: e.target.value }))}
-                    placeholder="fx nødder, svampe"
-                    className="rounded-xl border-[#e5e3dc] bg-[#faf9f6] text-[13px] placeholder:text-[#c5c4be]"
-                  />
-                </div>
-
-                <div className="space-y-2 pt-1">
-                  <label className="flex items-center gap-3 rounded-xl bg-[#faf9f6] px-3 py-2.5 text-[13px] text-[#2f2f2d]">
-                    <Checkbox
-                      checked={autoPlannerSettings.childFriendly}
-                      onCheckedChange={(checked) => setAutoPlannerSettings((prev) => ({ ...prev, childFriendly: checked as boolean }))}
-                      className="h-5 w-5 rounded-lg border-[#d8d7cf] data-[state=checked]:bg-[#2f2f2d] data-[state=checked]:border-[#2f2f2d]"
-                    />
-                    Prioritér børnevenlige retter
-                  </label>
-                  <label className="flex items-center gap-3 rounded-xl bg-[#faf9f6] px-3 py-2.5 text-[13px] text-[#2f2f2d]">
-                    <Checkbox
-                      checked={autoPlannerSettings.replaceExisting}
-                      onCheckedChange={(checked) => setAutoPlannerSettings((prev) => ({ ...prev, replaceExisting: checked as boolean }))}
-                      className="h-5 w-5 rounded-lg border-[#d8d7cf] data-[state=checked]:bg-[#2f2f2d] data-[state=checked]:border-[#2f2f2d]"
-                    />
-                    Erstat eksisterende middage i denne uge
-                  </label>
-                  <label className="flex items-center gap-3 rounded-xl bg-[#faf9f6] px-3 py-2.5 text-[13px] text-[#2f2f2d]">
-                    <Checkbox
-                      checked={autoPlannerSettings.useChildAllergies}
-                      onCheckedChange={(checked) => setAutoPlannerSettings((prev) => ({ ...prev, useChildAllergies: checked as boolean }))}
-                      className="h-5 w-5 rounded-lg border-[#d8d7cf] data-[state=checked]:bg-[#2f2f2d] data-[state=checked]:border-[#2f2f2d]"
-                    />
-                    Tag hensyn til barnets allergier
-                  </label>
-                  {autoPlannerSettings.useChildAllergies && (
-                    <p className="text-[11px] text-[#b98b5a] pl-8">
-                      Aktive allergier: {currentChild?.allergies?.length ? currentChild.allergies.join(', ') : 'Ingen registreret'}
-                    </p>
-                  )}
-                </div>
-
-                <button
-                  onClick={generateAutoWeekPlan}
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#f58a2d] px-4 py-3.5 text-[14px] font-bold text-white shadow-[0_2px_12px_rgba(245,138,45,0.25)] transition-all active:scale-[0.98]"
-                >
-                  <RefreshCw className="h-4 w-4" />
-                  Generer ugeplan automatisk
-                </button>
-                <p className="text-[11px] text-[#9a978f] text-center pb-1">
-                  Planneren vælger 7 middage ud fra dine regler og opretter dem i madplanen.
-                </p>
+              <div className="flex-1 min-w-0">
+                <p className="text-[14px] font-semibold text-[#2f2f2d]">{template.name}</p>
+                <p className="text-[11px] text-[#9a978f] mt-0.5 line-clamp-1">{template.description}</p>
               </div>
+              <button
+                onClick={() => applyWeekTemplate(template.id)}
+                className="shrink-0 rounded-[8px] bg-[#2f2f2d] px-4 py-2 text-[12px] font-semibold text-white transition-all active:scale-[0.96]"
+              >
+                Brug
+              </button>
             </div>
-          </div>
-
-          {/* ─── Ekstra hurtigtilvalg ─── */}
-          <div>
-            <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] mb-2">Hurtigtilvalg</p>
-            <div className="space-y-2">
-              {[
-                { id: 'weekly-check-in', title: 'Ugentlig familie check-in', desc: 'Automatisk møde i kalenderen hver søndag aften.', icon: CalendarDays },
-                { id: 'meal-routine', title: 'Fast madplan-rutine', desc: 'Gentagende opgave, så I husker næste uges måltider.', icon: Repeat2 },
-                { id: 'starter-shopping', title: 'Basis-indkøbsliste', desc: 'Fyld listen med faste basisvarer med ét klik.', icon: ShoppingCart },
-                { id: 'monthly-deep-clean', title: 'Månedlig dybderengøring', desc: 'Fast plan for de tungere huslige opgaver.', icon: Home },
-              ].map((item) => {
-                const Icon = item.icon;
-                return (
-                  <div key={item.id} className="flex items-center gap-3.5 rounded-2xl border-2 border-[#e5e3dc] bg-white px-4 py-3.5">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#fff2e6]">
-                      <Icon className="h-5 w-5 text-[#f58a2d]" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[14px] font-semibold text-[#2f2f2d]">{item.title}</p>
-                      <p className="text-[11px] text-[#9a978f] leading-snug mt-0.5">{item.desc}</p>
-                    </div>
-                    <button
-                      onClick={() => applyIdea(item.id)}
-                      className="shrink-0 rounded-xl bg-[#f58a2d] px-4 py-2 text-[12px] font-bold text-white transition-all active:scale-[0.96]"
-                    >
-                      Tilføj
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          ))}
         </div>
       )}
 
-      {/* Recipe Browser — Full-screen page */}
+      {activeTab === 'auto-plan' && (
+        <div className="space-y-4">
+          <p className="text-[11px] text-[#9a978f]">Regelbaseret madplan-generator</p>
+
+          <div className="space-y-1.5">
+            <p className="text-[12px] font-semibold text-[#5f5d56]">Favoritter (kommasepareret)</p>
+            <Input
+              value={autoPlannerSettings.favoriteKeywords}
+              onChange={(e) => setAutoPlannerSettings((prev) => ({ ...prev, favoriteKeywords: e.target.value }))}
+              placeholder="fx pasta, frikadeller, kylling"
+              className="rounded-[8px] border-[#e5e3dc] bg-white text-[13px] placeholder:text-[#c5c4be]"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <p className="text-[12px] font-semibold text-[#5f5d56]">Undgå ingredienser (kommasepareret)</p>
+            <Input
+              value={autoPlannerSettings.avoidIngredients}
+              onChange={(e) => setAutoPlannerSettings((prev) => ({ ...prev, avoidIngredients: e.target.value }))}
+              placeholder="fx nødder, svampe"
+              className="rounded-[8px] border-[#e5e3dc] bg-white text-[13px] placeholder:text-[#c5c4be]"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="flex items-center gap-3 rounded-[8px] bg-[#f2f1ed] px-3 py-2.5 text-[13px] text-[#2f2f2d]">
+              <Checkbox
+                checked={autoPlannerSettings.childFriendly}
+                onCheckedChange={(checked) => setAutoPlannerSettings((prev) => ({ ...prev, childFriendly: checked as boolean }))}
+                className="size-4 rounded-[8px] border-[#d8d7cf] data-[state=checked]:bg-[#2f2f2d] data-[state=checked]:border-[#2f2f2d]"
+              />
+              Prioritér børnevenlige retter
+            </label>
+            <label className="flex items-center gap-3 rounded-[8px] bg-[#f2f1ed] px-3 py-2.5 text-[13px] text-[#2f2f2d]">
+              <Checkbox
+                checked={autoPlannerSettings.replaceExisting}
+                onCheckedChange={(checked) => setAutoPlannerSettings((prev) => ({ ...prev, replaceExisting: checked as boolean }))}
+                className="size-4 rounded-[8px] border-[#d8d7cf] data-[state=checked]:bg-[#2f2f2d] data-[state=checked]:border-[#2f2f2d]"
+              />
+              Erstat eksisterende middage i denne uge
+            </label>
+            <label className="flex items-center gap-3 rounded-[8px] bg-[#f2f1ed] px-3 py-2.5 text-[13px] text-[#2f2f2d]">
+              <Checkbox
+                checked={autoPlannerSettings.useChildAllergies}
+                onCheckedChange={(checked) => setAutoPlannerSettings((prev) => ({ ...prev, useChildAllergies: checked as boolean }))}
+                className="size-4 rounded-[8px] border-[#d8d7cf] data-[state=checked]:bg-[#2f2f2d] data-[state=checked]:border-[#2f2f2d]"
+              />
+              Tag hensyn til barnets allergier
+            </label>
+            {autoPlannerSettings.useChildAllergies && (
+              <p className="text-[11px] text-[#b98b5a] pl-8">
+                Aktive allergier: {currentChild?.allergies?.length ? currentChild.allergies.join(', ') : 'Ingen registreret'}
+              </p>
+            )}
+          </div>
+
+          <button
+            onClick={generateAutoWeekPlan}
+            className="flex w-full items-center justify-center gap-2 rounded-[8px] bg-[#f58a2d] px-4 py-3.5 text-[14px] font-bold text-white shadow-[0_2px_12px_rgba(245,138,45,0.25)] transition-all active:scale-[0.98]"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Generer ugeplan automatisk
+          </button>
+          <p className="text-[11px] text-[#9a978f] text-center">
+            Planneren vælger 7 middage ud fra dine regler og opretter dem i madplanen.
+          </p>
+        </div>
+      )}
+
+      {activeTab === 'quick-setup' && (
+        <div className="space-y-3">
+          {[
+            { id: 'weekly-check-in', title: 'Ugentlig familie check-in', desc: 'Automatisk møde i kalenderen hver søndag aften.', icon: CalendarDays },
+            { id: 'meal-routine', title: 'Fast madplan-rutine', desc: 'Gentagende opgave, så I husker næste uges måltider.', icon: Repeat2 },
+            { id: 'starter-shopping', title: 'Basis-indkøbsliste', desc: 'Fyld listen med faste basisvarer med ét klik.', icon: ShoppingCart },
+            { id: 'monthly-deep-clean', title: 'Månedlig dybderengøring', desc: 'Fast plan for de tungere huslige opgaver.', icon: Home },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <div key={item.id} className="flex items-center gap-3.5 py-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-[#fff2e6]">
+                  <Icon className="h-5 w-5 text-[#f58a2d]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[14px] font-semibold text-[#2f2f2d]">{item.title}</p>
+                  <p className="text-[11px] text-[#9a978f] leading-snug mt-0.5">{item.desc}</p>
+                </div>
+                <button
+                  onClick={() => applyIdea(item.id)}
+                  className="shrink-0 rounded-[8px] bg-[#f58a2d] px-4 py-2 text-[12px] font-bold text-white transition-all active:scale-[0.96]"
+                >
+                  Tilføj
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Full-screen "Ny uge-skabelon" page */}
+      <AnimatePresence>
+        {isAddTemplateOpen && (
+          <motion.div
+            key="new-template"
+            className="fixed inset-0 z-[55] bg-[#faf9f6] flex flex-col overflow-hidden"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', stiffness: 380, damping: 38 }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.15}
+            onDragEnd={(_: unknown, info: { offset: { x: number } }) => {
+              if (info.offset.x > 100) setIsAddTemplateOpen(false);
+            }}
+          >
+            {/* Header */}
+            <div className="shrink-0 flex items-center justify-between px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-[#faf9f6]">
+              <button
+                onClick={() => setIsAddTemplateOpen(false)}
+                className="flex h-9 w-9 items-center justify-center text-[#2f2f2d] active:scale-[0.92] transition-transform"
+              >
+                <ArrowLeft className="h-[18px] w-[18px]" />
+              </button>
+              <h1 className="text-[17px] font-bold text-[#2f2f2d]">Ny uge-skabelon</h1>
+              <button
+                onClick={() => {
+                  if (!newTemplateName.trim()) { toast.error('Angiv et navn til skabelonen'); return; }
+                  const meals = Object.entries(newTemplateMeals)
+                    .filter(([, v]) => v.trim())
+                    .map(([dayStr, title]) => ({
+                      dayOffset: parseInt(dayStr),
+                      mealType: 'dinner' as const,
+                      title: title.trim(),
+                      ingredients: [] as string[],
+                      instructions: '',
+                    }));
+                  const newT: WeekTemplate = {
+                    id: `custom-${Date.now()}`,
+                    name: newTemplateName.trim(),
+                    description: `${meals.length} retter planlagt`,
+                    meals,
+                    cleaning: [],
+                  };
+                  weekTemplates.push(newT);
+                  toast.success('Uge-skabelon oprettet!');
+                  setIsAddTemplateOpen(false);
+                  setNewTemplateName('');
+                  setNewTemplateMeals({});
+                }}
+                className="text-[15px] font-bold text-[#f58a2d] active:opacity-60 transition-opacity"
+              >
+                Gem
+              </button>
+            </div>
+
+            {/* Scrollable form */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="px-4 pt-4 pb-8 max-w-[430px] mx-auto space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-[12px] font-semibold text-[#78766d]">Navn *</label>
+                  <input
+                    type="text"
+                    value={newTemplateName}
+                    onChange={(e) => setNewTemplateName(e.target.value)}
+                    placeholder="Fx Hurtig familieuge"
+                    autoFocus
+                    className="w-full rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d]"
+                  />
+                </div>
+
+                <p className="text-[12px] font-semibold text-[#78766d]">Aftensmad for hver dag</p>
+
+                {['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag'].map((day, i) => (
+                  <div key={day} className="space-y-1">
+                    <label className="text-[11px] font-medium text-[#9a978f]">{day}</label>
+                    <input
+                      type="text"
+                      value={newTemplateMeals[i] || ''}
+                      onChange={(e) => setNewTemplateMeals((prev) => ({ ...prev, [i]: e.target.value }))}
+                      placeholder="Fx pasta med kødsovs"
+                      className="w-full rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-2.5 text-[13px] text-[#2f2f2d] placeholder:text-[#c5c4be] outline-none focus:border-[#f58a2d]"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Full-screen "Nyt hurtig valg" page */}
+      <AnimatePresence>
+        {isAddQuickSetupOpen && (
+          <motion.div
+            key="new-quick-setup"
+            className="fixed inset-0 z-[55] bg-[#faf9f6] flex flex-col overflow-hidden"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', stiffness: 380, damping: 38 }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.15}
+            onDragEnd={(_: unknown, info: { offset: { x: number } }) => {
+              if (info.offset.x > 100) setIsAddQuickSetupOpen(false);
+            }}
+          >
+            {/* Header */}
+            <div className="shrink-0 flex items-center justify-between px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-[#faf9f6]">
+              <button
+                onClick={() => setIsAddQuickSetupOpen(false)}
+                className="flex h-9 w-9 items-center justify-center text-[#2f2f2d] active:scale-[0.92] transition-transform"
+              >
+                <ArrowLeft className="h-[18px] w-[18px]" />
+              </button>
+              <h1 className="text-[17px] font-bold text-[#2f2f2d]">Nyt hurtig valg</h1>
+              <button
+                onClick={() => {
+                  if (!newQuickSetup.title.trim()) { toast.error('Angiv en titel'); return; }
+                  toast.success(`Hurtig valg "${newQuickSetup.title}" oprettet!`);
+                  setIsAddQuickSetupOpen(false);
+                  setNewQuickSetup({ title: '', description: '' });
+                }}
+                className="text-[15px] font-bold text-[#f58a2d] active:opacity-60 transition-opacity"
+              >
+                Gem
+              </button>
+            </div>
+
+            {/* Scrollable form */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="px-4 pt-4 pb-8 max-w-[430px] mx-auto space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-[12px] font-semibold text-[#78766d]">Titel *</label>
+                  <input
+                    type="text"
+                    value={newQuickSetup.title}
+                    onChange={(e) => setNewQuickSetup((prev) => ({ ...prev, title: e.target.value }))}
+                    placeholder="Fx Ugentlig check-in"
+                    autoFocus
+                    className="w-full rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d]"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[12px] font-semibold text-[#78766d]">Beskrivelse</label>
+                  <textarea
+                    value={newQuickSetup.description}
+                    onChange={(e) => setNewQuickSetup((prev) => ({ ...prev, description: e.target.value }))}
+                    placeholder="Beskriv hvad dette hurtige valg gør..."
+                    rows={4}
+                    className="w-full rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d] resize-none"
+                  />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Recipe Browser — Full-screen page (z-[60] to cover BottomNav) */}
       <AnimatePresence>
         {recipeBrowserOpen && (
           <motion.div
@@ -3157,7 +3188,11 @@ export function MadOgHjem() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className="fixed inset-0 z-50 bg-[#faf9f6] overflow-hidden flex flex-col"
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.15}
+            onDragEnd={(_: unknown, info: { offset: { x: number } }) => { if (info.offset.x > 100) setRecipeBrowserOpen(false); }}
+            className="fixed inset-0 z-[60] bg-[#faf9f6] overflow-hidden flex flex-col"
             style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
           >
             {/* Header */}
@@ -3165,73 +3200,79 @@ export function MadOgHjem() {
               <div className="flex items-center gap-3 mb-4">
                 <button
                   onClick={() => setRecipeBrowserOpen(false)}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f2f1ed] transition-all active:scale-[0.92]"
+                  className="flex h-9 w-9 items-center justify-center text-[#2f2f2d] transition-all active:scale-[0.92]"
                 >
                   <ArrowLeft className="h-[18px] w-[18px] text-[#2f2f2d]" />
                 </button>
                 <h1 className="text-[20px] font-bold tracking-[-0.02em] text-[#2f2f2d]">Opskrifter</h1>
-                <div className="flex-1" />
-                <button
-                  onClick={() => setCreateRecipeOpen(true)}
-                  className="flex items-center gap-1.5 rounded-xl bg-[#f58a2d] px-3.5 py-2 text-[13px] font-bold text-white transition-all active:scale-[0.96]"
-                >
-                  <Plus className="h-4 w-4" />
-                  Ny
-                </button>
               </div>
 
-              {/* Search */}
-              <div className="relative mb-3">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#b0ada4]" />
-                <Input
-                  value={recipeSearch}
-                  onChange={e => setRecipeSearch(e.target.value)}
-                  placeholder="Søg opskrift..."
-                  className="pl-9 rounded-xl border-[#e5e3dc] bg-white text-[14px]"
-                />
-              </div>
+              <motion.div
+                animate={{ height: recipeHeaderVisible ? 'auto' : 0, opacity: recipeHeaderVisible ? 1 : 0 }}
+                transition={{ duration: 0.25, ease: 'easeInOut' }}
+                className="overflow-hidden"
+              >
+                {/* Search */}
+                <div className="relative mb-3">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#b0ada4]" />
+                  <Input
+                    value={recipeSearch}
+                    onChange={e => setRecipeSearch(e.target.value)}
+                    placeholder="Søg opskrift..."
+                    className="pl-9 rounded-[8px] border-[#e5e3dc] bg-white text-[14px]"
+                  />
+                </div>
 
-              {/* Category filter pills with icons */}
-              <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4">
-                {['Alle', ...recipeCategories].map((cat: string) => {
-                  const CatIcon = recipeCategoryIcons[cat] || UtensilsCrossed;
-                  const isActive = recipeCategory === cat;
-                  return (
-                    <button
-                      key={cat}
-                      onClick={() => setRecipeCategory(cat)}
-                      className={cn(
-                        "shrink-0 flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition-all",
-                        isActive ? "bg-[#2f2f2f] text-white" : "bg-[#f2f1ed] text-[#5f5d56]"
-                      )}
-                    >
-                      <CatIcon className="h-3.5 w-3.5" />
-                      {cat}
-                    </button>
-                  );
-                })}
-              </div>
+                {/* Category filter pills with icons */}
+                <div className="flex gap-1.5 sm:gap-3 overflow-x-auto pb-1 -mx-4 px-4">
+                  {['Alle', ...recipeCategories].map((cat: string) => {
+                    const CatIcon = recipeCategoryIcons[cat] || UtensilsCrossed;
+                    const isActive = recipeCategory === cat;
+                    return (
+                      <button
+                        key={cat}
+                        onClick={() => setRecipeCategory(cat)}
+                        className={cn(
+                          "shrink-0 flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition-all",
+                          isActive ? "bg-[#2f2f2f] text-white" : "bg-[#f2f1ed] text-[#5f5d56]"
+                        )}
+                      >
+                        <CatIcon className="h-3.5 w-3.5" />
+                        {cat}
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
             </div>
 
             {/* Recipe list */}
-            <div className="flex-1 overflow-y-auto px-4 pb-8">
+            <div
+              className="flex-1 overflow-y-auto px-4 pb-8"
+              onScroll={(e) => {
+                const y = e.currentTarget.scrollTop;
+                if (y > recipeLastScrollY.current + 10) setRecipeHeaderVisible(false);
+                else if (y < recipeLastScrollY.current - 10) setRecipeHeaderVisible(true);
+                recipeLastScrollY.current = y;
+              }}
+            >
               <div className="space-y-2 pt-2">
                 {filteredRecipes.map((recipe: Recipe) => (
                   <button
                     key={recipe.id}
-                    onClick={() => { setSelectedRecipe(recipe); setRecipeServings(recipe.servings); }}
-                    className="flex w-full items-center gap-3 rounded-2xl border-2 border-[#e5e3dc] bg-white px-4 py-3.5 text-left transition-all active:scale-[0.98] hover:border-[#d8d7cf]"
+                    onClick={() => { setSelectedRecipe(recipe); setRecipeServings(recipe.servings); setNutritionUnit('portion'); setSelectedMembers(eligibleMembers.map(m => m.id)); setMealPlanDate(todayString); setActiveStepIndex(0); setVideoPlaying(false); const catMap: Record<string, MealType> = { 'Morgenmad': 'breakfast', 'Frokost': 'lunch', 'Aftensmad': 'dinner', 'Snacks': 'snack' }; setSelectedMealType(catMap[recipe.category] || 'dinner'); }}
+                    className="flex w-full items-center gap-3 rounded-[8px] border-2 border-[#e5e3dc] bg-white px-4 py-3.5 text-left transition-all active:scale-[0.98] hover:border-[#d8d7cf]"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="text-[14px] font-semibold text-[#2f2f2d]">{recipe.name}</p>
                         {recipe.childFriendly && (
-                          <span className="inline-flex items-center gap-0.5 rounded-lg bg-[#fff2e6] border border-[#f3c59d] px-1.5 py-0.5 text-[10px] font-semibold text-[#cc6f1f]">
+                          <span className="inline-flex items-center gap-0.5 rounded-[8px] bg-[#fff2e6] border border-[#f3c59d] px-1.5 py-0.5 text-[10px] font-semibold text-[#cc6f1f]">
                             <Baby className="h-3 w-3" /> Børnevenlig
                           </span>
                         )}
                         {recipe.isUserRecipe && (
-                          <span className="rounded-lg bg-[#e8f4fd] border border-[#b3d4f0] px-1.5 py-0.5 text-[10px] font-semibold text-[#4a90d9]">Din</span>
+                          <span className="rounded-[8px] bg-[#e8f4fd] border border-[#b3d4f0] px-1.5 py-0.5 text-[10px] font-semibold text-[#4a90d9]">Din</span>
                         )}
                       </div>
                       <p className="mt-1 text-[12px] text-[#78766d] line-clamp-1">{recipe.description}</p>
@@ -3259,6 +3300,15 @@ export function MadOgHjem() {
                 )}
               </div>
             </div>
+
+            {/* FAB — Ny opskrift */}
+            <button
+              onClick={() => setCreateRecipeOpen(true)}
+              className="absolute bottom-4 left-4 z-10 flex items-center justify-center h-12 w-12 rounded-full bg-[#f58a2d] text-white shadow-lg transition-all active:scale-[0.95]"
+              style={{ bottom: 'calc(env(safe-area-inset-bottom, 16px) + 12px)' }}
+            >
+              <Plus className="h-5 w-5" />
+            </button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -3271,26 +3321,78 @@ export function MadOgHjem() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.15}
+            onDragEnd={(_: unknown, info: { offset: { x: number } }) => { if (info.offset.x > 100) setCreateRecipeOpen(false); }}
             className="fixed inset-0 z-[60] bg-[#faf9f6] overflow-hidden flex flex-col"
             style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
           >
             <div className="shrink-0 px-4 pt-3 pb-3 flex items-center gap-3">
               <button
                 onClick={() => setCreateRecipeOpen(false)}
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f2f1ed] transition-all active:scale-[0.92]"
+                className="flex h-9 w-9 items-center justify-center text-[#2f2f2d] transition-all active:scale-[0.92]"
               >
                 <ArrowLeft className="h-[18px] w-[18px] text-[#2f2f2d]" />
               </button>
               <h1 className="text-[20px] font-bold tracking-[-0.02em] text-[#2f2f2d]">Opret ny opskrift</h1>
             </div>
           <div className="flex-1 overflow-y-auto px-4 space-y-2 pb-8">
+            {/* URL scrape field */}
+            <div className="space-y-2">
+              <Label className="text-[12px] font-semibold text-[#78766d]">Hent fra hjemmeside</Label>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Globe className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#b0ada4]" />
+                  <Input
+                    value={scrapeUrl}
+                    onChange={e => setScrapeUrl(e.target.value)}
+                    placeholder="Indsæt link til opskrift..."
+                    className="pl-8 rounded-[8px] border-[#d8d7cf] text-[13px]"
+                  />
+                </div>
+                <Button
+                  disabled={!scrapeUrl.trim() || scrapeLoading}
+                  className="rounded-[8px] bg-[#f58a2d] text-white hover:bg-[#e47921] px-4 shrink-0"
+                  onClick={async () => {
+                    setScrapeLoading(true);
+                    try {
+                      const result = await scrapeRecipe(scrapeUrl.trim());
+                      if (result && result.name) {
+                        setNewRecipe(prev => ({
+                          ...prev,
+                          name: result.name || prev.name,
+                          description: result.description || prev.description,
+                          ingredientsText: result.ingredients.length > 0 ? result.ingredients.join('\n') : prev.ingredientsText,
+                          stepsText: result.steps.length > 0 ? result.steps.join('\n') : prev.stepsText,
+                          servings: result.servings || prev.servings,
+                          prepTime: result.prepTime || prev.prepTime,
+                          cookTime: result.cookTime || prev.cookTime,
+                          tags: result.tags && result.tags.length > 0 ? result.tags : prev.tags,
+                        }));
+                        toast.success('Opskrift hentet!');
+                      } else {
+                        toast.error('Kunne ikke finde opskrift på siden');
+                      }
+                    } catch {
+                      toast.error('Fejl ved hentning af opskrift');
+                    } finally {
+                      setScrapeLoading(false);
+                    }
+                  }}
+                >
+                  {scrapeLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Hent'}
+                </Button>
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label className="text-[12px] font-semibold text-[#78766d]">Navn</Label>
               <Input
                 value={newRecipe.name}
                 onChange={e => setNewRecipe(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="Fx. Bedstemors kyllingesuppe"
-                className="rounded-xl border-[#d8d7cf]"
+                className="rounded-[8px] border-[#d8d7cf]"
               />
             </div>
             <div className="space-y-2">
@@ -3299,45 +3401,45 @@ export function MadOgHjem() {
                 value={newRecipe.description}
                 onChange={e => setNewRecipe(prev => ({ ...prev, description: e.target.value }))}
                 placeholder="Kort beskrivelse..."
-                className="rounded-xl border-[#d8d7cf]"
+                className="rounded-[8px] border-[#d8d7cf]"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <Label className="text-[12px] font-semibold text-[#78766d]">Kategori</Label>
-                <Select value={newRecipe.category} onValueChange={v => setNewRecipe(prev => ({ ...prev, category: v }))}>
-                  <SelectTrigger className="rounded-xl border-[#d8d7cf]"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {recipeCategories.map((cat: string) => (
-                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <button
+                  type="button"
+                  onClick={() => setRecipeCategorySheetOpen(true)}
+                  className="flex h-10 w-full items-center justify-between rounded-[8px] border border-[#d8d7cf] bg-white px-3 text-sm text-[#2f2f2d]"
+                >
+                  {newRecipe.category}
+                  <ChevronDown className="h-4 w-4 text-[#78766d]" />
+                </button>
               </div>
               <div className="space-y-2">
                 <Label className="text-[12px] font-semibold text-[#78766d]">Sværhedsgrad</Label>
-                <Select value={newRecipe.difficulty} onValueChange={(v: 'easy' | 'medium' | 'hard') => setNewRecipe(prev => ({ ...prev, difficulty: v }))}>
-                  <SelectTrigger className="rounded-xl border-[#d8d7cf]"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="easy">Nem</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="hard">Svær</SelectItem>
-                  </SelectContent>
-                </Select>
+                <button
+                  type="button"
+                  onClick={() => setRecipeDifficultySheetOpen(true)}
+                  className="flex h-10 w-full items-center justify-between rounded-[8px] border border-[#d8d7cf] bg-white px-3 text-sm text-[#2f2f2d]"
+                >
+                  {{ easy: 'Nem', medium: 'Medium', hard: 'Svær' }[newRecipe.difficulty]}
+                  <ChevronDown className="h-4 w-4 text-[#78766d]" />
+                </button>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div className="space-y-2">
                 <Label className="text-[12px] font-semibold text-[#78766d]">Portioner</Label>
-                <Input type="number" value={newRecipe.servings} onChange={e => setNewRecipe(prev => ({ ...prev, servings: +e.target.value || 1 }))} className="rounded-xl border-[#d8d7cf]" />
+                <Input type="number" value={newRecipe.servings || ''} onChange={e => setNewRecipe(prev => ({ ...prev, servings: e.target.value === '' ? 0 : +e.target.value }))} className="rounded-[8px] border-[#d8d7cf]" />
               </div>
               <div className="space-y-2">
                 <Label className="text-[12px] font-semibold text-[#78766d]">Forberedelse</Label>
-                <Input type="number" value={newRecipe.prepTime} onChange={e => setNewRecipe(prev => ({ ...prev, prepTime: +e.target.value || 0 }))} className="rounded-xl border-[#d8d7cf]" />
+                <Input type="number" value={newRecipe.prepTime || ''} onChange={e => setNewRecipe(prev => ({ ...prev, prepTime: e.target.value === '' ? 0 : +e.target.value }))} className="rounded-[8px] border-[#d8d7cf]" />
               </div>
               <div className="space-y-2">
                 <Label className="text-[12px] font-semibold text-[#78766d]">Tilberedning</Label>
-                <Input type="number" value={newRecipe.cookTime} onChange={e => setNewRecipe(prev => ({ ...prev, cookTime: +e.target.value || 0 }))} className="rounded-xl border-[#d8d7cf]" />
+                <Input type="number" value={newRecipe.cookTime || ''} onChange={e => setNewRecipe(prev => ({ ...prev, cookTime: e.target.value === '' ? 0 : +e.target.value }))} className="rounded-[8px] border-[#d8d7cf]" />
               </div>
             </div>
             <div className="space-y-2">
@@ -3347,7 +3449,7 @@ export function MadOgHjem() {
                 onChange={e => setNewRecipe(prev => ({ ...prev, ingredientsText: e.target.value }))}
                 placeholder={"500 g hakket oksekød\n1 stk løg\n2 dl fløde\n..."}
                 rows={5}
-                className="rounded-xl border-[#d8d7cf]"
+                className="rounded-[8px] border-[#d8d7cf]"
               />
             </div>
             <div className="space-y-2">
@@ -3357,23 +3459,45 @@ export function MadOgHjem() {
                 onChange={e => setNewRecipe(prev => ({ ...prev, stepsText: e.target.value }))}
                 placeholder={"Hak løget fint og svits i olie.\nTilsæt hakket kød og brun det.\nTilsæt fløde og lad simre 20 min."}
                 rows={5}
-                className="rounded-xl border-[#d8d7cf]"
+                className="rounded-[8px] border-[#d8d7cf]"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[12px] font-semibold text-[#78766d]">Tags (kommasepareret)</Label>
-              <Input
-                value={newRecipe.tags}
-                onChange={e => setNewRecipe(prev => ({ ...prev, tags: e.target.value }))}
-                placeholder="dansk, hurtig, comfort, børnevenlig"
-                className="rounded-xl border-[#d8d7cf]"
-              />
+              <Label className="text-[12px] font-semibold text-[#78766d]">Tags</Label>
+              <div className="flex flex-wrap gap-1.5 rounded-[8px] border border-[#d8d7cf] bg-white p-2 min-h-[42px] items-center">
+                {newRecipe.tags.map((tag, i) => (
+                  <span key={i} className="inline-flex items-center justify-center gap-0.5 rounded-full bg-[#fff2e6] border border-[#f3c59d] px-2 py-0.5 text-[11px] font-medium text-[#cc6f1f] leading-none">
+                    {tag}
+                    <button type="button" onClick={() => setNewRecipe(prev => ({ ...prev, tags: prev.tags.filter((_, idx) => idx !== i) }))}>
+                      <X className="h-2.5 w-2.5" />
+                    </button>
+                  </span>
+                ))}
+                <input
+                  value={tagInput}
+                  onChange={e => setTagInput(e.target.value)}
+                  onKeyDown={e => {
+                    if ((e.key === ' ' || e.key === 'Enter') && tagInput.trim()) {
+                      e.preventDefault();
+                      const tag = tagInput.trim();
+                      if (!newRecipe.tags.includes(tag)) {
+                        setNewRecipe(prev => ({ ...prev, tags: [...prev.tags, tag] }));
+                      }
+                      setTagInput('');
+                    } else if (e.key === 'Backspace' && !tagInput && newRecipe.tags.length > 0) {
+                      setNewRecipe(prev => ({ ...prev, tags: prev.tags.slice(0, -1) }));
+                    }
+                  }}
+                  placeholder={newRecipe.tags.length === 0 ? "Skriv et tag..." : ""}
+                  className="flex-1 min-w-[60px] text-sm outline-none bg-transparent"
+                />
+              </div>
             </div>
-            <div className="flex items-center justify-between rounded-xl border border-[#e8e7e0] bg-white px-3 py-2.5">
+            <div className="flex items-center justify-between rounded-[8px] border border-[#e8e7e0] bg-white px-3 py-2.5">
               <span className="text-[12px] font-semibold text-[#2f2f2d]">Børnevenlig</span>
               <Checkbox checked={newRecipe.childFriendly} onCheckedChange={(v) => setNewRecipe(prev => ({ ...prev, childFriendly: !!v }))} />
             </div>
-            <div className="flex items-center justify-between rounded-xl border border-[#e8e7e0] bg-white px-3 py-2.5">
+            <div className="flex items-center justify-between rounded-[8px] border border-[#e8e7e0] bg-white px-3 py-2.5">
               <div className="flex items-center gap-2">
                 <Share2 className="h-4 w-4 text-[#22c55e]" />
                 <div>
@@ -3384,7 +3508,7 @@ export function MadOgHjem() {
               <Checkbox checked={newRecipe.shareWithFamily} onCheckedChange={(v) => setNewRecipe(prev => ({ ...prev, shareWithFamily: !!v }))} />
             </div>
             <Button
-              className="w-full rounded-2xl bg-[#f58a2d] text-white hover:bg-[#e47921]"
+              className="w-full rounded-[8px] bg-[#f58a2d] text-white hover:bg-[#e47921]"
               disabled={!newRecipe.name.trim() || !newRecipe.stepsText.trim()}
               onClick={() => {
                 const parseIngredients = (text: string) => {
@@ -3412,15 +3536,15 @@ export function MadOgHjem() {
                   ingredients: parseIngredients(newRecipe.ingredientsText),
                   steps: parseSteps(newRecipe.stepsText),
                   nutrition: { kcal: 0, protein: 0, carbs: 0, fat: 0 },
-                  tags: newRecipe.tags.split(',').map(t => t.trim()).filter(Boolean),
+                  tags: newRecipe.tags,
                   childFriendly: newRecipe.childFriendly,
                   isUserRecipe: true,
                   createdBy: currentUser?.id,
                   isShared: newRecipe.shareWithFamily,
                 };
-                addUserRecipe(recipe);
+                createUserRecipe(recipe).catch(() => {});
                 setCreateRecipeOpen(false);
-                setNewRecipe({ name: '', description: '', category: 'Aftensmad', servings: 4, prepTime: 15, cookTime: 30, difficulty: 'easy', ingredientsText: '', stepsText: '', tags: '', childFriendly: true, shareWithFamily: true });
+                setNewRecipe({ name: '', description: '', category: 'Aftensmad', servings: 4, prepTime: 15, cookTime: 30, difficulty: 'easy', ingredientsText: '', stepsText: '', tags: [], childFriendly: true, shareWithFamily: true }); setTagInput(''); setScrapeUrl('');
                 toast.success(newRecipe.shareWithFamily ? 'Opskrift oprettet og delt med familien' : 'Opskrift gemt');
               }}
             >
@@ -3432,7 +3556,43 @@ export function MadOgHjem() {
         )}
       </AnimatePresence>
 
-      {/* Recipe Detail — Full-screen page */}
+      {/* Kategori bottom sheet */}
+      <BottomSheet open={recipeCategorySheetOpen} onOpenChange={setRecipeCategorySheetOpen} title="Kategori">
+        <div className="space-y-1 pb-4">
+          {recipeCategories.map((cat: string) => (
+            <button
+              key={cat}
+              onClick={() => { setNewRecipe(prev => ({ ...prev, category: cat })); setRecipeCategorySheetOpen(false); }}
+              className={cn(
+                "w-full rounded-lg px-4 py-3 text-left text-[15px] font-medium transition-colors",
+                newRecipe.category === cat ? "bg-[#fff2e6] text-[#2f2f2d]" : "text-[#4a4945]"
+              )}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </BottomSheet>
+
+      {/* Sværhedsgrad bottom sheet */}
+      <BottomSheet open={recipeDifficultySheetOpen} onOpenChange={setRecipeDifficultySheetOpen} title="Sværhedsgrad">
+        <div className="space-y-1 pb-4">
+          {([['easy', 'Nem'], ['medium', 'Medium'], ['hard', 'Svær']] as const).map(([value, label]) => (
+            <button
+              key={value}
+              onClick={() => { setNewRecipe(prev => ({ ...prev, difficulty: value })); setRecipeDifficultySheetOpen(false); }}
+              className={cn(
+                "w-full rounded-lg px-4 py-3 text-left text-[15px] font-medium transition-colors",
+                newRecipe.difficulty === value ? "bg-[#fff2e6] text-[#2f2f2d]" : "text-[#4a4945]"
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </BottomSheet>
+
+      {/* Recipe Detail — Full-screen page (z-[60] to cover BottomNav) */}
       <AnimatePresence>
         {selectedRecipe && (
           <motion.div
@@ -3440,18 +3600,29 @@ export function MadOgHjem() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className="fixed inset-0 z-[55] bg-[#faf9f6] overflow-hidden flex flex-col"
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.15}
+            onDragEnd={(_: unknown, info: { offset: { x: number } }) => { if (info.offset.x > 100) setSelectedRecipe(null); }}
+            className="fixed inset-0 z-[60] bg-[#faf9f6] overflow-hidden flex flex-col"
             style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
           >
             {/* Header */}
             <div className="shrink-0 px-4 pt-3 pb-3 flex items-center gap-3">
               <button
                 onClick={() => setSelectedRecipe(null)}
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f2f1ed] transition-all active:scale-[0.92]"
+                className="flex h-9 w-9 items-center justify-center text-[#2f2f2d] transition-all active:scale-[0.92]"
               >
                 <ArrowLeft className="h-[18px] w-[18px] text-[#2f2f2d]" />
               </button>
-              <h1 className="text-[20px] font-bold tracking-[-0.02em] text-[#2f2f2d] truncate">{selectedRecipe.name}</h1>
+              <h1 className="flex-1 text-[20px] font-bold tracking-[-0.02em] text-[#2f2f2d] truncate">{selectedRecipe.name}</h1>
+              <button
+                onClick={() => setDatePickerOpen(true)}
+                className="flex items-center gap-1.5 rounded-full bg-[#f2f1ed] px-3 py-1.5 text-[12px] font-semibold text-[#2f2f2d] shrink-0"
+              >
+                <Calendar className="h-3.5 w-3.5 text-[#78766d]" />
+                {format(parseISO(mealPlanDate), 'd. MMM', { locale: da })}
+              </button>
             </div>
 
             {/* Content */}
@@ -3462,45 +3633,173 @@ export function MadOgHjem() {
                 {/* Nutrition bar */}
                 <div className="grid grid-cols-4 gap-2">
                   {[
-                    { label: 'Kcal', val: Math.round(selectedRecipe.nutrition.kcal * recipeServings / selectedRecipe.servings), color: 'bg-[#f58a2d]' },
-                    { label: 'Protein', val: `${Math.round(selectedRecipe.nutrition.protein * recipeServings / selectedRecipe.servings)}g`, color: 'bg-[#4a90d9]' },
-                    { label: 'Kulhydrat', val: `${Math.round(selectedRecipe.nutrition.carbs * recipeServings / selectedRecipe.servings)}g`, color: 'bg-[#22c55e]' },
-                    { label: 'Fedt', val: `${Math.round(selectedRecipe.nutrition.fat * recipeServings / selectedRecipe.servings)}g`, color: 'bg-[#ef4444]' },
+                    { label: 'Kcal', val: getNutritionValue(selectedRecipe.nutrition.kcal), color: 'bg-[#f58a2d]' },
+                    { label: 'Protein', val: `${getNutritionValue(selectedRecipe.nutrition.protein)}g`, color: 'bg-[#4a90d9]' },
+                    { label: 'Kulhydrat', val: `${getNutritionValue(selectedRecipe.nutrition.carbs)}g`, color: 'bg-[#22c55e]' },
+                    { label: 'Fedt', val: `${getNutritionValue(selectedRecipe.nutrition.fat)}g`, color: 'bg-[#ef4444]' },
                   ].map(n => (
-                    <div key={n.label} className="rounded-2xl border-2 border-[#e5e3dc] bg-white p-3 text-center">
+                    <div key={n.label} className="rounded-[8px] border-2 border-[#e5e3dc] bg-white p-3 text-center">
                       <div className={cn("mx-auto mb-1.5 h-1.5 w-10 rounded-full", n.color)} />
                       <p className="text-[14px] font-bold text-[#2f2f2d]">{n.val}</p>
                       <p className="text-[10px] text-[#9a978f]">{n.label}</p>
                     </div>
                   ))}
                 </div>
+                {/* Portionskontrol — to rækker */}
+                <div className="rounded-[8px] border-2 border-[#e5e3dc] bg-white">
+                  {/* Række 1: Portionsstørrelse */}
+                  <button
+                    onClick={() => {
+                      const units = ['portion', '100g', '1g', 'total'] as const;
+                      const idx = units.indexOf(nutritionUnit);
+                      const next = units[(idx + 1) % units.length];
+                      setNutritionUnit(next);
+                      if (next === 'portion') setRecipeServings(selectedRecipe?.servings ?? 4);
+                      else if (next === '100g') setRecipeServings(Math.round(basePortionWeight * (selectedRecipe?.servings ?? 4) / 100));
+                      else if (next === '1g') setRecipeServings(Math.round(basePortionWeight * (selectedRecipe?.servings ?? 4)));
+                    }}
+                    className="flex w-full items-center justify-between px-4 py-3 active:bg-[#fafaf8] transition-colors"
+                  >
+                    <span className="text-[13px] font-medium text-[#2f2f2d]">Portionsstørrelse</span>
+                    <span className="flex items-center gap-1 text-[13px] font-semibold text-[#5f5d56]">
+                      {nutritionUnit === 'portion' ? 'Per portion' : nutritionUnit === '100g' ? 'Per 100 g' : nutritionUnit === '1g' ? 'Per gram' : 'Hele retten'}
+                      <ChevronDown className="h-3.5 w-3.5 text-[#9a978f]" />
+                    </span>
+                  </button>
+                  {/* Række 2: Antal */}
+                  {nutritionUnit !== 'total' && (
+                    <>
+                      <div className="border-t border-[#e5e3dc]" />
+                      <div className="flex items-center justify-between px-4 py-2.5">
+                        <span className="text-[13px] font-medium text-[#2f2f2d]">
+                          {nutritionUnit === 'portion' ? 'Antal portioner' : nutritionUnit === '100g' ? 'Antal (×100g)' : 'Gram'}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setRecipeServings(Math.max(1, recipeServings - (nutritionUnit === '1g' ? 50 : 1)))}
+                            className="flex h-7 w-7 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56] active:scale-[0.92]"
+                          >
+                            <Minus className="h-3.5 w-3.5" />
+                          </button>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={servingsInput}
+                            onChange={e => {
+                              setServingsInput(e.target.value);
+                              const v = parseInt(e.target.value);
+                              if (!isNaN(v) && v >= 1) setRecipeServings(v);
+                            }}
+                            onBlur={() => {
+                              const v = parseInt(servingsInput);
+                              if (isNaN(v) || v < 1) setServingsInput(String(recipeServings));
+                            }}
+                            className="w-10 text-center text-[14px] font-bold text-[#2f2f2d] bg-transparent outline-none border-none"
+                          />
+                          <button
+                            onClick={() => setRecipeServings(recipeServings + (nutritionUnit === '1g' ? 50 : 1))}
+                            className="flex h-7 w-7 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56] active:scale-[0.92]"
+                          >
+                            <Plus className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
 
-                {/* Serving adjuster */}
-                <div className="flex items-center justify-between rounded-2xl border-2 border-[#e5e3dc] bg-white px-4 py-3">
-                  <span className="text-[13px] font-semibold text-[#2f2f2d]">Portioner</span>
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => setRecipeServings(Math.max(1, recipeServings - 1))}
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56] active:scale-[0.92]"
-                    >
-                      <Minus className="h-4 w-4" />
-                    </button>
-                    <span className="w-6 text-center text-[15px] font-bold text-[#2f2f2d]">{recipeServings}</span>
-                    <button
-                      onClick={() => setRecipeServings(Math.min(20, recipeServings + 1))}
-                      className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56] active:scale-[0.92]"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </button>
+                {/* Måltidsvælger */}
+                <div>
+                  <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Måltid</p>
+                  <div className="flex gap-2">
+                    {(['breakfast', 'lunch', 'dinner', 'snack'] as MealType[]).map(mt => (
+                      <button
+                        key={mt}
+                        onClick={() => setSelectedMealType(mt)}
+                        className={cn(
+                          "flex-1 rounded-[8px] py-2 text-[12px] font-semibold transition-all active:scale-[0.96]",
+                          selectedMealType === mt
+                            ? "bg-[#2f2f2d] text-white"
+                            : "bg-[#f2f1ed] text-[#5f5d56]"
+                        )}
+                      >
+                        {getMealTypeLabel(mt)}
+                      </button>
+                    ))}
                   </div>
                 </div>
+
+                {/* Household member selection — moved above Ingredienser */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Hvem spiser med?</p>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedMembers(eligibleMembers.map(m => m.id))}
+                      className="text-[11px] text-[#f58a2d] font-semibold"
+                    >
+                      Vælg alle
+                    </button>
+                  </div>
+                  <div className="rounded-[8px] border-2 border-[#e5e3dc] bg-white p-2 space-y-0.5">
+                    {eligibleMembers.map(member => (
+                      <label key={member.id} className="flex items-center gap-2.5 rounded-[8px] px-2 py-1.5 text-[13px] hover:bg-[#faf9f6] transition-colors cursor-pointer">
+                        <Checkbox
+                          checked={selectedMembers.includes(member.id)}
+                          onCheckedChange={(checked) => {
+                            setSelectedMembers(prev => checked
+                              ? [...prev, member.id]
+                              : prev.filter(id => id !== member.id));
+                          }}
+                          className="h-4 w-4"
+                        />
+                        <span className="text-[#2f2f2d]">{member.name}</span>
+                        {member.kcalGoal ? (
+                          <span className="text-[10px] text-[#9a978f] ml-auto">{member.kcalGoal} kcal/dag</span>
+                        ) : member.canConfigure ? (
+                          <span className="text-[10px] text-[#f5a623] ml-auto">Ikke konfigureret</span>
+                        ) : (
+                          <span className="text-[10px] text-[#9a978f] ml-auto">Bed {member.name} konfigurere</span>
+                        )}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Portionsfordeling — visuelt per person */}
+                {portionCalculation.length > 0 && (
+                  <div className="rounded-[8px] border-2 border-[#e5e3dc] bg-white p-4">
+                    <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Portionsfordeling</p>
+                    <div className="space-y-0">
+                      {portionCalculation.map((p, i) => (
+                        <div key={p.name} className={cn(i > 0 && "border-t border-[#e5e3dc] pt-3", i > 0 ? "mt-3" : "")}>
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="text-[13px] font-semibold text-[#2f2f2d]">{p.name}</span>
+                            <span className="text-[18px] font-bold text-[#2f2f2d]">{p.percent}%</span>
+                          </div>
+                          <div className="mb-2 h-2 w-full overflow-hidden rounded-full bg-[#f2f1ed]">
+                            <div
+                              className="h-full rounded-full bg-[#f58a2d] transition-all"
+                              style={{ width: `${p.percent}%` }}
+                            />
+                          </div>
+                          <div className="flex items-center gap-3 text-[12px] text-[#5f5d56]">
+                            <span className="font-semibold">{p.kcal} kcal</span>
+                            <span>{p.protein}g protein</span>
+                            <span className="text-[#9a978f]">{p.carbs}g kulhydrat · {p.fat}g fedt</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Ingredients */}
                 <div>
                   <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Ingredienser</p>
-                  <div className="rounded-2xl border-2 border-[#e5e3dc] bg-white p-4 space-y-2">
+                  <div className="rounded-[8px] border-2 border-[#e5e3dc] bg-white p-4 space-y-2">
                     {selectedRecipe.ingredients.map((ing, i) => {
-                      const scale = recipeServings / selectedRecipe.servings;
+                      const scale = equivalentServings / selectedRecipe.servings;
                       const amount = Math.round(ing.amount * scale * 10) / 10;
                       return (
                         <div key={i} className="flex justify-between text-[13px]">
@@ -3512,53 +3811,142 @@ export function MadOgHjem() {
                   </div>
                 </div>
 
-                {/* Steps */}
+                {/* Steps + Video */}
                 <div>
                   <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Tilberedning</p>
-                  <div className="space-y-2.5">
-                    {selectedRecipe.steps.map(step => (
-                      <div key={step.step} className="rounded-2xl border-2 border-[#e5e3dc] bg-white px-4 py-3">
-                        <div className="flex items-start gap-3">
-                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#f58a2d] text-[12px] font-bold text-white">
-                            {step.step}
-                          </span>
-                          <div className="pt-0.5">
-                            <p className="text-[13px] text-[#2f2f2d] leading-relaxed">{step.description}</p>
-                            {step.duration && (
-                              <p className="mt-1 text-[11px] text-[#9a978f] flex items-center gap-1">
-                                <Timer className="h-3 w-3" /> {step.duration} min
-                              </p>
-                            )}
+
+                  {/* Video card — only shown if recipe has a video */}
+                  {(() => {
+                    const videoUrl = getRecipeVideoUrl(selectedRecipe.id);
+                    if (!videoUrl) return null;
+                    return videoPlaying ? (
+                      <div className="mb-3 rounded-[8px] overflow-hidden border-2 border-[#e5e3dc] bg-black">
+                        <video
+                          src={videoUrl}
+                          controls
+                          autoPlay
+                          playsInline
+                          className="w-full aspect-video"
+                          onEnded={() => setVideoPlaying(false)}
+                        />
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setVideoPlaying(true)}
+                        className="mb-3 flex w-full items-center gap-3 rounded-[8px] border-2 border-[#e5e3dc] bg-[#2f2f2d] px-4 py-3.5 text-left transition-all active:scale-[0.98]"
+                      >
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f58a2d]">
+                          <Play className="h-5 w-5 text-white ml-0.5" />
+                        </div>
+                        <div>
+                          <p className="text-[14px] font-bold text-white">Se tilberedningsvideo</p>
+                          <p className="text-[11px] text-[#9a978f]">Trin-for-trin video</p>
+                        </div>
+                      </button>
+                    );
+                  })()}
+
+                  {/* Swipeable step carousel */}
+                  <div className="relative overflow-hidden rounded-[8px] border-2 border-[#e5e3dc] bg-white">
+                    <div
+                      className="flex transition-transform duration-300 ease-out"
+                      style={{ transform: `translateX(-${activeStepIndex * 100}%)` }}
+                    >
+                      {selectedRecipe.steps.map(step => (
+                        <div key={step.step} className="w-full shrink-0 px-4 py-4">
+                          <div className="flex items-start gap-3">
+                            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#f58a2d] text-[12px] font-bold text-white">
+                              {step.step}
+                            </span>
+                            <div className="pt-0.5">
+                              <p className="text-[13px] text-[#2f2f2d] leading-relaxed">{step.description}</p>
+                              {step.duration && (
+                                <p className="mt-1 text-[11px] text-[#9a978f] flex items-center gap-1">
+                                  <Timer className="h-3 w-3" /> {step.duration} min
+                                </p>
+                              )}
+                            </div>
                           </div>
                         </div>
+                      ))}
+                    </div>
+                    {/* Swipe detection overlay */}
+                    <div
+                      className="absolute inset-0"
+                      onTouchStart={(e) => {
+                        const touch = e.touches[0];
+                        (e.currentTarget as HTMLDivElement).dataset.startX = String(touch.clientX);
+                      }}
+                      onTouchEnd={(e) => {
+                        const startX = Number((e.currentTarget as HTMLDivElement).dataset.startX || 0);
+                        const endX = e.changedTouches[0].clientX;
+                        const diff = startX - endX;
+                        if (diff > 50 && activeStepIndex < selectedRecipe.steps.length - 1) {
+                          setActiveStepIndex(activeStepIndex + 1);
+                        } else if (diff < -50 && activeStepIndex > 0) {
+                          setActiveStepIndex(activeStepIndex - 1);
+                        }
+                      }}
+                    />
+                    {/* Dots */}
+                    {selectedRecipe.steps.length > 1 && (
+                      <div className="flex justify-center gap-1.5 pb-3">
+                        {selectedRecipe.steps.map((_, i) => (
+                          <button
+                            key={i}
+                            onClick={() => setActiveStepIndex(i)}
+                            className={cn(
+                              "h-2 w-2 rounded-full transition-all",
+                              i === activeStepIndex ? "bg-[#f58a2d] w-4" : "bg-[#d8d7cf]"
+                            )}
+                          />
+                        ))}
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
 
-                {/* Add to meal plan button */}
+                {/* Add to meal plan button — direct save */}
                 <button
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#f58a2d] px-4 py-3.5 text-[14px] font-bold text-white shadow-[0_2px_12px_rgba(245,138,45,0.25)] transition-all active:scale-[0.98]"
-                  onClick={() => {
+                  className="flex w-full items-center justify-center gap-2 rounded-[8px] bg-[#f58a2d] px-4 py-3.5 text-[14px] font-bold text-white shadow-[0_2px_12px_rgba(245,138,45,0.25)] transition-all active:scale-[0.98] disabled:opacity-50"
+                  disabled={addingToMealPlan}
+                  onClick={async () => {
                     if (!selectedRecipe) return;
-                    setNewMeal((prev) => ({
-                      ...prev,
-                      title: selectedRecipe.name,
-                      mealType: 'dinner',
-                      ingredientsText: selectedRecipe.ingredients.map(ing => {
-                        const scale = recipeServings / selectedRecipe.servings;
-                        return `${Math.round(ing.amount * scale * 10) / 10} ${ing.unit} ${ing.name}`;
-                      }).join('\n'),
-                      instructions: selectedRecipe.steps.map(s => `${s.step}. ${s.description}`).join('\n'),
-                      notes: `${selectedRecipe.nutrition.kcal} kcal/portion · ${recipeServings} portioner`
-                    }));
-                    setSelectedRecipe(null);
-                    setRecipeBrowserOpen(false);
-                    setIsAddMealOpen(true);
-                    toast.success('Opskrift tilføjet til madplan');
+                    setAddingToMealPlan(true);
+                    try {
+                      const scale = recipeServings / selectedRecipe.servings;
+                      const ingredients = selectedRecipe.ingredients.map(ing =>
+                        `${Math.round(ing.amount * scale * 10) / 10} ${ing.unit} ${ing.name}`
+                      );
+
+                      await createMealPlan({
+                        date: mealPlanDate,
+                        mealType: selectedMealType,
+                        title: selectedRecipe.name,
+                        notes: selectedMembers.length > 0
+                          ? `${Math.round(selectedRecipe.nutrition.kcal * scale)} kcal · ${recipeServings} portioner · ${selectedMembers.length} personer`
+                          : `${Math.round(selectedRecipe.nutrition.kcal * scale)} kcal · ${recipeServings} portioner`,
+                        recipe: {
+                          name: selectedRecipe.name,
+                          ingredients,
+                          instructions: selectedRecipe.steps.map(s => `${s.step}. ${s.description}`).join('\n'),
+                        },
+                      });
+
+                      toast.success(`${selectedRecipe.name} tilføjet til ${format(parseISO(mealPlanDate), 'd. MMM', { locale: da })}`);
+                      setSelectedRecipe(null);
+                    } catch {
+                      toast.error('Kunne ikke tilføje til madplan');
+                    } finally {
+                      setAddingToMealPlan(false);
+                    }
                   }}
                 >
-                  <ChefHat className="h-4 w-4" />
+                  {addingToMealPlan ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <ChefHat className="h-4 w-4" />
+                  )}
                   Tilføj til madplan
                 </button>
               </div>
@@ -3566,6 +3954,301 @@ export function MadOgHjem() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Date picker BottomSheet for recipe → madplan */}
+      <BottomSheet open={datePickerOpen} onOpenChange={setDatePickerOpen} title="Vælg dato">
+        <div className="space-y-1 pb-4">
+          {Array.from({ length: 8 }, (_, i) => {
+            const d = addDays(new Date(), i);
+            const dateStr = format(d, 'yyyy-MM-dd');
+            const label = isToday(d) ? 'I dag' : isTomorrow(d) ? 'I morgen' : format(d, 'EEEE d. MMM', { locale: da });
+            const isSelected = mealPlanDate === dateStr;
+            return (
+              <button
+                key={dateStr}
+                onClick={() => { setMealPlanDate(dateStr); setDatePickerOpen(false); }}
+                className={cn(
+                  "w-full rounded-lg px-4 py-3 text-left text-[15px] font-medium transition-colors capitalize",
+                  isSelected ? "bg-[#fff2e6] text-[#2f2f2d]" : "text-[#4a4945]"
+                )}
+              >
+                {label}
+              </button>
+            );
+          })}
+          <div className="pt-2">
+            <label className="flex items-center gap-2 px-4 py-2 text-[13px] text-[#78766d]">
+              Anden dato:
+              <input
+                type="date"
+                value={mealPlanDate}
+                onChange={e => { setMealPlanDate(e.target.value); setDatePickerOpen(false); }}
+                className="flex-1 rounded-[8px] border border-[#d8d7cf] bg-white px-2 py-1.5 text-[13px] text-[#2f2f2d]"
+              />
+            </label>
+          </div>
+        </div>
+      </BottomSheet>
+
+      {/* Kaloriedagbog overlay */}
+      <AnimatePresence>
+        {kaloriedagbogOpen && (
+          <KaloriedagbogView onBack={() => setKaloriedagbogOpen(false)} />
+        )}
+      </AnimatePresence>
+
+      {/* Product detail overlay */}
+      <AnimatePresence>
+        {detailItem && (
+          <motion.div
+            className="fixed inset-0 z-[60] bg-[#faf9f6] flex flex-col"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', stiffness: 380, damping: 38 }}
+          >
+            {/* Minimal header: back + title + close */}
+            <div className="flex items-center justify-between px-4 pt-[env(safe-area-inset-top,12px)] pb-3">
+              <button onClick={() => setDetailItem(null)} className="p-1 -ml-1 text-[#2f2f2d] active:scale-95">
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+              <p className="text-[16px] font-bold text-[#2f2f2d] truncate mx-4 text-center flex-1">
+                {detailItem.name}
+              </p>
+              <button onClick={() => setDetailItem(null)} className="p-1 -mr-1 text-[#78766d] active:scale-95">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto px-4 pb-8">
+              {/* Product info */}
+              <div className="mt-4 text-center">
+                <p className="text-[20px] font-black text-[#2f2f2d]">{detailItem.name}</p>
+                {detailItem.quantity && (
+                  <p className="text-[14px] text-[#78766d] mt-1">{detailItem.quantity}</p>
+                )}
+                {(() => {
+                  const detailNutriGrade = matchNutriScore(detailItem.name, nutriScoreMap);
+                  return detailNutriGrade ? (
+                    <div className="flex justify-center mt-2">
+                      <NutriScoreBadge grade={detailNutriGrade} size="md" />
+                    </div>
+                  ) : null;
+                })()}
+                {detailItem.category && (
+                  <span className="inline-block mt-2 rounded-full bg-[#f2f1ed] px-3 py-1 text-[12px] font-medium text-[#5f5d56]">
+                    {detailItem.category}
+                  </span>
+                )}
+                {(() => {
+                  const detailItemAllergens = detailItem.allergens ?? matchAllergens(detailItem.name, allergenMap);
+                  const detailAllergenMatches = matchFamilyAllergens(detailItemAllergens, familyAllergenProfiles);
+                  return detailAllergenMatches.length > 0 ? (
+                    <div className="flex items-center justify-center gap-1.5 mt-3 px-3 py-2 rounded-[8px] bg-amber-50 border border-amber-200">
+                      <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0" />
+                      <span className="text-[12px] font-semibold text-amber-700">
+                        {detailAllergenMatches.map(m => `${m.allergenLabel} (${m.affectedMembers.join(', ')})`).join(' · ')}
+                      </span>
+                    </div>
+                  ) : null;
+                })()}
+              </div>
+
+              {/* Nutrition */}
+              {detailLoading ? (
+                <div className="mt-8 flex flex-col items-center gap-3 py-8">
+                  <Loader2 className="h-8 w-8 text-[#f58a2d] animate-spin" />
+                  <p className="text-[13px] text-[#9a978f]">Henter næringsdata...</p>
+                </div>
+              ) : detailNutrition && detailNutrition.energyKcal != null ? (
+                <div className="mt-8">
+                  <p className="text-[14px] font-bold text-[#2f2f2d] text-center mb-4">Næringsindhold pr. 100g</p>
+
+                  {/* Macro grid */}
+                  <div className="grid grid-cols-4 gap-3">
+                    {[
+                      { label: 'Kalorier', value: `${Math.round(detailNutrition.energyKcal ?? 0)}`, unit: 'kcal', color: '#f58a2d' },
+                      { label: 'Protein', value: `${(detailNutrition.protein ?? 0).toFixed(1)}`, unit: 'g', color: '#3b82f6' },
+                      { label: 'Kulhydrater', value: `${(detailNutrition.carbs ?? 0).toFixed(1)}`, unit: 'g', color: '#f59e0b' },
+                      { label: 'Fedt', value: `${(detailNutrition.fat ?? 0).toFixed(1)}`, unit: 'g', color: '#ef4444' },
+                    ].map(macro => (
+                      <div key={macro.label} className="rounded-[12px] bg-white border border-[#e5e3dc] p-3 text-center">
+                        <p className="text-[22px] font-black" style={{ color: macro.color }}>{macro.value}</p>
+                        <p className="text-[10px] text-[#9a978f] mt-0.5">{macro.unit}</p>
+                        <p className="text-[11px] font-medium text-[#78766d] mt-1">{macro.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-8 text-center py-8">
+                  <div className="flex h-14 w-14 mx-auto items-center justify-center rounded-[8px] bg-[#f2f1ed]">
+                    <UtensilsCrossed className="h-7 w-7 text-[#b0ada4]" />
+                  </div>
+                  <p className="text-[15px] font-semibold text-[#2f2f2d] mt-3">Ingen næringsdata tilgængelig</p>
+                  <p className="text-[13px] text-[#9a978f] mt-1">Scan stregkoden for at hente næringsdata</p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Opret indkøbsliste Fullscreen ── */}
+      <AnimatePresence>
+        {createListOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: '100%' }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            className="fixed inset-0 z-[9999] flex flex-col bg-[#faf9f6]"
+            style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[#e5e3dc] bg-white">
+              <button
+                onClick={() => { setCreateListOpen(false); setNewListName('Indkøbsliste'); setNewListDate(''); }}
+                className="flex items-center text-[#78766d] active:opacity-70"
+              >
+                <X className="h-5 w-5" />
+              </button>
+              <h2 className="text-[16px] font-bold text-[#2f2f2d]">Opret indkøbsliste</h2>
+              <button
+                onClick={async () => {
+                  if (!newListName.trim()) return;
+                  try {
+                    const list = await createShoppingList({
+                      name: newListName.trim(),
+                      scheduledDate: newListDate || undefined,
+                    });
+                    setActiveShoppingListId(list.id);
+                    setCreateListOpen(false);
+                    toast.success(`"${newListName.trim()}" oprettet`);
+                  } catch { /* handled by useApiActions */ }
+                }}
+                disabled={!newListName.trim()}
+                className="text-[15px] font-bold text-[#f58a2d] disabled:opacity-40 active:opacity-70"
+              >
+                Gem
+              </button>
+            </div>
+            {/* Content */}
+            <div className="flex-1 px-4 pt-6 space-y-4">
+              <div>
+                <label className="mb-1 block text-[13px] font-medium text-[#5f5d56]">Listenavn</label>
+                <input
+                  value={newListName}
+                  onChange={e => setNewListName(e.target.value)}
+                  placeholder="Indkøbsliste"
+                  className="w-full rounded-[8px] border border-[#d8d7cf] bg-white px-3 py-2.5 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#c5c3bb]"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-[13px] font-medium text-[#5f5d56]">Dato for indkøb (valgfrit)</label>
+                <input
+                  type="date"
+                  value={newListDate}
+                  onChange={e => setNewListDate(e.target.value)}
+                  className="w-full rounded-[8px] border border-[#d8d7cf] bg-white px-3 py-2.5 text-[14px] text-[#2f2f2d] outline-none focus:border-[#c5c3bb]"
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Alle lister Fullscreen ── */}
+      <AnimatePresence>
+        {showAllLists && (
+          <motion.div
+            initial={{ opacity: 0, y: '100%' }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+            className="fixed inset-0 z-[9999] flex flex-col bg-[#faf9f6]"
+            style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[#e5e3dc] bg-white">
+              <button
+                onClick={() => { setShowAllLists(false); if (shoppingLists.length > 0) setActiveShoppingListId(shoppingLists[0].id); }}
+                className="flex items-center text-[#78766d] active:opacity-70"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </button>
+              <h2 className="text-[16px] font-bold text-[#2f2f2d]">Indkøbslister</h2>
+              <button
+                onClick={() => { setNewListName('Indkøbsliste'); setNewListDate(''); setCreateListOpen(true); }}
+                className="text-[15px] font-bold text-[#f58a2d] active:opacity-70"
+              >
+                Ny
+              </button>
+            </div>
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto px-4 pt-4 space-y-3" style={{ paddingBottom: 'env(safe-area-inset-bottom, 24px)' }}>
+              {shoppingLists.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-[8px] bg-[#f2f1ed]">
+                    <ShoppingCart className="h-8 w-8 text-[#b0ada4]" />
+                  </div>
+                  <p className="text-[15px] font-semibold text-[#2f2f2d]">Ingen indkøbslister</p>
+                  <p className="text-[13px] text-[#9a978f]">Tryk "Ny" for at oprette en liste</p>
+                </div>
+              ) : (
+                shoppingLists.map(list => {
+                  const listItems = shoppingItems.filter(i => i.listId === list.id);
+                  const totalCount = listItems.length;
+                  const purchasedCount = listItems.filter(i => i.purchased).length;
+                  const pct = totalCount > 0 ? Math.round((purchasedCount / totalCount) * 100) : 0;
+                  return (
+                    <div key={list.id} className="relative overflow-hidden rounded-[8px]">
+                      {/* Swipe-to-delete background */}
+                      <div className="absolute inset-0 flex items-center justify-end bg-red-500 px-4 rounded-[8px]">
+                        <Trash2 className="h-5 w-5 text-white" />
+                      </div>
+                      <motion.div
+                        drag="x"
+                        dragConstraints={{ left: -120, right: 0 }}
+                        dragElastic={0.1}
+                        onDragEnd={(_: unknown, info: { offset: { x: number } }) => {
+                          if (info.offset.x < -100) {
+                            deleteShoppingList(list.id).catch(() => {});
+                            toast.success(`"${list.name}" slettet`);
+                          }
+                        }}
+                      >
+                        <button
+                          onClick={() => { setActiveShoppingListId(list.id); setShowAllLists(false); }}
+                          className="relative w-full rounded-[8px] border border-[#e5e3dc] bg-white px-4 py-4 text-left transition-all active:scale-[0.99]"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-[15px] font-bold text-[#2f2f2d]">{list.name}</p>
+                              <p className="text-[12px] text-[#9a978f] mt-0.5">{purchasedCount}/{totalCount} varer afkrydset</p>
+                            </div>
+                            <span className="text-[14px] font-semibold text-[#9a978f]">{pct}%</span>
+                          </div>
+                          <div className="mt-2.5 h-1.5 w-full rounded-full bg-[#f0efe8] overflow-hidden">
+                            <div
+                              className="h-full rounded-full bg-[#f58a2d] transition-all"
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        </button>
+                      </motion.div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <SavingOverlay open={isSaving} />
     </div>
   );
 }

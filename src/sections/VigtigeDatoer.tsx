@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useAppStore } from '@/store';
 import { useApiActions } from '@/hooks/useApiActions';
+import { OverblikSidePanel } from '@/components/custom/OverblikSidePanel';
+import { SavingOverlay } from '@/components/custom/SavingOverlay';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { da } from 'date-fns/locale';
 import { Plus, CalendarHeart, Trash2, Bell } from 'lucide-react';
@@ -9,20 +11,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { BottomSheet } from '@/components/custom/BottomSheet';
+import { SelectSheet } from '@/components/custom/SelectSheet';
 import { cn } from '@/lib/utils';
+import { ConfirmCloseDialog } from '@/components/custom/ConfirmCloseDialog';
 import type { KeyDate } from '@/types';
 
 type DateType = KeyDate['type'];
@@ -71,6 +63,8 @@ export function VigtigeDatoer() {
   const { currentUser, keyDates, children } = useAppStore();
   const { createKeyDate, deleteKeyDate } = useApiActions();
   const [addOpen, setAddOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [confirmClose, setConfirmClose] = useState(false);
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');
   const [type, setType] = useState<DateType>('birthday');
@@ -89,33 +83,41 @@ export function VigtigeDatoer() {
 
   async function handleAdd() {
     if (!currentUser || !title.trim() || !date) return;
-    await createKeyDate({
-      childId: childId && childId !== 'none' ? childId : undefined,
-      title: title.trim(),
-      date,
-      type,
-      recurrence,
-      reminderDaysBefore: parseInt(reminderDays) || 3,
-      notes: notes.trim() || undefined,
-    });
-    setAddOpen(false);
-    setTitle('');
-    setDate('');
-    setType('birthday');
-    setRecurrence('yearly');
-    setReminderDays('3');
-    setNotes('');
-    setChildId('');
-    toast.success('Vigtig dato tilføjet');
+    setIsSaving(true);
+    try {
+      await createKeyDate({
+        childId: childId && childId !== 'none' ? childId : undefined,
+        title: title.trim(),
+        date,
+        type,
+        recurrence,
+        reminderDaysBefore: parseInt(reminderDays) || 3,
+        notes: notes.trim() || undefined,
+      });
+      toast.success('Vigtig dato tilføjet');
+      setAddOpen(false);
+      setTitle('');
+      setDate('');
+      setType('birthday');
+      setRecurrence('yearly');
+      setReminderDays('3');
+      setNotes('');
+      setChildId('');
+    } catch {
+      toast.error('Kunne ikke tilføje dato');
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   return (
     <div className="space-y-1.5 py-1">
+      <OverblikSidePanel />
       <div className="flex items-center justify-between">
         <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Vigtige datoer</h1>
         <Button
           onClick={() => setAddOpen(true)}
-          className="h-9 gap-1.5 rounded-2xl bg-[#2f2f2f] px-4 text-sm text-white hover:bg-[#1a1a1a]"
+          className="h-9 gap-1.5 rounded-[8px] bg-[#2f2f2f] px-4 text-sm text-white hover:bg-[#1a1a1a]"
         >
           <Plus className="h-4 w-4" />
           Tilføj
@@ -131,7 +133,7 @@ export function VigtigeDatoer() {
           </div>
           <Button
             variant="outline"
-            className="mt-1 h-9 rounded-2xl border-[#d0cec5] px-4 text-sm"
+            className="mt-1 h-9 rounded-[8px] border-[#d0cec5] px-4 text-sm"
             onClick={() => setAddOpen(true)}
           >
             <Plus className="mr-1.5 h-4 w-4" /> Opret dato
@@ -151,7 +153,7 @@ export function VigtigeDatoer() {
               <div
                 key={kd.id}
                 className={cn(
-                  'flex items-center gap-3 rounded-2xl border px-4 py-3.5',
+                  'flex items-center gap-3 rounded-[8px] border px-4 py-3.5',
                   isToday
                     ? 'border-[#f5bf8f] bg-[#fff8f0]'
                     : 'border-[#e8e7e0] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)]'
@@ -194,121 +196,130 @@ export function VigtigeDatoer() {
         </div>
       )}
 
-      <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
-          <DialogHeader>
-            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Tilføj vigtig dato</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2">
+      <ConfirmCloseDialog
+        open={confirmClose}
+        onCancel={() => setConfirmClose(false)}
+        onConfirm={() => { setConfirmClose(false); setAddOpen(false); setTitle(''); setDate(''); setType('birthday'); setRecurrence('yearly'); setReminderDays('3'); setNotes(''); setChildId(''); }}
+      />
+      <BottomSheet open={addOpen} onOpenChange={(open) => {
+        if (!open && (title.trim() || date || notes.trim())) {
+          setConfirmClose(true);
+        } else {
+          setAddOpen(open);
+        }
+      }} title="Tilføj vigtig dato">
+        <div className="space-y-2">
+          <div className="space-y-1">
+            <Label htmlFor="kd-title" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Titel</Label>
+            <Input
+              id="kd-title"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              placeholder="f.eks. Mias fødselsdag"
+              className="rounded-[8px] border-[#d8d7cf] bg-white"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <Label htmlFor="kd-title" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Titel</Label>
-              <Input
-                id="kd-title"
-                value={title}
-                onChange={e => setTitle(e.target.value)}
-                placeholder="f.eks. Mias fødselsdag"
-                className="rounded-xl border-[#d8d7cf] bg-white"
+              <Label htmlFor="kd-type" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Type</Label>
+              <SelectSheet
+                value={type}
+                onValueChange={v => setType(v as DateType)}
+                title="Type"
+                options={typeOptions.map(t => ({ value: t.value, label: t.label }))}
+                className="rounded-[8px] border-[#d8d7cf] bg-white"
               />
             </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div className="space-y-1">
-                <Label htmlFor="kd-type" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Type</Label>
-                <Select value={type} onValueChange={v => setType(v as DateType)}>
-                  <SelectTrigger id="kd-type" className="rounded-xl border-[#d8d7cf] bg-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {typeOptions.map(t => (
-                      <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="kd-recurrence" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Gentagelse</Label>
-                <Select value={recurrence} onValueChange={v => setRecurrence(v as Recurrence)}>
-                  <SelectTrigger id="kd-recurrence" className="rounded-xl border-[#d8d7cf] bg-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="yearly">Hvert år</SelectItem>
-                    <SelectItem value="once">Én gang</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
             <div className="space-y-1">
-              <Label htmlFor="kd-date" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Dato</Label>
-              <Input
-                id="kd-date"
-                type="date"
-                value={date}
-                onChange={e => setDate(e.target.value)}
-                className="rounded-xl border-[#d8d7cf] bg-white"
+              <Label htmlFor="kd-recurrence" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Gentagelse</Label>
+              <SelectSheet
+                value={recurrence}
+                onValueChange={v => setRecurrence(v as Recurrence)}
+                title="Gentagelse"
+                options={[
+                  { value: 'yearly', label: 'Hvert år' },
+                  { value: 'once', label: 'Én gang' },
+                ]}
+                className="rounded-[8px] border-[#d8d7cf] bg-white"
               />
-            </div>
-
-            {children.length > 0 && (
-              <div className="space-y-1">
-                <Label htmlFor="kd-child" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Tilknyt barn (valgfrit)</Label>
-                <Select value={childId} onValueChange={setChildId}>
-                  <SelectTrigger id="kd-child" className="rounded-xl border-[#d8d7cf] bg-white">
-                    <SelectValue placeholder="Ingen" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Ingen</SelectItem>
-                    {children.map(c => (
-                      <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-
-            <div className="space-y-1">
-              <Label htmlFor="kd-reminder" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Påmind X dage før</Label>
-              <Input
-                id="kd-reminder"
-                type="number"
-                min={0}
-                max={30}
-                value={reminderDays}
-                onChange={e => {
-                  const val = Math.min(30, Math.max(0, parseInt(e.target.value) || 0));
-                  setReminderDays(String(val));
-                }}
-                className="rounded-xl border-[#d8d7cf] bg-white"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <Label htmlFor="kd-notes" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Noter (valgfrit)</Label>
-              <Textarea
-                id="kd-notes"
-                value={notes}
-                onChange={e => setNotes(e.target.value)}
-                placeholder="f.eks. Husk at bestille kage"
-                className="min-h-[60px] resize-none rounded-xl border-[#d8d7cf] bg-white text-sm"
-              />
-            </div>
-
-            <div className="flex gap-2 pt-1">
-              <Button variant="outline" className="flex-1 rounded-2xl border-[#d8d7cf]" onClick={() => setAddOpen(false)}>
-                Annuller
-              </Button>
-              <Button
-                className="flex-1 rounded-2xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
-                onClick={handleAdd}
-                disabled={!title.trim() || !date}
-              >
-                Gem dato
-              </Button>
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+
+          <div className="space-y-1">
+            <Label htmlFor="kd-date" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Dato</Label>
+            <Input
+              id="kd-date"
+              type="date"
+              value={date}
+              onChange={e => setDate(e.target.value)}
+              className="rounded-[8px] border-[#d8d7cf] bg-white"
+            />
+          </div>
+
+          {children.length > 0 && (
+            <div className="space-y-1">
+              <Label htmlFor="kd-child" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Tilknyt barn (valgfrit)</Label>
+              <SelectSheet
+                value={childId}
+                onValueChange={setChildId}
+                title="Tilknyt barn"
+                placeholder="Ingen"
+                options={[{ value: 'none', label: 'Ingen' }, ...children.map(c => ({ value: c.id, label: c.name }))]}
+                className="rounded-[8px] border-[#d8d7cf] bg-white"
+              />
+            </div>
+          )}
+
+          <div className="space-y-1">
+            <Label htmlFor="kd-reminder" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Påmind X dage før</Label>
+            <Input
+              id="kd-reminder"
+              type="number"
+              min={0}
+              max={30}
+              value={reminderDays}
+              onChange={e => {
+                const val = e.target.value === '' ? 0 : Math.min(30, Math.max(0, parseInt(e.target.value, 10)));
+                setReminderDays(String(val));
+              }}
+              className="rounded-[8px] border-[#d8d7cf] bg-white"
+            />
+          </div>
+
+          <div className="space-y-1">
+            <Label htmlFor="kd-notes" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Noter (valgfrit)</Label>
+            <Textarea
+              id="kd-notes"
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              placeholder="f.eks. Husk at bestille kage"
+              className="min-h-[60px] resize-none rounded-[8px] border-[#d8d7cf] bg-white text-sm"
+            />
+          </div>
+
+          <div className="flex gap-2 pt-1">
+            <Button variant="outline" className="flex-1 rounded-[8px] border-[#d8d7cf]" onClick={() => {
+              if (title.trim() || date || notes.trim()) {
+                setConfirmClose(true);
+              } else {
+                setAddOpen(false);
+              }
+            }}>
+              Annuller
+            </Button>
+            <Button
+              className="flex-1 flex items-center justify-center gap-2 rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+              onClick={handleAdd}
+              disabled={!title.trim() || !date || isSaving}
+            >
+              Gem dato
+            </Button>
+          </div>
+        </div>
+      </BottomSheet>
+
+      <SavingOverlay open={isSaving} />
     </div>
   );
 }

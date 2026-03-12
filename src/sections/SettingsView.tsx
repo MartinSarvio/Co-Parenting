@@ -6,12 +6,10 @@ import { paymentAccountId, userId as generateUserId } from '@/lib/id';
 import {
   BadgeCheck,
   Bell,
-  Briefcase,
   Camera,
   Check,
   CreditCard,
   Link2,
-  Menu,
   Moon,
   Save,
   ShieldCheck,
@@ -28,7 +26,12 @@ import {
   Star,
   Send,
   ArrowRight,
+  User,
+  Handshake,
+  UserCircle,
+  Shield,
 } from 'lucide-react';
+import { SavingOverlay } from '@/components/custom/SavingOverlay';
 import { toast } from 'sonner';
 import { useTheme } from 'next-themes';
 import { useAppStore } from '@/store';
@@ -37,7 +40,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { SelectSheet } from '@/components/custom/SelectSheet';
 import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { IOSSwitch } from '@/components/ui/ios-switch';
 import { Badge } from '@/components/ui/badge';
@@ -46,23 +49,21 @@ import { getPlanFeatures, getSubscriptionPlan, normalizeSubscription } from '@/l
 import type { BillingModel, FamilyMemberRole, HouseholdMode, SubscriptionPlan } from '@/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Users, Trash2, Receipt, ShieldAlert } from 'lucide-react';
+import { Users, Trash2, ShieldAlert, BarChart3, Tag, Newspaper } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { api } from '@/lib/api';
+import { EU_ALLERGENS_DA } from '@/lib/allergenMatch';
+import { supabase } from '@/lib/supabase';
 import { startCheckout, openBillingPortal, fetchStripeStatus, PLAN_PRICES } from '@/lib/stripe';
-import type { StripePlan } from '@/lib/stripe';
+import type { StripePlan, BillingInterval } from '@/lib/stripe';
 import { AdminPanel } from '@/sections/AdminPanel';
+import { PlatformAnalyseView } from '@/sections/PlatformAnalyseView';
+import { TilbudAdminView } from '@/sections/TilbudAdminView';
+import { NyhederAdminView } from '@/sections/NyhederAdminView';
 
 const AVATAR_PRESETS = [
   'Maria', 'Anders', 'Sofie', 'Lars', 'Emma', 'Mikkel',
   'Anne', 'Thomas', 'Camilla', 'Frederik', 'Julie', 'Oliver',
 ];
-
-const subscriptionPlanLabels: Record<SubscriptionPlan, string> = {
-  free: 'Gratis',
-  family_plus: 'Family Plus',
-  single_parent_plus: 'Enlig Plus'
-};
 
 const familyModeLabels: Record<HouseholdMode, string> = {
   together: 'Samboende familie',
@@ -90,6 +91,7 @@ export function SettingsView() {
   const {
     currentUser,
     users,
+    children,
     household,
     paymentAccounts,
     documents,
@@ -97,15 +99,26 @@ export function SettingsView() {
     isProfessionalView,
     setProfessionalView,
     updateUser,
+    updateChild,
     setHousehold,
     addPaymentAccount,
     updatePaymentAccount,
     addUser,
     addFamilyMember,
     removeFamilyMember,
+    sideMenuOpen,
+    setSideMenuOpen,
+    sideMenuContext,
+    notificationPreferences,
+    updateNotificationPreferences,
+    activeSettingsTab,
+    setActiveSettingsTab,
+    settingsDetailView,
+    setSettingsDetailView,
   } = useAppStore();
   const { createDocument } = useApiActions();
 
+  const [isSaving, setIsSaving] = useState(false);
   const [profileDraft, setProfileDraft] = useState({
     name: currentUser?.name || '',
     email: currentUser?.email || '',
@@ -115,6 +128,14 @@ export function SettingsView() {
     zipCode: (currentUser as any)?.zipCode || '',
     city: (currentUser as any)?.city || '',
     country: (currentUser as any)?.country || 'Danmark',
+    organization: currentUser?.organization || '',
+    municipality: currentUser?.municipality || '',
+  });
+  const [visibilityDraft, setVisibilityDraft] = useState({
+    showEmail: currentUser?.profileVisibility?.showEmail ?? false,
+    showPhone: currentUser?.profileVisibility?.showPhone ?? false,
+    showAddress: currentUser?.profileVisibility?.showAddress ?? false,
+    bio: currentUser?.profileVisibility?.bio ?? '',
   });
   const [avatarDialogOpen, setAvatarDialogOpen] = useState(false);
   const avatarFileRef = useRef<HTMLInputElement>(null);
@@ -132,6 +153,7 @@ export function SettingsView() {
     url: '',
     description: ''
   });
+  const [allergenEditId, setAllergenEditId] = useState<string | null>(null);
   const [familyMemberOpen, setFamilyMemberOpen] = useState(false);
   const [familyMemberDraft, setFamilyMemberDraft] = useState({
     name: '',
@@ -142,16 +164,13 @@ export function SettingsView() {
     if (typeof Notification === 'undefined') return 'denied';
     return Notification.permission;
   });
-  const [handoverReminderMinutes, setHandoverReminderMinutes] = useState(30);
-  const [activeSettingsTab, setActiveSettingsTab] = useState('profile');
-  const [sidePanelOpen, setSidePanelOpen] = useState(false);
+  const sidePanelOpen = sideMenuOpen && sideMenuContext === 'settings';
   const [feedbackDraft, setFeedbackDraft] = useState({
     rating: 0,
     category: 'general',
     message: '',
   });
   const [partnerInviteEmail, setPartnerInviteEmail] = useState('');
-  const [homeRemindersActive] = useState(false);
 
   useEffect(() => {
     if (typeof Notification !== 'undefined') {
@@ -161,11 +180,10 @@ export function SettingsView() {
 
   const subscription = normalizeSubscription(household);
   const plan = getSubscriptionPlan(household);
-  const features = getPlanFeatures(household);
+  const features = getPlanFeatures(household, currentUser?.isAdmin);
   const currentMode = household?.familyMode || 'co_parenting';
   const isTogetherMode = currentMode === 'together';
-  const isSingleParentMode = currentMode === 'single_parent';
-  const allowProfessionalTools = !isTogetherMode;
+  const allowProfessionalTools = currentUser?.isAdmin === true;
 
   const myPaymentAccounts = useMemo(() => {
     if (!currentUser) return [];
@@ -183,30 +201,45 @@ export function SettingsView() {
     ));
   }, [documents]);
 
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
     if (!currentUser) return;
-    const profileData = {
-      name: profileDraft.name.trim(),
-      email: profileDraft.email.trim(),
-      phone: profileDraft.phone.trim() || undefined,
-      birthDate: profileDraft.birthDate || undefined,
-      address: profileDraft.address.trim() || undefined,
-      zipCode: profileDraft.zipCode.trim() || undefined,
-      city: profileDraft.city.trim() || undefined,
-      country: profileDraft.country.trim() || undefined,
-    };
-    updateUser(currentUser.id, profileData as any);
-    // Persist profile to server
-    api.patch(`/api/users/${currentUser.id}`, profileData).catch(() => {});
-    toast.success('Profil gemt');
+    setIsSaving(true);
+    try {
+      const profileData = {
+        name: profileDraft.name.trim(),
+        email: profileDraft.email.trim(),
+        phone: profileDraft.phone.trim() || undefined,
+        birthDate: profileDraft.birthDate || undefined,
+        address: profileDraft.address.trim() || undefined,
+        zipCode: profileDraft.zipCode.trim() || undefined,
+        city: profileDraft.city.trim() || undefined,
+        country: profileDraft.country.trim() || undefined,
+        organization: profileDraft.organization.trim() || undefined,
+        municipality: profileDraft.municipality.trim() || undefined,
+        profileVisibility: {
+          showEmail: visibilityDraft.showEmail,
+          showPhone: visibilityDraft.showPhone,
+          showAddress: visibilityDraft.showAddress,
+          bio: visibilityDraft.bio.trim() || undefined,
+        },
+      };
+      updateUser(currentUser.id, profileData as any);
+      // Persist profile to Supabase
+      await supabase.from('profiles').update(profileData).eq('id', currentUser.id);
+      toast.success('Profil gemt');
+    } catch {
+      toast.error('Kunne ikke gemme profil');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleAvatarPreset = (seed: string) => {
     if (!currentUser) return;
     const url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}`;
     updateUser(currentUser.id, { avatar: url });
-    // Persist avatar to server
-    api.patch(`/api/users/${currentUser.id}`, { avatar: url }).catch(() => {});
+    // Persist avatar to Supabase
+    supabase.from('profiles').update({ avatar: url }).eq('id', currentUser.id).then(() => {}, () => {});
     setAvatarDialogOpen(false);
     toast.success('Avatar opdateret');
   };
@@ -248,6 +281,7 @@ export function SettingsView() {
 
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [hasStripeCustomer, setHasStripeCustomer] = useState(false);
+  const [billingInterval, setBillingInterval] = useState<BillingInterval>('monthly');
 
   const handlePlanChange = async (nextPlan: SubscriptionPlan) => {
     if (!household) return;
@@ -273,13 +307,13 @@ export function SettingsView() {
     // Paid plan — redirect to Stripe Checkout
     setCheckoutLoading(true);
     try {
-      const token = localStorage.getItem('auth-token');
-      if (!token) {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
         toast.error('Du skal være logget ind for at opgradere');
         setCheckoutLoading(false);
         return;
       }
-      await startCheckout(nextPlan as StripePlan, 'monthly');
+      await startCheckout(nextPlan as StripePlan, billingInterval);
       // User is redirected to Stripe — this code won't run
     } catch (err: any) {
       console.error('Stripe checkout error:', err);
@@ -319,7 +353,9 @@ export function SettingsView() {
     fetchStripeStatus().then((status) => {
       if (status.stripeActive) {
         setHasStripeCustomer(true);
-        if (household && status.plan !== 'free') {
+        const currentPlan = household?.subscription?.plan;
+        const currentStatus = household?.subscription?.status;
+        if (household && status.plan !== 'free' && (status.plan !== currentPlan || currentStatus !== 'active')) {
           setHousehold({
             ...household,
             subscription: {
@@ -439,7 +475,7 @@ export function SettingsView() {
       lawyerIds: []
     };
 
-    void createDocument({
+    createDocument({
       title: evidenceDraft.title.trim(),
       type: 'authority_document',
       url: evidenceDraft.url.trim(),
@@ -453,68 +489,59 @@ export function SettingsView() {
 
   return (
     <div className="space-y-1.5 py-1">
-      <motion.div
-        initial={{ opacity: 0, y: -16 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <h1 className="text-2xl font-semibold text-[#2f2f2d]">Indstillinger</h1>
-      </motion.div>
-
-      {/* ─── Side panel (slides from left) — portal to escape max-w container ─── */}
+      {/* ─── Side panel (OverblikSidePanel-stil) — portal to escape max-w container ─── */}
       {createPortal(
       <AnimatePresence>
         {sidePanelOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               className="fixed inset-0 z-[9998] bg-black/30"
-              onClick={() => setSidePanelOpen(false)}
+              onClick={() => setSideMenuOpen(false)}
             />
-            {/* Panel */}
             <motion.div
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-              className="fixed inset-y-0 left-0 z-[9999] w-[280px] bg-white shadow-[4px_0_24px_rgba(0,0,0,0.1)] flex flex-col"
+              className="fixed inset-y-0 left-0 z-[9999] w-full bg-white flex flex-col"
               style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
             >
-              {/* Panel header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-[#eeedea]">
-                <h2 className="text-[17px] font-bold text-[#2f2f2d]">Mere</h2>
+              <div className="flex items-center justify-between px-5 py-3 border-b border-[#eeedea]">
+                <h2 className="text-[17px] font-bold text-[#2f2f2d]">Indstillinger</h2>
                 <button
-                  onClick={() => setSidePanelOpen(false)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56]"
+                  onClick={() => setSideMenuOpen(false)}
+                  className="flex items-center justify-center text-[#5f5d56] hover:text-[#2f2f2d] transition-colors"
                 >
                   <XIcon className="h-4 w-4" />
                 </button>
               </div>
-
-              {/* Panel items */}
-              <div className="flex-1 overflow-y-auto py-2">
+              <div className="flex-1 overflow-y-auto py-2 pb-[env(safe-area-inset-bottom,0px)]">
                 {[
-                  { value: 'notifications', label: 'Notifikationer', icon: Bell, desc: 'Push & påmindelser' },
-                  { value: 'familytype', label: 'Familietype', icon: Home, desc: 'Samboende, skilt, enlig' },
-                  { value: 'appearance', label: 'Visning', icon: Eye, desc: 'Tema & professionel visning', adminOnly: false },
-                  null, // divider
-                  { value: 'payments', label: 'Betaling', icon: CreditCard, desc: 'Betalingskonti' },
-                  { value: 'members', label: 'Medlemmer', icon: Users, desc: 'Familiemedlemmer' },
-                  null, // divider
-                  { value: 'feedback', label: 'Feedback', icon: MessageSquare, desc: 'Giv os feedback' },
-                  ...(currentUser?.isAdmin
+                  { value: 'profile', label: 'Konto', icon: User },
+                  { value: 'subscription', label: 'Abonnement', icon: BadgeCheck },
+                  { value: 'notifications', label: 'Notifikationer', icon: Bell },
+                  // Følgende tabs skjules i professionelt mode
+                  ...(!isProfessionalView ? [
+                    { value: 'familytype', label: 'Familietype', icon: Home },
+                    { value: 'appearance', label: 'Visning', icon: Eye },
+                    { value: 'payments', label: 'Betaling', icon: CreditCard },
+                    { value: 'members', label: 'Medlemmer', icon: Users },
+                  ] : []),
+                  { value: 'feedback', label: 'Feedback', icon: MessageSquare },
+                  { value: 'info', label: 'Info', icon: Shield },
+                  ...(!isProfessionalView && currentUser?.isAdmin
                     ? [
-                        null, // divider
-                        { value: 'admin', label: 'Admin', icon: ShieldAlert, desc: 'Administration', adminOnly: true },
+                        { value: 'platform-analyse', label: 'Analyse', icon: BarChart3 },
+                        { value: 'tilbud-admin', label: 'Tilbuds-admin', icon: Tag },
+                        { value: 'nyheder-admin', label: 'Nyheder', icon: Newspaper },
+                        { value: 'admin', label: 'Admin', icon: ShieldAlert },
                       ]
                     : []),
-                ].map((item, idx) => {
-                  if (item === null) {
-                    return <div key={`div-${idx}`} className="my-2 mx-5 border-t border-[#eeedea]" />;
-                  }
+                ].map((item) => {
                   const Icon = item.icon;
                   const isActive = activeSettingsTab === item.value;
                   return (
@@ -522,27 +549,20 @@ export function SettingsView() {
                       key={item.value}
                       onClick={() => {
                         setActiveSettingsTab(item.value);
-                        setSidePanelOpen(false);
+                        setSideMenuOpen(false);
                       }}
                       className={cn(
-                        'flex w-full items-center gap-3.5 px-5 py-3 text-left transition-colors',
-                        isActive
-                          ? 'bg-[#f7f6f2]'
-                          : 'hover:bg-[#faf9f6]'
+                        'flex w-full items-center gap-3.5 px-5 py-3.5 text-left transition-colors',
+                        isActive ? 'bg-transparent' : 'hover:bg-[#faf9f6]'
                       )}
                     >
-                      <div className={cn(
-                        'flex h-9 w-9 items-center justify-center rounded-xl',
-                        isActive ? 'bg-[#fff2e6]' : 'bg-[#f2f1ed]'
+                      <Icon className={cn('h-5 w-5 shrink-0', isActive ? 'text-[#f58a2d]' : 'text-[#7a786f]')} />
+                      <p className={cn(
+                        'flex-1 min-w-0 text-[15px] font-semibold',
+                        isActive ? 'text-[#2f2f2d]' : 'text-[#4a4945]'
                       )}>
-                        <Icon className={cn('h-[18px] w-[18px]', isActive ? 'text-[#f58a2d]' : 'text-[#7a786f]')} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className={cn('text-[14px] font-semibold', isActive ? 'text-[#2f2f2d]' : 'text-[#4a4945]')}>
-                          {item.label}
-                        </p>
-                        <p className="text-[11px] text-[#9a978f] truncate">{item.desc}</p>
-                      </div>
+                        {item.label}
+                      </p>
                       {isActive && (
                         <div className="h-2 w-2 rounded-full bg-[#f58a2d] shrink-0" />
                       )}
@@ -558,50 +578,10 @@ export function SettingsView() {
       )}
 
       <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="space-y-2">
-        {/* Threads-style tab bar: Konto | Familie | Abonnement | ≡ */}
-        <div className="sticky top-0 z-10 bg-[#faf9f6] pb-0 pt-1">
-          <div className="flex items-center border-b border-[#e5e3dc]">
-            {/* Main tabs: Konto + Familie + Abonnement */}
-            {[
-              { value: 'profile', label: 'Konto' },
-              { value: 'family', label: 'Familie' },
-              { value: 'subscription', label: 'Abonnement' },
-            ].map((tab) => (
-              <button
-                key={tab.value}
-                onClick={() => setActiveSettingsTab(tab.value)}
-                className={cn(
-                  'relative flex-1 py-3 text-center text-[14px] font-semibold transition-colors',
-                  activeSettingsTab === tab.value
-                    ? 'text-[#2f2f2d]'
-                    : 'text-[#b0ada4]'
-                )}
-              >
-                {tab.label}
-                {activeSettingsTab === tab.value && (
-                  <motion.div
-                    layoutId="settings-underline"
-                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#2f2f2d] rounded-full"
-                    transition={{ type: 'spring', stiffness: 500, damping: 35 }}
-                  />
-                )}
-              </button>
-            ))}
-
-            {/* Hamburger icon (right side) */}
-            <button
-              onClick={() => setSidePanelOpen(true)}
-              className="flex items-center justify-center w-11 py-3 text-[#7a786f] hover:text-[#2f2f2d] transition-colors"
-            >
-              <Menu className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
 
         <TabsContent value="profile" className="space-y-2">
           {/* Avatar section */}
-          <Card>
-            <CardContent className="flex flex-col items-center gap-3 py-5">
+          <div className="flex flex-col items-center gap-3 py-5">
               <button
                 onClick={() => setAvatarDialogOpen(true)}
                 className="group relative"
@@ -622,8 +602,7 @@ export function SettingsView() {
               >
                 Skift profilbillede
               </button>
-            </CardContent>
-          </Card>
+          </div>
 
           {/* Avatar picker dialog */}
           <Dialog open={avatarDialogOpen} onOpenChange={setAvatarDialogOpen}>
@@ -635,7 +614,7 @@ export function SettingsView() {
                 {/* Upload own photo */}
                 <button
                   onClick={() => avatarFileRef.current?.click()}
-                  className="flex w-full items-center gap-3 rounded-2xl border-2 border-dashed border-[#d8d7cf] bg-white px-4 py-3 text-left transition-colors hover:border-[#f58a2d] hover:bg-[#fff8f0]"
+                  className="flex w-full items-center gap-3 rounded-[8px] border-2 border-dashed border-[#d8d7cf] bg-white px-4 py-3 text-left transition-colors hover:border-[#f58a2d] hover:bg-[#fff8f0]"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fff2e6]">
                     <Upload className="h-5 w-5 text-[#f58a2d]" />
@@ -665,7 +644,7 @@ export function SettingsView() {
                           key={seed}
                           onClick={() => handleAvatarPreset(seed)}
                           className={cn(
-                            "flex flex-col items-center gap-1 rounded-xl p-2 transition-all",
+                            "flex flex-col items-center gap-1 rounded-[8px] p-2 transition-all",
                             isSelected
                               ? "bg-[#fff2e6] ring-2 ring-[#f58a2d]"
                               : "hover:bg-[#f0efe8]"
@@ -685,11 +664,7 @@ export function SettingsView() {
             </DialogContent>
           </Dialog>
 
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Min profil</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 pt-0">
+          <div className="space-y-2">
               <div className="space-y-2">
                 <Label>Navn</Label>
                 <Input
@@ -769,12 +744,216 @@ export function SettingsView() {
                   placeholder="Danmark"
                 />
               </div>
-              <Button onClick={handleSaveProfile} className="w-full">
-                <Save className="mr-2 h-4 w-4" />
+
+              {/* Professionelle felter: organisation og kommune */}
+              {isProfessionalView && (
+                <>
+                  <div className="space-y-2">
+                    <Label>Organisation</Label>
+                    <Input
+                      value={profileDraft.organization}
+                      onChange={(e) => setProfileDraft((prev) => ({ ...prev, organization: e.target.value }))}
+                      placeholder="F.eks. Børn- og Familieafdelingen"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Kommune-tilhørsforhold</Label>
+                    <Input
+                      value={profileDraft.municipality}
+                      onChange={(e) => setProfileDraft((prev) => ({ ...prev, municipality: e.target.value }))}
+                      placeholder="F.eks. Københavns Kommune"
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* Profilsynlighed */}
+              <div className="overflow-hidden">
+                <p className="text-[12px] font-semibold text-[#9a978f] uppercase tracking-wider px-4 pt-3 pb-1.5">Profilsynlighed</p>
+                <p className="text-[11px] text-[#9a978f] px-4 pb-2">Vælg hvad andre kan se på din profil i grupper</p>
+                <div className="flex items-center justify-between px-4 py-3 border-t border-[#f0efea]">
+                  <span className="text-[13px] text-[#2f2f2d]">Vis email</span>
+                  <IOSSwitch checked={visibilityDraft.showEmail} onCheckedChange={(v) => setVisibilityDraft(prev => ({ ...prev, showEmail: v }))} />
+                </div>
+                <div className="flex items-center justify-between px-4 py-3 border-t border-[#f0efea]">
+                  <span className="text-[13px] text-[#2f2f2d]">Vis telefon</span>
+                  <IOSSwitch checked={visibilityDraft.showPhone} onCheckedChange={(v) => setVisibilityDraft(prev => ({ ...prev, showPhone: v }))} />
+                </div>
+                <div className="flex items-center justify-between px-4 py-3 border-t border-[#f0efea]">
+                  <span className="text-[13px] text-[#2f2f2d]">Vis by</span>
+                  <IOSSwitch checked={visibilityDraft.showAddress} onCheckedChange={(v) => setVisibilityDraft(prev => ({ ...prev, showAddress: v }))} />
+                </div>
+                <div className="px-4 py-3 border-t border-[#f0efea]">
+                  <label className="text-[13px] text-[#2f2f2d] block mb-1.5">Bio</label>
+                  <textarea
+                    value={visibilityDraft.bio}
+                    onChange={(e) => setVisibilityDraft(prev => ({ ...prev, bio: e.target.value }))}
+                    placeholder="Kort beskrivelse af dig selv..."
+                    className="w-full h-16 rounded-lg border border-[#e5e3dc] bg-[#f9f9f7] px-3 py-2 text-[13px] text-[#2f2f2d] placeholder:text-[#c5c3ba] resize-none focus:outline-none focus:ring-1 focus:ring-[#f58a2d]"
+                  />
+                </div>
+              </div>
+
+              <Button onClick={handleSaveProfile} className="w-full flex items-center justify-center gap-2" disabled={isSaving}>
+                <Save className="h-4 w-4" />
                 Gem profil
               </Button>
-            </CardContent>
-          </Card>
+
+              {/* Familiens allergener */}
+              <div className="overflow-hidden">
+                <p className="text-[12px] font-semibold text-[#9a978f] uppercase tracking-wider px-4 pt-3 pb-1.5">Familiens allergener</p>
+                <p className="text-[11px] text-[#9a978f] px-4 pb-2">Tilføj allergener for at få advarsler på indkøbsliste og køleskab</p>
+
+                {/* Current user */}
+                {currentUser && (
+                  <div className="border-t border-[#f0efea] px-4 py-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <User className="h-4 w-4 text-[#9a978f] shrink-0" />
+                        <span className="text-[13px] font-medium text-[#2f2f2d] truncate">{currentUser.name}</span>
+                      </div>
+                      <button
+                        onClick={() => setAllergenEditId(allergenEditId === currentUser.id ? null : currentUser.id)}
+                        className="text-[11px] font-semibold text-[#f58a2d] shrink-0"
+                      >
+                        {allergenEditId === currentUser.id ? 'Luk' : 'Rediger'}
+                      </button>
+                    </div>
+                    {currentUser.allergies?.length ? (
+                      <div className="flex flex-wrap gap-1 mt-1.5">
+                        {currentUser.allergies.map(a => (
+                          <span key={a} className="inline-flex items-center rounded-full bg-[#e8e7e0] px-2 py-0.5 text-[10px] font-semibold text-[#78766d]">{a}</span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-[11px] text-[#b0ada4] mt-1">Ingen allergener</p>
+                    )}
+                    {allergenEditId === currentUser.id && (
+                      <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-[#f0efea]">
+                        {EU_ALLERGENS_DA.map(allergen => {
+                          const active = currentUser.allergies?.includes(allergen);
+                          return (
+                            <button
+                              key={allergen}
+                              onClick={() => {
+                                const current = currentUser.allergies ?? [];
+                                const next = active ? current.filter(a => a !== allergen) : [...current, allergen];
+                                updateUser(currentUser.id, { allergies: next });
+                              }}
+                              className={cn(
+                                "rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors",
+                                active ? "bg-[#f58a2d] text-white" : "bg-[#f2f1ed] text-[#78766d]"
+                              )}
+                            >
+                              {allergen}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Children */}
+                {children.map(child => (
+                  <div key={child.id} className="border-t border-[#f0efea] px-4 py-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Heart className="h-4 w-4 text-[#f58a2d] shrink-0" />
+                        <span className="text-[13px] font-medium text-[#2f2f2d] truncate">{child.name}</span>
+                      </div>
+                      <button
+                        onClick={() => setAllergenEditId(allergenEditId === child.id ? null : child.id)}
+                        className="text-[11px] font-semibold text-[#f58a2d] shrink-0"
+                      >
+                        {allergenEditId === child.id ? 'Luk' : 'Rediger'}
+                      </button>
+                    </div>
+                    {child.allergies?.length ? (
+                      <div className="flex flex-wrap gap-1 mt-1.5">
+                        {child.allergies.map(a => (
+                          <span key={a} className="inline-flex items-center rounded-full bg-[#e8e7e0] px-2 py-0.5 text-[10px] font-semibold text-[#78766d]">{a}</span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-[11px] text-[#b0ada4] mt-1">Ingen allergener</p>
+                    )}
+                    {allergenEditId === child.id && (
+                      <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-[#f0efea]">
+                        {EU_ALLERGENS_DA.map(allergen => {
+                          const active = child.allergies?.includes(allergen);
+                          return (
+                            <button
+                              key={allergen}
+                              onClick={() => {
+                                const current = child.allergies ?? [];
+                                const next = active ? current.filter(a => a !== allergen) : [...current, allergen];
+                                updateChild(child.id, { allergies: next });
+                              }}
+                              className={cn(
+                                "rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors",
+                                active ? "bg-[#f58a2d] text-white" : "bg-[#f2f1ed] text-[#78766d]"
+                              )}
+                            >
+                              {allergen}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+          </div>
+
+          {/* ── Konto-handlinger ─────────────────────────── */}
+          <div className="space-y-2 pt-2">
+            <p className="text-[12px] font-semibold text-[#9a978f] uppercase tracking-wide px-1">Konto</p>
+
+            <button
+              onClick={async () => {
+                try {
+                  const { exportAllData } = await import('@/lib/export');
+                  await exportAllData();
+                  toast.success('Data eksporteret');
+                } catch {
+                  toast.error('Kunne ikke eksportere data');
+                }
+              }}
+              className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#faf9f6]"
+            >
+              <div className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-[#f2f1ed]">
+                <Save className="h-[18px] w-[18px] text-[#7a786f]" />
+              </div>
+              <div>
+                <p className="text-[14px] font-semibold text-[#2f2f2d]">Eksporter mine data</p>
+                <p className="text-[11px] text-[#9a978f]">Download alle dine data som JSON (GDPR)</p>
+              </div>
+            </button>
+
+            <button
+              onClick={async () => {
+                if (!window.confirm('Er du sikker? Din konto og alle persondata slettes permanent. Denne handling kan IKKE fortrydes.')) return;
+                if (!window.confirm('Sidste chance — bekræft at du vil slette din konto permanent.')) return;
+                try {
+                  const { deleteAccount } = await import('@/lib/auth');
+                  await deleteAccount();
+                  window.location.reload();
+                } catch (err: unknown) {
+                  toast.error((err as Error)?.message || 'Kontosletning fejlede');
+                }
+              }}
+              className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-red-50"
+            >
+              <div className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-red-50">
+                <Trash2 className="h-[18px] w-[18px] text-red-500" />
+              </div>
+              <div>
+                <p className="text-[14px] font-semibold text-red-600">Slet min konto</p>
+                <p className="text-[11px] text-[#9a978f]">Alle persondata anonymiseres permanent</p>
+              </div>
+            </button>
+          </div>
 
         </TabsContent>
 
@@ -782,10 +961,10 @@ export function SettingsView() {
           {/* Quick link to family type setting */}
           <button
             onClick={() => setActiveSettingsTab('familytype')}
-            className="flex w-full items-center justify-between rounded-2xl border border-[#e5e3dc] bg-white px-4 py-3 text-left transition-colors hover:bg-[#faf9f6]"
+            className="flex w-full items-center justify-between rounded-[8px] border border-[#e5e3dc] bg-white px-4 py-3 text-left transition-colors hover:bg-[#faf9f6]"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#f2f1ed]">
+              <div className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-[#f2f1ed]">
                 <Home className="h-[18px] w-[18px] text-[#7a786f]" />
               </div>
               <div>
@@ -812,7 +991,7 @@ export function SettingsView() {
                 );
                 if (partnerUser) {
                   return (
-                    <div className="flex items-center gap-3 rounded-xl border border-[#e5e3dc] bg-white p-3">
+                    <div className="flex items-center gap-3 rounded-[8px] border border-[#e5e3dc] bg-white p-3">
                       <Avatar className="h-10 w-10 border border-white shadow-sm">
                         <AvatarImage src={partnerUser.avatar} />
                         <AvatarFallback className="bg-[#ecebe5] text-[#4a4945] text-sm">
@@ -820,8 +999,8 @@ export function SettingsView() {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[#2f2f2d]">{partnerUser.name}</p>
-                        <p className="text-xs text-[#75736b]">{partnerUser.email}</p>
+                        <p className="text-[15px] font-medium text-[#2f2f2d]">{partnerUser.name}</p>
+                        <p className="text-[13px] text-[#75736b]">{partnerUser.email}</p>
                       </div>
                       <Badge variant="outline" className="text-xs border-green-300 text-green-700 bg-green-50">
                         Tilknyttet
@@ -831,7 +1010,7 @@ export function SettingsView() {
                 }
                 return (
                   <div className="space-y-2">
-                    <div className="rounded-xl border border-dashed border-[#d8d7cf] bg-[#f8f7f3] p-4 text-center">
+                    <div className="rounded-[8px] border border-dashed border-[#d8d7cf] bg-[#f8f7f3] p-4 text-center">
                       <Users className="h-8 w-8 text-[#b0ada4] mx-auto mb-2" />
                       <p className="text-sm text-[#75736b]">
                         {isTogetherMode
@@ -847,22 +1026,32 @@ export function SettingsView() {
                         value={partnerInviteEmail}
                         onChange={(e) => setPartnerInviteEmail(e.target.value)}
                         placeholder="Email på medforælder"
-                        className="flex-1 rounded-xl border-[#d8d7cf]"
+                        className="flex-1 rounded-[8px] border-[#d8d7cf]"
                       />
                       <Button
-                        className="rounded-xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+                        className="rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
                         disabled={!partnerInviteEmail.trim() || !partnerInviteEmail.includes('@') || !household?.id}
                         onClick={async () => {
                           try {
-                            await api.post(`/api/household/${household!.id}/invite`, {
-                              email: partnerInviteEmail.toLowerCase().trim(),
-                              role: 'parent',
-                            });
-                            toast.success(`Invitation sendt til ${partnerInviteEmail}`);
+                            const email = partnerInviteEmail.toLowerCase().trim();
+                            const { data: partner } = await supabase
+                              .from('profiles')
+                              .select('id')
+                              .eq('email', email)
+                              .single();
+                            if (partner) {
+                              await supabase.from('household_members').insert({
+                                user_id: partner.id,
+                                household_id: household!.id,
+                                role: 'parent',
+                              });
+                              toast.success(`${partnerInviteEmail} tilføjet til husstanden`);
+                            } else {
+                              toast.error('Bruger ikke fundet — de skal registrere sig først');
+                            }
                             setPartnerInviteEmail('');
                           } catch (err: any) {
-                            const msg = err?.response?.data?.error || 'Kunne ikke sende invitation';
-                            toast.error(msg);
+                            toast.error(err?.message || 'Kunne ikke sende invitation');
                           }
                         }}
                       >
@@ -876,7 +1065,7 @@ export function SettingsView() {
             </CardContent>
           </Card>
 
-          {isSingleParentMode && (
+          {!isTogetherMode && (
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-base">
@@ -885,10 +1074,10 @@ export function SettingsView() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 pt-0">
-                <div className="flex items-center justify-between rounded-xl border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2">
+                <div className="flex items-center justify-between rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2">
                   <div>
                     <p className="text-sm font-medium">Dokumentationsarkiv</p>
-                    <p className="text-xs text-[#75736b]">Gem kvitteringer og beviser centralt</p>
+                    <p className="text-[13px] text-[#75736b]">Gem kvitteringer og beviser centralt</p>
                   </div>
                   <IOSSwitch
                     checked={Boolean(household?.singleParentSupport?.evidenceVaultEnabled)}
@@ -896,10 +1085,10 @@ export function SettingsView() {
                     onCheckedChange={(value) => handleUpdateSingleParentSetting('evidenceVaultEnabled', value)}
                   />
                 </div>
-                <div className="flex items-center justify-between rounded-xl border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2">
+                <div className="flex items-center justify-between rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2">
                   <div>
                     <p className="text-sm font-medium">Auto-arkiver kvitteringer</p>
-                    <p className="text-xs text-[#75736b]">Udgiftskvitteringer samles automatisk</p>
+                    <p className="text-[13px] text-[#75736b]">Udgiftskvitteringer samles automatisk</p>
                   </div>
                   <IOSSwitch
                     checked={Boolean(household?.singleParentSupport?.autoArchiveReceipts)}
@@ -908,7 +1097,7 @@ export function SettingsView() {
                   />
                 </div>
 
-                <div className="rounded-xl border border-[#d8d7cf] bg-[#f8f7f3] p-3">
+                <div className="rounded-[8px] border border-[#d8d7cf] bg-[#f8f7f3] p-3">
                   <p className="mb-2 text-sm font-medium">Inviter advokat</p>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <Input
@@ -933,20 +1122,20 @@ export function SettingsView() {
 
                 <div className="space-y-2">
                   {lawyerUsers.length === 0 ? (
-                    <p className="rounded-xl border border-dashed border-[#d8d7cf] bg-[#f8f7f3] p-3 text-sm text-[#75736b]">
+                    <p className="rounded-[8px] border border-dashed border-[#d8d7cf] bg-[#f8f7f3] p-3 text-sm text-[#75736b]">
                       Ingen advokater tilknyttet endnu.
                     </p>
                   ) : (
                     lawyerUsers.map((lawyer) => (
-                      <div key={lawyer.id} className="rounded-xl border border-[#d8d7cf] bg-[#faf9f6] p-3">
+                      <div key={lawyer.id} className="rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] p-3">
                         <p className="font-medium">{lawyer.name}</p>
-                        <p className="text-xs text-[#75736b]">{lawyer.email}</p>
+                        <p className="text-[13px] text-[#75736b]">{lawyer.email}</p>
                       </div>
                     ))
                   )}
                 </div>
 
-                <div className="rounded-xl border border-[#d8d7cf] bg-[#f8f7f3] p-3">
+                <div className="rounded-[8px] border border-[#d8d7cf] bg-[#f8f7f3] p-3">
                   <p className="mb-2 text-sm font-medium">Upload vigtigt materiale</p>
                   <div className="space-y-2">
                     <Input
@@ -973,10 +1162,10 @@ export function SettingsView() {
 
                 <div className="space-y-2">
                   {evidenceDocuments.slice(0, 5).map((doc) => (
-                    <div key={doc.id} className="flex items-center justify-between rounded-xl border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2">
+                    <div key={doc.id} className="flex items-center justify-between rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2">
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium">{doc.title}</p>
-                        <p className="truncate text-xs text-[#75736b]">{doc.url}</p>
+                        <p className="truncate text-[13px] text-[#75736b]">{doc.url}</p>
                       </div>
                       <Badge variant="outline">Dok</Badge>
                     </div>
@@ -988,6 +1177,60 @@ export function SettingsView() {
         </TabsContent>
 
         <TabsContent value="subscription" className="space-y-2">
+          {isProfessionalView ? (
+            /* Read-only licens-status for professionelle */
+            <Card className="border border-[#e8e7e0] rounded-[8px]">
+              <CardContent className="p-4 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-[8px] bg-[#e6f9ed] flex items-center justify-center">
+                    <BadgeCheck className="h-5 w-5 text-[#1a7a3a]" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-[#2f2f2d]">Aktiv licens</p>
+                    <p className="text-xs text-[#78766d]">
+                      Administreres af din organisation
+                    </p>
+                  </div>
+                </div>
+                {currentUser?.organization && (
+                  <p className="text-sm text-[#5f5d56]">
+                    Organisation: {currentUser.organization}
+                  </p>
+                )}
+                {currentUser?.municipality && (
+                  <p className="text-sm text-[#5f5d56]">
+                    Kommune: {currentUser.municipality}
+                  </p>
+                )}
+                <p className="text-xs text-[#78766d]">
+                  Kontakt din administrator for ændringer i abonnement.
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+          <>
+          {/* Interval toggle */}
+          <div className="flex rounded-[8px] border-2 border-[#e0dfd8] bg-white p-1">
+            {([
+              { value: 'monthly' as BillingInterval, label: 'Månedlig' },
+              { value: 'annual' as BillingInterval, label: 'Årlig (spar 17%)' },
+            ]).map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => setBillingInterval(opt.value)}
+                className={cn(
+                  'flex-1 rounded-[3px] py-2 text-[13px] font-semibold transition-all',
+                  billingInterval === opt.value
+                    ? 'bg-[#2f2f2f] text-white shadow-sm'
+                    : 'text-[#78766d] hover:text-[#4a4945]'
+                )}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+
           {/* Plan cards with included features */}
           {([
             {
@@ -1008,8 +1251,12 @@ export function SettingsView() {
             {
               id: 'family_plus' as SubscriptionPlan,
               name: 'Family Plus',
-              price: '49 kr/md',
-              description: 'Alt til den aktive familie',
+              price: billingInterval === 'monthly'
+                ? `${PLAN_PRICES.family_plus.monthly} kr/md`
+                : `${PLAN_PRICES.family_plus.annual} kr/år`,
+              description: billingInterval === 'annual'
+                ? `Svarer til ${PLAN_PRICES.family_plus.annualMonthly} kr/md`
+                : 'Alt til den aktive familie',
               badge: 'Populær',
               features: [
                 { label: 'Op til 8 børn', included: true },
@@ -1025,8 +1272,12 @@ export function SettingsView() {
             {
               id: 'single_parent_plus' as SubscriptionPlan,
               name: 'Enlig Plus',
-              price: '79 kr/md',
-              description: 'Fuld dokumentation + juridisk',
+              price: billingInterval === 'monthly'
+                ? `${PLAN_PRICES.single_parent_plus.monthly} kr/md`
+                : `${PLAN_PRICES.single_parent_plus.annual} kr/år`,
+              description: billingInterval === 'annual'
+                ? `Svarer til ${PLAN_PRICES.single_parent_plus.annualMonthly} kr/md`
+                : 'Fuld dokumentation + juridisk',
               features: [
                 { label: 'Op til 8 børn', included: true },
                 { label: 'Udgiftsmodul', included: true },
@@ -1049,7 +1300,7 @@ export function SettingsView() {
                 disabled={checkoutLoading}
                 onClick={() => handlePlanChange(planCard.id)}
                 className={cn(
-                  'relative w-full rounded-2xl border-2 p-4 text-left transition-all',
+                  'relative w-full rounded-[8px] border-2 p-4 text-left transition-all',
                   isActive
                     ? 'border-[#f58a2d] bg-[#fff8f0] shadow-[0_2px_12px_rgba(245,138,45,0.12)]'
                     : 'border-[#e0dfd8] bg-white hover:border-[#cccbc3]',
@@ -1067,11 +1318,11 @@ export function SettingsView() {
                       <p className="text-lg font-bold text-[#2f2f2d]">{planCard.name}</p>
                       {isActive && <BadgeCheck className="h-5 w-5 text-[#f58a2d]" />}
                     </div>
-                    <p className="text-xs text-[#78766d]">{planCard.description}</p>
+                    <p className="text-[13px] text-[#78766d]">{planCard.description}</p>
                   </div>
                   <p className="text-right">
                     <span className="text-lg font-bold text-[#2f2f2d]">{planCard.price.split('/')[0]}</span>
-                    <span className="text-xs text-[#9b9a93]">/{planCard.price.split('/')[1]}</span>
+                    <span className="text-[13px] text-[#9b9a93]">/{planCard.price.split('/')[1]}</span>
                   </p>
                 </div>
                 <div className="mt-3 grid grid-cols-1 gap-1">
@@ -1082,14 +1333,14 @@ export function SettingsView() {
                       ) : (
                         <XIcon className="h-3.5 w-3.5 shrink-0 text-[#d0cec5]" />
                       )}
-                      <span className={cn('text-xs', f.included ? 'text-[#4a4945]' : 'text-[#b5b3ab]')}>
+                      <span className={cn('text-[13px]', f.included ? 'text-[#4a4945]' : 'text-[#b5b3ab]')}>
                         {f.label}
                       </span>
                     </div>
                   ))}
                 </div>
                 {isActive && (
-                  <div className="mt-3 rounded-lg bg-[#f58a2d]/10 px-3 py-1.5 text-center text-xs font-semibold text-[#b96424]">
+                  <div className="mt-3 rounded-[8px] bg-[#f58a2d]/10 px-3 py-1.5 text-center text-[13px] font-semibold text-[#b96424]">
                     Aktiv plan
                   </div>
                 )}
@@ -1099,14 +1350,14 @@ export function SettingsView() {
 
           {/* "Skift plan" CTA for free users */}
           {plan === 'free' && (
-            <div className="rounded-2xl border-2 border-dashed border-[#f3c59d] bg-[#fff8f0] p-5 text-center">
+            <div className="rounded-[8px] border-2 border-dashed border-[#f3c59d] bg-[#fff8f0] p-5 text-center">
               <Star className="h-8 w-8 text-[#f58a2d] mx-auto mb-2" />
               <p className="text-base font-bold text-[#2f2f2d]">Opgrader din plan</p>
               <p className="text-sm text-[#78766d] mt-1 mb-4">
                 Få adgang til flere børn, udgiftsmodul, indkøbsscanner og meget mere.
               </p>
               <Button
-                className="rounded-2xl bg-[#f58a2d] text-white hover:bg-[#e47921] px-8"
+                className="rounded-[8px] bg-[#f58a2d] text-white hover:bg-[#e47921] px-8"
                 disabled={checkoutLoading}
                 onClick={() => handlePlanChange('family_plus')}
               >
@@ -1122,14 +1373,14 @@ export function SettingsView() {
 
           {/* Administrer abonnement — only when user has real Stripe subscription */}
           {hasStripeCustomer && (
-            <div className="rounded-2xl border-2 border-[#e0dfd8] bg-white p-5 text-center space-y-2">
+            <div className="p-5 text-center space-y-2">
               <p className="text-sm font-semibold text-[#2f2f2d]">Administrer dit abonnement</p>
               <p className="text-xs text-[#78766d]">
                 Ændr betalingsmetode, se fakturaer eller annuller dit abonnement.
               </p>
               <Button
                 variant="outline"
-                className="rounded-2xl border-[#d8d7cf] text-[13px]"
+                className="rounded-[8px] border-[#d8d7cf] text-[13px]"
                 onClick={handleManageSubscription}
               >
                 <CreditCard className="h-4 w-4 mr-2" />
@@ -1137,11 +1388,13 @@ export function SettingsView() {
               </Button>
             </div>
           )}
+          </>
+          )}
         </TabsContent>
 
         <TabsContent value="payments" className="space-y-0">
           <div className="px-1 pt-2 pb-4">
-            <p className="text-xs text-[#75736b]">
+            <p className="text-[13px] text-[#75736b]">
               Tilføj betalingsmetoder til udgiftsdeling mellem forældre.
             </p>
           </div>
@@ -1150,9 +1403,9 @@ export function SettingsView() {
           {myPaymentAccounts.length > 0 && (
             <div className="space-y-2 mb-4">
               {myPaymentAccounts.map((account) => (
-                <div key={account.id} className="flex items-center justify-between rounded-2xl border-2 border-[#e5e3dc] bg-white px-4 py-3">
+                <div key={account.id} className="flex items-center justify-between rounded-[8px] border-2 border-[#e5e3dc] bg-white px-4 py-3">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f2f1ed]">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] bg-[#f2f1ed]">
                       <CreditCard className="h-4 w-4 text-[#7a786f]" />
                     </div>
                     <div className="min-w-0">
@@ -1161,11 +1414,11 @@ export function SettingsView() {
                     </div>
                   </div>
                   {account.isPrimary ? (
-                    <span className="shrink-0 rounded-lg bg-[#fff2e6] border border-[#f3c59d] px-2.5 py-1 text-[11px] font-semibold text-[#cc6f1f]">Primær</span>
+                    <span className="shrink-0 rounded-[8px] bg-[#fff2e6] border border-[#f3c59d] px-2.5 py-1 text-[11px] font-semibold text-[#cc6f1f]">Primær</span>
                   ) : (
                     <button
                       onClick={() => handleSetPrimaryPayment(account.id)}
-                      className="shrink-0 rounded-lg border-2 border-[#e5e3dc] px-2.5 py-1 text-[11px] font-semibold text-[#5f5d56] transition-all active:scale-[0.96]"
+                      className="shrink-0 rounded-[8px] border-2 border-[#e5e3dc] px-2.5 py-1 text-[11px] font-semibold text-[#5f5d56] transition-all active:scale-[0.96]"
                     >
                       Sæt primær
                     </button>
@@ -1176,39 +1429,37 @@ export function SettingsView() {
           )}
 
           {/* Tilføj ny konto */}
-          <div className="rounded-2xl border-2 border-[#e5e3dc] bg-white p-4 space-y-2">
+          <div className="rounded-[8px] border-2 border-[#e5e3dc] bg-white p-4 space-y-3">
             <p className="text-[13px] font-semibold text-[#2f2f2d]">Tilføj betalingskonto</p>
-            <Select
+            <SelectSheet
               value={paymentDraft.provider}
               onValueChange={(value) => setPaymentDraft((prev) => ({ ...prev, provider: value }))}
-            >
-              <SelectTrigger className="rounded-xl border-[#e5e3dc]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="mobilepay">MobilePay</SelectItem>
-                <SelectItem value="bank">Bankkonto</SelectItem>
-                <SelectItem value="card">Kort</SelectItem>
-                <SelectItem value="other">Andet</SelectItem>
-              </SelectContent>
-            </Select>
+              title="Betalingstype"
+              options={[
+                { value: 'mobilepay', label: 'MobilePay' },
+                { value: 'bank', label: 'Bankkonto' },
+                { value: 'card', label: 'Kort' },
+                { value: 'other', label: 'Andet' },
+              ]}
+              className="rounded-[8px] border-[#e5e3dc]"
+            />
             <Input
               value={paymentDraft.accountLabel}
               onChange={(e) => setPaymentDraft((prev) => ({ ...prev, accountLabel: e.target.value }))}
               placeholder="Kontonavn (fx 'Min MobilePay')"
-              className="rounded-xl border-[#e5e3dc]"
+              className="rounded-[8px] border-[#e5e3dc]"
             />
             <Input
               value={paymentDraft.accountHandle}
               onChange={(e) => setPaymentDraft((prev) => ({ ...prev, accountHandle: e.target.value }))}
               placeholder="Telefonnr. eller kontonummer"
-              className="rounded-xl border-[#e5e3dc]"
+              className="rounded-[8px] border-[#e5e3dc]"
             />
             <button
               onClick={handleAddPaymentAccount}
               disabled={!features.inAppPayments}
               className={cn(
-                "w-full rounded-xl py-2.5 text-[13px] font-semibold transition-all active:scale-[0.98]",
+                "w-full rounded-[8px] py-2.5 text-[13px] font-semibold transition-all active:scale-[0.98]",
                 features.inAppPayments
                   ? "bg-[#2f2f2f] text-white"
                   : "bg-[#e5e3dc] text-[#9a978f]"
@@ -1224,14 +1475,14 @@ export function SettingsView() {
           </div>
 
           {myPaymentAccounts.length === 0 && (
-            <div className="mt-3 rounded-2xl border-2 border-dashed border-[#e5e3dc] bg-[#faf9f6] p-4 text-center">
+            <div className="mt-3 rounded-[8px] border-2 border-dashed border-[#e5e3dc] bg-[#faf9f6] p-4 text-center">
               <CreditCard className="mx-auto h-6 w-6 text-[#d8d7cf] mb-1.5" />
               <p className="text-[12px] text-[#9a978f]">Ingen betalingskonti tilføjet endnu</p>
             </div>
           )}
 
           {/* Abonnementsmodel info */}
-          <div className="mt-4 rounded-2xl border-2 border-[#e5e3dc] bg-white px-4 py-3">
+          <div className="mt-4 rounded-[8px] border-2 border-[#e5e3dc] bg-white px-4 py-3">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-[13px] font-semibold text-[#2f2f2d]">Abonnementsmodel</p>
@@ -1241,7 +1492,7 @@ export function SettingsView() {
                     : 'Skilt/co-parenting: separat abonnement pr. bruger'}
                 </p>
               </div>
-              <span className="shrink-0 rounded-lg bg-[#f2f1ed] px-2.5 py-1 text-[11px] font-semibold text-[#5f5d56]">
+              <span className="shrink-0 rounded-[8px] bg-[#f2f1ed] px-2.5 py-1 text-[11px] font-semibold text-[#5f5d56]">
                 {isTogetherMode ? 'Delt' : 'Separat'}
               </span>
             </div>
@@ -1254,23 +1505,33 @@ export function SettingsView() {
           </TabsContent>
         )}
 
+        {currentUser?.isAdmin && (
+          <TabsContent value="platform-analyse" className="space-y-2">
+            <PlatformAnalyseView />
+          </TabsContent>
+        )}
+
+        {currentUser?.isAdmin && (
+          <TabsContent value="tilbud-admin" className="space-y-2">
+            <TilbudAdminView />
+          </TabsContent>
+        )}
+
+        {currentUser?.isAdmin && (
+          <TabsContent value="nyheder-admin" className="space-y-2">
+            <NyhederAdminView />
+          </TabsContent>
+        )}
+
         <TabsContent value="members" className="space-y-2">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Users className="h-4 w-4" />
-                Familiemedlemmer
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 pt-0">
               {!features.familyMembers ? (
-                <div className="rounded-xl border border-[#f3c59d] bg-[#fff6ef] p-4 text-center">
+                <div className="rounded-[8px] border border-[#f3c59d] bg-[#fff6ef] p-4 text-center">
                   <p className="text-sm font-semibold text-[#b96424]">Opgrader til Family Plus</p>
                   <p className="mt-1 text-xs text-[#cc8a4f]">
                     Tilføj familiemedlemmer som teenagere, bedsteforældre og bonusforældre med Family Plus eller Enlig Plus.
                   </p>
                   <Button
-                    className="mt-3 rounded-2xl bg-[#f58a2d] text-white hover:bg-[#e47921]"
+                    className="mt-3 rounded-[8px] bg-[#f58a2d] text-white hover:bg-[#e47921]"
                     size="sm"
                     onClick={() => handlePlanChange('family_plus')}
                   >
@@ -1281,10 +1542,10 @@ export function SettingsView() {
                 <>
                   <div className="space-y-2">
                     {users.filter(u => u.familyMemberRole).map(member => (
-                      <div key={member.id} className="flex items-center justify-between rounded-xl border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2">
+                      <div key={member.id} className="flex items-center justify-between rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2">
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-medium text-[#2f2f2d]">{member.name}</p>
-                          <p className="text-xs text-[#75736b]">
+                          <p className="truncate text-[15px] font-medium text-[#2f2f2d]">{member.name}</p>
+                          <p className="text-[13px] text-[#75736b]">
                             {member.familyMemberRole === 'teenager' ? 'Teenager' :
                              member.familyMemberRole === 'grandparent' ? 'Bedsteforælder' :
                              member.familyMemberRole === 'step_parent' ? 'Bonusforælder' : 'Øvrigt familiemedlem'}
@@ -1305,7 +1566,7 @@ export function SettingsView() {
                       </div>
                     ))}
                     {users.filter(u => u.familyMemberRole).length === 0 && (
-                      <p className="rounded-xl border border-dashed border-[#d8d7cf] bg-[#f8f7f3] p-3 text-sm text-[#75736b]">
+                      <p className="rounded-[8px] border border-dashed border-[#d8d7cf] bg-[#f8f7f3] p-3 text-sm text-[#75736b]">
                         Ingen ekstra familiemedlemmer endnu.
                       </p>
                     )}
@@ -1314,7 +1575,7 @@ export function SettingsView() {
                     Maks {features.maxFamilyMembers} familiemedlemmer med dit abonnement.
                   </p>
                   <Button
-                    className="w-full rounded-2xl"
+                    className="w-full rounded-[8px]"
                     variant="outline"
                     disabled={users.filter(u => u.familyMemberRole).length >= features.maxFamilyMembers}
                     onClick={() => setFamilyMemberOpen(true)}
@@ -1324,171 +1585,311 @@ export function SettingsView() {
                   </Button>
                 </>
               )}
-            </CardContent>
-          </Card>
         </TabsContent>
 
         {/* ─── Notifikationer (fra sidepanel) ─── */}
         <TabsContent value="notifications" className="space-y-0">
-          {/* Push-notifikationer status */}
-          <div className="px-1 pt-2 pb-3">
-            <p className="text-xs text-[#75736b]">
-              Modtag notifikationer om afleveringer, beskeder og opdateringer.
-            </p>
-          </div>
-
-          {notifPermission === 'granted' ? (
-            <div className="space-y-2 mb-4">
-              <div className="flex items-center justify-between px-1 py-2">
-                <p className="text-sm font-medium text-[#2f2f2d]">Push-notifikationer</p>
-                <BadgeCheck className="h-4 w-4 text-green-600" />
+          {!settingsDetailView ? (
+            <>
+              {/* Push-notifikationer status */}
+              <div className="px-1 pt-2 pb-3">
+                <p className="text-[13px] text-[#75736b]">
+                  Modtag notifikationer om afleveringer, beskeder og opdateringer.
+                </p>
               </div>
-              <div className="space-y-1.5 px-1">
-                <Label htmlFor="reminder-minutes" className="text-xs text-[#75736b]">Påmind mig (minutter før aflevering)</Label>
-                <Select
-                  value={String(handoverReminderMinutes)}
-                  onValueChange={(v) => setHandoverReminderMinutes(Number(v))}
+
+              {notifPermission === 'granted' ? (
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center justify-between px-1 py-2">
+                    <p className="text-[15px] font-medium text-[#2f2f2d]">Push-notifikationer</p>
+                    <BadgeCheck className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div className="space-y-1.5 px-1">
+                    <Label htmlFor="reminder-minutes" className="text-[13px] text-[#75736b]">Påmind mig (minutter før aflevering)</Label>
+                    <SelectSheet
+                      value={String(notificationPreferences.handoverReminderMinutes)}
+                      onValueChange={(v) => updateNotificationPreferences({ handoverReminderMinutes: Number(v) })}
+                      title="Påmindelsestid"
+                      options={[
+                        { value: '15', label: '15 minutter' },
+                        { value: '30', label: '30 minutter' },
+                        { value: '60', label: '1 time' },
+                        { value: '120', label: '2 timer' },
+                      ]}
+                      className="rounded-[8px] border-[#d8d7cf]"
+                    />
+                  </div>
+                  <Button
+                    className="w-full rounded-[8px]"
+                    onClick={() => {
+                      const handoverEvents = events.filter(e => e.type === 'handover');
+                      scheduleAllHandoverReminders(handoverEvents, notificationPreferences.handoverReminderMinutes);
+                      toast.success(`Påmindelser planlagt ${notificationPreferences.handoverReminderMinutes} min. før aflevering`);
+                    }}
+                  >
+                    <Bell className="mr-2 h-4 w-4" />
+                    Planlæg påmindelser
+                  </Button>
+                </div>
+              ) : notifPermission === 'denied' ? (
+                <Button
+                  variant="outline"
+                  className="w-full rounded-[8px] mb-4 text-[#b96424] border-[#f3c59d]"
+                  onClick={() => toast.error('Notifikationer er blokeret. Tillad dem i enhedens indstillinger.')}
                 >
-                  <SelectTrigger id="reminder-minutes" className="rounded-xl border-[#d8d7cf]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="15">15 minutter</SelectItem>
-                    <SelectItem value="30">30 minutter</SelectItem>
-                    <SelectItem value="60">1 time</SelectItem>
-                    <SelectItem value="120">2 timer</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <Bell className="mr-2 h-4 w-4" />
+                  Notifikationer blokeret
+                </Button>
+              ) : (
+                <Button
+                  className="w-full rounded-[8px] mb-4"
+                  onClick={async () => {
+                    const granted = await requestNotificationPermission();
+                    setNotifPermission(granted ? 'granted' : 'denied');
+                    if (granted) {
+                      toast.success('Notifikationer aktiveret!');
+                    } else {
+                      toast.error('Notifikationer afvist');
+                    }
+                  }}
+                >
+                  <Bell className="mr-2 h-4 w-4" />
+                  Aktiver notifikationer
+                </Button>
+              )}
+
+              {/* ─── Kategori-rækker ─── */}
+              <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2">Kategorier</p>
+              <div className="divide-y divide-[#e5e3dc]">
+                {[
+                  { id: 'notif-samvaer', label: 'Samvær & Afleveringer' },
+                  { id: 'notif-kalender', label: 'Kalender & Datoer' },
+                  { id: 'notif-opgaver', label: 'Opgaver' },
+                  { id: 'notif-oekonomi', label: 'Økonomi' },
+                  { id: 'notif-beskeder', label: 'Beskeder' },
+                  { id: 'notif-hjem', label: 'Hjem & Mad' },
+                  { id: 'notif-dokumenter', label: 'Dokumenter & Beslutninger' },
+                  { id: 'notif-dagbog', label: 'Dagbog & Trivsel' },
+                ].map((cat) => (
+                  <button
+                    key={cat.id}
+                    onClick={() => setSettingsDetailView(cat.id)}
+                    className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-[#faf9f6]"
+                  >
+                    <p className="text-[15px] font-medium text-[#2f2f2d]">{cat.label}</p>
+                    <ChevronRight className="h-4 w-4 text-[#b0ada4] shrink-0" />
+                  </button>
+                ))}
               </div>
-              <Button
-                className="w-full rounded-2xl"
-                onClick={() => {
-                  const handoverEvents = events.filter(e => e.type === 'handover');
-                  scheduleAllHandoverReminders(handoverEvents, handoverReminderMinutes);
-                  toast.success(`Påmindelser planlagt ${handoverReminderMinutes} min. før aflevering`);
-                }}
-              >
-                <Bell className="mr-2 h-4 w-4" />
-                Planlæg påmindelser
-              </Button>
-            </div>
-          ) : notifPermission === 'denied' ? (
-            <div className="rounded-xl bg-[#fff6ef] p-3 mb-4">
-              <p className="text-sm text-[#b96424]">
-                Notifikationer er blokeret. Tillad dem i enhedens indstillinger.
-              </p>
-            </div>
+
+            </>
           ) : (
-            <Button
-              className="w-full rounded-2xl mb-4"
-              onClick={async () => {
-                const granted = await requestNotificationPermission();
-                setNotifPermission(granted ? 'granted' : 'denied');
-                if (granted) {
-                  toast.success('Notifikationer aktiveret!');
-                } else {
-                  toast.error('Notifikationer afvist');
-                }
-              }}
-            >
-              <Bell className="mr-2 h-4 w-4" />
-              Aktiver notifikationer
-            </Button>
+            <>
+              {/* ─── Notifikations-undersider ─── */}
+
+              {settingsDetailView === 'notif-samvaer' && (
+                <div className="space-y-0">
+                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2">Samvær & Afleveringer</p>
+                  <div className="divide-y divide-[#e5e3dc]">
+                    <div className="flex items-center justify-between py-3 px-1">
+                      <div>
+                        <p className="text-[15px] font-medium text-[#2f2f2d]">Afleveringspåmindelser</p>
+                        <p className="text-[13px] text-[#75736b]">Før hver aflevering</p>
+                      </div>
+                      <IOSSwitch checked={notificationPreferences.handoverReminders} onCheckedChange={(v) => updateNotificationPreferences({ handoverReminders: v })} />
+                    </div>
+                    <div className="flex items-center justify-between py-3 px-1">
+                      <div>
+                        <p className="text-[15px] font-medium text-[#2f2f2d]">Samværsændringer</p>
+                        <p className="text-[13px] text-[#75736b]">Bytteanmodninger & planændringer</p>
+                      </div>
+                      <IOSSwitch checked={notificationPreferences.scheduleChanges} onCheckedChange={(v) => updateNotificationPreferences({ scheduleChanges: v })} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {settingsDetailView === 'notif-kalender' && (
+                <div className="space-y-0">
+                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2">Kalender & Datoer</p>
+                  <div className="divide-y divide-[#e5e3dc]">
+                    <div className="flex items-center justify-between py-3 px-1">
+                      <div>
+                        <p className="text-[15px] font-medium text-[#2f2f2d]">Kalenderbegivenheder</p>
+                        <p className="text-[13px] text-[#75736b]">Nye events & ændringer</p>
+                      </div>
+                      <IOSSwitch checked={notificationPreferences.eventReminders} onCheckedChange={(v) => updateNotificationPreferences({ eventReminders: v })} />
+                    </div>
+                    <div className="flex items-center justify-between py-3 px-1">
+                      <div>
+                        <p className="text-[15px] font-medium text-[#2f2f2d]">Vigtige datoer</p>
+                        <p className="text-[13px] text-[#75736b]">Fødselsdage, vaccinationer, skole</p>
+                      </div>
+                      <IOSSwitch checked={notificationPreferences.importantDates} onCheckedChange={(v) => updateNotificationPreferences({ importantDates: v })} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {settingsDetailView === 'notif-opgaver' && (
+                <div className="space-y-0">
+                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2">Opgaver</p>
+                  <div className="divide-y divide-[#e5e3dc]">
+                    <div className="flex items-center justify-between py-3 px-1">
+                      <div>
+                        <p className="text-[15px] font-medium text-[#2f2f2d]">Opgavetildeling</p>
+                        <p className="text-[13px] text-[#75736b]">Når du får en ny opgave</p>
+                      </div>
+                      <IOSSwitch checked={notificationPreferences.taskAssigned} onCheckedChange={(v) => updateNotificationPreferences({ taskAssigned: v })} />
+                    </div>
+                    <div className="flex items-center justify-between py-3 px-1">
+                      <div>
+                        <p className="text-[15px] font-medium text-[#2f2f2d]">Deadlines</p>
+                        <p className="text-[13px] text-[#75736b]">Forfaldne & kommende opgaver</p>
+                      </div>
+                      <IOSSwitch checked={notificationPreferences.taskDeadline} onCheckedChange={(v) => updateNotificationPreferences({ taskDeadline: v })} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {settingsDetailView === 'notif-oekonomi' && (
+                <div className="space-y-0">
+                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2">Økonomi</p>
+                  <div className="divide-y divide-[#e5e3dc]">
+                    <div className="flex items-center justify-between py-3 px-1">
+                      <div>
+                        <p className="text-[15px] font-medium text-[#2f2f2d]">Nye udgifter</p>
+                        <p className="text-[13px] text-[#75736b]">Afventer din godkendelse</p>
+                      </div>
+                      <IOSSwitch checked={notificationPreferences.expensePending} onCheckedChange={(v) => updateNotificationPreferences({ expensePending: v })} />
+                    </div>
+                    <div className="flex items-center justify-between py-3 px-1">
+                      <div>
+                        <p className="text-[15px] font-medium text-[#2f2f2d]">Udgiftsopdateringer</p>
+                        <p className="text-[13px] text-[#75736b]">Godkendt, afvist, anfægtet</p>
+                      </div>
+                      <IOSSwitch checked={notificationPreferences.expenseUpdates} onCheckedChange={(v) => updateNotificationPreferences({ expenseUpdates: v })} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {settingsDetailView === 'notif-beskeder' && (
+                <div className="space-y-0">
+                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2">Beskeder</p>
+                  <div className="divide-y divide-[#e5e3dc]">
+                    <div className="flex items-center justify-between py-3 px-1">
+                      <div>
+                        <p className="text-[15px] font-medium text-[#2f2f2d]">Nye beskeder</p>
+                        <p className="text-[13px] text-[#75736b]">Kommunikation & dagbog</p>
+                      </div>
+                      <IOSSwitch checked={notificationPreferences.newMessages} onCheckedChange={(v) => updateNotificationPreferences({ newMessages: v })} />
+                    </div>
+                    <div className="flex items-center justify-between py-3 px-1">
+                      <div>
+                        <p className="text-[15px] font-medium text-[#2f2f2d]">Professionelle beskeder</p>
+                        <p className="text-[13px] text-[#75736b]">Fra fagpersoner</p>
+                      </div>
+                      <IOSSwitch checked={notificationPreferences.professionalMessages} onCheckedChange={(v) => updateNotificationPreferences({ professionalMessages: v })} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {settingsDetailView === 'notif-hjem' && (
+                <div className="space-y-0">
+                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2">Hjem & Mad</p>
+                  <div className="divide-y divide-[#e5e3dc]">
+                    <div className="flex items-center justify-between py-3 px-1">
+                      <div>
+                        <p className="text-[15px] font-medium text-[#2f2f2d]">Madplan</p>
+                        <p className="text-[13px] text-[#75736b]">Daglig påmindelse om aftensmad</p>
+                      </div>
+                      <IOSSwitch checked={notificationPreferences.mealPlanReminder} onCheckedChange={(v) => updateNotificationPreferences({ mealPlanReminder: v })} />
+                    </div>
+                    <div className="flex items-center justify-between py-3 px-1">
+                      <div>
+                        <p className="text-[15px] font-medium text-[#2f2f2d]">Indkøb</p>
+                        <p className="text-[13px] text-[#75736b]">Ugentlig indkøbspåmindelse</p>
+                      </div>
+                      <IOSSwitch checked={notificationPreferences.shoppingReminder} onCheckedChange={(v) => updateNotificationPreferences({ shoppingReminder: v })} />
+                    </div>
+                    <div className="flex items-center justify-between py-3 px-1">
+                      <div>
+                        <p className="text-[15px] font-medium text-[#2f2f2d]">Rengøring</p>
+                        <p className="text-[13px] text-[#75736b]">Rengøringsopgave-påmindelser</p>
+                      </div>
+                      <IOSSwitch checked={notificationPreferences.cleaningReminder} onCheckedChange={(v) => updateNotificationPreferences({ cleaningReminder: v })} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {settingsDetailView === 'notif-dokumenter' && (
+                <div className="space-y-0">
+                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2">Dokumenter & Beslutninger</p>
+                  <div className="divide-y divide-[#e5e3dc]">
+                    <div className="flex items-center justify-between py-3 px-1">
+                      <div>
+                        <p className="text-[15px] font-medium text-[#2f2f2d]">Delte dokumenter</p>
+                        <p className="text-[13px] text-[#75736b]">Nye filer delt med dig</p>
+                      </div>
+                      <IOSSwitch checked={notificationPreferences.documentShared} onCheckedChange={(v) => updateNotificationPreferences({ documentShared: v })} />
+                    </div>
+                    <div className="flex items-center justify-between py-3 px-1">
+                      <div>
+                        <p className="text-[15px] font-medium text-[#2f2f2d]">Beslutningsforslag</p>
+                        <p className="text-[13px] text-[#75736b]">Nye forslag der kræver svar</p>
+                      </div>
+                      <IOSSwitch checked={notificationPreferences.decisionProposed} onCheckedChange={(v) => updateNotificationPreferences({ decisionProposed: v })} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {settingsDetailView === 'notif-dagbog' && (
+                <div className="space-y-0">
+                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2">Dagbog & Trivsel</p>
+                  <div className="divide-y divide-[#e5e3dc]">
+                    <div className="flex items-center justify-between py-3 px-1">
+                      <div>
+                        <p className="text-[15px] font-medium text-[#2f2f2d]">Dagbogspåmindelse</p>
+                        <p className="text-[13px] text-[#75736b]">Daglig påmindelse om at logge</p>
+                      </div>
+                      <IOSSwitch checked={notificationPreferences.diaryReminder} onCheckedChange={(v) => updateNotificationPreferences({ diaryReminder: v })} />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
           )}
-
-          {/* Notifikationscenter — clean rows without Card wrappers */}
-          <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2">Notifikationstyper</p>
-          <div className="divide-y divide-[#e5e3dc]">
-            <div className="flex items-center justify-between py-3 px-1">
-              <div>
-                <p className="text-sm font-medium text-[#2f2f2d]">Afleveringspåmindelser</p>
-                <p className="text-xs text-[#75736b]">Før hver aflevering</p>
-              </div>
-              <IOSSwitch defaultChecked />
-            </div>
-            <div className="flex items-center justify-between py-3 px-1">
-              <div>
-                <p className="text-sm font-medium text-[#2f2f2d]">Nye beskeder</p>
-                <p className="text-xs text-[#75736b]">Dagbog, beslutninger</p>
-              </div>
-              <IOSSwitch defaultChecked />
-            </div>
-            <div className="flex items-center justify-between py-3 px-1">
-              <div>
-                <p className="text-sm font-medium text-[#2f2f2d]">Udgifter & betalinger</p>
-                <p className="text-xs text-[#75736b]">Anmodninger og godkendelser</p>
-              </div>
-              <IOSSwitch defaultChecked />
-            </div>
-            <div className="flex items-center justify-between py-3 px-1">
-              <div>
-                <p className="text-sm font-medium text-[#2f2f2d]">Kalenderopdateringer</p>
-                <p className="text-xs text-[#75736b]">Nye begivenheder & ændringer</p>
-              </div>
-              <IOSSwitch defaultChecked />
-            </div>
-            <div className="flex items-center justify-between py-3 px-1">
-              <div>
-                <p className="text-sm font-medium text-[#2f2f2d]">Opgaver</p>
-                <p className="text-xs text-[#75736b]">Tildelte og forfaldne</p>
-              </div>
-              <IOSSwitch defaultChecked />
-            </div>
-          </div>
-
-          {/* ─── Påmindelser ─── */}
-          <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2 pt-3">Påmindelser</p>
-          <div className="divide-y divide-[#e5e3dc]">
-            <div className="flex items-center justify-between py-3 px-1">
-              <div>
-                <p className="text-sm font-medium text-[#2f2f2d]">Madplan</p>
-                <p className="text-xs text-[#75736b]">Daglig påmindelse om aftensmad</p>
-              </div>
-              <IOSSwitch checked={homeRemindersActive ? true : undefined} defaultChecked />
-            </div>
-            <div className="flex items-center justify-between py-3 px-1">
-              <div>
-                <p className="text-sm font-medium text-[#2f2f2d]">Indkøb</p>
-                <p className="text-xs text-[#75736b]">Ugentlig indkøbspåmindelse</p>
-              </div>
-              <IOSSwitch checked={homeRemindersActive ? true : undefined} defaultChecked />
-            </div>
-            <div className="flex items-center justify-between py-3 px-1">
-              <div>
-                <p className="text-sm font-medium text-[#2f2f2d]">Rengøring</p>
-                <p className="text-xs text-[#75736b]">Påmindelser om rengøringsopgaver</p>
-              </div>
-              <IOSSwitch checked={homeRemindersActive ? true : undefined} defaultChecked />
-            </div>
-          </div>
         </TabsContent>
 
         {/* ─── Familietype (fra sidepanel) ─── */}
         <TabsContent value="familytype" className="space-y-0">
           <div className="px-1 pt-2 pb-4">
-            <p className="text-xs text-[#75736b]">
+            <p className="text-[13px] text-[#75736b]">
               Vælg den familietype der passer bedst til jeres situation.
             </p>
           </div>
 
           <div className="space-y-2">
             {([
-              { value: 'together' as HouseholdMode, label: 'Samboende familie', desc: 'Deler ét abonnement og ser alt sammen', icon: '🏠' },
-              { value: 'co_parenting' as HouseholdMode, label: 'Skilt / Co-parenting', desc: 'Separate abonnementer, deler udvalgt data', icon: '🤝' },
-              { value: 'blended' as HouseholdMode, label: 'Bonusfamilie', desc: 'Udvidet familie med fælles overblik', icon: '👨‍👩‍👧‍👦' },
-              { value: 'single_parent' as HouseholdMode, label: 'Enlig forsørger', desc: 'Dokumentation og advokatværktøj', icon: '💪' },
+              { value: 'together' as HouseholdMode, label: 'Samboende familie', desc: 'Deler ét abonnement og ser alt sammen', Icon: Home },
+              { value: 'co_parenting' as HouseholdMode, label: 'Skilt / Co-parenting', desc: 'Separate abonnementer, deler udvalgt data', Icon: Handshake },
+              { value: 'blended' as HouseholdMode, label: 'Bonusfamilie', desc: 'Udvidet familie med fælles overblik', Icon: Users },
+              { value: 'single_parent' as HouseholdMode, label: 'Enlig forsørger', desc: 'Dokumentation og advokatværktøj', Icon: UserCircle },
             ]).map((option) => (
               <button
                 key={option.value}
                 onClick={() => handleFamilyModeChange(option.value)}
                 className={cn(
-                  "flex w-full items-center gap-3.5 rounded-2xl border-2 p-4 text-left transition-all active:scale-[0.98]",
-                  currentMode === option.value
-                    ? "border-[#f58a2d] bg-[#fff8f0]"
-                    : "border-[#e5e3dc] bg-white hover:border-[#d8d7cf]"
+                  "flex w-full items-center gap-3.5 p-4 text-left transition-all active:scale-[0.98] border-b border-[#f2f1ed]",
+                  currentMode === option.value && "bg-[#fff8f0]"
                 )}
               >
-                <span className="text-xl">{option.icon}</span>
+                <option.Icon className={cn("h-6 w-6 shrink-0", currentMode === option.value ? "text-[#f58a2d]" : "text-[#4f4d45]")} />
                 <div className="flex-1 min-w-0">
                   <p className={cn(
                     "text-[14px] font-semibold",
@@ -1508,14 +1909,6 @@ export function SettingsView() {
 
         {/* ─── Feedback (fra sidepanel) ─── */}
         <TabsContent value="feedback" className="space-y-2">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <MessageSquare className="h-4 w-4" />
-                Feedback
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 pt-0">
               <p className="text-sm text-[#75736b]">
                 Vi vil gerne høre din mening! Hjælp os med at forbedre appen.
               </p>
@@ -1551,22 +1944,20 @@ export function SettingsView() {
                 <Label className="text-xs font-semibold uppercase tracking-[0.05em] text-[#78766d]">
                   Kategori
                 </Label>
-                <Select
+                <SelectSheet
                   value={feedbackDraft.category}
                   onValueChange={(v) => setFeedbackDraft(prev => ({ ...prev, category: v }))}
-                >
-                  <SelectTrigger className="rounded-xl border-[#d8d7cf]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="general">Generelt</SelectItem>
-                    <SelectItem value="bug">Fejl / Bug</SelectItem>
-                    <SelectItem value="feature">Ny funktion</SelectItem>
-                    <SelectItem value="design">Design / Brugervenlighed</SelectItem>
-                    <SelectItem value="calendar">Kalender / Samvær</SelectItem>
-                    <SelectItem value="expenses">Udgifter / Økonomi</SelectItem>
-                  </SelectContent>
-                </Select>
+                  title="Feedback-kategori"
+                  options={[
+                    { value: 'general', label: 'Generelt' },
+                    { value: 'bug', label: 'Fejl / Bug' },
+                    { value: 'feature', label: 'Ny funktion' },
+                    { value: 'design', label: 'Design / Brugervenlighed' },
+                    { value: 'calendar', label: 'Kalender / Samvær' },
+                    { value: 'expenses', label: 'Udgifter / Økonomi' },
+                  ]}
+                  className="rounded-[8px] border-[#d8d7cf]"
+                />
               </div>
 
               {/* Message */}
@@ -1579,12 +1970,12 @@ export function SettingsView() {
                   onChange={(e) => setFeedbackDraft(prev => ({ ...prev, message: e.target.value }))}
                   placeholder="Fortæl os hvad du synes, eller hvad vi kan forbedre..."
                   rows={5}
-                  className="rounded-xl border-[#d8d7cf]"
+                  className="rounded-[8px] border-[#d8d7cf]"
                 />
               </div>
 
               <Button
-                className="w-full rounded-2xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+                className="w-full rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
                 disabled={!feedbackDraft.message.trim() || feedbackDraft.rating === 0}
                 onClick={() => {
                   toast.success('Tak for din feedback! Vi sætter stor pris på det.');
@@ -1594,23 +1985,442 @@ export function SettingsView() {
                 <Send className="mr-2 h-4 w-4" />
                 Send feedback
               </Button>
-            </CardContent>
-          </Card>
+        </TabsContent>
+
+        {/* ─── Info / GDPR (fra sidepanel) ─── */}
+        <TabsContent value="info" className="space-y-3">
+          {!settingsDetailView ? (
+            <>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Shield className="h-4 w-4" />
+                    Databeskyttelse & Privatliv
+                  </CardTitle>
+                  <p className="text-xs text-[#78766d]">
+                    Hos Hverdag tager vi beskyttelsen af dine og dine børns persondata alvorligt. Herunder kan du læse om, hvordan vi indsamler, behandler og beskytter dine oplysninger i overensstemmelse med EU&apos;s persondataforordning (GDPR).
+                  </p>
+                </CardHeader>
+              </Card>
+
+              {/* Kategori 1 */}
+              <div className="space-y-1 px-1">
+                <p className="text-sm font-bold text-[#2f2f2d]">For at levere vores tjeneste til dig</p>
+                <p className="text-xs text-[#4a4945] leading-relaxed">
+                  Vi indsamler og behandler persondata for at kunne levere Hverdag-appen til dig — herunder samværsplaner, kalender, kommunikation, opgavestyring og dokumenthåndtering.
+                </p>
+                <button onClick={() => setSettingsDetailView('tjeneste')} className="text-xs font-semibold text-[#2f82de] flex items-center gap-0.5 pt-0.5">
+                  Læs mere <ChevronRight className="h-3 w-3" />
+                </button>
+              </div>
+              <div className="border-t border-[#e5e3dc]" />
+
+              {/* Kategori 2 */}
+              <div className="space-y-1 px-1">
+                <p className="text-sm font-bold text-[#2f2f2d]">For at beskytte dine børns data</p>
+                <p className="text-xs text-[#4a4945] leading-relaxed">
+                  Vi behandler børns data med særlig omhu og ekstra sikkerhedsforanstaltninger. Forældre giver samtykke på vegne af børn under 13 år, og børnedata deles aldrig med tredjeparter.
+                </p>
+                <button onClick={() => setSettingsDetailView('boernedata')} className="text-xs font-semibold text-[#2f82de] flex items-center gap-0.5 pt-0.5">
+                  Læs mere <ChevronRight className="h-3 w-3" />
+                </button>
+              </div>
+              <div className="border-t border-[#e5e3dc]" />
+
+              {/* Kategori 3 */}
+              <div className="space-y-1 px-1">
+                <p className="text-sm font-bold text-[#2f2f2d]">For at holde dine data sikre</p>
+                <p className="text-xs text-[#4a4945] leading-relaxed">
+                  Vi bruger kryptering, adgangskontrol og sikker cloud-lagring i EU for at beskytte dine personlige oplysninger, dokumenter og samværsplaner.
+                </p>
+                <button onClick={() => setSettingsDetailView('sikkerhed')} className="text-xs font-semibold text-[#2f82de] flex items-center gap-0.5 pt-0.5">
+                  Læs mere <ChevronRight className="h-3 w-3" />
+                </button>
+              </div>
+              <div className="border-t border-[#e5e3dc]" />
+
+              {/* Kategori 4 */}
+              <div className="space-y-1 px-1">
+                <p className="text-sm font-bold text-[#2f2f2d]">For at kommunikere med dig</p>
+                <p className="text-xs text-[#4a4945] leading-relaxed">
+                  Vi bruger dine kontaktoplysninger til at sende dig notifikationer om afleveringer, beskeder, opgaver og vigtige opdateringer i din husstand.
+                </p>
+                <button onClick={() => setSettingsDetailView('kommunikation')} className="text-xs font-semibold text-[#2f82de] flex items-center gap-0.5 pt-0.5">
+                  Læs mere <ChevronRight className="h-3 w-3" />
+                </button>
+              </div>
+              <div className="border-t border-[#e5e3dc]" />
+
+              {/* Kategori 5 */}
+              <div className="space-y-1 px-1">
+                <p className="text-sm font-bold text-[#2f2f2d]">Dine rettigheder som bruger</p>
+                <p className="text-xs text-[#4a4945] leading-relaxed">
+                  Du har ret til at se, rette, slette og eksportere dine data. Vi respekterer alle dine rettigheder under GDPR og gør det nemt for dig at udøve dem.
+                </p>
+                <button onClick={() => setSettingsDetailView('rettigheder')} className="text-xs font-semibold text-[#2f82de] flex items-center gap-0.5 pt-0.5">
+                  Læs mere <ChevronRight className="h-3 w-3" />
+                </button>
+              </div>
+              <div className="border-t border-[#e5e3dc]" />
+
+              {/* Kategori 6 */}
+              <div className="space-y-1 px-1">
+                <p className="text-sm font-bold text-[#2f2f2d]">Hvem vi deler data med</p>
+                <p className="text-xs text-[#4a4945] leading-relaxed">
+                  Vi bruger betroede databehandlere til at drive appen sikkert. Dine data deles aldrig med tredjeparter til markedsføring eller reklameformål.
+                </p>
+                <button onClick={() => setSettingsDetailView('databehandlere')} className="text-xs font-semibold text-[#2f82de] flex items-center gap-0.5 pt-0.5">
+                  Læs mere <ChevronRight className="h-3 w-3" />
+                </button>
+              </div>
+              <div className="border-t border-[#e5e3dc]" />
+
+              {/* Kategori 7 */}
+              <div className="space-y-1 px-1">
+                <p className="text-sm font-bold text-[#2f2f2d]">Sådan sletter du dine data</p>
+                <p className="text-xs text-[#4a4945] leading-relaxed">
+                  Du kan til enhver tid slette din konto. Alle persondata anonymiseres permanent ved sletning, og vi informerer dig om hele processen.
+                </p>
+                <button onClick={() => setSettingsDetailView('sletning')} className="text-xs font-semibold text-[#2f82de] flex items-center gap-0.5 pt-0.5">
+                  Læs mere <ChevronRight className="h-3 w-3" />
+                </button>
+              </div>
+
+              <div className="border-t border-[#e5e3dc] mt-2" />
+              <p className="text-[10px] text-center text-[#9e9c95] pb-4 pt-2">
+                Dataansvarlig: Hverdag ApS · support@hverdag.app<br />
+                Senest opdateret: Februar 2026 · Hverdag v1.0
+              </p>
+            </>
+          ) : (
+            <>
+              {settingsDetailView === 'tjeneste' && (
+                <div className="space-y-4 px-1">
+                  <p className="text-base font-bold text-[#2f2f2d]">For at levere vores tjeneste til dig</p>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Hvilke data indsamler vi</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">For at levere Hverdag-appen indsamler vi følgende persondata:</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-[#4a4945] leading-relaxed">
+                      <li><span className="font-semibold">Kontooplysninger:</span> Navn, email, telefonnummer, profilbillede, fødselsdato, adresse</li>
+                      <li><span className="font-semibold">Familieforhold:</span> Husstandstype (samboende, co-parenting, bonusfamilie, enlig forsørger), familiemedlemmer og deres roller</li>
+                      <li><span className="font-semibold">Børnedata:</span> Navn, fødselsdato, allergier, medicin, institutioner, forældretilknytning</li>
+                      <li><span className="font-semibold">Samværsplaner:</span> Samværsmodel (7/7, 10/4, tilpasset), ugefordeling, ferieaftaler</li>
+                      <li><span className="font-semibold">Kalenderdata:</span> Begivenheder, påmindelser, skemaskabeloner</li>
+                      <li><span className="font-semibold">Kommunikation:</span> Beskeder mellem husstandsmedlemmer, dagbogsindlæg</li>
+                      <li><span className="font-semibold">Dokumenter:</span> Uploadede filer (samværsaftaler, retsdokumenter, vaccinationskort)</li>
+                      <li><span className="font-semibold">Økonomi:</span> Udgifter, betalingskonti (MobilePay-/kontonumre), budgetmål</li>
+                      <li><span className="font-semibold">Sundhedsdata:</span> Børns humør-, søvn- og appetitlogs, kaloriedagbog</li>
+                      <li><span className="font-semibold">Opgaver:</span> Opgavelister, madplaner, indkøbslister, rengøringsplaner</li>
+                    </ul>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Hvordan vi bruger dataene</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-[#4a4945] leading-relaxed">
+                      <li>Samværsplaner beregnes lokalt på din enhed og synkroniseres krypteret til cloud</li>
+                      <li>Kalenderdata bruges til at vise din families samlede overblik og sende påmindelser</li>
+                      <li>Beskeder leveres til husstandsmedlemmer via krypterede kanaler</li>
+                      <li>Udgifter bruges til at beregne fordelinger og generere oversigter</li>
+                      <li>Sundhedsdata vises kun for din husstand og bruges til at spore trivsel over tid</li>
+                    </ul>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Behandlingsgrundlag</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">Vi behandler dine data på følgende juridiske grundlag i henhold til GDPR:</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-[#4a4945] leading-relaxed">
+                      <li><span className="font-semibold">Art. 6(1)(b) — Kontrakt:</span> Behandling er nødvendig for at levere den tjeneste, du har tilmeldt dig</li>
+                      <li><span className="font-semibold">Art. 9(2)(a) — Eksplicit samtykke:</span> For følsomme data som sundhedsoplysninger og børns data</li>
+                      <li><span className="font-semibold">Art. 6(1)(f) — Legitim interesse:</span> For at forbedre appens funktionalitet og sikkerhed</li>
+                    </ul>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Opbevaringsperiode</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Dine data opbevares, så længe din konto er aktiv. Ved kontosletning anonymiseres alle persondata inden for 30 dage. Anonymiserede, aggregerede data (uden personhenførbarhed) kan opbevares til statistiske formål.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Datalagring</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Alle data lagres i en Supabase PostgreSQL-database hostet i EU-regionen (Frankfurt, Tyskland). Data forlader aldrig EU. Databasen er krypteret at-rest med AES-256 og in-transit med TLS 1.3.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {settingsDetailView === 'boernedata' && (
+                <div className="space-y-4 px-1">
+                  <p className="text-base font-bold text-[#2f2f2d]">For at beskytte dine børns data</p>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Særlig beskyttelse af børns data</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Hverdag behandler børns persondata med den højeste grad af omhu. Børns data er underlagt strengere beskyttelse end voksnes data i henhold til GDPR art. 8 og den danske databeskyttelseslov.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Samtykke</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Forældre eller værger giver samtykke på vegne af børn under 13 år. Begge forældre i en co-parenting-husstand har adgang til barnets data. Samtykket kan til enhver tid trækkes tilbage.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Hvilke børnedata behandles</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-[#4a4945] leading-relaxed">
+                      <li><span className="font-semibold">Identifikation:</span> Navn, fødselsdato, profilbillede</li>
+                      <li><span className="font-semibold">Sundhed:</span> Allergier, medicin, humør/søvn/appetit-logs</li>
+                      <li><span className="font-semibold">Institution:</span> Vuggestue, børnehave eller skole</li>
+                      <li><span className="font-semibold">Samvær:</span> Hvilken forælder barnet er hos på en given dag</li>
+                      <li><span className="font-semibold">Fotos:</span> Billeder delt i familiens fotoalbum</li>
+                      <li><span className="font-semibold">Milestones:</span> Udviklingsmæssige milepæle</li>
+                    </ul>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Hvem kan se børnedata</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Kun husstandens voksne medlemmer kan se børnedata. Hverdag som virksomhed har ikke adgang til individuelle børns data. Børnedata deles aldrig med tredjeparter — hverken til markedsføring, forskning eller andre formål.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Sletning af børnedata</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Børnedata kan fjernes fra appen af enhver forælder med adgang. Ved kontosletning anonymiseres alle børnedata tilknyttet kontoen. Hvis begge forældre sletter deres konti, slettes alle børnedata permanent.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {settingsDetailView === 'sikkerhed' && (
+                <div className="space-y-4 px-1">
+                  <p className="text-base font-bold text-[#2f2f2d]">For at holde dine data sikre</p>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Kryptering</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-[#4a4945] leading-relaxed">
+                      <li>Adgangskoder krypteres med bcrypt (salt rounds 12) og gemmes aldrig i klartekst</li>
+                      <li>Al kommunikation foregår via HTTPS med TLS 1.3-kryptering</li>
+                      <li>Databasen er krypteret at-rest med AES-256</li>
+                      <li>Samværsplaner og dokumenter gemmes krypteret i cloud-storage</li>
+                    </ul>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Adgangskontrol</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Hverdag bruger household-baseret adgangskontrol, hvilket betyder at kun godkendte husstandsmedlemmer kan se jeres data. Hvert dataobjekt er knyttet til en specifik husstand og kan ikke tilgås af andre brugere.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Autentificering</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Vi bruger Supabase Auth til sikker brugerautentificering med JWT-tokens. Sessions udløber automatisk, og tokens fornyes sikkert. Push notification tokens slettes automatisk ved kontosletning.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Databrud</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Ved et sikkerhedsbrud følger vi GDPR art. 33 og 34: Vi notificerer Datatilsynet inden 72 timer og informerer berørte brugere direkte via email og/eller push-notifikation med information om bruddet, de berørte data og de tiltag vi har iværksat.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Cookies & lokal lagring</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Appen bruger localStorage til session-data (login-token og app-tilstand). Dette er teknisk nødvendigt for appens funktion. Vi bruger ingen tredjeparts-cookies og ingen tracking- eller reklame-cookies.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {settingsDetailView === 'kommunikation' && (
+                <div className="space-y-4 px-1">
+                  <p className="text-base font-bold text-[#2f2f2d]">For at kommunikere med dig</p>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Push-notifikationer</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Vi sender push-notifikationer via Apple Push Notification Service (APNs) for at informere dig om vigtige hændelser. Du kan styre hvilke typer notifikationer du modtager under Indstillinger → Notifikationer. Dine device-tokens gemmes i vores database og slettes ved kontosletning.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Hvilke notifikationer sender vi</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-[#4a4945] leading-relaxed">
+                      <li>Afleveringspåmindelser og samværsændringer</li>
+                      <li>Nye beskeder fra husstandsmedlemmer</li>
+                      <li>Opgavetildelinger og deadlines</li>
+                      <li>Udgifter der afventer godkendelse</li>
+                      <li>Kalenderbegivenheder og vigtige datoer</li>
+                      <li>Madplan- og indkøbspåmindelser</li>
+                      <li>Nye delte dokumenter og beslutningsforslag</li>
+                    </ul>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Email-kommunikation</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Din email bruges til kontoverifikation, adgangskodegendannelse og vigtige kontorelaterede meddelelser. Vi sender ikke markedsføringsemails medmindre du eksplicit tilmelder dig.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Dine kontaktpræferencer</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Du kan til enhver tid ændre dine notifikationsindstillinger i appen. Du kan slå individuelle kategorier til og fra, og du kan helt fravælge push-notifikationer i din enheds indstillinger.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {settingsDetailView === 'rettigheder' && (
+                <div className="space-y-4 px-1">
+                  <p className="text-base font-bold text-[#2f2f2d]">Dine rettigheder som bruger</p>
+                  <p className="text-xs text-[#4a4945] leading-relaxed">
+                    Som bruger af Hverdag har du en række rettigheder i henhold til GDPR. Vi gør det nemt for dig at udøve disse rettigheder direkte i appen eller ved at kontakte os.
+                  </p>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Ret til indsigt (art. 15)</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Du kan se alle dine persondata direkte i appen under din profil og i de forskellige sektioner. Du kan også anmode om en komplet oversigt over alle data vi har om dig ved at kontakte os.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Ret til berigtigelse (art. 16)</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Du kan rette dine personoplysninger direkte under Indstillinger → Konto. Dette omfatter dit navn, email, telefonnummer, adresse og andre profiloplysninger.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Ret til sletning (art. 17)</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Du kan slette din konto under Indstillinger → Konto → Slet konto. Ved sletning anonymiseres alle dine persondata permanent. Se afsnittet &quot;Sådan sletter du dine data&quot; for detaljer.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Ret til begrænsning af behandling (art. 18)</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Du kan anmode om, at vi begrænser behandlingen af dine data i visse situationer, fx mens en indsigelse behandles. Kontakt os på support@hverdag.app.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Ret til dataportabilitet (art. 20)</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Du har ret til at modtage dine persondata i et struktureret, almindeligt anvendt og maskinlæsbart format (JSON). Kontakt os på support@hverdag.app for at anmode om dataeksport.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Ret til indsigelse (art. 21)</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Du kan gøre indsigelse mod behandling af dine data, der er baseret på legitim interesse. Vi stopper behandlingen, medmindre vi kan påvise tvingende legitime grunde.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Klage til tilsynsmyndighed</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Du har ret til at klage til Datatilsynet, hvis du mener, at vi behandler dine persondata i strid med GDPR. Datatilsynet kan kontaktes på dt@datatilsynet.dk eller via datatilsynet.dk.
+                    </p>
+                  </div>
+                  <div className="space-y-2 pt-1">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Kontakt</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Dataansvarlig: Hverdag ApS<br />
+                      Email: support@hverdag.app<br />
+                      Vi bestræber os på at besvare alle henvendelser inden for 30 dage.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {settingsDetailView === 'databehandlere' && (
+                <div className="space-y-4 px-1">
+                  <p className="text-base font-bold text-[#2f2f2d]">Hvem vi deler data med</p>
+                  <p className="text-xs text-[#4a4945] leading-relaxed">
+                    Vi deler aldrig dine persondata med tredjeparter til markedsføring, reklame eller andre kommercielle formål. Vi bruger kun betroede databehandlere, der er nødvendige for at drive appen.
+                  </p>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Supabase — Database & Autentificering</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-[#4a4945] leading-relaxed">
+                      <li>Lagrer alle appdata (brugerprofiler, samværsplaner, beskeder, dokumenter etc.)</li>
+                      <li>Håndterer brugerautentificering og session-management</li>
+                      <li>Hostet i EU-region (Frankfurt, Tyskland)</li>
+                      <li>SOC 2 Type II-certificeret</li>
+                      <li>Databehandleraftale (DPA) indgået i henhold til GDPR art. 28</li>
+                    </ul>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Stripe — Betalingshåndtering</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-[#4a4945] leading-relaxed">
+                      <li>Håndterer abonnementsbetalinger og fakturering</li>
+                      <li>PCI DSS Level 1-compliant (højeste sikkerhedsniveau for betalingsdata)</li>
+                      <li>Vi gemmer aldrig kreditkortoplysninger — Stripe håndterer det direkte</li>
+                      <li>Databehandleraftale (DPA) indgået</li>
+                    </ul>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Apple Push Notification Service (APNs)</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-[#4a4945] leading-relaxed">
+                      <li>Leverer push-notifikationer til din iPhone/iPad</li>
+                      <li>Vi sender kun notifikationsindhold — Apple kan ikke læse beskederne</li>
+                      <li>Device-tokens slettes ved kontosletning</li>
+                    </ul>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Ingen andre databehandlere</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Vi bruger ingen analytics-tjenester (Google Analytics, Mixpanel etc.), ingen reklame-netværk, ingen social media-trackers og ingen AI/ML-tjenester til at behandle dine data. Dine data forbliver inden for de ovennævnte tjenester.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {settingsDetailView === 'sletning' && (
+                <div className="space-y-4 px-1">
+                  <p className="text-base font-bold text-[#2f2f2d]">Sådan sletter du dine data</p>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Sletning af din konto</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Du kan slette din konto under Indstillinger → Konto → Slet konto. Sletningen er permanent og kan ikke fortrydes.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Hvad sker der ved sletning</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">Ved kontosletning anonymiseres alle dine persondata:</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-[#4a4945] leading-relaxed">
+                      <li>Dit navn erstattes med &quot;Slettet bruger&quot;</li>
+                      <li>Din email anonymiseres (fx slettet_a1b2c3@anon.hverdag.app)</li>
+                      <li>Telefonnummer, adresse og andre kontaktoplysninger fjernes</li>
+                      <li>Dit profilbillede slettes</li>
+                      <li>Push notification tokens slettes fra vores database</li>
+                      <li>Personlige beskeder anonymiseres (afsender vises som &quot;Slettet bruger&quot;)</li>
+                      <li>Dagbogsindlæg og private noter slettes</li>
+                    </ul>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Hvad bevares (anonymiseret)</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      For at bevare husstandens historik anonymiseres visse data i stedet for at slettes fuldstændigt. Dette inkluderer delte udgifter, beslutningslog-indlæg og mødereferater, hvor dit navn erstattes med &quot;Slettet bruger&quot;. Disse data kan ikke føres tilbage til dig som person.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Tidsramme</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Anonymiseringen sker inden for 30 dage efter anmodning om kontosletning. Betalingsdata hos Stripe bevares i overensstemmelse med Stripes egne opbevaringsregler og lovkrav om regnskabsopbevaring.
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-[#2f2f2d]">Sletning af specifikke data</p>
+                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                      Du behøver ikke slette hele din konto for at fjerne data. Du kan slette individuelle elementer direkte i appen: børneprofiler, dokumenter, dagbogsindlæg, fotos, udgifter og beskeder kan alle fjernes enkeltvist.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="border-t border-[#e5e3dc] mt-4" />
+              <p className="text-[10px] text-center text-[#9e9c95] pb-4 pt-2">
+                Dataansvarlig: Hverdag ApS · support@hverdag.app<br />
+                Senest opdateret: Februar 2026 · Hverdag v1.0
+              </p>
+            </>
+          )}
         </TabsContent>
 
         {/* ─── Visning (fra sidepanel) ─── */}
         <TabsContent value="appearance" className="space-y-2">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Eye className="h-4 w-4" />
-                Visning
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 pt-0">
               {/* Dark mode toggle */}
               <div className="space-y-2">
-                <p className="text-sm font-medium text-[#2f2f2d] dark:text-slate-200">Farvetema</p>
+                <p className="text-[15px] font-medium text-[#2f2f2d] dark:text-slate-200">Farvetema</p>
                 <div className="flex gap-2">
                   {([
                     { value: 'light', label: 'Lys', Icon: Sun },
@@ -1622,7 +2432,7 @@ export function SettingsView() {
                       type="button"
                       onClick={() => setTheme(value)}
                       aria-pressed={theme === value}
-                      className={`flex flex-1 flex-col items-center gap-1 rounded-xl border py-2.5 px-2 text-xs font-medium transition-colors ${
+                      className={`flex flex-1 flex-col items-center gap-1 rounded-[8px] border py-2.5 px-2 text-xs font-medium transition-colors ${
                         theme === value
                           ? 'border-orange-400 bg-orange-50 text-orange-700 dark:border-orange-400 dark:bg-orange-950 dark:text-orange-300'
                           : 'border-[#d8d7cf] bg-[#faf9f6] text-[#75736b] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400'
@@ -1635,11 +2445,11 @@ export function SettingsView() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between rounded-xl border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
+              <div className="flex items-center justify-between rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
                 <div>
-                  <p className="text-sm font-medium text-[#2f2f2d] dark:text-slate-200">Professionel visning</p>
-                  <p className="text-xs text-[#75736b] dark:text-slate-400">
-                    {allowProfessionalTools ? 'Kan slås til/fra' : 'Skjult i samboende mode'}
+                  <p className="text-[15px] font-medium text-[#2f2f2d] dark:text-slate-200">Professionel visning</p>
+                  <p className="text-[13px] text-[#75736b] dark:text-slate-400">
+                    {allowProfessionalTools ? 'Kan slås til/fra' : 'Kun tilgængelig for administratorer'}
                   </p>
                 </div>
                 <IOSSwitch
@@ -1648,8 +2458,6 @@ export function SettingsView() {
                   onCheckedChange={(value) => setProfessionalView(value)}
                 />
               </div>
-            </CardContent>
-          </Card>
         </TabsContent>
       </Tabs>
 
@@ -1666,7 +2474,7 @@ export function SettingsView() {
                 value={familyMemberDraft.name}
                 onChange={e => setFamilyMemberDraft(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="Fulde navn"
-                className="rounded-xl border-[#d8d7cf] bg-white"
+                className="rounded-[8px] border-[#d8d7cf] bg-white"
               />
             </div>
             <div className="space-y-1">
@@ -1675,32 +2483,30 @@ export function SettingsView() {
                 value={familyMemberDraft.email}
                 onChange={e => setFamilyMemberDraft(prev => ({ ...prev, email: e.target.value }))}
                 placeholder="email@eksempel.dk"
-                className="rounded-xl border-[#d8d7cf] bg-white"
+                className="rounded-[8px] border-[#d8d7cf] bg-white"
               />
             </div>
             <div className="space-y-1">
               <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Rolle</Label>
-              <Select
+              <SelectSheet
                 value={familyMemberDraft.role}
                 onValueChange={(v) => setFamilyMemberDraft(prev => ({ ...prev, role: v as FamilyMemberRole }))}
-              >
-                <SelectTrigger className="rounded-xl border-[#d8d7cf] bg-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="teenager">Teenager</SelectItem>
-                  <SelectItem value="grandparent">Bedsteforælder</SelectItem>
-                  <SelectItem value="step_parent">Bonusforælder</SelectItem>
-                  <SelectItem value="other_relative">Øvrigt familiemedlem</SelectItem>
-                </SelectContent>
-              </Select>
+                title="Rolle"
+                options={[
+                  { value: 'teenager', label: 'Teenager' },
+                  { value: 'grandparent', label: 'Bedsteforælder' },
+                  { value: 'step_parent', label: 'Bonusforælder' },
+                  { value: 'other_relative', label: 'Øvrigt familiemedlem' },
+                ]}
+                className="rounded-[8px] border-[#d8d7cf] bg-white"
+              />
             </div>
             <div className="flex gap-2 pt-1">
-              <Button variant="outline" className="flex-1 rounded-2xl border-[#d8d7cf]" onClick={() => setFamilyMemberOpen(false)}>
+              <Button variant="outline" className="flex-1 rounded-[8px] border-[#d8d7cf]" onClick={() => setFamilyMemberOpen(false)}>
                 Annuller
               </Button>
               <Button
-                className="flex-1 rounded-2xl bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+                className="flex-1 rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
                 disabled={!familyMemberDraft.name.trim()}
                 onClick={() => {
                   const memberId = generateUserId();
@@ -1725,6 +2531,7 @@ export function SettingsView() {
           </div>
         </DialogContent>
       </Dialog>
+      <SavingOverlay open={isSaving} />
     </div>
   );
 }
