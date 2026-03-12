@@ -18,13 +18,13 @@ export function Navbar() {
   ];
 
   return (
-    <nav className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-xl shadow-sm' : 'bg-white/60 backdrop-blur-md'} border-b border-[#e5e3dc]/60`}>
+    <nav className={`sticky top-0 z-50 transition-colors duration-200 ${scrolled ? 'bg-white/95 shadow-sm' : 'bg-white/80'} border-b border-[#e5e3dc]/60`}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <a href="/web.html" className="flex items-center gap-2.5 group">
-            <img src="/icon-192.png" alt="Hverdag" className="h-9 w-9 rounded-xl shadow-sm group-hover:shadow-md transition-shadow" />
-            <span className="text-xl font-bold text-[#2f2f2f] tracking-tight">Hverdag</span>
+            <img src="/huska-logo.svg" alt="Huska" className="h-9 w-9 rounded-xl shadow-sm group-hover:shadow-md transition-shadow" />
+            <span className="text-xl font-bold text-[#2f2f2f] tracking-tight">Huska</span>
           </a>
 
           {/* Desktop nav */}
@@ -46,7 +46,7 @@ export function Navbar() {
             </a>
             <a
               href="#funktioner"
-              className="inline-flex items-center px-5 py-2.5 text-sm font-semibold text-white rounded-full hover:scale-[1.03] hover:shadow-lg hover:shadow-[#f58a2d]/25 transition-all duration-200"
+              className="inline-flex items-center px-5 py-2.5 text-sm font-semibold text-white rounded-full hover:shadow-lg hover:shadow-[#f58a2d]/25 transition-shadow duration-200"
               style={{ background: 'linear-gradient(135deg, #f7a95c 0%, #f58a2d 50%, #e8773f 100%)' }}
             >
               Hent appen

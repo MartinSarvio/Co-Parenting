@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import {
   Calendar,
   MessageCircle,
@@ -28,22 +27,6 @@ import {
   Briefcase,
 } from 'lucide-react';
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const } },
-};
-
-const stagger = {
-  visible: { transition: { staggerChildren: 0.07 } },
-};
-
-const float = {
-  animate: {
-    y: [-8, 8, -8],
-    transition: { duration: 6, repeat: Infinity, ease: 'easeInOut' as const },
-  },
-};
-
 /* ═══════════════════════════════════════════════════════════════════════════ */
 /*  HERO                                                                     */
 /* ═══════════════════════════════════════════════════════════════════════════ */
@@ -53,31 +36,19 @@ function HeroSection() {
     <section className="relative overflow-hidden min-h-[90vh] flex items-center">
       {/* Background decorations */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[-200px] right-[-150px] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-[#f58a2d]/15 to-[#f7a95c]/5 blur-3xl" />
-        <div className="absolute bottom-[-150px] left-[-100px] w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-[#f58a2d]/8 to-transparent blur-3xl" />
-        <div className="absolute top-[20%] left-[15%] w-[200px] h-[200px] rounded-full bg-[#f58a2d]/3 blur-2xl" />
+        <div className="absolute top-[-200px] right-[-150px] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-[#f58a2d]/15 to-[#f7a95c]/5 blur-xl" />
+        <div className="absolute bottom-[-150px] left-[-100px] w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-[#f58a2d]/8 to-transparent blur-xl" />
       </div>
-
-      {/* Floating decorative dots */}
-      <motion.div animate={float.animate} className="absolute top-[15%] right-[20%] w-3 h-3 rounded-full bg-[#f58a2d]/20" />
-      <motion.div animate={{ ...float.animate, transition: { ...float.animate.transition, delay: 1 } }} className="absolute top-[60%] left-[8%] w-2 h-2 rounded-full bg-[#f58a2d]/15" />
-      <motion.div animate={{ ...float.animate, transition: { ...float.animate.transition, delay: 2 } }} className="absolute bottom-[25%] right-[12%] w-4 h-4 rounded-full bg-[#f58a2d]/10" />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-20 md:pt-16 md:pb-28 relative z-10">
         <div className="grid md:grid-cols-2 gap-16 items-center">
           {/* Text */}
-          <motion.div initial="hidden" animate="visible" variants={stagger}>
-            <motion.div
-              variants={fadeUp}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/70 backdrop-blur-sm border border-[#f58a2d]/20 text-[#e8773f] text-xs font-semibold mb-8 shadow-sm"
-            >
+          <div className="animate-fadeIn">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 border border-[#f58a2d]/20 text-[#e8773f] text-xs font-semibold mb-8 shadow-sm">
               <Heart size={14} className="fill-[#f58a2d]/30" /> Lavet til familier i Danmark
-            </motion.div>
+            </div>
 
-            <motion.h1
-              variants={fadeUp}
-              className="text-[2.75rem] sm:text-[3.5rem] lg:text-[4rem] font-extrabold text-[#2f2f2f] leading-[1.05] tracking-tight"
-            >
+            <h1 className="text-[2.75rem] sm:text-[3.5rem] lg:text-[4rem] font-extrabold text-[#2f2f2f] leading-[1.05] tracking-tight">
               Koordinér
               <br />
               hverdagen
@@ -87,19 +58,19 @@ function HeroSection() {
               >
                 med din familie
               </span>
-            </motion.h1>
+            </h1>
 
-            <motion.p variants={fadeUp} className="mt-6 text-[1.1rem] text-[#5f5d56] max-w-[440px] leading-[1.7]">
+            <p className="mt-6 text-[1.1rem] text-[#5f5d56] max-w-[440px] leading-[1.7]">
               Én sandhedskilde for hele familien. Samværsplan, kalender,
               kommunikation, udgifter og meget mere — samlet i én app.
-            </motion.p>
+            </p>
 
-            <motion.div variants={fadeUp} className="mt-10 flex flex-wrap gap-3">
+            <div className="mt-10 flex flex-wrap gap-3">
               <a
                 href="https://apps.apple.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2.5 px-7 py-3.5 text-[15px] font-semibold text-white rounded-full shadow-lg shadow-[#f58a2d]/25 hover:shadow-xl hover:shadow-[#f58a2d]/35 hover:scale-[1.02] transition-all duration-200"
+                className="group inline-flex items-center gap-2.5 px-7 py-3.5 text-[15px] font-semibold text-white rounded-full shadow-lg shadow-[#f58a2d]/25 hover:shadow-xl hover:shadow-[#f58a2d]/35 transition-shadow duration-200"
                 style={{ background: 'linear-gradient(135deg, #f7a95c 0%, #f58a2d 50%, #e8773f 100%)' }}
               >
                 <Smartphone size={18} />
@@ -108,37 +79,29 @@ function HeroSection() {
               </a>
               <a
                 href="#funktioner"
-                className="inline-flex items-center gap-2 px-7 py-3.5 text-[15px] font-semibold text-[#2f2f2f] rounded-full border border-[#d8d7cf] bg-white/50 backdrop-blur-sm hover:bg-white/80 hover:border-[#c5c3bc] transition-all duration-200"
+                className="inline-flex items-center gap-2 px-7 py-3.5 text-[15px] font-semibold text-[#2f2f2f] rounded-full border border-[#d8d7cf] bg-white/80 hover:bg-white hover:border-[#c5c3bc] transition-colors duration-200"
               >
                 Se funktioner
                 <ArrowDown size={16} />
               </a>
-            </motion.div>
+            </div>
 
-            <motion.div variants={fadeUp} className="mt-8 flex items-center gap-6 text-[13px] text-[#9a978f]">
+            <div className="mt-8 flex items-center gap-6 text-[13px] text-[#9a978f]">
               <span className="flex items-center gap-1.5"><Shield size={15} className="text-[#78766d]" /> Sikker</span>
               <span className="flex items-center gap-1.5"><Clock size={15} className="text-[#78766d]" /> Tidsbesparende</span>
               <span className="flex items-center gap-1.5 text-[#f58a2d] font-bold">
                 <Sparkles size={15} /> Gratis
               </span>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
 
           {/* Phone mockup */}
-          <motion.div
-            initial={{ opacity: 0, y: 50, rotateX: 5 }}
-            animate={{ opacity: 1, y: 0, rotateX: 0 }}
-            transition={{ delay: 0.3, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="flex justify-center perspective-1000"
-          >
-            <motion.div animate={float.animate} className="relative">
-              {/* Glow behind phone */}
-              <div className="absolute inset-0 scale-110 rounded-[3.5rem] bg-gradient-to-b from-[#f58a2d]/15 to-transparent blur-2xl" />
+          <div className="flex justify-center animate-fadeIn" style={{ animationDelay: '0.2s' }}>
+            <div className="relative">
+              <div className="absolute inset-0 scale-110 rounded-[3.5rem] bg-gradient-to-b from-[#f58a2d]/15 to-transparent blur-xl" />
 
               <div className="relative w-[290px] h-[590px] bg-gradient-to-b from-[#fafafa] to-white rounded-[3rem] shadow-2xl shadow-black/15 border border-[#e0ded8] p-3">
-                {/* Screen */}
                 <div className="w-full h-full rounded-[2.2rem] bg-gradient-to-b from-[#f7f6f2] to-[#eceae2] flex flex-col items-center justify-center gap-5 overflow-hidden relative">
-                  {/* Status bar mock */}
                   <div className="absolute top-3 left-6 right-6 flex justify-between text-[9px] font-medium text-[#9a978f]">
                     <span>9:41</span>
                     <span className="flex gap-1 items-center">
@@ -148,15 +111,14 @@ function HeroSection() {
                     </span>
                   </div>
 
-                  <img src="/icon-512.png" alt="Hverdag app" className="w-20 h-20 rounded-[1.25rem] shadow-lg shadow-black/10" />
+                  <img src="/huska-logo.svg" alt="Huska" className="w-20 h-20 rounded-[1.25rem] shadow-lg shadow-black/10" loading="lazy" />
                   <div className="text-center">
-                    <p className="text-xl font-bold text-[#2f2f2f] tracking-tight">Hverdag</p>
+                    <p className="text-xl font-bold text-[#2f2f2f] tracking-tight">Huska</p>
                     <p className="text-[11px] text-[#9a978f] mt-1 px-10 leading-relaxed">
-                      Koordinér hverdagen med co-parenting og familieplanlægning
+                      Husk alt det vigtige i familien
                     </p>
                   </div>
 
-                  {/* Mini feature icons */}
                   <div className="flex gap-3 mt-2">
                     {[Calendar, MessageCircle, CheckSquare, Wallet].map((Icon, i) => (
                       <div key={i} className="w-10 h-10 rounded-xl bg-white/80 shadow-sm flex items-center justify-center">
@@ -166,15 +128,13 @@ function HeroSection() {
                   </div>
                 </div>
 
-                {/* Dynamic Island */}
                 <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-[100px] h-[28px] bg-[#1a1a1a] rounded-full" />
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Bottom wave */}
       <div className="absolute bottom-0 left-0 right-0">
         <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
           <path d="M0 40C240 70 480 80 720 60C960 40 1200 10 1440 30V80H0V40Z" fill="white" fillOpacity="0.5" />
@@ -209,38 +169,24 @@ function FeatureSection() {
 
   return (
     <section id="funktioner" className="py-24 relative">
-      {/* Subtle background */}
       <div className="absolute inset-0 bg-gradient-to-b from-white/50 via-[#f9f8f5] to-[#f2f1ed] pointer-events-none" />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={stagger}
-          className="text-center mb-16"
-        >
-          <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f58a2d]/8 text-[#e8773f] text-xs font-semibold mb-4">
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f58a2d]/8 text-[#e8773f] text-xs font-semibold mb-4">
             <Zap size={13} /> Alt-i-én platform
-          </motion.div>
-          <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold text-[#2f2f2f] tracking-tight">
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold text-[#2f2f2f] tracking-tight">
             Alt hvad din familie har brug for
-          </motion.h2>
-          <motion.p variants={fadeUp} className="mt-4 text-[#78766d] max-w-lg mx-auto text-[1.05rem] leading-relaxed">
-            Fra samværsplan til dagligvarer — Hverdag samler alle familiens funktioner på ét sted.
-          </motion.p>
-        </motion.div>
+          </h2>
+          <p className="mt-4 text-[#78766d] max-w-lg mx-auto text-[1.05rem] leading-relaxed">
+            Fra samværsplan til dagligvarer — Huska samler alle familiens funktioner på ét sted.
+          </p>
+        </div>
 
-        {/* Highlight card — Samværsplan */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-40px' }}
-          variants={fadeUp}
-          className="mb-8"
-        >
-          <div className="group relative p-8 rounded-3xl border border-[#f58a2d]/20 bg-gradient-to-br from-white to-[#fff8f0] hover:shadow-xl hover:shadow-[#f58a2d]/8 transition-all duration-300 overflow-hidden">
-            <div className="absolute top-0 right-0 w-[300px] h-[300px] rounded-full bg-[#f58a2d]/5 blur-3xl pointer-events-none" />
+        <div className="mb-8">
+          <div className="group relative p-8 rounded-3xl border border-[#f58a2d]/20 bg-gradient-to-br from-white to-[#fff8f0] hover:shadow-lg hover:shadow-[#f58a2d]/8 transition-shadow duration-200 overflow-hidden">
+            <div className="absolute top-0 right-0 w-[300px] h-[300px] rounded-full bg-[#f58a2d]/5 blur-xl pointer-events-none" />
             <div className="relative flex flex-col md:flex-row gap-6 items-start md:items-center">
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#f7a95c] to-[#e8773f] flex items-center justify-center shadow-lg shadow-[#f58a2d]/20 shrink-0">
                 <highlight.icon size={26} className="text-white" />
@@ -254,38 +200,26 @@ function FeatureSection() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Feature grid */}
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-40px' }}
-          variants={stagger}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {rest.map((f) => (
-            <motion.div
+            <div
               key={f.title}
-              variants={fadeUp}
-              className="group p-6 rounded-2xl bg-white/80 backdrop-blur-sm border border-[#e8e6df] hover:border-[#f58a2d]/25 hover:shadow-lg hover:shadow-[#f58a2d]/5 hover:-translate-y-0.5 transition-all duration-300"
+              className="group p-6 rounded-2xl bg-white/80 border border-[#e8e6df] hover:border-[#f58a2d]/25 hover:shadow-md hover:shadow-[#f58a2d]/5 transition-shadow duration-200"
             >
-              <div className="w-11 h-11 rounded-xl bg-[#f58a2d]/8 flex items-center justify-center mb-4 group-hover:bg-[#f58a2d]/12 group-hover:scale-105 transition-all duration-300">
+              <div className="w-11 h-11 rounded-xl bg-[#f58a2d]/8 flex items-center justify-center mb-4 group-hover:bg-[#f58a2d]/12 transition-colors duration-200">
                 <f.icon size={21} className="text-[#f58a2d]" />
               </div>
               <h3 className="text-[15px] font-bold text-[#2f2f2f]">{f.title}</h3>
               <p className="mt-1.5 text-[13px] text-[#78766d] leading-relaxed">{f.desc}</p>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
 }
-
-/* ═══════════════════════════════════════════════════════════════════════════ */
-/*  STATS                                                                    */
-/* ═══════════════════════════════════════════════════════════════════════════ */
 
 const stats = [
   { icon: Zap, value: '12+', label: 'Funktioner' },
@@ -298,33 +232,19 @@ function StatsSection() {
   return (
     <section className="py-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-40px' }}
-          variants={stagger}
-          className="grid grid-cols-2 md:grid-cols-4 gap-6"
-        >
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {stats.map((s) => (
-            <motion.div
-              key={s.label}
-              variants={fadeUp}
-              className="text-center p-5 rounded-2xl bg-white/60 backdrop-blur-sm border border-[#e8e6df]"
-            >
+            <div key={s.label} className="text-center p-5 rounded-2xl bg-white/60 border border-[#e8e6df]">
               <s.icon size={22} className="mx-auto text-[#f58a2d] mb-3" />
               <p className="text-2xl font-extrabold text-[#2f2f2f] tracking-tight">{s.value}</p>
               <p className="text-[12px] text-[#9a978f] font-medium mt-0.5">{s.label}</p>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
 }
-
-/* ═══════════════════════════════════════════════════════════════════════════ */
-/*  HOW IT WORKS                                                             */
-/* ═══════════════════════════════════════════════════════════════════════════ */
 
 const steps = [
   { num: '1', title: 'Opret din familie', desc: 'Download appen og opret en familieprofil. Vælg jeres familiemodel — co-parenting, sammensat eller under samme tag.', icon: Users },
@@ -338,33 +258,20 @@ function HowItWorksSection() {
       <div className="absolute inset-0 bg-gradient-to-b from-[#f2f1ed] via-[#f7f6f2] to-white/50 pointer-events-none" />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={stagger}
-          className="text-center mb-16"
-        >
-          <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl font-extrabold text-[#2f2f2f] tracking-tight">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#2f2f2f] tracking-tight">
             Kom i gang på 3 trin
-          </motion.h2>
-          <motion.p variants={fadeUp} className="mt-3 text-[#78766d] text-[1.05rem]">
+          </h2>
+          <p className="mt-3 text-[#78766d] text-[1.05rem]">
             Det tager under 5 minutter at sætte op.
-          </motion.p>
-        </motion.div>
+          </p>
+        </div>
 
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-40px' }}
-          variants={stagger}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8 relative"
-        >
-          {/* Connection line (desktop) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
           <div className="hidden md:block absolute top-[52px] left-[20%] right-[20%] h-[2px] bg-gradient-to-r from-[#f58a2d]/20 via-[#f58a2d]/30 to-[#f58a2d]/20" />
 
           {steps.map((s) => (
-            <motion.div key={s.num} variants={fadeUp} className="text-center relative">
+            <div key={s.num} className="text-center relative">
               <div className="relative inline-block mb-5">
                 <div
                   className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-white shadow-lg shadow-[#f58a2d]/20 relative z-10"
@@ -378,17 +285,13 @@ function HowItWorksSection() {
               </div>
               <h3 className="text-lg font-bold text-[#2f2f2f]">{s.title}</h3>
               <p className="mt-2 text-[14px] text-[#78766d] max-w-[280px] mx-auto leading-relaxed">{s.desc}</p>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
 }
-
-/* ═══════════════════════════════════════════════════════════════════════════ */
-/*  ABOUT / FAMILIES                                                         */
-/* ═══════════════════════════════════════════════════════════════════════════ */
 
 const familyTypes = [
   { icon: HandHeart, label: 'Co-parenting', desc: 'Fast eller fleksibel samværsplan' },
@@ -401,18 +304,11 @@ function AboutSection() {
   return (
     <section id="om" className="py-24 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-[#2f2f2f] to-[#1a1a1a]" />
-      {/* Decorative glow */}
-      <div className="absolute top-[-100px] right-[-50px] w-[400px] h-[400px] rounded-full bg-[#f58a2d]/8 blur-3xl pointer-events-none" />
+      <div className="absolute top-[-100px] right-[-50px] w-[400px] h-[400px] rounded-full bg-[#f58a2d]/8 blur-xl pointer-events-none" />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={stagger}
-          className="grid md:grid-cols-2 gap-16 items-center"
-        >
-          <motion.div variants={fadeUp}>
+        <div className="grid md:grid-cols-2 gap-16 items-center">
+          <div>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-[1.1] tracking-tight">
               Bygget til familier
               <span
@@ -423,7 +319,7 @@ function AboutSection() {
               </span>
             </h2>
             <p className="mt-5 text-white/70 leading-relaxed text-[1.05rem]">
-              Hverdag er skabt med én mission: at gøre hverdagen lettere for danske familier.
+              Huska er skabt med én mission: at gøre hverdagen lettere for danske familier.
               Uanset om I er samboende, co-parenting eller en sammensat familie, fortjener I
               et redskab der samler alt ét sted — uden forvirring og med fuld gennemsigtighed.
             </p>
@@ -431,96 +327,68 @@ function AboutSection() {
               Vi tror på, at mindre friktion i hverdagen giver mere tid til det der virkelig tæller:
               at være sammen med dem, man holder af.
             </p>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-40px' }}
-            variants={stagger}
-            className="grid grid-cols-2 gap-4"
-          >
+          <div className="grid grid-cols-2 gap-4">
             {familyTypes.map((item) => (
-              <motion.div
+              <div
                 key={item.label}
-                variants={fadeUp}
-                className="p-5 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+                className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors duration-200"
               >
                 <item.icon size={22} className="text-[#f58a2d] mb-3" />
                 <p className="text-[14px] font-semibold text-white">{item.label}</p>
                 <p className="text-[12px] text-white/50 mt-1">{item.desc}</p>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
     </section>
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════ */
-/*  CTA                                                                      */
-/* ═══════════════════════════════════════════════════════════════════════════ */
-
 function CTASection() {
   return (
     <section className="py-24">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-80px' }}
-          variants={stagger}
-          className="relative text-center rounded-[2rem] p-12 md:p-20 overflow-hidden"
-        >
-          {/* Background */}
+        <div className="relative text-center rounded-[2rem] p-12 md:p-20 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-[#fef3e7] via-[#fff0de] to-[#fde8d0]" />
-          <div className="absolute top-[-80px] right-[-40px] w-[300px] h-[300px] rounded-full bg-[#f58a2d]/10 blur-3xl pointer-events-none" />
-          <div className="absolute bottom-[-60px] left-[-30px] w-[250px] h-[250px] rounded-full bg-[#f58a2d]/8 blur-3xl pointer-events-none" />
-
-          {/* Decorative dots */}
-          <div className="absolute top-8 left-8 w-2 h-2 rounded-full bg-[#f58a2d]/20" />
-          <div className="absolute top-12 left-16 w-1.5 h-1.5 rounded-full bg-[#f58a2d]/15" />
-          <div className="absolute bottom-10 right-10 w-3 h-3 rounded-full bg-[#f58a2d]/15" />
-          <div className="absolute bottom-16 right-20 w-2 h-2 rounded-full bg-[#f58a2d]/10" />
+          <div className="absolute top-[-80px] right-[-40px] w-[300px] h-[300px] rounded-full bg-[#f58a2d]/10 blur-xl pointer-events-none" />
+          <div className="absolute bottom-[-60px] left-[-30px] w-[250px] h-[250px] rounded-full bg-[#f58a2d]/8 blur-xl pointer-events-none" />
 
           <div className="relative z-10">
-            <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm text-[#e8773f] text-xs font-bold mb-6 shadow-sm">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 text-[#e8773f] text-xs font-bold mb-6 shadow-sm">
               <Sparkles size={14} /> Gratis at bruge
-            </motion.div>
+            </div>
 
-            <motion.h2 variants={fadeUp} className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#2f2f2f] tracking-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#2f2f2f] tracking-tight">
               Klar til at koordinere
               <br />
               <span style={{ color: '#f58a2d' }}>hverdagen?</span>
-            </motion.h2>
-            <motion.p variants={fadeUp} className="mt-4 text-[#5f5d56] max-w-md mx-auto text-[1.05rem] leading-relaxed">
-              Hent Hverdag gratis og kom i gang med at skabe mere struktur og mindre friktion i din families hverdag.
-            </motion.p>
+            </h2>
+            <p className="mt-4 text-[#5f5d56] max-w-md mx-auto text-[1.05rem] leading-relaxed">
+              Hent Huska gratis og kom i gang med at skabe mere struktur og mindre friktion i din families hverdag.
+            </p>
 
-            <motion.div variants={fadeUp} className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
+            <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
               <a
                 href="https://apps.apple.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex items-center justify-center gap-2.5 px-8 py-4 text-[15px] font-bold text-white rounded-full shadow-lg shadow-[#f58a2d]/30 hover:shadow-xl hover:shadow-[#f58a2d]/40 hover:scale-[1.02] transition-all duration-200"
+                className="group inline-flex items-center justify-center gap-2.5 px-8 py-4 text-[15px] font-bold text-white rounded-full shadow-lg shadow-[#f58a2d]/30 hover:shadow-xl hover:shadow-[#f58a2d]/40 transition-shadow duration-200"
                 style={{ background: 'linear-gradient(135deg, #f7a95c 0%, #f58a2d 50%, #e8773f 100%)' }}
               >
                 <Smartphone size={20} />
                 Hent appen nu
                 <ArrowRight size={17} className="group-hover:translate-x-0.5 transition-transform" />
               </a>
-            </motion.div>
+            </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
 }
-
-/* ═══════════════════════════════════════════════════════════════════════════ */
-/*  LANDING PAGE                                                             */
-/* ═══════════════════════════════════════════════════════════════════════════ */
 
 export default function LandingPage() {
   return (
