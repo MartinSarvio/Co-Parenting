@@ -161,6 +161,7 @@ type NavItem = {
 export function BottomNav() {
   const { activeTab, setActiveTab, isProfessionalView, household, fullScreenOverlayOpen, kommunikationThreadId, currentUser, handoverAction, feedTab, activeSettingsTab, milestoneFormMode, meetingFormMode, docFormMode } = useAppStore();
   const [moreOpen, setMoreOpen] = useState(false);
+  const isFamilyMember = currentUser?.role === 'family_member';
   const isTogetherFamily = household?.familyMode === 'together';
   const isSingleParent = household?.familyMode === 'single_parent';
   const showHandoverNav = !isTogetherFamily && !isSingleParent;
@@ -168,7 +169,13 @@ export function BottomNav() {
 
   if (fullScreenOverlayOpen || kommunikationThreadId || activeTab === 'swap-request' || activeTab === 'kalender-week' || activeTab === 'group-detail' || activeTab === 'profile' || activeTab === 'create-group' || handoverAction === 'add-pakkeliste' || (activeTab === 'feed' && (feedTab === 'forum' || feedTab === 'tilbud')) || (activeTab === 'settings' && activeSettingsTab === 'info') || milestoneFormMode || meetingFormMode || docFormMode) return null;
 
-  const mainNavItems: NavItem[] = isTogetherFamily
+  const mainNavItems: NavItem[] = isFamilyMember
+    ? [
+        { id: 'dashboard', label: 'Oversigt', icon: LayoutDashboard },
+        { id: 'samversplan', label: 'Samvær', icon: Repeat },
+        { id: 'kalender', label: 'Kalender', icon: CalendarDays },
+      ]
+    : isTogetherFamily
     ? [
         { id: 'dashboard', label: 'Oversigt', icon: LayoutDashboard },
         { id: 'kalender', label: 'Kalender', icon: CalendarDays },
@@ -190,7 +197,13 @@ export function BottomNav() {
         { id: 'opgaver', label: 'Opgaver', icon: CheckSquare },
       ];
 
-  const moreNavItems: NavItem[] = isTogetherFamily
+  const moreNavItems: NavItem[] = isFamilyMember
+    ? [
+        { id: 'children', label: 'Børn', icon: Baby },
+        { id: 'borneoverblik', label: 'Overblik', icon: UserCircle },
+        { id: 'fotoalbum', label: 'Fotoalbum', icon: Camera },
+      ]
+    : isTogetherFamily
     ? [
         { id: 'kommunikation', label: 'Chat', icon: MessageCircle },
         { id: 'expenses', label: 'Udgifter', icon: Receipt },

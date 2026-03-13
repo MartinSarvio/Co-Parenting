@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAppStore } from '@/store';
 import { useApiActions } from '@/hooks/useApiActions';
+import { useIsFamilyMember } from '@/hooks/useIsFamilyMember';
 // ID generation handled by backend via useApiActions
 import { cn, formatDate } from '@/lib/utils';
 import { getMaxChildren } from '@/lib/subscription';
@@ -46,6 +47,7 @@ export function ChildManagement() {
     setCurrentChildId,
   } = useAppStore();
   const { createChild, updateChild, deleteChild } = useApiActions();
+  const { isFamilyMember } = useIsFamilyMember();
 
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -326,8 +328,8 @@ export function ChildManagement() {
                           </div>
                         )}
 
-                        {/* Alerts */}
-                        {((child.allergies?.length ?? 0) > 0 || (child.medications?.length ?? 0) > 0) && (
+                        {/* Alerts — hidden for family members (GDPR) */}
+                        {!isFamilyMember && ((child.allergies?.length ?? 0) > 0 || (child.medications?.length ?? 0) > 0) && (
                           <div className="flex gap-2 mt-2">
                             {child.allergies && child.allergies.length > 0 && (
                               <div className="flex items-center gap-1 text-amber-600 text-xs">
@@ -413,20 +415,24 @@ export function ChildManagement() {
                   onChange={(e) => setNewChild({...newChild, birthDate: e.target.value})}
                 />
               </div>
-              <div className="space-y-2">
-                <Label>Allergier (kommasepareret)</Label>
-                <Input
-                  value={newChild.allergies}
-                  onChange={(e) => setNewChild({...newChild, allergies: e.target.value})}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Medicin (kommasepareret)</Label>
-                <Input
-                  value={newChild.medications}
-                  onChange={(e) => setNewChild({...newChild, medications: e.target.value})}
-                />
-              </div>
+              {!isFamilyMember && (
+                <>
+                  <div className="space-y-2">
+                    <Label>Allergier (kommasepareret)</Label>
+                    <Input
+                      value={newChild.allergies}
+                      onChange={(e) => setNewChild({...newChild, allergies: e.target.value})}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Medicin (kommasepareret)</Label>
+                    <Input
+                      value={newChild.medications}
+                      onChange={(e) => setNewChild({...newChild, medications: e.target.value})}
+                    />
+                  </div>
+                </>
+              )}
               <div className="space-y-2">
                 <Label>Institutionsnavn</Label>
                 <Input
@@ -547,22 +553,26 @@ export function ChildManagement() {
                   options={[{ value: '__none__', label: 'Ingen' }, ...parents.map(p => ({ value: p.id, label: p.name }))]}
                 />
               </div>
-              <div className="space-y-2">
-                <Label>Allergier (kommasepareret)</Label>
-                <Input
-                  value={newChild.allergies}
-                  onChange={(e) => setNewChild({...newChild, allergies: e.target.value})}
-                  placeholder="F.eks. nødder, mælk"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Medicin (kommasepareret)</Label>
-                <Input
-                  value={newChild.medications}
-                  onChange={(e) => setNewChild({...newChild, medications: e.target.value})}
-                  placeholder="F.eks. astmaspray"
-                />
-              </div>
+              {!isFamilyMember && (
+                <>
+                  <div className="space-y-2">
+                    <Label>Allergier (kommasepareret)</Label>
+                    <Input
+                      value={newChild.allergies}
+                      onChange={(e) => setNewChild({...newChild, allergies: e.target.value})}
+                      placeholder="F.eks. nødder, mælk"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Medicin (kommasepareret)</Label>
+                    <Input
+                      value={newChild.medications}
+                      onChange={(e) => setNewChild({...newChild, medications: e.target.value})}
+                      placeholder="F.eks. astmaspray"
+                    />
+                  </div>
+                </>
+              )}
               <div className="space-y-2">
                 <Label>Institutionsnavn</Label>
                 <Input
