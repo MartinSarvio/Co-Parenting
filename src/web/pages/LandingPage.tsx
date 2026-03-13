@@ -101,31 +101,13 @@ function HeroSection() {
               <div className="absolute inset-0 scale-110 rounded-[3.5rem] bg-gradient-to-b from-[#f58a2d]/15 to-transparent blur-xl" />
 
               <div className="relative w-[290px] h-[590px] bg-gradient-to-b from-[#fafafa] to-white rounded-[3rem] shadow-2xl shadow-black/15 border border-[#e0ded8] p-3">
-                <div className="w-full h-full rounded-[2.2rem] bg-gradient-to-b from-[#f7f6f2] to-[#eceae2] flex flex-col items-center justify-center gap-5 overflow-hidden relative">
-                  <div className="absolute top-3 left-6 right-6 flex justify-between text-[9px] font-medium text-[#9a978f]">
-                    <span>9:41</span>
-                    <span className="flex gap-1 items-center">
-                      <span className="w-4 h-2 rounded-sm border border-[#9a978f]">
-                        <span className="block w-2.5 h-full rounded-sm bg-[#9a978f]" />
-                      </span>
-                    </span>
-                  </div>
-
-                  <img src="/huska-logo.svg" alt="Huska" className="w-20 h-20 rounded-[1.25rem] shadow-lg shadow-black/10" loading="lazy" />
-                  <div className="text-center">
-                    <p className="text-xl font-bold text-[#2f2f2f] tracking-tight">Huska</p>
-                    <p className="text-[11px] text-[#9a978f] mt-1 px-10 leading-relaxed">
-                      Husk alt det vigtige i familien
-                    </p>
-                  </div>
-
-                  <div className="flex gap-3 mt-2">
-                    {[Calendar, MessageCircle, CheckSquare, Wallet].map((Icon, i) => (
-                      <div key={i} className="w-10 h-10 rounded-xl bg-white/80 shadow-sm flex items-center justify-center">
-                        <Icon size={18} className="text-[#f58a2d]" />
-                      </div>
-                    ))}
-                  </div>
+                <div className="w-full h-full rounded-[2.2rem] overflow-hidden relative">
+                  <img
+                    src="/app-screenshot.png"
+                    alt="Huska app — samværsplan indstillinger"
+                    className="w-full h-full object-cover object-top"
+                    loading="lazy"
+                  />
                 </div>
 
                 <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-[100px] h-[28px] bg-[#1a1a1a] rounded-full" />
