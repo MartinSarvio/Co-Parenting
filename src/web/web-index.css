@@ -5,6 +5,7 @@
 @layer base {
   :root {
     --radius: 1.1rem;
+    --font-display: 'DM Serif Display', Georgia, serif;
   }
 
   html, body {
@@ -15,10 +16,23 @@
   }
 
   body {
-    background-color: #f2f1ed;
+    background-color: #fafafa;
     font-family: "SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", sans-serif;
     letter-spacing: -0.01em;
-    color: #2f2f2f;
+    color: #1a1a1a;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .glass {
+    background: rgba(255, 255, 255, 0.65);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.35);
   }
 }
 
@@ -34,4 +48,21 @@ html {
 }
 .animate-fadeIn {
   animation: fadeIn 0.5s ease-out both;
+}
+
+/* Floating animation for glassmorphism cards */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float 4s ease-in-out 1s infinite;
+}
+
+.animate-float-slow {
+  animation: float 5s ease-in-out 0.5s infinite;
 }

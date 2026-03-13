@@ -10,7 +10,7 @@ const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
 function LoadingFallback() {
   return (
     <div className="flex items-center justify-center py-20">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#f58a2d] border-t-transparent" />
+      <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#1a1a1a] border-t-transparent" />
     </div>
   );
 }
@@ -29,7 +29,7 @@ export function WebApp() {
   const hideChrome = isAdmin;
 
   return (
-    <div className="min-h-screen bg-[#f2f1ed] flex flex-col">
+    <div className="min-h-screen bg-[#fafafa] flex flex-col">
       {!hideChrome && <Navbar />}
       <main className="flex-1">
         <Suspense fallback={<LoadingFallback />}>
