@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useState, useCallback } from 'react';
+import { Suspense, lazy, useEffect, useState, useCallback, useMemo } from 'react';
 import { useAppStore } from '@/store';
 import { BottomNav } from '@/components/custom/BottomNav';
 import { TopBar } from '@/components/custom/TopBar';
@@ -12,6 +12,7 @@ import { startRealtimeSync, stopRealtimeSync } from '@/lib/realtime';
 import { Capacitor } from '@capacitor/core';
 import { App as CapApp } from '@capacitor/app';
 import { cn } from '@/lib/utils';
+import { ChildVerificationDialog } from '@/components/custom/ChildVerificationDialog';
 import './App.css';
 
 const OnboardingFlow = lazy(() =>
@@ -136,9 +137,12 @@ function SectionLoading() {
 }
 
 function App() {
-  const { isAuthenticated, isProfessionalView, activeTab, household, currentUser, setCurrentUser, setAuthenticated, hydrateFromServer, logout } = useAppStore();
+  const { isAuthenticated, isProfessionalView, activeTab, household, currentUser, children, setCurrentUser, setAuthenticated, hydrateFromServer, logout } = useAppStore();
   const [isReady, setIsReady] = useState(false);
   const [authScreen, setAuthScreen] = useState<'login' | 'register'>('login');
+  const [childVerified, setChildVerified] = useState(false);
+  const [verificationChecked, setVerificationChecked] = useState(false);
+  const [needsVerification, setNeedsVerification] = useState(false);
   const canUseProfessionalView = currentUser?.isAdmin === true;
   const showProfessionalView = isProfessionalView && canUseProfessionalView;
 
@@ -189,6 +193,42 @@ function App() {
   useEffect(() => {
     restoreSession();
   }, [restoreSession]);
+
+  // Check if current user (parent 2) needs to verify children
+  useEffect(() => {
+    if (!isAuthenticated || !household || !currentUser) {
+      setVerificationChecked(true);
+      return;
+    }
+
+    const checkVerification = async () => {
+      try {
+        const { data } = await supabase
+          .from('household_members')
+          .select('child_verified, role')
+          .eq('household_id', household.id)
+          .eq('user_id', currentUser.id)
+          .single();
+
+        // Only require verification for parent 2 (invited members who haven't verified)
+        if (data && data.role !== 'creator' && data.child_verified === false && children.length > 0) {
+          setNeedsVerification(true);
+        }
+      } catch {
+        // If column doesn't exist yet (pre-migration), skip verification
+      } finally {
+        setVerificationChecked(true);
+      }
+    };
+
+    checkVerification();
+  }, [isAuthenticated, household, currentUser, children.length]);
+
+  // Children that need verification (memoized)
+  const childrenToVerify = useMemo(
+    () => children.map(c => ({ id: c.id, name: c.name })),
+    [children],
+  );
 
   // App lifecycle — refresh data on resume from background
   useEffect(() => {
@@ -300,6 +340,24 @@ function App() {
             }} />
           </Suspense>
         </ErrorBoundary>
+        <Toaster position="top-center" />
+      </>
+    );
+  }
+
+  // Child verification gate for parent 2
+  if (needsVerification && !childVerified && verificationChecked && childrenToVerify.length > 0) {
+    return (
+      <>
+        <ChildVerificationDialog
+          children={childrenToVerify}
+          householdId={household.id}
+          userId={currentUser!.id}
+          onVerified={() => {
+            setChildVerified(true);
+            setNeedsVerification(false);
+          }}
+        />
         <Toaster position="top-center" />
       </>
     );
