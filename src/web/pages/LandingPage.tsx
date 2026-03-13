@@ -12,9 +12,12 @@ import {
   Tag,
   Users,
   ArrowRight,
-  Smartphone,
-  Sparkles,
   Shield,
+  Clock,
+  Heart,
+  Smartphone,
+  ArrowDown,
+  Sparkles,
   Globe,
   Lock,
   Zap,
@@ -22,8 +25,6 @@ import {
   Baby,
   Home,
   Briefcase,
-  Mail,
-  MapPin,
 } from 'lucide-react';
 
 /* ═══════════════════════════════════════════════════════════════════════════ */
@@ -32,126 +33,94 @@ import {
 
 function HeroSection() {
   return (
-    <section className="pt-10 pb-6 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="rounded-[2rem] bg-[#f5f5f5] p-8 md:p-12 lg:p-16">
-          <div className="grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Left — Text */}
-            <div className="animate-fadeIn">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white text-[13px] font-medium text-[#4a4a4a] shadow-xs mb-8">
-                <Sparkles size={14} className="text-[#f58a2d]" />
-                Alt-i-én familiapp
-              </div>
+    <section className="relative overflow-hidden min-h-[90vh] flex items-center">
+      {/* Background decorations */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-[-200px] right-[-150px] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-[#f58a2d]/15 to-[#f7a95c]/5 blur-xl" />
+        <div className="absolute bottom-[-150px] left-[-100px] w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-[#f58a2d]/8 to-transparent blur-xl" />
+      </div>
 
-              <h1 className="font-display text-[2.75rem] sm:text-[3.25rem] lg:text-[4rem] text-[#1a1a1a] leading-[1.05] tracking-tight">
-                Koordinér
-                <br />
-                hverdagen med
-                <br />
-                <span className="text-[#f58a2d]">din familie</span>
-              </h1>
-
-              <p className="mt-6 text-[1.05rem] text-[#6b7280] max-w-[440px] leading-[1.7]">
-                Én app for hele familien. Samværsplan, kalender, kommunikation,
-                udgifter og meget mere — samlet ét sted.
-              </p>
-
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <a
-                  href="https://apps.apple.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group inline-flex items-center gap-2.5 px-7 py-3.5 text-[15px] font-semibold text-white bg-[#1a1a1a] rounded-full hover:bg-[#333] transition-colors duration-200"
-                >
-                  <Smartphone size={18} />
-                  Hent til iPhone
-                  <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
-                </a>
-                <a
-                  href="#funktioner"
-                  className="inline-flex items-center gap-2 px-6 py-3.5 text-[15px] font-semibold text-[#1a1a1a] rounded-full border border-[#d1d5db] hover:border-[#9ca3af] transition-colors duration-200"
-                >
-                  Se funktioner
-                </a>
-              </div>
-
-              <div className="mt-8 flex items-center gap-5 text-[13px] text-[#9ca3af]">
-                <span className="flex items-center gap-1.5"><Shield size={14} /> Sikker</span>
-                <span className="flex items-center gap-1.5"><Globe size={14} /> Dansk</span>
-                <span className="flex items-center gap-1.5"><Zap size={14} /> Gratis</span>
-              </div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-20 md:pt-16 md:pb-28 relative z-10">
+        <div className="grid md:grid-cols-2 gap-16 items-center">
+          {/* Text */}
+          <div className="animate-fadeIn">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 border border-[#f58a2d]/20 text-[#e8773f] text-xs font-semibold mb-8 shadow-sm">
+              <Heart size={14} className="fill-[#f58a2d]/30" /> Lavet til familier i Danmark
             </div>
 
-            {/* Right — Phone mockup */}
-            <div className="flex justify-center animate-fadeIn" style={{ animationDelay: '0.15s' }}>
-              <div className="relative">
-                {/* Phone frame */}
-                <div className="relative w-[280px] sm:w-[300px] h-[570px] sm:h-[612px] bg-[#1a1a1a] rounded-[3rem] p-[10px] shadow-2xl shadow-black/20">
-                  {/* Notch */}
-                  <div className="absolute top-[10px] left-1/2 -translate-x-1/2 w-[110px] h-[30px] bg-[#1a1a1a] rounded-b-2xl z-20" />
-                  {/* Screen */}
-                  <div className="w-full h-full rounded-[2.3rem] overflow-hidden bg-white">
-                    <img
-                      src="/app-screenshot.png"
-                      alt="Huska app — Samværsplan"
-                      className="w-full h-full object-cover object-top"
-                      loading="lazy"
-                      onError={(e) => {
-                        // Fallback if screenshot doesn't exist yet
-                        const target = e.currentTarget;
-                        target.style.display = 'none';
-                        target.parentElement!.classList.add('bg-gradient-to-br', 'from-[#f58a2d]', 'to-[#e8773f]', 'flex', 'items-center', 'justify-center');
-                        target.parentElement!.innerHTML = '<div class="text-center"><img src="/huska-logo.svg" alt="Huska" class="w-20 h-20 rounded-2xl shadow-lg mx-auto mb-4" /><p class="text-white text-xl font-bold">Huska</p><p class="text-white/70 text-sm mt-1">Husk alt det vigtige</p></div>';
-                      }}
-                    />
-                  </div>
+            <h1 className="text-[2.75rem] sm:text-[3.5rem] lg:text-[4rem] font-extrabold text-[#2f2f2f] leading-[1.05] tracking-tight">
+              Koordinér
+              <br />
+              hverdagen
+              <span
+                className="block bg-clip-text text-transparent"
+                style={{ backgroundImage: 'linear-gradient(135deg, #f7a95c 0%, #f58a2d 40%, #e8773f 100%)' }}
+              >
+                med din familie
+              </span>
+            </h1>
+
+            <p className="mt-6 text-[1.1rem] text-[#5f5d56] max-w-[440px] leading-[1.7]">
+              Én sandhedskilde for hele familien. Samværsplan, kalender,
+              kommunikation, udgifter og meget mere — samlet i én app.
+            </p>
+
+            <div className="mt-10 flex flex-wrap gap-3">
+              <a
+                href="https://apps.apple.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-2.5 px-7 py-3.5 text-[15px] font-semibold text-white rounded-full shadow-lg shadow-[#f58a2d]/25 hover:shadow-xl hover:shadow-[#f58a2d]/35 transition-shadow duration-200"
+                style={{ background: 'linear-gradient(135deg, #f7a95c 0%, #f58a2d 50%, #e8773f 100%)' }}
+              >
+                <Smartphone size={18} />
+                Hent til iPhone
+                <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+              </a>
+              <a
+                href="#funktioner"
+                className="inline-flex items-center gap-2 px-7 py-3.5 text-[15px] font-semibold text-[#2f2f2f] rounded-full border border-[#d8d7cf] bg-white/80 hover:bg-white hover:border-[#c5c3bc] transition-colors duration-200"
+              >
+                Se funktioner
+                <ArrowDown size={16} />
+              </a>
+            </div>
+
+            <div className="mt-8 flex items-center gap-6 text-[13px] text-[#9a978f]">
+              <span className="flex items-center gap-1.5"><Shield size={15} className="text-[#78766d]" /> Sikker</span>
+              <span className="flex items-center gap-1.5"><Clock size={15} className="text-[#78766d]" /> Tidsbesparende</span>
+              <span className="flex items-center gap-1.5 text-[#f58a2d] font-bold">
+                <Sparkles size={15} /> Gratis
+              </span>
+            </div>
+          </div>
+
+          {/* Phone mockup */}
+          <div className="flex justify-center animate-fadeIn" style={{ animationDelay: '0.2s' }}>
+            <div className="relative">
+              <div className="absolute inset-0 scale-110 rounded-[3.5rem] bg-gradient-to-b from-[#f58a2d]/15 to-transparent blur-xl" />
+
+              <div className="relative w-[290px] h-[590px] bg-gradient-to-b from-[#fafafa] to-white rounded-[3rem] shadow-2xl shadow-black/15 border border-[#e0ded8] p-3">
+                <div className="w-full h-full rounded-[2.2rem] overflow-hidden relative">
+                  <img
+                    src="/app-screenshot.png"
+                    alt="Huska app — samværsplan indstillinger"
+                    className="w-full h-full object-cover object-top"
+                    loading="lazy"
+                  />
                 </div>
 
-                {/* Floating badge */}
-                <div className="hidden md:flex absolute -bottom-4 -left-8 glass rounded-2xl px-4 py-3 shadow-glass items-center gap-3 animate-float">
-                  <div className="w-10 h-10 rounded-xl bg-[#1a1a1a] flex items-center justify-center">
-                    <Calendar size={18} className="text-white" />
-                  </div>
-                  <div>
-                    <p className="text-[13px] font-semibold text-[#1a1a1a]">12+ funktioner</p>
-                    <p className="text-[11px] text-[#9ca3af]">Samlet i én app</p>
-                  </div>
-                </div>
+                <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-[100px] h-[28px] bg-[#1a1a1a] rounded-full" />
               </div>
             </div>
           </div>
         </div>
       </div>
-    </section>
-  );
-}
 
-/* ═══════════════════════════════════════════════════════════════════════════ */
-/*  TRUST BAR                                                                */
-/* ═══════════════════════════════════════════════════════════════════════════ */
-
-const trustItems = [
-  { icon: HandHeart, label: 'Co-parenting' },
-  { icon: Baby, label: 'Sammensatte familier' },
-  { icon: Home, label: 'Under samme tag' },
-  { icon: Briefcase, label: 'Professionelle' },
-];
-
-function TrustBar() {
-  return (
-    <section className="py-12">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <p className="text-center text-[12px] text-[#b0b0b0] font-medium uppercase tracking-[0.15em] mb-8">
-          Designet til alle familietyper
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-8 md:gap-14">
-          {trustItems.map((item) => (
-            <div key={item.label} className="flex items-center gap-2.5 text-[#b0b0b0] hover:text-[#6b7280] transition-colors">
-              <item.icon size={20} strokeWidth={1.5} />
-              <span className="text-[14px] font-medium">{item.label}</span>
-            </div>
-          ))}
-        </div>
+      <div className="absolute bottom-0 left-0 right-0">
+        <svg viewBox="0 0 1440 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
+          <path d="M0 40C240 70 480 80 720 60C960 40 1200 10 1440 30V80H0V40Z" fill="white" fillOpacity="0.5" />
+        </svg>
       </div>
     </section>
   );
@@ -161,115 +130,71 @@ function TrustBar() {
 /*  FEATURES                                                                 */
 /* ═══════════════════════════════════════════════════════════════════════════ */
 
-const heroFeatures = [
-  {
-    icon: Calendar,
-    title: 'Samværsplan',
-    desc: 'Planlæg samvær med fast 7/7, 10/4 eller fleksibel model. Altid overblik over hvem der har børnene — med ugevisning, skiftedetaljer og ferieplanlægning.',
-    visual: [
-      { label: '7/7', sub: 'En uge hos hver' },
-      { label: '10/4', sub: '10 dage / 4 dage' },
-      { label: 'Tilpasset', sub: 'Din egen plan' },
-    ],
-    accent: 'from-[#fff7ed] to-[#fff1e0]',
-    iconBg: 'bg-[#f58a2d]',
-  },
-  {
-    icon: MessageCircle,
-    title: 'Kalender & Kommunikation',
-    desc: 'Fælles familiekalender med begivenheder og aktiviteter. Struktureret kommunikation mellem forældre med tråde, beskeder og delt historik.',
-    visual: [
-      { label: 'Kalender', sub: 'Fælles overblik' },
-      { label: 'Beskeder', sub: 'Tråde & historik' },
-      { label: 'Deling', sub: 'Real-time sync' },
-    ],
-    accent: 'from-[#eff6ff] to-[#e0edff]',
-    iconBg: 'bg-[#3b82f6]',
-  },
-  {
-    icon: Wallet,
-    title: 'Udgifter & Opgaver',
-    desc: 'Del udgifter retfærdigt og hold styr på budgetter. Fordel og følg op på familiens opgaver — se hvem der gør hvad og hvornår.',
-    visual: [
-      { label: 'Budget', sub: 'Balancer & deling' },
-      { label: 'Opgaver', sub: 'Fordel ansvar' },
-      { label: 'Historik', sub: 'Fuld oversigt' },
-    ],
-    accent: 'from-[#f0fdf4] to-[#dcfce7]',
-    iconBg: 'bg-[#22c55e]',
-  },
-];
-
-const moreFeatures = [
-  { icon: UtensilsCrossed, title: 'Mad & Indkøb', desc: 'Madplan, indkøbslister og ugens bedste tilbud.' },
-  { icon: FileText, title: 'Dokumenter', desc: 'Opbevar vigtige dokumenter sikkert og tilgængeligt.' },
-  { icon: Camera, title: 'Fotoalbum', desc: 'Del minder og organisér billeder i albums.' },
-  { icon: BookOpen, title: 'Dagbog', desc: 'Noter og dagbogsindlæg med historik over tid.' },
-  { icon: CalendarHeart, title: 'Vigtige Datoer', desc: 'Fødselsdage, lægebesøg og milepæle.' },
-  { icon: Scale, title: 'Beslutningslog', desc: 'Dokumentér fælles beslutninger og aftaler.' },
-  { icon: Tag, title: 'Tilbud', desc: 'Ugens bedste tilbud fra danske supermarkeder.' },
-  { icon: CheckSquare, title: 'Rutiner', desc: 'Spor daglige rutiner for morgen, dag og aften.' },
-  { icon: Users, title: 'Overleveringer', desc: 'Strukturerede overleveringer mellem forældre.' },
+const features = [
+  { icon: Calendar, title: 'Samværsplan', desc: 'Planlæg samvær med fast 7/7, 10/4 eller fleksibel model. Altid overblik over hvem der har børnene.', highlight: true },
+  { icon: CalendarHeart, title: 'Kalender', desc: 'Fælles familiekalender med begivenheder, aktiviteter og vigtige datoer for alle.' },
+  { icon: MessageCircle, title: 'Kommunikation', desc: 'Struktureret kommunikation mellem forældre. Tråde, beskeder og delt historik.' },
+  { icon: CheckSquare, title: 'Opgaver', desc: 'Fordel og følg op på familiens opgaver. Se hvem der gør hvad og hvornår.' },
+  { icon: UtensilsCrossed, title: 'Mad & Indkøb', desc: 'Madplan og indkøbslister. Se ugens bedste tilbud fra lokale butikker.' },
+  { icon: Wallet, title: 'Udgifter', desc: 'Del udgifter retfærdigt. Hold styr på budgetter, balancer og kvitteringer.' },
+  { icon: FileText, title: 'Dokumenter', desc: 'Opbevar vigtige dokumenter sikkert. Altid tilgængelige for begge forældre.' },
+  { icon: Camera, title: 'Fotoalbum', desc: 'Del minder med familien. Organisér billeder i albums og del med den anden forælder.' },
+  { icon: BookOpen, title: 'Dagbog', desc: 'Hold styr på hverdagen med noter og dagbogsindlæg. Se historik over tid.' },
+  { icon: CalendarHeart, title: 'Vigtige Datoer', desc: 'Glem aldrig en vigtig dag. Fødselsdage, lægebesøg og andre milepæle.' },
+  { icon: Scale, title: 'Beslutningslog', desc: 'Dokumentér fælles beslutninger. Altid enighed om hvad der er aftalt.' },
+  { icon: Tag, title: 'Tilbud', desc: 'Se ugens bedste tilbud fra danske supermarkeder. Spar penge på dagligvarer.' },
 ];
 
 function FeatureSection() {
+  const highlight = features[0];
+  const rest = features.slice(1);
+
   return (
-    <section id="funktioner" className="py-20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="funktioner" className="py-24 relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-white/50 via-[#f9f8f5] to-[#f2f1ed] pointer-events-none" />
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16">
-          <p className="text-[12px] text-[#f58a2d] font-semibold uppercase tracking-[0.15em] mb-3">Funktioner</p>
-          <h2 className="font-display text-3xl sm:text-4xl lg:text-[2.75rem] text-[#1a1a1a] tracking-tight">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f58a2d]/8 text-[#e8773f] text-xs font-semibold mb-4">
+            <Zap size={13} /> Alt-i-én platform
+          </div>
+          <h2 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold text-[#2f2f2f] tracking-tight">
             Alt hvad din familie har brug for
           </h2>
-          <p className="mt-4 text-[#6b7280] max-w-lg mx-auto text-[1.05rem] leading-relaxed">
+          <p className="mt-4 text-[#78766d] max-w-lg mx-auto text-[1.05rem] leading-relaxed">
             Fra samværsplan til dagligvarer — Huska samler alle familiens funktioner på ét sted.
           </p>
         </div>
 
-        {/* Hero features — alternating large cards */}
-        <div className="space-y-6 mb-12">
-          {heroFeatures.map((f, idx) => (
-            <div
-              key={f.title}
-              className={`rounded-[1.5rem] bg-gradient-to-br ${f.accent} p-8 md:p-10`}
-            >
-              <div className={`grid md:grid-cols-2 gap-8 items-center ${idx % 2 === 1 ? 'md:direction-rtl' : ''}`}>
-                {/* Text side */}
-                <div className={idx % 2 === 1 ? 'md:order-2' : ''}>
-                  <div className={`w-12 h-12 rounded-2xl ${f.iconBg} flex items-center justify-center mb-5`}>
-                    <f.icon size={22} className="text-white" />
-                  </div>
-                  <h3 className="font-display text-2xl text-[#1a1a1a] mb-3">{f.title}</h3>
-                  <p className="text-[15px] text-[#6b7280] leading-relaxed max-w-md">{f.desc}</p>
-                </div>
-                {/* Visual side */}
-                <div className={`flex gap-3 ${idx % 2 === 1 ? 'md:order-1' : ''}`}>
-                  {f.visual.map((v) => (
-                    <div key={v.label} className="flex-1 bg-white rounded-xl p-4 shadow-sm border border-white/80">
-                      <p className="text-[15px] font-bold text-[#1a1a1a]">{v.label}</p>
-                      <p className="text-[12px] text-[#9ca3af] mt-1">{v.sub}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* More features — compact grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {moreFeatures.map((f) => (
-            <div
-              key={f.title}
-              className="group flex items-start gap-4 p-5 rounded-xl bg-white border border-[#ebebeb] hover:shadow-md hover:border-[#d1d5db] transition-all duration-200"
-            >
-              <div className="w-10 h-10 rounded-xl bg-[#f5f5f5] flex items-center justify-center shrink-0 group-hover:bg-[#ebebeb] transition-colors">
-                <f.icon size={18} className="text-[#f58a2d]" />
+        <div className="mb-8">
+          <div className="group relative p-8 rounded-3xl border border-[#f58a2d]/20 bg-gradient-to-br from-white to-[#fff8f0] hover:shadow-lg hover:shadow-[#f58a2d]/8 transition-shadow duration-200 overflow-hidden">
+            <div className="absolute top-0 right-0 w-[300px] h-[300px] rounded-full bg-[#f58a2d]/5 blur-xl pointer-events-none" />
+            <div className="relative flex flex-col md:flex-row gap-6 items-start md:items-center">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#f7a95c] to-[#e8773f] flex items-center justify-center shadow-lg shadow-[#f58a2d]/20 shrink-0">
+                <highlight.icon size={26} className="text-white" />
               </div>
               <div>
-                <h4 className="text-[14px] font-bold text-[#1a1a1a]">{f.title}</h4>
-                <p className="text-[13px] text-[#9ca3af] mt-0.5 leading-relaxed">{f.desc}</p>
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-xl font-bold text-[#2f2f2f]">{highlight.title}</h3>
+                  <span className="px-2 py-0.5 rounded-full bg-[#f58a2d]/10 text-[#e8773f] text-[10px] font-bold uppercase tracking-wide">Populær</span>
+                </div>
+                <p className="text-[#5f5d56] leading-relaxed max-w-xl">{highlight.desc}</p>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {rest.map((f) => (
+            <div
+              key={f.title}
+              className="group p-6 rounded-2xl bg-white/80 border border-[#e8e6df] hover:border-[#f58a2d]/25 hover:shadow-md hover:shadow-[#f58a2d]/5 transition-shadow duration-200"
+            >
+              <div className="w-11 h-11 rounded-xl bg-[#f58a2d]/8 flex items-center justify-center mb-4 group-hover:bg-[#f58a2d]/12 transition-colors duration-200">
+                <f.icon size={21} className="text-[#f58a2d]" />
+              </div>
+              <h3 className="text-[15px] font-bold text-[#2f2f2f]">{f.title}</h3>
+              <p className="mt-1.5 text-[13px] text-[#78766d] leading-relaxed">{f.desc}</p>
             </div>
           ))}
         </div>
@@ -278,40 +203,30 @@ function FeatureSection() {
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════ */
-/*  STATS                                                                    */
-/* ═══════════════════════════════════════════════════════════════════════════ */
-
 const stats = [
-  { value: '12+', label: 'Funktioner', icon: Zap },
-  { value: '100%', label: 'Gratis', icon: Sparkles },
-  { value: 'Dansk', label: 'Bygget i DK', icon: Globe },
-  { value: 'Sikker', label: 'Krypteret data', icon: Lock },
+  { icon: Zap, value: '12+', label: 'Funktioner' },
+  { icon: Heart, value: '100%', label: 'Gratis' },
+  { icon: Globe, value: 'Dansk', label: 'Bygget i DK' },
+  { icon: Lock, value: 'Sikker', label: 'Krypteret data' },
 ];
 
 function StatsSection() {
   return (
-    <section className="py-6 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="rounded-[1.5rem] bg-[#1a1a1a] px-8 py-12 md:py-14">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((s) => (
-              <div key={s.label} className="text-center">
-                <s.icon size={22} className="mx-auto text-[#f58a2d] mb-3" />
-                <p className="text-2xl md:text-3xl font-bold text-white tracking-tight">{s.value}</p>
-                <p className="text-[13px] text-white/50 font-medium mt-1">{s.label}</p>
-              </div>
-            ))}
-          </div>
+    <section className="py-16">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          {stats.map((s) => (
+            <div key={s.label} className="text-center p-5 rounded-2xl bg-white/60 border border-[#e8e6df]">
+              <s.icon size={22} className="mx-auto text-[#f58a2d] mb-3" />
+              <p className="text-2xl font-extrabold text-[#2f2f2f] tracking-tight">{s.value}</p>
+              <p className="text-[12px] text-[#9a978f] font-medium mt-0.5">{s.label}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
   );
 }
-
-/* ═══════════════════════════════════════════════════════════════════════════ */
-/*  HOW IT WORKS                                                             */
-/* ═══════════════════════════════════════════════════════════════════════════ */
 
 const steps = [
   { num: '1', title: 'Opret din familie', desc: 'Download appen og opret en familieprofil. Vælg jeres familiemodel — co-parenting, sammensat eller under samme tag.', icon: Users },
@@ -321,26 +236,37 @@ const steps = [
 
 function HowItWorksSection() {
   return (
-    <section id="hvordan" className="py-20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-14">
-          <p className="text-[12px] text-[#f58a2d] font-semibold uppercase tracking-[0.15em] mb-3">Kom i gang</p>
-          <h2 className="font-display text-3xl sm:text-4xl text-[#1a1a1a] tracking-tight">
-            3 nemme trin
+    <section id="hvordan" className="py-24 relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-[#f2f1ed] via-[#f7f6f2] to-white/50 pointer-events-none" />
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#2f2f2f] tracking-tight">
+            Kom i gang på 3 trin
           </h2>
-          <p className="mt-3 text-[#6b7280] text-[1.05rem]">
+          <p className="mt-3 text-[#78766d] text-[1.05rem]">
             Det tager under 5 minutter at sætte op.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+          <div className="hidden md:block absolute top-[52px] left-[20%] right-[20%] h-[2px] bg-gradient-to-r from-[#f58a2d]/20 via-[#f58a2d]/30 to-[#f58a2d]/20" />
+
           {steps.map((s) => (
-            <div key={s.num} className="bg-white rounded-2xl border border-[#ebebeb] p-8 text-center hover:shadow-lg transition-shadow duration-300">
-              <div className="w-14 h-14 rounded-full bg-[#1a1a1a] flex items-center justify-center mx-auto mb-5">
-                <span className="text-white text-lg font-bold">{s.num}</span>
+            <div key={s.num} className="text-center relative">
+              <div className="relative inline-block mb-5">
+                <div
+                  className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-white shadow-lg shadow-[#f58a2d]/20 relative z-10"
+                  style={{ background: 'linear-gradient(135deg, #f7a95c 0%, #f58a2d 50%, #e8773f 100%)' }}
+                >
+                  <s.icon size={26} />
+                </div>
+                <div className="absolute -top-1.5 -right-1.5 w-7 h-7 rounded-full bg-white border-2 border-[#f58a2d] flex items-center justify-center text-[11px] font-extrabold text-[#f58a2d] z-20">
+                  {s.num}
+                </div>
               </div>
-              <h3 className="text-[17px] font-bold text-[#1a1a1a]">{s.title}</h3>
-              <p className="mt-2 text-[14px] text-[#9ca3af] leading-relaxed">{s.desc}</p>
+              <h3 className="text-lg font-bold text-[#2f2f2f]">{s.title}</h3>
+              <p className="mt-2 text-[14px] text-[#78766d] max-w-[280px] mx-auto leading-relaxed">{s.desc}</p>
             </div>
           ))}
         </div>
@@ -348,10 +274,6 @@ function HowItWorksSection() {
     </section>
   );
 }
-
-/* ═══════════════════════════════════════════════════════════════════════════ */
-/*  ABOUT                                                                    */
-/* ═══════════════════════════════════════════════════════════════════════════ */
 
 const familyTypes = [
   { icon: HandHeart, label: 'Co-parenting', desc: 'Fast eller fleksibel samværsplan' },
@@ -362,125 +284,72 @@ const familyTypes = [
 
 function AboutSection() {
   return (
-    <section id="om" className="py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="rounded-[1.5rem] bg-[#f5f5f5] p-8 md:p-12 lg:p-16">
-          <div className="grid md:grid-cols-2 gap-12 lg:gap-16">
-            {/* Text */}
-            <div>
-              <p className="text-[12px] text-[#f58a2d] font-semibold uppercase tracking-[0.15em] mb-3">Om Huska</p>
-              <h2 className="font-display text-3xl sm:text-[2.5rem] text-[#1a1a1a] leading-[1.1] tracking-tight">
-                Bygget til familier i Danmark
-              </h2>
-              <p className="mt-5 text-[#6b7280] leading-relaxed text-[15px]">
-                Huska er skabt med én mission: at gøre hverdagen lettere for danske familier.
-                Uanset om I er samboende, co-parenting eller en sammensat familie, fortjener I
-                et redskab der samler alt ét sted — uden forvirring og med fuld gennemsigtighed.
-              </p>
-              <p className="mt-4 text-[#6b7280] leading-relaxed text-[15px]">
-                Vi tror på, at mindre friktion i hverdagen giver mere tid til det der virkelig tæller:
-                at være sammen med dem, man holder af.
-              </p>
+    <section id="om" className="py-24 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#2f2f2f] to-[#1a1a1a]" />
+      <div className="absolute top-[-100px] right-[-50px] w-[400px] h-[400px] rounded-full bg-[#f58a2d]/8 blur-xl pointer-events-none" />
 
-              <div className="mt-8 p-5 rounded-xl bg-white border border-[#ebebeb]">
-                <h3 className="text-[14px] font-bold text-[#1a1a1a] mb-2">Vores vision</h3>
-                <p className="text-[13px] text-[#9ca3af] leading-relaxed">
-                  At blive Danmarks foretrukne platform for familiekoordinering — hvor alle familier,
-                  uanset struktur, kan finde overblik, ro og samarbejde i hverdagen.
-                </p>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid md:grid-cols-2 gap-16 items-center">
+          <div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-[1.1] tracking-tight">
+              Bygget til familier
+              <span
+                className="block bg-clip-text text-transparent"
+                style={{ backgroundImage: 'linear-gradient(135deg, #f7a95c 0%, #f58a2d 60%, #ffb366 100%)' }}
+              >
+                i Danmark
+              </span>
+            </h2>
+            <p className="mt-5 text-white/70 leading-relaxed text-[1.05rem]">
+              Huska er skabt med én mission: at gøre hverdagen lettere for danske familier.
+              Uanset om I er samboende, co-parenting eller en sammensat familie, fortjener I
+              et redskab der samler alt ét sted — uden forvirring og med fuld gennemsigtighed.
+            </p>
+            <p className="mt-4 text-white/70 leading-relaxed text-[1.05rem]">
+              Vi tror på, at mindre friktion i hverdagen giver mere tid til det der virkelig tæller:
+              at være sammen med dem, man holder af.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            {familyTypes.map((item) => (
+              <div
+                key={item.label}
+                className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors duration-200"
+              >
+                <item.icon size={22} className="text-[#f58a2d] mb-3" />
+                <p className="text-[14px] font-semibold text-white">{item.label}</p>
+                <p className="text-[12px] text-white/50 mt-1">{item.desc}</p>
               </div>
-            </div>
-
-            {/* Family type cards */}
-            <div className="grid grid-cols-2 gap-4">
-              {familyTypes.map((item) => (
-                <div
-                  key={item.label}
-                  className="p-5 rounded-xl bg-white border border-[#ebebeb] hover:shadow-sm transition-shadow"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-[#f5f5f5] flex items-center justify-center mb-3">
-                    <item.icon size={20} className="text-[#f58a2d]" />
-                  </div>
-                  <p className="text-[14px] font-semibold text-[#1a1a1a]">{item.label}</p>
-                  <p className="text-[12px] text-[#9ca3af] mt-1">{item.desc}</p>
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
       </div>
     </section>
   );
 }
-
-/* ═══════════════════════════════════════════════════════════════════════════ */
-/*  CONTACT                                                                  */
-/* ═══════════════════════════════════════════════════════════════════════════ */
-
-function ContactSection() {
-  return (
-    <section id="kontakt" className="py-20">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <p className="text-[12px] text-[#f58a2d] font-semibold uppercase tracking-[0.15em] mb-3">Kontakt</p>
-          <h2 className="font-display text-3xl sm:text-4xl text-[#1a1a1a] tracking-tight">
-            Har du spørgsmål?
-          </h2>
-          <p className="mt-3 text-[#6b7280] text-[1.05rem]">
-            Vi hører gerne fra dig. Skriv til os, og vi vender tilbage hurtigst muligt.
-          </p>
-        </div>
-
-        <div className="max-w-md mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-[#f5f5f5]">
-              <Mail size={20} className="text-[#f58a2d] shrink-0" />
-              <div>
-                <p className="text-[12px] text-[#9ca3af] font-medium">Email</p>
-                <p className="text-[14px] font-semibold text-[#1a1a1a]">kontakt@huska.dk</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 p-4 rounded-xl bg-[#f5f5f5]">
-              <MapPin size={20} className="text-[#f58a2d] shrink-0" />
-              <div>
-                <p className="text-[12px] text-[#9ca3af] font-medium">Lokation</p>
-                <p className="text-[14px] font-semibold text-[#1a1a1a]">Danmark</p>
-              </div>
-            </div>
-          </div>
-
-          <a
-            href="mailto:kontakt@huska.dk"
-            className="group flex items-center justify-center gap-2 w-full px-6 py-3.5 text-[15px] font-semibold text-white bg-[#1a1a1a] rounded-full hover:bg-[#333] transition-colors"
-          >
-            <Mail size={18} />
-            Send os en email
-            <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
-          </a>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════ */
-/*  CTA                                                                      */
-/* ═══════════════════════════════════════════════════════════════════════════ */
 
 function CTASection() {
   return (
-    <section className="py-10 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="rounded-[1.5rem] bg-[#1a1a1a] p-12 md:p-20 text-center relative overflow-hidden">
+    <section className="py-24">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="relative text-center rounded-[2rem] p-12 md:p-20 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#fef3e7] via-[#fff0de] to-[#fde8d0]" />
+          <div className="absolute top-[-80px] right-[-40px] w-[300px] h-[300px] rounded-full bg-[#f58a2d]/10 blur-xl pointer-events-none" />
+          <div className="absolute bottom-[-60px] left-[-30px] w-[250px] h-[250px] rounded-full bg-[#f58a2d]/8 blur-xl pointer-events-none" />
+
           <div className="relative z-10">
-            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl text-white tracking-tight">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 text-[#e8773f] text-xs font-bold mb-6 shadow-sm">
+              <Sparkles size={14} /> Gratis at bruge
+            </div>
+
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#2f2f2f] tracking-tight">
               Klar til at koordinere
               <br />
-              hverdagen?
+              <span style={{ color: '#f58a2d' }}>hverdagen?</span>
             </h2>
-            <p className="mt-5 text-white/50 max-w-md mx-auto text-[1.05rem] leading-relaxed">
-              Hent Huska gratis og kom i gang med at skabe mere struktur
-              og mindre friktion i din families hverdag.
+            <p className="mt-4 text-[#5f5d56] max-w-md mx-auto text-[1.05rem] leading-relaxed">
+              Hent Huska gratis og kom i gang med at skabe mere struktur og mindre friktion i din families hverdag.
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
@@ -488,7 +357,8 @@ function CTASection() {
                 href="https://apps.apple.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex items-center justify-center gap-2.5 px-8 py-4 text-[15px] font-bold text-[#1a1a1a] bg-white rounded-full hover:bg-[#f0f0f0] transition-colors duration-200"
+                className="group inline-flex items-center justify-center gap-2.5 px-8 py-4 text-[15px] font-bold text-white rounded-full shadow-lg shadow-[#f58a2d]/30 hover:shadow-xl hover:shadow-[#f58a2d]/40 transition-shadow duration-200"
+                style={{ background: 'linear-gradient(135deg, #f7a95c 0%, #f58a2d 50%, #e8773f 100%)' }}
               >
                 <Smartphone size={20} />
                 Hent appen nu
@@ -502,20 +372,14 @@ function CTASection() {
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════ */
-/*  PAGE                                                                     */
-/* ═══════════════════════════════════════════════════════════════════════════ */
-
 export default function LandingPage() {
   return (
     <>
       <HeroSection />
-      <TrustBar />
       <FeatureSection />
       <StatsSection />
       <HowItWorksSection />
       <AboutSection />
-      <ContactSection />
       <CTASection />
     </>
   );

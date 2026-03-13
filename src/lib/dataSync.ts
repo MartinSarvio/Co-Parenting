@@ -70,6 +70,10 @@ import type {
   RiskAssessment,
   ProfessionalDepartment,
   CaseActivity,
+  FamilyPhoto,
+  FridgeItem,
+  WishItem,
+  BudgetGoal,
 } from '@/types';
 
 export interface InitialData {
@@ -93,6 +97,10 @@ export interface InitialData {
   riskAssessments: RiskAssessment[];
   departments: ProfessionalDepartment[];
   caseActivities: CaseActivity[];
+  photos: FamilyPhoto[];
+  fridgeItems: FridgeItem[];
+  wishItems: WishItem[];
+  budgetGoals: BudgetGoal[];
 }
 
 /**
@@ -158,6 +166,10 @@ export async function loadInitialData(): Promise<InitialData> {
     riskAssessmentsResult,
     departmentsResult,
     caseActivitiesResult,
+    photosResult,
+    fridgeItemsResult,
+    wishItemsResult,
+    budgetGoalsResult,
   ] = await Promise.all([
     supabase.from('children').select('*').then(r => r.data as DbChild[] | null, () => null),
     supabase.from('calendar_events').select('*').order('start_date', { ascending: false }).limit(MAX_EVENTS).then(r => (r.data || []) as DbCalendarEvent[], () => [] as DbCalendarEvent[]),
@@ -177,6 +189,10 @@ export async function loadInitialData(): Promise<InitialData> {
     supabase.from('risk_assessments').select('*').then(r => (r.data || []) as DbRiskAssessment[], () => [] as DbRiskAssessment[]),
     supabase.from('professional_departments').select('*').then(r => (r.data || []) as DbProfessionalDepartment[], () => [] as DbProfessionalDepartment[]),
     supabase.from('case_activity_log').select('*').order('created_at', { ascending: false }).limit(200).then(r => (r.data || []) as DbCaseActivity[], () => [] as DbCaseActivity[]),
+    supabase.from('family_photos').select('*').order('added_at', { ascending: false }).then(r => r.data || [], () => []),
+    supabase.from('fridge_items').select('*').then(r => r.data || [], () => []),
+    supabase.from('wish_items').select('*').then(r => r.data || [], () => []),
+    supabase.from('budget_goals').select('*').then(r => r.data || [], () => []),
   ]);
 
   return {
@@ -200,5 +216,40 @@ export async function loadInitialData(): Promise<InitialData> {
     riskAssessments: riskAssessmentsResult.map(mapRiskAssessment),
     departments: departmentsResult.map(mapProfessionalDepartment),
     caseActivities: caseActivitiesResult.map(mapCaseActivity),
+    photos: (photosResult as Record<string, unknown>[]).map((r): FamilyPhoto => ({
+      id: r.id as string,
+      childId: r.child_id as string,
+      url: r.url as string,
+      caption: r.caption as string | undefined,
+      takenAt: r.taken_at as string,
+      addedBy: r.added_by as string,
+      addedAt: r.added_at as string,
+    })),
+    fridgeItems: (fridgeItemsResult as Record<string, unknown>[]).map((r): FridgeItem => ({
+      id: r.id as string,
+      name: r.name as string,
+      barcode: r.barcode as string | undefined,
+      addedAt: r.added_at as string,
+      addedBy: r.added_by as string,
+      expiresAt: r.expires_at as string | undefined,
+      nutritionPer100g: r.nutrition_per_100g as FridgeItem['nutritionPer100g'],
+    })),
+    wishItems: (wishItemsResult as Record<string, unknown>[]).map((r): WishItem => ({
+      id: r.id as string,
+      title: r.title as string,
+      priceEstimate: r.price_estimate as number | undefined,
+      link: r.link as string | undefined,
+      imageUrl: r.image_url as string | undefined,
+      description: r.description as string | undefined,
+      childId: r.child_id as string,
+      addedBy: r.added_by as string,
+      status: r.status as 'wanted' | 'bought',
+      boughtBy: r.bought_by as string | undefined,
+      createdAt: r.created_at as string,
+    })),
+    budgetGoals: (budgetGoalsResult as Record<string, unknown>[]).map((r): BudgetGoal => ({
+      category: r.category as string,
+      monthlyAmount: r.monthly_amount as number,
+    })),
   };
 }

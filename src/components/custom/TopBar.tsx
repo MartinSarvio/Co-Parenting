@@ -56,7 +56,7 @@ export function TopBar() {
   const wishPersonLabel = wishPersonFilter === 'all'
     ? 'Alle personer'
     : parentUsers.find(u => u.id === wishPersonFilter)?.name?.split(' ')[0] ?? 'Person';
-  const OVERBLIK_TABS = ['borneoverblik', 'milestones', 'meeting-minutes', 'dokumenter', 'dagbog', 'vigtige-datoer', 'beslutningslog', 'familie-og-boern'];
+  const OVERBLIK_TABS = ['borneoverblik', 'milestones', 'meeting-minutes', 'dokumenter', 'dagbog', 'rutiner', 'vigtige-datoer', 'beslutningslog', 'familie-og-boern'];
   const MAD_TABS = ['mad-hjem'];
   const KALENDER_TABS = ['kalender', 'aarskalender'];
   const OPGAVER_TABS = ['opgaver', 'historik'];

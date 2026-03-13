@@ -424,6 +424,10 @@ interface AppStore {
     riskAssessments?: RiskAssessment[];
     departments?: ProfessionalDepartment[];
     caseActivities?: CaseActivity[];
+    photos?: FamilyPhoto[];
+    fridgeItems?: FridgeItem[];
+    wishItems?: WishItem[];
+    budgetGoals?: BudgetGoal[];
   }) => void;
 
   // Auth
@@ -1095,6 +1099,10 @@ export const useAppStore = create<AppStore>()(
         riskAssessments: data.riskAssessments ?? state.riskAssessments,
         departments: data.departments ?? state.departments,
         caseActivities: data.caseActivities ?? state.caseActivities,
+        photos: data.photos ?? state.photos,
+        fridgeItems: data.fridgeItems ?? state.fridgeItems,
+        wishItems: data.wishItems ?? state.wishItems,
+        budgetGoals: data.budgetGoals ?? state.budgetGoals,
         currentChildId: data.children !== undefined && data.children.length > 0
           ? (state.currentChildId && data.children.some(c => c.id === state.currentChildId)
               ? state.currentChildId

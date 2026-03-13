@@ -1232,6 +1232,156 @@ export function useApiActions() {
     [store],
   );
 
+  // ── Photos ──────────────────────────────────────────────
+
+  const createPhoto = useCallback(
+    (data: import('@/types').FamilyPhoto) => {
+      store.addPhoto(data);
+      syncToSupabase('family_photos', {
+        id: data.id,
+        child_id: data.childId,
+        url: data.url,
+        caption: data.caption || null,
+        taken_at: data.takenAt,
+        added_by: data.addedBy,
+        added_at: data.addedAt,
+        household_id: getHouseholdId(),
+      }, 'Kunne ikke synkronisere foto');
+      return data;
+    },
+    [store],
+  );
+
+  const deletePhoto = useCallback(
+    (id: string) => {
+      store.deletePhoto(id);
+      supabase.from('family_photos').delete().eq('id', id).then(({ error }) => {
+        if (error) console.error('Supabase sync failed for family_photos delete:', error);
+      });
+    },
+    [store],
+  );
+
+  // ── Fridge ──────────────────────────────────────────────
+
+  const createFridgeItem = useCallback(
+    (data: import('@/types').FridgeItem) => {
+      store.addFridgeItem(data);
+      syncToSupabase('fridge_items', {
+        id: data.id,
+        name: data.name,
+        barcode: data.barcode || null,
+        added_at: data.addedAt,
+        added_by: data.addedBy,
+        expires_at: data.expiresAt || null,
+        nutrition_per_100g: data.nutritionPer100g || null,
+        household_id: getHouseholdId(),
+      }, 'Kunne ikke synkronisere køleskabsvare');
+      return data;
+    },
+    [store],
+  );
+
+  const updateFridgeItem = useCallback(
+    (id: string, updates: Partial<Pick<import('@/types').FridgeItem, 'name' | 'expiresAt'>>) => {
+      store.updateFridgeItem(id, updates);
+      const updateData: Record<string, unknown> = {};
+      if (updates.name !== undefined) updateData.name = updates.name;
+      if (updates.expiresAt !== undefined) updateData.expires_at = updates.expiresAt;
+      supabase.from('fridge_items').update(updateData).eq('id', id).then(({ error }) => {
+        if (error) console.error('Supabase sync failed for fridge_items update:', error);
+      });
+    },
+    [store],
+  );
+
+  const deleteFridgeItem = useCallback(
+    (id: string) => {
+      store.removeFridgeItem(id);
+      supabase.from('fridge_items').delete().eq('id', id).then(({ error }) => {
+        if (error) console.error('Supabase sync failed for fridge_items delete:', error);
+      });
+    },
+    [store],
+  );
+
+  // ── Wish Items ──────────────────────────────────────────
+
+  const createWishItem = useCallback(
+    (data: import('@/types').WishItem) => {
+      store.addWishItem(data);
+      syncToSupabase('wish_items', {
+        id: data.id,
+        title: data.title,
+        price_estimate: data.priceEstimate || null,
+        link: data.link || null,
+        image_url: data.imageUrl || null,
+        description: data.description || null,
+        child_id: data.childId,
+        added_by: data.addedBy,
+        status: data.status,
+        bought_by: data.boughtBy || null,
+        created_at: data.createdAt,
+        household_id: getHouseholdId(),
+      }, 'Kunne ikke synkronisere ønske');
+      return data;
+    },
+    [store],
+  );
+
+  const updateWishItem = useCallback(
+    (id: string, updates: Partial<import('@/types').WishItem>) => {
+      store.updateWishItem(id, updates);
+      const updateData: Record<string, unknown> = {};
+      if (updates.title !== undefined) updateData.title = updates.title;
+      if (updates.priceEstimate !== undefined) updateData.price_estimate = updates.priceEstimate;
+      if (updates.status !== undefined) updateData.status = updates.status;
+      if (updates.boughtBy !== undefined) updateData.bought_by = updates.boughtBy;
+      if (updates.link !== undefined) updateData.link = updates.link;
+      if (updates.description !== undefined) updateData.description = updates.description;
+      supabase.from('wish_items').update(updateData).eq('id', id).then(({ error }) => {
+        if (error) console.error('Supabase sync failed for wish_items update:', error);
+      });
+    },
+    [store],
+  );
+
+  const deleteWishItem = useCallback(
+    (id: string) => {
+      store.deleteWishItem(id);
+      supabase.from('wish_items').delete().eq('id', id).then(({ error }) => {
+        if (error) console.error('Supabase sync failed for wish_items delete:', error);
+      });
+    },
+    [store],
+  );
+
+  // ── Budget Goals ────────────────────────────────────────
+
+  const syncBudgetGoals = useCallback(
+    (goals: import('@/types').BudgetGoal[]) => {
+      store.setBudgetGoals(goals);
+      const householdId = getHouseholdId();
+      const userId = getCurrentUserId();
+      // Upsert all goals
+      supabase.from('budget_goals').delete().eq('household_id', householdId).then(() => {
+        if (goals.length > 0) {
+          supabase.from('budget_goals').insert(
+            goals.map(g => ({
+              household_id: householdId,
+              category: g.category,
+              monthly_amount: g.monthlyAmount,
+              created_by: userId,
+            }))
+          ).then(({ error }) => {
+            if (error) console.error('Supabase sync failed for budget_goals:', error);
+          });
+        }
+      });
+    },
+    [store],
+  );
+
   return {
     // Events
     createEvent,
@@ -1302,5 +1452,18 @@ export function useApiActions() {
     deleteRoutineItem,
     createRoutineLog,
     updateRoutineLog,
+    // Photos
+    createPhoto,
+    deletePhoto,
+    // Fridge
+    createFridgeItem,
+    updateFridgeItem,
+    deleteFridgeItem,
+    // Wish Items
+    createWishItem,
+    updateWishItem,
+    deleteWishItem,
+    // Budget
+    syncBudgetGoals,
   };
 }
