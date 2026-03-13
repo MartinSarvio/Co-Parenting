@@ -161,7 +161,8 @@ type NavItem = {
 export function BottomNav() {
   const { activeTab, setActiveTab, isProfessionalView, household, fullScreenOverlayOpen, kommunikationThreadId, currentUser, handoverAction, feedTab, activeSettingsTab, milestoneFormMode, meetingFormMode, docFormMode } = useAppStore();
   const [moreOpen, setMoreOpen] = useState(false);
-  const isFamilyMember = currentUser?.role === 'family_member';
+  const isFamilyMemberView = useAppStore((s) => s.isFamilyMemberView);
+  const isFamilyMember = currentUser?.role === 'family_member' || (isFamilyMemberView && currentUser?.isAdmin === true);
   const isTogetherFamily = household?.familyMode === 'together';
   const isSingleParent = household?.familyMode === 'single_parent';
   const showHandoverNav = !isTogetherFamily && !isSingleParent;
@@ -171,7 +172,6 @@ export function BottomNav() {
 
   const mainNavItems: NavItem[] = isFamilyMember
     ? [
-        { id: 'dashboard', label: 'Oversigt', icon: LayoutDashboard },
         { id: 'samversplan', label: 'Samvær', icon: Repeat },
         { id: 'kalender', label: 'Kalender', icon: CalendarDays },
       ]
@@ -199,9 +199,9 @@ export function BottomNav() {
 
   const moreNavItems: NavItem[] = isFamilyMember
     ? [
-        { id: 'children', label: 'Børn', icon: Baby },
-        { id: 'borneoverblik', label: 'Overblik', icon: UserCircle },
         { id: 'fotoalbum', label: 'Fotoalbum', icon: Camera },
+        { id: 'children', label: 'Børn', icon: Baby },
+        { id: 'settings', label: 'Indstillinger', icon: Settings },
       ]
     : isTogetherFamily
     ? [

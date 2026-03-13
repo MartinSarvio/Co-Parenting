@@ -14,6 +14,7 @@ import {
   ListChecks,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useIsFamilyMember } from '@/hooks/useIsFamilyMember';
 
 const OVERBLIK_TABS = [
   { id: 'borneoverblik', label: 'Børneoverblik', icon: UserCircle },
@@ -27,10 +28,14 @@ const OVERBLIK_TABS = [
   { id: 'familie-og-boern', label: 'Familie & Børn', icon: BookHeart },
 ] as const;
 
+// Tabs allowed for family members in overblik
+const FAMILY_MEMBER_OVERBLIK_TABS = new Set(['borneoverblik', 'milestones']);
+
 export const OVERBLIK_SUB_TAB_IDS = OVERBLIK_TABS.map((t) => t.id);
 
 export function OverblikSidePanel() {
   const { activeTab, setActiveTab, sideMenuOpen, setSideMenuOpen, sideMenuContext } = useAppStore();
+  const { isFamilyMember } = useIsFamilyMember();
 
   return createPortal(
     <AnimatePresence>
@@ -68,7 +73,7 @@ export function OverblikSidePanel() {
               </button>
             </div>
             <div className="flex-1 overflow-y-auto py-2 pb-[env(safe-area-inset-bottom,0px)]">
-              {OVERBLIK_TABS.map((item) => {
+              {OVERBLIK_TABS.filter((item) => !isFamilyMember || FAMILY_MEMBER_OVERBLIK_TABS.has(item.id)).map((item) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
                 return (

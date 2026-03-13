@@ -188,8 +188,8 @@ export function Samversplan() {
 
   return (
     <div className="space-y-1.5 py-1">
-      {/* ─── Side panel: CustodyConfig full-screen — portal ─── */}
-      {createPortal(
+      {/* ─── Side panel: CustodyConfig full-screen — portal (skjult for familiemedlemmer) ─── */}
+      {!isFamilyMember && createPortal(
       <AnimatePresence>
         {sideMenuOpen && sideMenuContext === 'samversplan' && (
           <>
@@ -228,8 +228,8 @@ export function Samversplan() {
       document.body
       )}
 
-      {/* Konfigurationsbanner hvis plan ikke er konfigureret */}
-      {custodyPlan && !custodyPlan.customWeekConfig && (
+      {/* Konfigurationsbanner hvis plan ikke er konfigureret (skjult for familiemedlemmer) */}
+      {!isFamilyMember && custodyPlan && !custodyPlan.customWeekConfig && (
         <Card className="border-[#f3c59d] bg-[#fff2e6]">
           <CardContent className="p-4 text-center space-y-2">
             <p className="text-[14px] font-semibold text-[#2f2f2d]">

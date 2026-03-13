@@ -211,7 +211,8 @@ function App() {
           .single();
 
         // Only require verification for parent 2 (invited members who haven't verified)
-        if (data && data.role !== 'creator' && data.child_verified === false && children.length > 0) {
+        // Admins skip verification entirely
+        if (data && data.role !== 'creator' && !currentUser.isAdmin && data.child_verified === false && children.length > 0) {
           setNeedsVerification(true);
         }
       } catch {
@@ -405,15 +406,18 @@ function App() {
 
   // Blocked tabs for family_member role (GDPR + access control)
   const FAMILY_MEMBER_BLOCKED_TABS = new Set([
-    'handover', 'mad-hjem', 'opgaver', 'feed', 'kommunikation',
+    'dashboard', 'handover', 'mad-hjem', 'opgaver', 'feed', 'kommunikation',
     'expenses', 'balance', 'send-penge', 'budget', 'gaveoenskeliste',
-    'analyse', 'swap-request', 'meeting-minutes',
+    'analyse', 'swap-request', 'meeting-minutes', 'dagbog', 'dokumenter',
+    'rutiner', 'vigtige-datoer', 'beslutningslog', 'historik',
   ]);
 
   // Parent view
   const renderContent = () => {
-    if (currentUser?.role === 'family_member' && FAMILY_MEMBER_BLOCKED_TABS.has(activeTab)) {
-      setActiveTab('dashboard');
+    const isFamilyMemberView = useAppStore.getState().isFamilyMemberView;
+    const isFamilyMember = currentUser?.role === 'family_member' || (isFamilyMemberView && currentUser?.isAdmin === true);
+    if (isFamilyMember && FAMILY_MEMBER_BLOCKED_TABS.has(activeTab)) {
+      setActiveTab('samversplan');
       return null;
     }
 

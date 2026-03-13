@@ -3,6 +3,7 @@ import { useAppStore } from '@/store';
 import { cn, getParentColor } from '@/lib/utils';
 import { Bell, Settings, ChevronDown, ChevronLeft, ChevronRight, Briefcase, User, LogOut, Menu, Plus, BookOpen, UtensilsCrossed, Camera, Search, Clock, UserPlus, Newspaper, Tag, MessageSquare, ExternalLink, Building2, FolderOpen, Upload, X } from 'lucide-react';
 import { StoreBadge } from './StoreBadge';
+import { useIsFamilyMember } from '@/hooks/useIsFamilyMember';
 import { FLYERS, getFlyerStoreSlug } from '@/lib/etilbudsavis';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -32,6 +33,7 @@ export function TopBar() {
     analyticsPeriod, setAnalyticsPeriod,
     tilbudAdminTab, setTilbudAdminTab, setTilbudAdminCreateOpen, setNyhederAdminCreateOpen,
   } = useAppStore();
+  const { isFamilyMember } = useIsFamilyMember();
   const [avatarSheetOpen, setAvatarSheetOpen] = useState(false);
   const [childSelectorOpen, setChildSelectorOpen] = useState(false);
   const [expenseFilterSelectorOpen, setExpenseFilterSelectorOpen] = useState(false);
@@ -94,8 +96,8 @@ export function TopBar() {
   const chatThread = isChatMode ? threads.find(t => t.id === kommunikationThreadId) : null;
   const visibleThreads = threads.filter(t => !t.deletedBy?.includes(currentUser?.id || ''));
 
-  // Render dedicated header for milestone/meeting/upload form modes
-  if (milestoneFormMode || meetingFormMode || docFormMode) {
+  // Render dedicated header for milestone/meeting/upload form modes (blocked for family members)
+  if (!isFamilyMember && (milestoneFormMode || meetingFormMode || docFormMode)) {
     const formTitle = milestoneFormMode ? 'Ny milepæl' : meetingFormMode ? 'Nyt referat' : 'Upload dokument';
     const onBack = () => {
       if (milestoneFormMode) setMilestoneFormMode(null);
@@ -797,6 +799,16 @@ export function TopBar() {
                 </button>
               )}
 
+              {isFamilyMember && !isExpensePage && activeTab !== 'borneoverblik' && activeTab !== 'milestones' && (
+                <button
+                  onClick={() => setActiveTab('borneoverblik')}
+                  className="flex h-8 items-center gap-1.5 rounded-full border border-[#d8d7cf] bg-[#faf9f6] px-3 text-[#41403c] transition-colors hover:bg-[#f0efea]"
+                  aria-label="Gå til overblik"
+                >
+                  <User className="h-3.5 w-3.5" />
+                  <span className="text-[13px] font-medium">Overblik</span>
+                </button>
+              )}
               {showProfessionalView && allowProfessionalTools && (
                 <Badge variant="outline" className="h-8 border-[#d8d7cf] bg-[#f8f7f3] px-3 text-[#41403c]">
                   <Briefcase className="mr-1 h-3.5 w-3.5" aria-hidden="true" />
@@ -833,7 +845,7 @@ export function TopBar() {
                 >
                   <Plus className="h-5 w-5" aria-hidden="true" />
                 </button>
-              ) : activeTab === 'milestones' ? (
+              ) : activeTab === 'milestones' && !isFamilyMember ? (
                 /* ── Milepæle: Tilføj ── */
                 <button
                   onClick={() => setMilestonesAction('add')}
