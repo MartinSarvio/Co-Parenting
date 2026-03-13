@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 import { RotateCcw } from 'lucide-react';
 import { BottomSheet } from './BottomSheet';
 import { StoreBadge } from './StoreBadge';
-import { FLYERS } from '@/lib/etilbudsavis';
+import { FLYERS, getFlyerStoreSlug } from '@/lib/etilbudsavis';
 
 export interface TilbudFilters {
   sortBy: 'default' | 'budget' | 'kilopris' | 'besparelse' | 'sundhed';
@@ -186,18 +186,22 @@ export function TilbudFilterSheet({ open, onOpenChange, filters, onFiltersChange
               )}
             </div>
             <div className="flex flex-wrap gap-3">
-              {FLYERS.map(flyer => {
-                const active = filters.enabledStores.size === 0 || filters.enabledStores.has(flyer.id);
+              {FLYERS.filter((flyer, _i, arr) => {
+                const slug = getFlyerStoreSlug(flyer);
+                return arr.findIndex(f => getFlyerStoreSlug(f) === slug) === arr.indexOf(flyer);
+              }).map(flyer => {
+                const slug = getFlyerStoreSlug(flyer);
+                const active = filters.enabledStores.size === 0 || filters.enabledStores.has(slug);
                 return (
                   <button
-                    key={flyer.id}
-                    onClick={() => toggleStore(flyer.id)}
+                    key={slug}
+                    onClick={() => toggleStore(slug)}
                     className={cn(
                       "flex flex-col items-center gap-1 transition-opacity",
                       !active && "opacity-30"
                     )}
                   >
-                    <StoreBadge storeId={flyer.id} size="md" />
+                    <StoreBadge storeId={slug} size="md" />
                     <span className="text-[10px] font-semibold text-[#5f5d56]">{flyer.store}</span>
                   </button>
                 );

@@ -207,7 +207,7 @@ export function TilbudMainPage({
     // Store filter
     if (filters.enabledStores.size > 0) {
       const enabledStoreNames = new Set(
-        FLYERS.filter(f => filters.enabledStores.has(f.id)).map(f => f.store)
+        FLYERS.filter(f => filters.enabledStores.has(getFlyerStoreSlug(f))).map(f => f.store)
       );
       result = result.filter(o => enabledStoreNames.has(o.store));
     }
@@ -284,7 +284,7 @@ export function TilbudMainPage({
             className="min-w-[140px] max-w-[140px] snap-start shrink-0 rounded-[8px] overflow-hidden bg-white active:scale-[0.97] transition-transform text-left"
           >
             {flyer.coverImage ? (
-              <img src={flyer.coverImage} alt={flyer.store} className="w-full h-[170px] object-cover" />
+              <img src={flyer.coverImage} alt={flyer.store} className="w-full h-[170px] object-cover object-top" />
             ) : (
               <div
                 className="w-full h-[170px] flex flex-col items-center justify-center gap-2"

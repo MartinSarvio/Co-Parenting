@@ -6,6 +6,9 @@ import { Toaster } from 'sonner';
 const LandingPage = lazy(() => import('./pages/LandingPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
+const TermsPage = lazy(() => import('./pages/TermsPage'));
 
 function LoadingFallback() {
   return (
@@ -26,14 +29,26 @@ export function WebApp() {
 
   const isAdmin = route === '#admin';
   const isPrivacy = route === '#privatlivspolitik';
+  const isAbout = route === '#om';
+  const isContact = route === '#kontakt';
+  const isTerms = route === '#vilkar';
   const hideChrome = isAdmin;
+
+  const renderPage = () => {
+    if (isAdmin) return <AdminPage />;
+    if (isPrivacy) return <PrivacyPage />;
+    if (isAbout) return <AboutPage />;
+    if (isContact) return <ContactPage />;
+    if (isTerms) return <TermsPage />;
+    return <LandingPage />;
+  };
 
   return (
     <div className="min-h-screen bg-[#fafafa] flex flex-col">
       {!hideChrome && <Navbar />}
       <main className="flex-1">
         <Suspense fallback={<LoadingFallback />}>
-          {isAdmin ? <AdminPage /> : isPrivacy ? <PrivacyPage /> : <LandingPage />}
+          {renderPage()}
         </Suspense>
       </main>
       {!hideChrome && <Footer />}

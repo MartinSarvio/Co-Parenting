@@ -383,7 +383,7 @@ const familyTypes = [
 
 function AboutSection() {
   return (
-    <section id="om" className="py-24 relative overflow-hidden">
+    <section id="om-section" className="py-24 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-[#2f2f2f] to-[#1a1a1a]" />
       <div className="absolute top-[-100px] right-[-50px] w-[400px] h-[400px] rounded-full bg-[#f58a2d]/8 blur-xl pointer-events-none" />
 
