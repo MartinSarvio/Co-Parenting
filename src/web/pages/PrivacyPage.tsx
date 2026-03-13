@@ -8,10 +8,10 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-xl font-semibold text-[#2f2f2f] mb-3">1. Dataansvarlig</h2>
           <p>
-            Hverdag ApS (herefter &ldquo;Hverdag&rdquo;, &ldquo;vi&rdquo; eller &ldquo;os&rdquo;) er dataansvarlig
-            for behandlingen af de personoplysninger, vi indsamler via appen Hverdag og tilhørende hjemmeside.
+            Huska (herefter &ldquo;Huska&rdquo;, &ldquo;vi&rdquo; eller &ldquo;os&rdquo;), drevet af Martin Kristensen &amp; Frederik Hansen, er dataansvarlig
+            for behandlingen af de personoplysninger, vi indsamler via appen Huska og tilhørende hjemmeside.
           </p>
-          <p>Kontakt: <a href="mailto:kontakt@hverdag.dk" className="text-[#f58a2d] hover:underline">kontakt@hverdag.dk</a></p>
+          <p>Kontakt: <a href="mailto:kontakt@huska.dk" className="text-[#f58a2d] hover:underline">kontakt@huska.dk</a></p>
         </section>
 
         <section>
@@ -86,7 +86,7 @@ export default function PrivacyPage() {
         <section>
           <h2 className="text-xl font-semibold text-[#2f2f2f] mb-3">8. Børns data</h2>
           <p>
-            Hverdag indsamler oplysninger om børn (navne, aldre, trivsel) som led i samværsplanlægningen.
+            Huska indsamler oplysninger om børn (navne, aldre, trivsel) som led i samværsplanlægningen.
             Disse data behandles udelukkende efter forældrenes anvisning og er kun tilgængelige for
             husstandens medlemmer.
           </p>

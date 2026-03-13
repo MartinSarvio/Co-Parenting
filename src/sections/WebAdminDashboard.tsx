@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Upload, FileText, Search, Trash2, RefreshCw, Eye, Check, X,
   Plus, Pencil, ExternalLink, ImagePlus, Crop,
-  LogOut, LayoutDashboard, Link2, AlertTriangle,
+  LogOut, Link2, AlertTriangle,
   Newspaper, Globe, Loader2,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -133,8 +133,8 @@ export function WebAdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f7f6f2] flex items-center justify-center">
-        <RefreshCw className="h-6 w-6 animate-spin text-[#9a978f]" />
+      <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
+        <RefreshCw className="h-6 w-6 animate-spin text-[#9ca3af]" />
       </div>
     );
   }
@@ -144,20 +144,20 @@ export function WebAdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f6f2]">
+    <div className="min-h-screen bg-[#fafafa]">
       {/* Header */}
-      <header className="bg-white border-b border-[#e8e6df] px-6 py-3 flex items-center gap-4 sticky top-0 z-10">
-        <LayoutDashboard className="h-5 w-5 text-[#f58a2d]" />
-        <h1 className="text-[16px] font-bold text-[#2f2f2d]">Hverdag Admin</h1>
+      <header className="bg-white border-b border-[#e5e5e5] px-6 py-3 flex items-center gap-4 sticky top-0 z-10">
+        <img src="/huska-logo.svg" alt="Huska" className="h-8 w-8 rounded-xl" />
+        <h1 className="text-[16px] font-bold text-[#1a1a1a]">Huska <span className="text-[12px] font-medium text-[#9ca3af] ml-1">Admin</span></h1>
         <div className="flex-1" />
-        <span className="text-[12px] text-[#9a978f]">{user.email}</span>
-        <button onClick={handleLogout} className="p-2 rounded-lg hover:bg-[#f2f1ed] text-[#78766d]" title="Log ud">
+        <span className="text-[12px] text-[#9ca3af]">{user.email}</span>
+        <button onClick={handleLogout} className="p-2 rounded-lg hover:bg-[#f5f5f5] text-[#9ca3af]" title="Log ud">
           <LogOut className="h-4 w-4" />
         </button>
       </header>
 
       {/* Tab Bar */}
-      <div className="bg-white border-b border-[#e8e6df] px-6 flex gap-1">
+      <div className="bg-white border-b border-[#e5e5e5] px-6 flex gap-1">
         {([
           { id: 'tilbudsaviser' as const, label: 'Tilbudsaviser', icon: FileText },
           { id: 'affiliate' as const, label: 'Affiliate-links', icon: Link2 },
@@ -168,8 +168,8 @@ export function WebAdminDashboard() {
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-2 px-4 py-3 text-[13px] font-medium border-b-2 transition-colors ${
               activeTab === tab.id
-                ? 'border-[#f58a2d] text-[#f58a2d]'
-                : 'border-transparent text-[#78766d] hover:text-[#2f2f2d]'
+                ? 'border-[#1a1a1a] text-[#1a1a1a]'
+                : 'border-transparent text-[#9ca3af] hover:text-[#1a1a1a]'
             }`}
           >
             <tab.icon className="h-4 w-4" />
@@ -210,37 +210,37 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f6f2] flex items-center justify-center">
-      <form onSubmit={handleLogin} className="bg-white rounded-xl shadow-sm border border-[#e8e6df] p-8 w-full max-w-[400px] space-y-4">
+    <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
+      <form onSubmit={handleLogin} className="bg-white rounded-xl shadow-sm border border-[#e5e5e5] p-8 w-full max-w-[400px] space-y-4">
         <div className="text-center mb-6">
-          <LayoutDashboard className="h-8 w-8 text-[#f58a2d] mx-auto mb-2" />
-          <h1 className="text-[18px] font-bold text-[#2f2f2d]">Hverdag Admin</h1>
-          <p className="text-[13px] text-[#78766d]">Log ind for at administrere tilbudsaviser</p>
+          <img src="/huska-logo.svg" alt="Huska" className="h-12 w-12 rounded-2xl mx-auto mb-3" />
+          <h1 className="text-[18px] font-bold text-[#1a1a1a]">Huska <span className="text-[#9ca3af] font-medium">Admin</span></h1>
+          <p className="text-[13px] text-[#9ca3af] mt-1">Log ind for at administrere indhold</p>
         </div>
         <div>
-          <label className="text-[12px] font-semibold text-[#5f5d56] block mb-1">E-mail</label>
+          <label className="text-[12px] font-semibold text-[#6b7280] block mb-1">E-mail</label>
           <input
             type="email"
             value={email}
             onChange={e => setEmail(e.target.value)}
-            className="w-full h-10 rounded-lg border border-[#e8e6df] px-3 text-[13px]"
+            className="w-full h-10 rounded-lg border border-[#e5e5e5] px-3 text-[13px]"
             required
           />
         </div>
         <div>
-          <label className="text-[12px] font-semibold text-[#5f5d56] block mb-1">Adgangskode</label>
+          <label className="text-[12px] font-semibold text-[#6b7280] block mb-1">Adgangskode</label>
           <input
             type="password"
             value={password}
             onChange={e => setPassword(e.target.value)}
-            className="w-full h-10 rounded-lg border border-[#e8e6df] px-3 text-[13px]"
+            className="w-full h-10 rounded-lg border border-[#e5e5e5] px-3 text-[13px]"
             required
           />
         </div>
         <button
           type="submit"
           disabled={loading}
-          className="w-full h-10 rounded-lg bg-[#f58a2d] text-white font-semibold text-[14px] hover:bg-[#e47921] disabled:opacity-50"
+          className="w-full h-10 rounded-lg bg-[#1a1a1a] text-white font-semibold text-[14px] hover:bg-[#333] disabled:opacity-50"
         >
           {loading ? 'Logger ind...' : 'Log ind'}
         </button>
@@ -324,40 +324,40 @@ function TilbudsaviserTab() {
     if (items.length === 0) return null;
     return (
       <div className="mb-6">
-        <h3 className="text-[13px] font-semibold text-[#5f5d56] mb-2">{title} ({items.length})</h3>
-        <div className="bg-white rounded-lg border border-[#e8e6df] overflow-hidden">
+        <h3 className="text-[13px] font-semibold text-[#6b7280] mb-2">{title} ({items.length})</h3>
+        <div className="bg-white rounded-lg border border-[#e5e5e5] overflow-hidden">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-[#f2f1ed] bg-[#faf9f6]">
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f]">Butik</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f]">Fil</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f]">Periode</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f] text-center">Produkter</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f] text-center">Status</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f]"></th>
+              <tr className="border-b border-[#f0f0f0] bg-[#fafafa]">
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af]">Butik</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af]">Fil</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af]">Periode</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af] text-center">Produkter</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af] text-center">Status</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af]"></th>
               </tr>
             </thead>
             <tbody>
               {items.map((b, i) => (
-                <tr key={b.id} className={i % 2 === 0 ? 'bg-white' : 'bg-[#faf9f6]'}>
-                  <td className="px-4 py-2.5 text-[13px] font-semibold text-[#2f2f2d]">{b.store ?? '—'}</td>
-                  <td className="px-4 py-2.5 text-[12px] text-[#78766d] truncate max-w-[200px]">{b.file_name}</td>
-                  <td className="px-4 py-2.5 text-[12px] text-[#5f5d56]">
+                <tr key={b.id} className={i % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]'}>
+                  <td className="px-4 py-2.5 text-[13px] font-semibold text-[#1a1a1a]">{b.store ?? '—'}</td>
+                  <td className="px-4 py-2.5 text-[12px] text-[#9ca3af] truncate max-w-[200px]">{b.file_name}</td>
+                  <td className="px-4 py-2.5 text-[12px] text-[#6b7280]">
                     {b.valid_from && b.valid_until
                       ? `${new Date(b.valid_from).toLocaleDateString('da-DK', { day: 'numeric', month: 'short' })} – ${new Date(b.valid_until).toLocaleDateString('da-DK', { day: 'numeric', month: 'short' })}`
                       : '—'}
                   </td>
-                  <td className="px-4 py-2.5 text-center text-[13px] font-semibold text-[#2f2f2d]">{b.total_products || 0}</td>
+                  <td className="px-4 py-2.5 text-center text-[13px] font-semibold text-[#1a1a1a]">{b.total_products || 0}</td>
                   <td className="px-4 py-2.5 text-center">{statusBadge(b.status)}</td>
                   <td className="px-4 py-2.5">
                     <div className="flex gap-1 justify-end">
                       {b.total_products > 0 && (
-                        <button onClick={() => loadPreview(b)} className="p-1.5 rounded-md hover:bg-[#f2f1ed] text-[#78766d]" title="Se produkter">
+                        <button onClick={() => loadPreview(b)} className="p-1.5 rounded-md hover:bg-[#f5f5f5] text-[#9ca3af]" title="Se produkter">
                           <Eye className="h-3.5 w-3.5" />
                         </button>
                       )}
                       {b.total_products > 0 && b.file_url && (
-                        <button onClick={() => setCropBatch(b)} className="p-1.5 rounded-md hover:bg-[#f2f1ed] text-[#78766d]" title="Tilknyt billeder">
+                        <button onClick={() => setCropBatch(b)} className="p-1.5 rounded-md hover:bg-[#f5f5f5] text-[#9ca3af]" title="Tilknyt billeder">
                           <Crop className="h-3.5 w-3.5" />
                         </button>
                       )}
@@ -387,10 +387,10 @@ function TilbudsaviserTab() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-[18px] font-bold text-[#2f2f2d]">Tilbudsaviser</h2>
+        <h2 className="text-[18px] font-bold text-[#1a1a1a]">Tilbudsaviser</h2>
         <button
           onClick={() => setShowUpload(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#f58a2d] text-white text-[13px] font-semibold hover:bg-[#e47921]"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a1a1a] text-white text-[13px] font-semibold hover:bg-[#333]"
         >
           <Plus className="h-4 w-4" />
           Upload tilbudsavis
@@ -399,17 +399,17 @@ function TilbudsaviserTab() {
 
       {/* ── Aktive aviser fra app (hardcoded FLYERS) ── */}
       <div className="mb-6">
-        <h3 className="text-[13px] font-semibold text-[#5f5d56] mb-2">Aviser i appen ({FLYERS.length})</h3>
-        <div className="bg-white rounded-lg border border-[#e8e6df] overflow-hidden">
+        <h3 className="text-[13px] font-semibold text-[#6b7280] mb-2">Aviser i appen ({FLYERS.length})</h3>
+        <div className="bg-white rounded-lg border border-[#e5e5e5] overflow-hidden">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-[#f2f1ed] bg-[#faf9f6]">
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f]">Cover</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f]">Butik</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f]">Periode</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f] text-center">Sider</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f] text-center">Status</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f]"></th>
+              <tr className="border-b border-[#f0f0f0] bg-[#fafafa]">
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af]">Cover</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af]">Butik</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af]">Periode</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af] text-center">Sider</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af] text-center">Status</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af]"></th>
               </tr>
             </thead>
             <tbody>
@@ -420,7 +420,7 @@ function TilbudsaviserTab() {
                   return true;
                 })();
                 return (
-                  <tr key={f.id} className={i % 2 === 0 ? 'bg-white' : 'bg-[#faf9f6]'}>
+                  <tr key={f.id} className={i % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]'}>
                     <td className="px-4 py-2">
                       {f.coverImage ? (
                         <img src={f.coverImage} alt={f.store} className="h-10 w-8 object-cover rounded shadow-sm" />
@@ -438,13 +438,13 @@ function TilbudsaviserTab() {
                         >
                           {f.storeInitial}
                         </span>
-                        <span className="text-[13px] font-semibold text-[#2f2f2d]">
+                        <span className="text-[13px] font-semibold text-[#1a1a1a]">
                           {f.store}{f.label ? ` (${f.label})` : ''}
                         </span>
                       </div>
                     </td>
-                    <td className="px-4 py-2.5 text-[12px] text-[#5f5d56]">{f.validFrom} – {f.validUntil}</td>
-                    <td className="px-4 py-2.5 text-center text-[13px] font-semibold text-[#2f2f2d]">{f.pages}</td>
+                    <td className="px-4 py-2.5 text-[12px] text-[#6b7280]">{f.validFrom} – {f.validUntil}</td>
+                    <td className="px-4 py-2.5 text-center text-[13px] font-semibold text-[#1a1a1a]">{f.pages}</td>
                     <td className="px-4 py-2.5 text-center">
                       <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                         {isActive ? 'Aktiv' : 'Udløbet'}
@@ -455,7 +455,7 @@ function TilbudsaviserTab() {
                         href={f.webUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-1.5 rounded-md hover:bg-[#f2f1ed] text-[#78766d] inline-flex"
+                        className="p-1.5 rounded-md hover:bg-[#f5f5f5] text-[#9ca3af] inline-flex"
                         title="Åbn tilbudsavis"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
@@ -472,7 +472,7 @@ function TilbudsaviserTab() {
       {/* ── Uploadede batches fra database ── */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <RefreshCw className="h-5 w-5 animate-spin text-[#9a978f]" />
+          <RefreshCw className="h-5 w-5 animate-spin text-[#9ca3af]" />
         </div>
       ) : (
         <>
@@ -482,7 +482,7 @@ function TilbudsaviserTab() {
           {batches.length === 0 && (
             <div className="text-center py-10">
               <FileText className="h-8 w-8 text-[#c8c6bc] mx-auto mb-2" />
-              <p className="text-[13px] text-[#78766d]">Ingen uploadede tilbudsaviser endnu — brug knappen ovenfor</p>
+              <p className="text-[13px] text-[#9ca3af]">Ingen uploadede tilbudsaviser endnu — brug knappen ovenfor</p>
             </div>
           )}
         </>
@@ -603,8 +603,8 @@ function UploadModal({ allBatches, onClose, onSaved }: { allBatches: ImportBatch
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center" onClick={onClose}>
       <div className="bg-white rounded-xl shadow-xl w-full max-w-[500px] p-6" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-[16px] font-bold text-[#2f2f2d]">Upload tilbudsavis</h3>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[#f2f1ed] text-[#78766d]">
+          <h3 className="text-[16px] font-bold text-[#1a1a1a]">Upload tilbudsavis</h3>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[#f5f5f5] text-[#9ca3af]">
             <X className="h-4 w-4" />
           </button>
         </div>
@@ -612,11 +612,11 @@ function UploadModal({ allBatches, onClose, onSaved }: { allBatches: ImportBatch
         <div className="space-y-4">
           {/* Store */}
           <div>
-            <label className="text-[12px] font-semibold text-[#5f5d56] block mb-1">Butikskæde *</label>
+            <label className="text-[12px] font-semibold text-[#6b7280] block mb-1">Butikskæde *</label>
             <select
               value={store}
               onChange={e => setStore(e.target.value)}
-              className="w-full h-10 rounded-lg border border-[#e8e6df] px-3 text-[13px]"
+              className="w-full h-10 rounded-lg border border-[#e5e5e5] px-3 text-[13px]"
             >
               <option value="">Vælg butik...</option>
               {STORES.map(s => <option key={s} value={s}>{s}</option>)}
@@ -625,23 +625,23 @@ function UploadModal({ allBatches, onClose, onSaved }: { allBatches: ImportBatch
 
           {/* PDF */}
           <div>
-            <label className="text-[12px] font-semibold text-[#5f5d56] block mb-1">PDF-fil *</label>
+            <label className="text-[12px] font-semibold text-[#6b7280] block mb-1">PDF-fil *</label>
             <input ref={fileRef} type="file" accept=".pdf" onChange={e => { const f = e.target.files?.[0]; if (f) setPdfFile(f); e.target.value = ''; }} className="hidden" />
             <div
               onClick={() => fileRef.current?.click()}
-              className="rounded-lg border-2 border-dashed border-[#d0cec5] bg-[#faf9f6] hover:border-[#b0ae9f] p-6 text-center cursor-pointer transition-colors"
+              className="rounded-lg border-2 border-dashed border-[#d0cec5] bg-[#fafafa] hover:border-[#b0ae9f] p-6 text-center cursor-pointer transition-colors"
             >
               {pdfFile ? (
                 <div className="flex flex-col items-center gap-2">
                   <FileText className="h-8 w-8 text-green-500" />
-                  <p className="text-[13px] font-semibold text-[#2f2f2d]">{pdfFile.name}</p>
-                  <p className="text-[11px] text-[#78766d]">{(pdfFile.size / 1024 / 1024).toFixed(1)} MB</p>
+                  <p className="text-[13px] font-semibold text-[#1a1a1a]">{pdfFile.name}</p>
+                  <p className="text-[11px] text-[#9ca3af]">{(pdfFile.size / 1024 / 1024).toFixed(1)} MB</p>
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-2">
                   <Upload className="h-8 w-8 text-[#c8c6bc]" />
                   <p className="text-[13px] font-semibold text-[#3f3e3a]">Klik for at vælge PDF</p>
-                  <p className="text-[11px] text-[#78766d]">Max 70 MB</p>
+                  <p className="text-[11px] text-[#9ca3af]">Max 70 MB</p>
                 </div>
               )}
             </div>
@@ -650,12 +650,12 @@ function UploadModal({ allBatches, onClose, onSaved }: { allBatches: ImportBatch
           {/* Date range */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[12px] font-semibold text-[#5f5d56] block mb-1">Gyldig fra</label>
-              <input type="date" value={validFrom} onChange={e => setValidFrom(e.target.value)} className="w-full h-10 rounded-lg border border-[#e8e6df] px-3 text-[13px]" />
+              <label className="text-[12px] font-semibold text-[#6b7280] block mb-1">Gyldig fra</label>
+              <input type="date" value={validFrom} onChange={e => setValidFrom(e.target.value)} className="w-full h-10 rounded-lg border border-[#e5e5e5] px-3 text-[13px]" />
             </div>
             <div>
-              <label className="text-[12px] font-semibold text-[#5f5d56] block mb-1">Gyldig til</label>
-              <input type="date" value={validUntil} onChange={e => setValidUntil(e.target.value)} className="w-full h-10 rounded-lg border border-[#e8e6df] px-3 text-[13px]" />
+              <label className="text-[12px] font-semibold text-[#6b7280] block mb-1">Gyldig til</label>
+              <input type="date" value={validUntil} onChange={e => setValidUntil(e.target.value)} className="w-full h-10 rounded-lg border border-[#e5e5e5] px-3 text-[13px]" />
             </div>
           </div>
 
@@ -668,13 +668,13 @@ function UploadModal({ allBatches, onClose, onSaved }: { allBatches: ImportBatch
         </div>
 
         <div className="flex gap-2 mt-6">
-          <button onClick={onClose} className="flex-1 h-10 rounded-lg border border-[#e8e6df] text-[13px] font-medium text-[#5f5d56] hover:bg-[#f2f1ed]">
+          <button onClick={onClose} className="flex-1 h-10 rounded-lg border border-[#e5e5e5] text-[13px] font-medium text-[#6b7280] hover:bg-[#f5f5f5]">
             Annuller
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex-1 h-10 rounded-lg bg-[#f58a2d] text-white text-[13px] font-semibold hover:bg-[#e47921] disabled:opacity-50"
+            className="flex-1 h-10 rounded-lg bg-[#1a1a1a] text-white text-[13px] font-semibold hover:bg-[#333] disabled:opacity-50"
           >
             {saving ? 'Uploader...' : 'Upload & Parse'}
           </button>
@@ -697,40 +697,40 @@ function PreviewModal({ batch, items, onClose }: { batch: ImportBatch; items: Im
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center" onClick={onClose}>
       <div className="bg-white rounded-xl shadow-xl w-full max-w-[800px] max-h-[80vh] flex flex-col" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#e8e6df]">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#e5e5e5]">
           <div>
-            <h3 className="text-[16px] font-bold text-[#2f2f2d]">{batch.store} — {batch.total_products} produkter</h3>
-            <p className="text-[12px] text-[#78766d]">{batch.file_name}</p>
+            <h3 className="text-[16px] font-bold text-[#1a1a1a]">{batch.store} — {batch.total_products} produkter</h3>
+            <p className="text-[12px] text-[#9ca3af]">{batch.file_name}</p>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[#f2f1ed] text-[#78766d]">
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[#f5f5f5] text-[#9ca3af]">
             <X className="h-4 w-4" />
           </button>
         </div>
         <div className="flex-1 overflow-y-auto px-6 py-4">
           {Object.entries(grouped).sort(([a], [b]) => a.localeCompare(b)).map(([cat, catItems]) => (
             <div key={cat} className="mb-4">
-              <h4 className="text-[12px] font-semibold text-[#9a978f] uppercase tracking-wide mb-2">{cat} ({catItems.length})</h4>
+              <h4 className="text-[12px] font-semibold text-[#9ca3af] uppercase tracking-wide mb-2">{cat} ({catItems.length})</h4>
               <div className="space-y-1">
                 {catItems.map(item => (
-                  <div key={item.id} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#faf9f6]">
+                  <div key={item.id} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#fafafa]">
                     {item.image_url ? (
                       <img src={item.image_url} alt="" className="h-10 w-10 rounded object-cover shrink-0" />
                     ) : (
-                      <div className="h-10 w-10 rounded bg-[#f2f1ed] shrink-0 flex items-center justify-center">
+                      <div className="h-10 w-10 rounded bg-[#f5f5f5] shrink-0 flex items-center justify-center">
                         <FileText className="h-4 w-4 text-[#c8c6bc]" />
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-medium text-[#2f2f2d] truncate">{item.title}</p>
-                      <p className="text-[11px] text-[#78766d]">{item.unit ?? ''}</p>
+                      <p className="text-[13px] font-medium text-[#1a1a1a] truncate">{item.title}</p>
+                      <p className="text-[11px] text-[#9ca3af]">{item.unit ?? ''}</p>
                     </div>
                     {item.discount && (
                       <span className="text-[11px] font-semibold text-red-600 bg-red-50 px-1.5 py-0.5 rounded">{item.discount}</span>
                     )}
                     {item.original_price && (
-                      <span className="text-[12px] text-[#9a978f] line-through">{item.original_price} kr</span>
+                      <span className="text-[12px] text-[#9ca3af] line-through">{item.original_price} kr</span>
                     )}
-                    <span className="text-[14px] font-bold text-[#f58a2d]">{item.price} kr</span>
+                    <span className="text-[14px] font-bold text-[#1a1a1a]">{item.price} kr</span>
                     <div className={`w-2 h-2 rounded-full ${(item.confidence ?? 0) >= 0.7 ? 'bg-green-400' : 'bg-yellow-400'}`} title={`Confidence: ${((item.confidence ?? 0) * 100).toFixed(0)}%`} />
                   </div>
                 ))}
@@ -829,7 +829,7 @@ function CropModal({ batch, onClose }: { batch: ImportBatch; onClose: () => void
     const ctx = overlayRef.current.getContext('2d')!;
     ctx.clearRect(0, 0, overlayRef.current.width, overlayRef.current.height);
     if (cropStart && cropEnd) {
-      ctx.strokeStyle = '#f58a2d';
+      ctx.strokeStyle = '#1a1a1a';
       ctx.lineWidth = 2;
       ctx.setLineDash([6, 3]);
       const x = Math.min(cropStart.x, cropEnd.x);
@@ -914,10 +914,10 @@ function CropModal({ batch, onClose }: { batch: ImportBatch; onClose: () => void
     <div className="fixed inset-0 z-50 bg-black/50 flex" onClick={onClose}>
       <div className="bg-white w-full h-full flex" onClick={e => e.stopPropagation()}>
         {/* Left: Product list */}
-        <div className="w-[300px] border-r border-[#e8e6df] flex flex-col">
-          <div className="px-4 py-3 border-b border-[#e8e6df] flex items-center justify-between">
-            <h3 className="text-[14px] font-bold text-[#2f2f2d]">Produkter</h3>
-            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[#f2f1ed] text-[#78766d]">
+        <div className="w-[300px] border-r border-[#e5e5e5] flex flex-col">
+          <div className="px-4 py-3 border-b border-[#e5e5e5] flex items-center justify-between">
+            <h3 className="text-[14px] font-bold text-[#1a1a1a]">Produkter</h3>
+            <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[#f5f5f5] text-[#9ca3af]">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -926,18 +926,18 @@ function CropModal({ batch, onClose }: { batch: ImportBatch; onClose: () => void
               <button
                 key={item.id}
                 onClick={() => { setSelectedItem(item); setCropStart(null); setCropEnd(null); }}
-                className={`w-full text-left px-4 py-2.5 border-b border-[#f2f1ed] hover:bg-[#faf9f6] flex items-center gap-2 ${selectedItem?.id === item.id ? 'bg-orange-50' : ''}`}
+                className={`w-full text-left px-4 py-2.5 border-b border-[#f0f0f0] hover:bg-[#fafafa] flex items-center gap-2 ${selectedItem?.id === item.id ? 'bg-gray-100' : ''}`}
               >
                 {item.image_url ? (
                   <img src={item.image_url} alt="" className="h-8 w-8 rounded object-cover shrink-0" />
                 ) : (
-                  <div className="h-8 w-8 rounded bg-[#f2f1ed] shrink-0 flex items-center justify-center">
+                  <div className="h-8 w-8 rounded bg-[#f5f5f5] shrink-0 flex items-center justify-center">
                     <ImagePlus className="h-3 w-3 text-[#c8c6bc]" />
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-[12px] font-medium text-[#2f2f2d] truncate">{item.title}</p>
-                  <p className="text-[11px] text-[#f58a2d] font-semibold">{item.price} kr</p>
+                  <p className="text-[12px] font-medium text-[#1a1a1a] truncate">{item.title}</p>
+                  <p className="text-[11px] text-[#1a1a1a] font-semibold">{item.price} kr</p>
                 </div>
                 {item.image_url && <Check className="h-3.5 w-3.5 text-green-500 shrink-0" />}
               </button>
@@ -946,16 +946,16 @@ function CropModal({ batch, onClose }: { batch: ImportBatch; onClose: () => void
         </div>
 
         {/* Right: PDF viewer */}
-        <div className="flex-1 flex flex-col bg-[#e8e6df]">
+        <div className="flex-1 flex flex-col bg-[#e5e5e5]">
           {/* Page selector */}
-          <div className="bg-white border-b border-[#e8e6df] px-4 py-2 flex items-center gap-3">
-            <span className="text-[12px] text-[#78766d]">Side:</span>
+          <div className="bg-white border-b border-[#e5e5e5] px-4 py-2 flex items-center gap-3">
+            <span className="text-[12px] text-[#9ca3af]">Side:</span>
             <div className="flex gap-1 flex-wrap">
               {pages.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => { setSelectedPage(i); setCropStart(null); setCropEnd(null); }}
-                  className={`w-7 h-7 rounded text-[11px] font-medium ${selectedPage === i ? 'bg-[#f58a2d] text-white' : 'bg-[#f2f1ed] text-[#5f5d56] hover:bg-[#e8e6df]'}`}
+                  className={`w-7 h-7 rounded text-[11px] font-medium ${selectedPage === i ? 'bg-[#1a1a1a] text-white' : 'bg-[#f5f5f5] text-[#6b7280] hover:bg-[#e5e5e5]'}`}
                 >
                   {i + 1}
                 </button>
@@ -963,7 +963,7 @@ function CropModal({ batch, onClose }: { batch: ImportBatch; onClose: () => void
             </div>
             <div className="flex-1" />
             {selectedItem && (
-              <span className="text-[12px] text-[#f58a2d] font-medium">
+              <span className="text-[12px] text-[#1a1a1a] font-medium">
                 Vælger billede for: {selectedItem.title}
               </span>
             )}
@@ -973,11 +973,11 @@ function CropModal({ batch, onClose }: { batch: ImportBatch; onClose: () => void
           <div className="flex-1 overflow-auto p-4 flex items-start justify-center">
             {loadingPdf ? (
               <div className="flex flex-col items-center gap-3 py-20">
-                <RefreshCw className="h-6 w-6 animate-spin text-[#9a978f]" />
-                <p className="text-[13px] text-[#78766d]">Indlæser PDF...</p>
+                <RefreshCw className="h-6 w-6 animate-spin text-[#9ca3af]" />
+                <p className="text-[13px] text-[#9ca3af]">Indlæser PDF...</p>
               </div>
             ) : pages.length === 0 ? (
-              <p className="text-[13px] text-[#78766d] py-20">Ingen sider fundet</p>
+              <p className="text-[13px] text-[#9ca3af] py-20">Ingen sider fundet</p>
             ) : (
               <div className="relative inline-block" style={{ cursor: selectedItem ? 'crosshair' : 'default' }}>
                 <canvas ref={canvasRef} className="max-w-full shadow-lg rounded" />
@@ -1041,10 +1041,10 @@ function AffiliateTab() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-[18px] font-bold text-[#2f2f2d]">Affiliate-links</h2>
+        <h2 className="text-[18px] font-bold text-[#1a1a1a]">Affiliate-links</h2>
         <button
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#f58a2d] text-white text-[13px] font-semibold hover:bg-[#e47921]"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#1a1a1a] text-white text-[13px] font-semibold hover:bg-[#333]"
         >
           <Plus className="h-4 w-4" />
           Opret affiliate-link
@@ -1053,37 +1053,37 @@ function AffiliateTab() {
 
       {/* ── Standard sponsors (hardcoded i appen) ── */}
       <div className="mb-6">
-        <h3 className="text-[13px] font-semibold text-[#5f5d56] mb-2">Standard sponsors i appen ({DEFAULT_SPONSORS.length})</h3>
-        <div className="bg-white rounded-lg border border-[#e8e6df] overflow-hidden">
+        <h3 className="text-[13px] font-semibold text-[#6b7280] mb-2">Standard sponsors i appen ({DEFAULT_SPONSORS.length})</h3>
+        <div className="bg-white rounded-lg border border-[#e5e5e5] overflow-hidden">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-[#f2f1ed] bg-[#faf9f6]">
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f]">Banner</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f]">Navn</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f]">Butik</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f]">Kategori</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f]">Type</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f]"></th>
+              <tr className="border-b border-[#f0f0f0] bg-[#fafafa]">
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af]">Banner</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af]">Navn</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af]">Butik</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af]">Kategori</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af]">Type</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af]"></th>
               </tr>
             </thead>
             <tbody>
               {DEFAULT_SPONSORS.map((s, i) => (
-                <tr key={s.id} className={i % 2 === 0 ? 'bg-white' : 'bg-[#faf9f6]'}>
+                <tr key={s.id} className={i % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]'}>
                   <td className="px-4 py-2">
                     {s.banner_image ? (
                       <img src={s.banner_image} alt="" className="h-8 w-16 object-cover rounded" />
                     ) : (
-                      <div className="h-8 w-16 bg-[#f2f1ed] rounded flex items-center justify-center">
+                      <div className="h-8 w-16 bg-[#f5f5f5] rounded flex items-center justify-center">
                         <ImagePlus className="h-3 w-3 text-[#c8c6bc]" />
                       </div>
                     )}
                   </td>
                   <td className="px-4 py-2">
-                    <p className="text-[13px] font-semibold text-[#2f2f2d]">{s.name}</p>
-                    <p className="text-[10px] text-[#9a978f] truncate max-w-[200px]">{s.url}</p>
+                    <p className="text-[13px] font-semibold text-[#1a1a1a]">{s.name}</p>
+                    <p className="text-[10px] text-[#9ca3af] truncate max-w-[200px]">{s.url}</p>
                   </td>
-                  <td className="px-4 py-2 text-[12px] text-[#5f5d56]">{s.store}</td>
-                  <td className="px-4 py-2 text-[12px] text-[#5f5d56]">{s.category}</td>
+                  <td className="px-4 py-2 text-[12px] text-[#6b7280]">{s.store}</td>
+                  <td className="px-4 py-2 text-[12px] text-[#6b7280]">{s.category}</td>
                   <td className="px-4 py-2">
                     <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-purple-100 text-purple-700">Hardcoded</span>
                   </td>
@@ -1092,7 +1092,7 @@ function AffiliateTab() {
                       href={s.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-1.5 rounded-md hover:bg-[#f2f1ed] text-[#78766d] inline-flex"
+                      className="p-1.5 rounded-md hover:bg-[#f5f5f5] text-[#9ca3af] inline-flex"
                       title="Åbn link"
                     >
                       <ExternalLink className="h-3.5 w-3.5" />
@@ -1106,62 +1106,62 @@ function AffiliateTab() {
       </div>
 
       {/* ── Database affiliate-links ── */}
-      <h3 className="text-[13px] font-semibold text-[#5f5d56] mb-2">Database affiliate-links</h3>
+      <h3 className="text-[13px] font-semibold text-[#6b7280] mb-2">Database affiliate-links</h3>
 
       {/* Search */}
       <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9a978f]" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9ca3af]" />
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Søg affiliate-links..."
-          className="w-full h-10 rounded-lg border border-[#e8e6df] pl-10 pr-3 text-[13px]"
+          className="w-full h-10 rounded-lg border border-[#e5e5e5] pl-10 pr-3 text-[13px]"
         />
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg border border-[#e8e6df] overflow-hidden">
+      <div className="bg-white rounded-lg border border-[#e5e5e5] overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <RefreshCw className="h-5 w-5 animate-spin text-[#9a978f]" />
+            <RefreshCw className="h-5 w-5 animate-spin text-[#9ca3af]" />
           </div>
         ) : filteredLinks.length === 0 ? (
           <div className="text-center py-12">
             <ExternalLink className="h-8 w-8 text-[#c8c6bc] mx-auto mb-2" />
             <p className="text-[14px] font-semibold text-[#3f3e3a]">Ingen affiliate-links</p>
-            <p className="text-[12px] text-[#78766d]">Opret dit første affiliate-link ovenfor</p>
+            <p className="text-[12px] text-[#9ca3af]">Opret dit første affiliate-link ovenfor</p>
           </div>
         ) : (
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-[#f2f1ed] bg-[#faf9f6]">
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f]">Banner</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f]">Navn</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f]">Butik</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f]">Kategori</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f] text-center">Aktiv</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f] text-right">Klik</th>
-                <th className="px-4 py-2 text-[11px] font-semibold text-[#9a978f]"></th>
+              <tr className="border-b border-[#f0f0f0] bg-[#fafafa]">
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af]">Banner</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af]">Navn</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af]">Butik</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af]">Kategori</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af] text-center">Aktiv</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af] text-right">Klik</th>
+                <th className="px-4 py-2 text-[11px] font-semibold text-[#9ca3af]"></th>
               </tr>
             </thead>
             <tbody>
               {filteredLinks.map((link, i) => (
-                <tr key={link.id} className={i % 2 === 0 ? 'bg-white' : 'bg-[#faf9f6]'}>
+                <tr key={link.id} className={i % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]'}>
                   <td className="px-4 py-2">
                     {link.banner_image ? (
                       <img src={link.banner_image} alt="" className="h-8 w-16 object-cover rounded" />
                     ) : (
-                      <div className="h-8 w-16 bg-[#f2f1ed] rounded flex items-center justify-center">
+                      <div className="h-8 w-16 bg-[#f5f5f5] rounded flex items-center justify-center">
                         <ImagePlus className="h-3 w-3 text-[#c8c6bc]" />
                       </div>
                     )}
                   </td>
                   <td className="px-4 py-2">
-                    <p className="text-[13px] font-semibold text-[#2f2f2d]">{link.name}</p>
-                    <p className="text-[10px] text-[#9a978f] truncate max-w-[200px]">{link.url}</p>
+                    <p className="text-[13px] font-semibold text-[#1a1a1a]">{link.name}</p>
+                    <p className="text-[10px] text-[#9ca3af] truncate max-w-[200px]">{link.url}</p>
                   </td>
-                  <td className="px-4 py-2 text-[12px] text-[#5f5d56]">{link.store ?? '—'}</td>
-                  <td className="px-4 py-2 text-[12px] text-[#5f5d56]">{link.category ?? '—'}</td>
+                  <td className="px-4 py-2 text-[12px] text-[#6b7280]">{link.store ?? '—'}</td>
+                  <td className="px-4 py-2 text-[12px] text-[#6b7280]">{link.category ?? '—'}</td>
                   <td className="px-4 py-2 text-center">
                     <button
                       onClick={() => handleToggle(link.id, !link.is_active)}
@@ -1172,10 +1172,10 @@ function AffiliateTab() {
                       {link.is_active ? 'Aktiv' : 'Inaktiv'}
                     </button>
                   </td>
-                  <td className="px-4 py-2 text-[13px] font-semibold text-[#2f2f2d] text-right">{link.click_count}</td>
+                  <td className="px-4 py-2 text-[13px] font-semibold text-[#1a1a1a] text-right">{link.click_count}</td>
                   <td className="px-4 py-2">
                     <div className="flex gap-1 justify-end">
-                      <button onClick={() => setEditLink(link)} className="p-1.5 rounded-md hover:bg-[#f2f1ed] text-[#78766d]">
+                      <button onClick={() => setEditLink(link)} className="p-1.5 rounded-md hover:bg-[#f5f5f5] text-[#9ca3af]">
                         <Pencil className="h-3.5 w-3.5" />
                       </button>
                       <button onClick={() => handleDelete(link.id)} className="p-1.5 rounded-md hover:bg-red-50 text-red-500">
@@ -1278,40 +1278,40 @@ function AffiliateFormModal({ link, onClose, onSaved }: { link: AffiliateLink | 
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center" onClick={onClose}>
       <div className="bg-white rounded-xl shadow-xl w-full max-w-[500px] max-h-[90vh] overflow-y-auto p-6" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-[16px] font-bold text-[#2f2f2d]">{link ? 'Rediger' : 'Opret'} affiliate-link</h3>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[#f2f1ed] text-[#78766d]">
+          <h3 className="text-[16px] font-bold text-[#1a1a1a]">{link ? 'Rediger' : 'Opret'} affiliate-link</h3>
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[#f5f5f5] text-[#9ca3af]">
             <X className="h-4 w-4" />
           </button>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="text-[12px] font-semibold text-[#5f5d56] block mb-1">Navn *</label>
-            <input value={name} onChange={e => setName(e.target.value)} placeholder="F.eks. Bilka Affiliate" className="w-full h-10 rounded-lg border border-[#e8e6df] px-3 text-[13px]" />
+            <label className="text-[12px] font-semibold text-[#6b7280] block mb-1">Navn *</label>
+            <input value={name} onChange={e => setName(e.target.value)} placeholder="F.eks. Bilka Affiliate" className="w-full h-10 rounded-lg border border-[#e5e5e5] px-3 text-[13px]" />
           </div>
           <div>
-            <label className="text-[12px] font-semibold text-[#5f5d56] block mb-1">Affiliate-URL *</label>
-            <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://..." className="w-full h-10 rounded-lg border border-[#e8e6df] px-3 text-[13px]" />
+            <label className="text-[12px] font-semibold text-[#6b7280] block mb-1">Affiliate-URL *</label>
+            <input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://..." className="w-full h-10 rounded-lg border border-[#e5e5e5] px-3 text-[13px]" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[12px] font-semibold text-[#5f5d56] block mb-1">Butik</label>
-              <input list="admin-store-list" value={store} onChange={e => setStore(e.target.value)} placeholder="Vælg butik..." className="w-full h-10 rounded-lg border border-[#e8e6df] px-3 text-[13px]" />
+              <label className="text-[12px] font-semibold text-[#6b7280] block mb-1">Butik</label>
+              <input list="admin-store-list" value={store} onChange={e => setStore(e.target.value)} placeholder="Vælg butik..." className="w-full h-10 rounded-lg border border-[#e5e5e5] px-3 text-[13px]" />
               <datalist id="admin-store-list">{STORES.map(s => <option key={s} value={s} />)}</datalist>
             </div>
             <div>
-              <label className="text-[12px] font-semibold text-[#5f5d56] block mb-1">Partner</label>
-              <input value={partner} onChange={e => setPartner(e.target.value)} placeholder="Partner-navn" className="w-full h-10 rounded-lg border border-[#e8e6df] px-3 text-[13px]" />
+              <label className="text-[12px] font-semibold text-[#6b7280] block mb-1">Partner</label>
+              <input value={partner} onChange={e => setPartner(e.target.value)} placeholder="Partner-navn" className="w-full h-10 rounded-lg border border-[#e5e5e5] px-3 text-[13px]" />
             </div>
           </div>
           <div>
-            <label className="text-[12px] font-semibold text-[#5f5d56] block mb-1">Kategori</label>
-            <input value={category} onChange={e => setCategory(e.target.value)} placeholder="F.eks. Elektronik, Mejeri" className="w-full h-10 rounded-lg border border-[#e8e6df] px-3 text-[13px]" />
+            <label className="text-[12px] font-semibold text-[#6b7280] block mb-1">Kategori</label>
+            <input value={category} onChange={e => setCategory(e.target.value)} placeholder="F.eks. Elektronik, Mejeri" className="w-full h-10 rounded-lg border border-[#e5e5e5] px-3 text-[13px]" />
           </div>
 
           {/* Banner */}
           <div>
-            <label className="text-[12px] font-semibold text-[#5f5d56] block mb-1">Banner-billede</label>
+            <label className="text-[12px] font-semibold text-[#6b7280] block mb-1">Banner-billede</label>
             <input ref={bannerRef} type="file" accept="image/*" onChange={handleBannerSelect} className="hidden" />
             {bannerImage ? (
               <div className="space-y-2">
@@ -1319,7 +1319,7 @@ function AffiliateFormModal({ link, onClose, onSaved }: { link: AffiliateLink | 
                   <img src={bannerImage} alt="Banner" className="w-full h-24 object-cover rounded-lg" style={{ objectPosition: `center ${bannerPositionY}%` }} />
                   <div className="absolute top-1.5 right-1.5 flex gap-1">
                     <button onClick={() => bannerRef.current?.click()} className="h-7 w-7 rounded-full bg-white/90 flex items-center justify-center shadow-sm">
-                      <Pencil className="h-3 w-3 text-[#5f5d56]" />
+                      <Pencil className="h-3 w-3 text-[#6b7280]" />
                     </button>
                     <button onClick={() => { setBannerImage(''); setBannerFile(null); }} className="h-7 w-7 rounded-full bg-white/90 flex items-center justify-center shadow-sm">
                       <X className="h-3 w-3 text-red-500" />
@@ -1327,29 +1327,29 @@ function AffiliateFormModal({ link, onClose, onSaved }: { link: AffiliateLink | 
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] text-[#78766d]">Position</span>
-                  <input type="range" min={0} max={100} value={bannerPositionY} onChange={e => setBannerPositionY(Number(e.target.value))} className="flex-1 h-1 accent-[#f58a2d]" />
-                  <span className="text-[11px] text-[#9a978f] w-8 text-right">{bannerPositionY}%</span>
+                  <span className="text-[11px] text-[#9ca3af]">Position</span>
+                  <input type="range" min={0} max={100} value={bannerPositionY} onChange={e => setBannerPositionY(Number(e.target.value))} className="flex-1 h-1 accent-[#1a1a1a]" />
+                  <span className="text-[11px] text-[#9ca3af] w-8 text-right">{bannerPositionY}%</span>
                 </div>
               </div>
             ) : (
-              <button onClick={() => bannerRef.current?.click()} className="w-full h-20 rounded-lg border-2 border-dashed border-[#d0cec5] bg-[#faf9f6] hover:border-[#b0ae9f] flex flex-col items-center justify-center gap-1 transition-colors">
+              <button onClick={() => bannerRef.current?.click()} className="w-full h-20 rounded-lg border-2 border-dashed border-[#d0cec5] bg-[#fafafa] hover:border-[#b0ae9f] flex flex-col items-center justify-center gap-1 transition-colors">
                 <ImagePlus className="h-5 w-5 text-[#c8c6bc]" />
-                <p className="text-[11px] text-[#78766d]">Upload banner</p>
+                <p className="text-[11px] text-[#9ca3af]">Upload banner</p>
               </button>
             )}
           </div>
 
           <div>
-            <label className="text-[12px] font-semibold text-[#5f5d56] block mb-1">Kilde / URL</label>
-            <input value={sourceUrl} onChange={e => setSourceUrl(e.target.value)} placeholder="URL til partner-side" className="w-full h-10 rounded-lg border border-[#e8e6df] px-3 text-[13px]" />
+            <label className="text-[12px] font-semibold text-[#6b7280] block mb-1">Kilde / URL</label>
+            <input value={sourceUrl} onChange={e => setSourceUrl(e.target.value)} placeholder="URL til partner-side" className="w-full h-10 rounded-lg border border-[#e5e5e5] px-3 text-[13px]" />
           </div>
 
-          <div className="flex items-center justify-between rounded-lg border border-[#e8e6df] px-4 py-3">
-            <span className="text-[13px] font-semibold text-[#2f2f2d]">Aktiv</span>
+          <div className="flex items-center justify-between rounded-lg border border-[#e5e5e5] px-4 py-3">
+            <span className="text-[13px] font-semibold text-[#1a1a1a]">Aktiv</span>
             <button
               onClick={() => setIsActive(!isActive)}
-              className={`w-12 h-7 rounded-full transition-colors ${isActive ? 'bg-[#34C759]' : 'bg-[#e8e6df]'}`}
+              className={`w-12 h-7 rounded-full transition-colors ${isActive ? 'bg-[#34C759]' : 'bg-[#e5e5e5]'}`}
             >
               <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform mx-1 ${isActive ? 'translate-x-5' : 'translate-x-0'}`} />
             </button>
@@ -1357,13 +1357,13 @@ function AffiliateFormModal({ link, onClose, onSaved }: { link: AffiliateLink | 
         </div>
 
         <div className="flex gap-2 mt-6">
-          <button onClick={onClose} className="flex-1 h-10 rounded-lg border border-[#e8e6df] text-[13px] font-medium text-[#5f5d56] hover:bg-[#f2f1ed]">
+          <button onClick={onClose} className="flex-1 h-10 rounded-lg border border-[#e5e5e5] text-[13px] font-medium text-[#6b7280] hover:bg-[#f5f5f5]">
             Annuller
           </button>
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex-1 h-10 rounded-lg bg-[#f58a2d] text-white text-[13px] font-semibold hover:bg-[#e47921] disabled:opacity-50"
+            className="flex-1 h-10 rounded-lg bg-[#1a1a1a] text-white text-[13px] font-semibold hover:bg-[#333] disabled:opacity-50"
           >
             {saving ? 'Gemmer...' : link ? 'Opdater' : 'Opret'}
           </button>
@@ -1493,17 +1493,17 @@ function NyhederTab() {
       {/* Top bar */}
       <div className="flex items-center gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9a978f]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9ca3af]" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Søg nyheder..."
-            className="w-full pl-9 pr-3 h-10 rounded-lg border border-[#e8e6df] bg-white text-[13px] text-[#2f2f2d] placeholder:text-[#b5b3ab] focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]"
+            className="w-full pl-9 pr-3 h-10 rounded-lg border border-[#e5e5e5] bg-white text-[13px] text-[#1a1a1a] placeholder:text-[#d1d5db] focus:outline-none focus:ring-2 focus:ring-[#1a1a1a]/30 focus:border-[#1a1a1a]"
           />
         </div>
         <button
           onClick={() => setCreateOpen(true)}
-          className="flex items-center gap-2 h-10 px-4 rounded-lg bg-[#f58a2d] text-white text-[13px] font-semibold hover:bg-[#e47921] transition-colors"
+          className="flex items-center gap-2 h-10 px-4 rounded-lg bg-[#1a1a1a] text-white text-[13px] font-semibold hover:bg-[#333] transition-colors"
         >
           <Plus className="h-4 w-4" />
           Opret nyhed
@@ -1513,19 +1513,19 @@ function NyhederTab() {
       {/* Article list */}
       {loading ? (
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="h-6 w-6 animate-spin text-[#9a978f]" />
+          <Loader2 className="h-6 w-6 animate-spin text-[#9ca3af]" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-xl bg-white border border-[#e8e6df] p-12 text-center">
+        <div className="rounded-xl bg-white border border-[#e5e5e5] p-12 text-center">
           <Newspaper className="h-10 w-10 text-[#c5c3bb] mx-auto mb-3" />
-          <p className="text-sm text-[#78766d]">
+          <p className="text-sm text-[#9ca3af]">
             {search ? 'Ingen nyheder matcher søgningen' : 'Ingen nyheder endnu'}
           </p>
         </div>
       ) : (
-        <div className="rounded-xl bg-white border border-[#e8e6df] overflow-hidden">
+        <div className="rounded-xl bg-white border border-[#e5e5e5] overflow-hidden">
           {/* Table header */}
-          <div className="grid grid-cols-[auto_1fr_120px_100px_80px_100px] items-center gap-3 px-4 py-2.5 bg-[#fafaf7] border-b border-[#e8e6df] text-[11px] font-semibold text-[#9a978f] uppercase tracking-wide">
+          <div className="grid grid-cols-[auto_1fr_120px_100px_80px_100px] items-center gap-3 px-4 py-2.5 bg-[#fafaf7] border-b border-[#e5e5e5] text-[11px] font-semibold text-[#9ca3af] uppercase tracking-wide">
             <div className="w-10" />
             <div>Titel</div>
             <div>Kilde</div>
@@ -1537,27 +1537,27 @@ function NyhederTab() {
           {filtered.map(article => (
             <div
               key={article.id}
-              className="grid grid-cols-[auto_1fr_120px_100px_80px_100px] items-center gap-3 px-4 py-3 border-b border-[#e8e6df] last:border-b-0 hover:bg-[#fafaf7] transition-colors"
+              className="grid grid-cols-[auto_1fr_120px_100px_80px_100px] items-center gap-3 px-4 py-3 border-b border-[#e5e5e5] last:border-b-0 hover:bg-[#fafaf7] transition-colors"
             >
               {/* Thumbnail */}
               {article.image ? (
                 <img src={article.image} alt="" className="h-10 w-10 rounded-lg object-cover" />
               ) : (
                 <div className="h-10 w-10 rounded-lg bg-[#f0efe8] flex items-center justify-center">
-                  <FileText className="h-4 w-4 text-[#9a978f]" />
+                  <FileText className="h-4 w-4 text-[#9ca3af]" />
                 </div>
               )}
 
               {/* Title */}
               <div className="min-w-0">
-                <p className="text-[13px] font-medium text-[#2f2f2d] truncate">{article.title}</p>
+                <p className="text-[13px] font-medium text-[#1a1a1a] truncate">{article.title}</p>
                 {article.description && (
-                  <p className="text-[11px] text-[#9a978f] truncate mt-0.5">{article.description}</p>
+                  <p className="text-[11px] text-[#9ca3af] truncate mt-0.5">{article.description}</p>
                 )}
               </div>
 
               {/* Source */}
-              <div className="text-[12px] text-[#78766d] truncate">
+              <div className="text-[12px] text-[#9ca3af] truncate">
                 {article.source ?? '—'}
                 {article.is_scraped && (
                   <span className="ml-1 inline-flex items-center gap-0.5 text-[#007AFF] text-[10px]">
@@ -1567,7 +1567,7 @@ function NyhederTab() {
               </div>
 
               {/* Date */}
-              <div className="text-[12px] text-[#78766d]">{article.date ?? '—'}</div>
+              <div className="text-[12px] text-[#9ca3af]">{article.date ?? '—'}</div>
 
               {/* Status badges */}
               <div className="flex items-center gap-1">
@@ -1580,7 +1580,7 @@ function NyhederTab() {
                     Aktiv
                   </span>
                 ) : (
-                  <span className="inline-flex items-center rounded-full bg-[#f2f1ed] px-2 py-0.5 text-[10px] font-semibold text-[#78766d] ring-1 ring-[#e8e6df]">
+                  <span className="inline-flex items-center rounded-full bg-[#f5f5f5] px-2 py-0.5 text-[10px] font-semibold text-[#9ca3af] ring-1 ring-[#e5e5e5]">
                     Kladde
                   </span>
                 )}
@@ -1595,7 +1595,7 @@ function NyhederTab() {
                     className={`p-1.5 rounded-md transition-colors ${
                       article.is_published
                         ? 'text-green-600 hover:bg-green-50'
-                        : 'text-[#9a978f] hover:bg-[#f2f1ed]'
+                        : 'text-[#9ca3af] hover:bg-[#f5f5f5]'
                     }`}
                   >
                     <Eye className="h-3.5 w-3.5" />
@@ -1606,7 +1606,7 @@ function NyhederTab() {
                     href={article.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-1.5 rounded-md text-[#9a978f] hover:text-[#007AFF] hover:bg-blue-50 transition-colors"
+                    className="p-1.5 rounded-md text-[#9ca3af] hover:text-[#007AFF] hover:bg-blue-50 transition-colors"
                     title="Åbn link"
                   >
                     <ExternalLink className="h-3.5 w-3.5" />
@@ -1614,7 +1614,7 @@ function NyhederTab() {
                 )}
                 <button
                   onClick={() => setEditArticle(article)}
-                  className="p-1.5 rounded-md text-[#9a978f] hover:text-[#2f2f2d] hover:bg-[#f2f1ed] transition-colors"
+                  className="p-1.5 rounded-md text-[#9ca3af] hover:text-[#1a1a1a] hover:bg-[#f5f5f5] transition-colors"
                   title="Rediger"
                 >
                   <Pencil className="h-3.5 w-3.5" />
@@ -1622,7 +1622,7 @@ function NyhederTab() {
                 {!article.is_demo && (
                   <button
                     onClick={() => setDeleteTarget(article)}
-                    className="p-1.5 rounded-md text-[#9a978f] hover:text-red-500 hover:bg-red-50 transition-colors"
+                    className="p-1.5 rounded-md text-[#9ca3af] hover:text-red-500 hover:bg-red-50 transition-colors"
                     title="Slet"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -1638,14 +1638,14 @@ function NyhederTab() {
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
           <div className="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full mx-4">
-            <h3 className="text-[15px] font-bold text-[#2f2f2d] mb-2">Slet nyhed?</h3>
-            <p className="text-[13px] text-[#78766d] mb-4">
+            <h3 className="text-[15px] font-bold text-[#1a1a1a] mb-2">Slet nyhed?</h3>
+            <p className="text-[13px] text-[#9ca3af] mb-4">
               &ldquo;{deleteTarget.title}&rdquo; slettes permanent.
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => setDeleteTarget(null)}
-                className="flex-1 h-10 rounded-lg border border-[#e8e6df] text-[13px] font-medium text-[#5f5d56] hover:bg-[#f2f1ed]"
+                className="flex-1 h-10 rounded-lg border border-[#e5e5e5] text-[13px] font-medium text-[#6b7280] hover:bg-[#f5f5f5]"
               >
                 Annuller
               </button>
@@ -1745,21 +1745,21 @@ function NewsForm({
     <div className="max-w-2xl">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-[18px] font-bold text-[#2f2f2d]">
+        <h2 className="text-[18px] font-bold text-[#1a1a1a]">
           {isEdit ? 'Rediger nyhed' : 'Opret nyhed'}
         </h2>
-        <button onClick={onClose} className="p-2 rounded-lg hover:bg-[#f2f1ed] text-[#78766d]">
+        <button onClick={onClose} className="p-2 rounded-lg hover:bg-[#f5f5f5] text-[#9ca3af]">
           <X className="h-5 w-5" />
         </button>
       </div>
 
       {/* Mode toggle (only for new) */}
       {!isEdit && (
-        <div className="flex rounded-lg bg-[#f2f1ed] p-1 mb-5">
+        <div className="flex rounded-lg bg-[#f5f5f5] p-1 mb-5">
           <button
             onClick={() => setMode('scrape')}
             className={`flex-1 flex items-center justify-center gap-2 rounded-md py-2 text-[13px] font-medium transition-all ${
-              mode === 'scrape' ? 'bg-white text-[#2f2f2d] shadow-sm' : 'text-[#78766d]'
+              mode === 'scrape' ? 'bg-white text-[#1a1a1a] shadow-sm' : 'text-[#9ca3af]'
             }`}
           >
             <Globe className="h-3.5 w-3.5" />
@@ -1768,7 +1768,7 @@ function NewsForm({
           <button
             onClick={() => setMode('manual')}
             className={`flex-1 flex items-center justify-center gap-2 rounded-md py-2 text-[13px] font-medium transition-all ${
-              mode === 'manual' ? 'bg-white text-[#2f2f2d] shadow-sm' : 'text-[#78766d]'
+              mode === 'manual' ? 'bg-white text-[#1a1a1a] shadow-sm' : 'text-[#9ca3af]'
             }`}
           >
             <FileText className="h-3.5 w-3.5" />
@@ -1779,74 +1779,74 @@ function NewsForm({
 
       {/* Scrape URL input */}
       {mode === 'scrape' && !isEdit && (
-        <div className="rounded-xl bg-white border border-[#e8e6df] p-4 mb-5">
-          <label className="block text-[12px] font-semibold text-[#5f5d56] mb-1.5">Artikel-URL</label>
+        <div className="rounded-xl bg-white border border-[#e5e5e5] p-4 mb-5">
+          <label className="block text-[12px] font-semibold text-[#6b7280] mb-1.5">Artikel-URL</label>
           <div className="flex gap-2">
             <input
               value={scrapeUrl}
               onChange={e => setScrapeUrl(e.target.value)}
               placeholder="https://..."
-              className="flex-1 h-10 px-3 rounded-lg border border-[#e8e6df] text-[13px] text-[#2f2f2d] placeholder:text-[#b5b3ab] focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]"
+              className="flex-1 h-10 px-3 rounded-lg border border-[#e5e5e5] text-[13px] text-[#1a1a1a] placeholder:text-[#d1d5db] focus:outline-none focus:ring-2 focus:ring-[#1a1a1a]/30 focus:border-[#1a1a1a]"
             />
             <button
               onClick={handleScrape}
               disabled={scraping}
-              className="flex items-center gap-2 h-10 px-4 rounded-lg bg-[#2f2f2d] text-white text-[13px] font-medium hover:bg-[#1a1a1a] disabled:opacity-50"
+              className="flex items-center gap-2 h-10 px-4 rounded-lg bg-[#1a1a1a] text-white text-[13px] font-medium hover:bg-[#1a1a1a] disabled:opacity-50"
             >
               {scraping ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Globe className="h-3.5 w-3.5" />}
               Hent
             </button>
           </div>
-          {scraping && <p className="text-[11px] text-[#9a978f] mt-2">Henter artikel-data...</p>}
+          {scraping && <p className="text-[11px] text-[#9ca3af] mt-2">Henter artikel-data...</p>}
         </div>
       )}
 
       {/* Form fields */}
       <div className="space-y-4">
         <div>
-          <label className="block text-[12px] font-semibold text-[#5f5d56] mb-1.5">Titel *</label>
+          <label className="block text-[12px] font-semibold text-[#6b7280] mb-1.5">Titel *</label>
           <input
             value={title}
             onChange={e => setTitle(e.target.value)}
             placeholder="Nyhedens titel"
-            className="w-full h-10 px-3 rounded-lg border border-[#e8e6df] bg-white text-[13px] text-[#2f2f2d] placeholder:text-[#b5b3ab] focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]"
+            className="w-full h-10 px-3 rounded-lg border border-[#e5e5e5] bg-white text-[13px] text-[#1a1a1a] placeholder:text-[#d1d5db] focus:outline-none focus:ring-2 focus:ring-[#1a1a1a]/30 focus:border-[#1a1a1a]"
           />
         </div>
 
         <div>
-          <label className="block text-[12px] font-semibold text-[#5f5d56] mb-1.5">Beskrivelse</label>
+          <label className="block text-[12px] font-semibold text-[#6b7280] mb-1.5">Beskrivelse</label>
           <textarea
             value={description}
             onChange={e => setDescription(e.target.value)}
             placeholder="Kort beskrivelse..."
             rows={2}
-            className="w-full px-3 py-2 rounded-lg border border-[#e8e6df] bg-white text-[13px] text-[#2f2f2d] placeholder:text-[#b5b3ab] resize-y focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]"
+            className="w-full px-3 py-2 rounded-lg border border-[#e5e5e5] bg-white text-[13px] text-[#1a1a1a] placeholder:text-[#d1d5db] resize-y focus:outline-none focus:ring-2 focus:ring-[#1a1a1a]/30 focus:border-[#1a1a1a]"
           />
         </div>
 
         <div>
-          <label className="block text-[12px] font-semibold text-[#5f5d56] mb-1.5">Fuld tekst</label>
+          <label className="block text-[12px] font-semibold text-[#6b7280] mb-1.5">Fuld tekst</label>
           <textarea
             value={fullText}
             onChange={e => setFullText(e.target.value)}
             placeholder="Artikelens fulde tekst..."
             rows={5}
-            className="w-full px-3 py-2 rounded-lg border border-[#e8e6df] bg-white text-[13px] text-[#2f2f2d] placeholder:text-[#b5b3ab] resize-y focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]"
+            className="w-full px-3 py-2 rounded-lg border border-[#e5e5e5] bg-white text-[13px] text-[#1a1a1a] placeholder:text-[#d1d5db] resize-y focus:outline-none focus:ring-2 focus:ring-[#1a1a1a]/30 focus:border-[#1a1a1a]"
           />
         </div>
 
         {/* Image preview + URL */}
         <div>
-          <label className="block text-[12px] font-semibold text-[#5f5d56] mb-1.5">Billede-URL</label>
+          <label className="block text-[12px] font-semibold text-[#6b7280] mb-1.5">Billede-URL</label>
           <input
             value={image}
             onChange={e => setImage(e.target.value)}
             placeholder="https://..."
-            className="w-full h-10 px-3 rounded-lg border border-[#e8e6df] bg-white text-[13px] text-[#2f2f2d] placeholder:text-[#b5b3ab] focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]"
+            className="w-full h-10 px-3 rounded-lg border border-[#e5e5e5] bg-white text-[13px] text-[#1a1a1a] placeholder:text-[#d1d5db] focus:outline-none focus:ring-2 focus:ring-[#1a1a1a]/30 focus:border-[#1a1a1a]"
           />
           {image && (
             <div className="relative mt-2">
-              <img src={image} alt="" className="w-full h-40 object-cover rounded-lg border border-[#e8e6df]" />
+              <img src={image} alt="" className="w-full h-40 object-cover rounded-lg border border-[#e5e5e5]" />
               <button
                 onClick={() => setImage('')}
                 className="absolute top-2 right-2 bg-black/50 rounded-full p-1 hover:bg-black/70"
@@ -1859,32 +1859,32 @@ function NewsForm({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-[12px] font-semibold text-[#5f5d56] mb-1.5">Kilde</label>
+            <label className="block text-[12px] font-semibold text-[#6b7280] mb-1.5">Kilde</label>
             <input
               value={source}
               onChange={e => setSource(e.target.value)}
               placeholder="F.eks. DR, TV2"
-              className="w-full h-10 px-3 rounded-lg border border-[#e8e6df] bg-white text-[13px] text-[#2f2f2d] placeholder:text-[#b5b3ab] focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]"
+              className="w-full h-10 px-3 rounded-lg border border-[#e5e5e5] bg-white text-[13px] text-[#1a1a1a] placeholder:text-[#d1d5db] focus:outline-none focus:ring-2 focus:ring-[#1a1a1a]/30 focus:border-[#1a1a1a]"
             />
           </div>
           <div>
-            <label className="block text-[12px] font-semibold text-[#5f5d56] mb-1.5">Dato</label>
+            <label className="block text-[12px] font-semibold text-[#6b7280] mb-1.5">Dato</label>
             <input
               value={date}
               onChange={e => setDate(e.target.value)}
               placeholder="F.eks. 1. mar 2026"
-              className="w-full h-10 px-3 rounded-lg border border-[#e8e6df] bg-white text-[13px] text-[#2f2f2d] placeholder:text-[#b5b3ab] focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]"
+              className="w-full h-10 px-3 rounded-lg border border-[#e5e5e5] bg-white text-[13px] text-[#1a1a1a] placeholder:text-[#d1d5db] focus:outline-none focus:ring-2 focus:ring-[#1a1a1a]/30 focus:border-[#1a1a1a]"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-[12px] font-semibold text-[#5f5d56] mb-1.5">Link til artikel</label>
+          <label className="block text-[12px] font-semibold text-[#6b7280] mb-1.5">Link til artikel</label>
           <input
             value={url}
             onChange={e => setUrl(e.target.value)}
             placeholder="https://..."
-            className="w-full h-10 px-3 rounded-lg border border-[#e8e6df] bg-white text-[13px] text-[#2f2f2d] placeholder:text-[#b5b3ab] focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]"
+            className="w-full h-10 px-3 rounded-lg border border-[#e5e5e5] bg-white text-[13px] text-[#1a1a1a] placeholder:text-[#d1d5db] focus:outline-none focus:ring-2 focus:ring-[#1a1a1a]/30 focus:border-[#1a1a1a]"
           />
           {url && (
             <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 mt-1 text-[11px] text-[#007AFF] hover:underline">
@@ -1894,8 +1894,8 @@ function NewsForm({
         </div>
 
         {/* Published toggle */}
-        <div className="flex items-center justify-between rounded-xl bg-white border border-[#e8e6df] px-4 py-3">
-          <span className="text-[13px] font-medium text-[#2f2f2d]">Publiceret</span>
+        <div className="flex items-center justify-between rounded-xl bg-white border border-[#e5e5e5] px-4 py-3">
+          <span className="text-[13px] font-medium text-[#1a1a1a]">Publiceret</span>
           <button
             onClick={() => setIsPublished(!isPublished)}
             className={`relative w-11 h-6 rounded-full transition-colors ${isPublished ? 'bg-green-500' : 'bg-[#d1d0ca]'}`}
@@ -1908,14 +1908,14 @@ function NewsForm({
         <div className="flex gap-3 pt-2">
           <button
             onClick={onClose}
-            className="flex-1 h-10 rounded-lg border border-[#e8e6df] text-[13px] font-medium text-[#5f5d56] hover:bg-[#f2f1ed]"
+            className="flex-1 h-10 rounded-lg border border-[#e5e5e5] text-[13px] font-medium text-[#6b7280] hover:bg-[#f5f5f5]"
           >
             Annuller
           </button>
           <button
             onClick={handleSave}
             disabled={saving || !title.trim()}
-            className="flex-1 h-10 rounded-lg bg-[#f58a2d] text-white text-[13px] font-semibold hover:bg-[#e47921] disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 h-10 rounded-lg bg-[#1a1a1a] text-white text-[13px] font-semibold hover:bg-[#333] disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {saving && <Loader2 className="h-4 w-4 animate-spin" />}
             {saving ? 'Gemmer...' : isEdit ? 'Gem ændringer' : 'Opret nyhed'}

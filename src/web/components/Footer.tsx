@@ -34,7 +34,8 @@ export function Footer() {
             <ul className="space-y-2.5 text-sm">
               <li className="text-white/50">kontakt@huska.dk</li>
               <li><a href="#privatlivspolitik" className="text-white/50 hover:text-white transition-colors">Privatlivspolitik</a></li>
-              <li><a href="#" className="text-white/50 hover:text-white transition-colors">Vilkår og betingelser</a></li>
+              <li><a href="#kontakt" className="text-white/50 hover:text-white transition-colors">Kontakt</a></li>
+              <li><a href="#vilkar" className="text-white/50 hover:text-white transition-colors">Vilkår og betingelser</a></li>
             </ul>
           </div>
         </div>
