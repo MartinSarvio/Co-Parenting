@@ -66,3 +66,12 @@ html {
 .animate-float-slow {
   animation: float 5s ease-in-out 0.5s infinite;
 }
+
+/* Feature card hover lift */
+.feature-card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.feature-card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+}

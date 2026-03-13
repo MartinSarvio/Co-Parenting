@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import {
   Calendar,
   MessageCircle,
@@ -34,7 +35,6 @@ import {
 function HeroSection() {
   return (
     <section className="relative overflow-hidden min-h-[90vh] flex items-center">
-      {/* Background decorations */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[-200px] right-[-150px] w-[600px] h-[600px] rounded-full bg-gradient-to-br from-[#f58a2d]/15 to-[#f7a95c]/5 blur-xl" />
         <div className="absolute bottom-[-150px] left-[-100px] w-[500px] h-[500px] rounded-full bg-gradient-to-tr from-[#f58a2d]/8 to-transparent blur-xl" />
@@ -42,8 +42,11 @@ function HeroSection() {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-20 md:pt-16 md:pb-28 relative z-10">
         <div className="grid md:grid-cols-2 gap-16 items-center">
-          {/* Text */}
-          <div className="animate-fadeIn">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/90 border border-[#f58a2d]/20 text-[#e8773f] text-xs font-semibold mb-8 shadow-sm">
               <Heart size={14} className="fill-[#f58a2d]/30" /> Lavet til familier i Danmark
             </div>
@@ -90,16 +93,19 @@ function HeroSection() {
               <span className="flex items-center gap-1.5"><Shield size={15} className="text-[#78766d]" /> Sikker</span>
               <span className="flex items-center gap-1.5"><Clock size={15} className="text-[#78766d]" /> Tidsbesparende</span>
               <span className="flex items-center gap-1.5 text-[#f58a2d] font-bold">
-                <Sparkles size={15} /> Gratis
+                <Sparkles size={15} /> Freemium
               </span>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Phone mockup */}
-          <div className="flex justify-center animate-fadeIn" style={{ animationDelay: '0.2s' }}>
+          <motion.div
+            className="flex justify-center"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+          >
             <div className="relative">
               <div className="absolute inset-0 scale-110 rounded-[3.5rem] bg-gradient-to-b from-[#f58a2d]/15 to-transparent blur-xl" />
-
               <div className="relative w-[290px] h-[590px] bg-gradient-to-b from-[#fafafa] to-white rounded-[3rem] shadow-2xl shadow-black/15 border border-[#e0ded8] p-3">
                 <div className="w-full h-full rounded-[2.2rem] overflow-hidden relative">
                   <img
@@ -109,11 +115,10 @@ function HeroSection() {
                     loading="lazy"
                   />
                 </div>
-
                 <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-[100px] h-[28px] bg-[#1a1a1a] rounded-full" />
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 
@@ -130,31 +135,58 @@ function HeroSection() {
 /*  FEATURES                                                                 */
 /* ═══════════════════════════════════════════════════════════════════════════ */
 
-const features = [
-  { icon: Calendar, title: 'Samværsplan', desc: 'Planlæg samvær med fast 7/7, 10/4 eller fleksibel model. Altid overblik over hvem der har børnene.', highlight: true },
-  { icon: CalendarHeart, title: 'Kalender', desc: 'Fælles familiekalender med begivenheder, aktiviteter og vigtige datoer for alle.' },
-  { icon: MessageCircle, title: 'Kommunikation', desc: 'Struktureret kommunikation mellem forældre. Tråde, beskeder og delt historik.' },
-  { icon: CheckSquare, title: 'Opgaver', desc: 'Fordel og følg op på familiens opgaver. Se hvem der gør hvad og hvornår.' },
-  { icon: UtensilsCrossed, title: 'Mad & Indkøb', desc: 'Madplan og indkøbslister. Se ugens bedste tilbud fra lokale butikker.' },
-  { icon: Wallet, title: 'Udgifter', desc: 'Del udgifter retfærdigt. Hold styr på budgetter, balancer og kvitteringer.' },
-  { icon: FileText, title: 'Dokumenter', desc: 'Opbevar vigtige dokumenter sikkert. Altid tilgængelige for begge forældre.' },
-  { icon: Camera, title: 'Fotoalbum', desc: 'Del minder med familien. Organisér billeder i albums og del med den anden forælder.' },
-  { icon: BookOpen, title: 'Dagbog', desc: 'Hold styr på hverdagen med noter og dagbogsindlæg. Se historik over tid.' },
-  { icon: CalendarHeart, title: 'Vigtige Datoer', desc: 'Glem aldrig en vigtig dag. Fødselsdage, lægebesøg og andre milepæle.' },
-  { icon: Scale, title: 'Beslutningslog', desc: 'Dokumentér fælles beslutninger. Altid enighed om hvad der er aftalt.' },
-  { icon: Tag, title: 'Tilbud', desc: 'Se ugens bedste tilbud fra danske supermarkeder. Spar penge på dagligvarer.' },
+const heroFeatures = [
+  {
+    icon: Calendar,
+    title: 'Samværsplan',
+    desc: 'Planlæg samvær med fast 7/7, 10/4 eller fleksibel model. Altid overblik over hvem der har børnene — ingen misforståelser.',
+    color: 'from-[#fff4e6] to-[#ffe8cc]',
+    iconBg: 'from-[#f7a95c] to-[#e8773f]',
+    items: ['7/7 og 10/4 modeller', 'Fleksibel tilpasning', 'Delt kalendervisning'],
+  },
+  {
+    icon: MessageCircle,
+    title: 'Kalender & Kommunikation',
+    desc: 'Fælles familiekalender kombineret med struktureret kommunikation. Tråde, beskeder og delt historik — alt på ét sted.',
+    color: 'from-[#f0f4ff] to-[#e4ecff]',
+    iconBg: 'from-[#6b8cff] to-[#4a6cf7]',
+    items: ['Fælles begivenheder', 'Beskedtråde', 'Push-notifikationer'],
+  },
+  {
+    icon: Wallet,
+    title: 'Udgifter & Opgaver',
+    desc: 'Del udgifter retfærdigt og fordel familiens opgaver. Hold styr på budgetter, balancer og hvem der gør hvad.',
+    color: 'from-[#f0fdf4] to-[#dcfce7]',
+    iconBg: 'from-[#4ade80] to-[#22c55e]',
+    items: ['Delte budgetter', 'Opgavefordeling', 'Kvitteringssporing'],
+  },
+];
+
+const gridFeatures = [
+  { icon: UtensilsCrossed, title: 'Mad & Indkøb', desc: 'Madplan og indkøbslister med ugens bedste tilbud.' },
+  { icon: FileText, title: 'Dokumenter', desc: 'Opbevar vigtige dokumenter sikkert og delt.' },
+  { icon: Camera, title: 'Fotoalbum', desc: 'Del minder og organisér billeder i albums.' },
+  { icon: BookOpen, title: 'Dagbog', desc: 'Noter og dagbogsindlæg med historik.' },
+  { icon: CalendarHeart, title: 'Vigtige Datoer', desc: 'Fødselsdage, lægebesøg og milepæle.' },
+  { icon: Scale, title: 'Beslutningslog', desc: 'Dokumentér fælles beslutninger.' },
+  { icon: CheckSquare, title: 'Opgaver', desc: 'Fordel og følg op på familiens to-dos.' },
+  { icon: Tag, title: 'Tilbud', desc: 'Ugens bedste tilbud fra danske butikker.' },
+  { icon: Users, title: 'Familietyper', desc: 'Tilpasset co-parenting og sammensatte familier.' },
 ];
 
 function FeatureSection() {
-  const highlight = features[0];
-  const rest = features.slice(1);
-
   return (
     <section id="funktioner" className="py-24 relative">
       <div className="absolute inset-0 bg-gradient-to-b from-white/50 via-[#f9f8f5] to-[#f2f1ed] pointer-events-none" />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center mb-16">
+        <motion.div
+          className="text-center mb-20"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#f58a2d]/8 text-[#e8773f] text-xs font-semibold mb-4">
             <Zap size={13} /> Alt-i-én platform
           </div>
@@ -164,38 +196,73 @@ function FeatureSection() {
           <p className="mt-4 text-[#78766d] max-w-lg mx-auto text-[1.05rem] leading-relaxed">
             Fra samværsplan til dagligvarer — Huska samler alle familiens funktioner på ét sted.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="mb-8">
-          <div className="group relative p-8 rounded-3xl border border-[#f58a2d]/20 bg-gradient-to-br from-white to-[#fff8f0] hover:shadow-lg hover:shadow-[#f58a2d]/8 transition-shadow duration-200 overflow-hidden">
-            <div className="absolute top-0 right-0 w-[300px] h-[300px] rounded-full bg-[#f58a2d]/5 blur-xl pointer-events-none" />
-            <div className="relative flex flex-col md:flex-row gap-6 items-start md:items-center">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#f7a95c] to-[#e8773f] flex items-center justify-center shadow-lg shadow-[#f58a2d]/20 shrink-0">
-                <highlight.icon size={26} className="text-white" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-xl font-bold text-[#2f2f2f]">{highlight.title}</h3>
-                  <span className="px-2 py-0.5 rounded-full bg-[#f58a2d]/10 text-[#e8773f] text-[10px] font-bold uppercase tracking-wide">Populær</span>
+        {/* Hero features — alternating large cards */}
+        <div className="space-y-8 mb-20">
+          {heroFeatures.map((feature, i) => {
+            const isReversed = i % 2 !== 0;
+            return (
+              <motion.div
+                key={feature.title}
+                initial={{ opacity: 0, x: isReversed ? 60 : -60 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: '-80px' }}
+                transition={{ duration: 0.6, ease: 'easeOut' }}
+                className={`rounded-3xl bg-gradient-to-br ${feature.color} p-8 md:p-12 overflow-hidden`}
+              >
+                <div className={`grid md:grid-cols-2 gap-8 items-center ${isReversed ? 'md:[direction:rtl]' : ''}`}>
+                  <div className={isReversed ? 'md:[direction:ltr]' : ''}>
+                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.iconBg} flex items-center justify-center shadow-lg mb-6`}>
+                      <feature.icon size={26} className="text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-[#2f2f2f] mb-3">{feature.title}</h3>
+                    <p className="text-[#5f5d56] leading-relaxed text-[1.05rem] mb-6">{feature.desc}</p>
+                    <ul className="space-y-2.5">
+                      {feature.items.map((item) => (
+                        <li key={item} className="flex items-center gap-2.5 text-[14px] text-[#4a4a4a]">
+                          <div className={`w-5 h-5 rounded-full bg-gradient-to-br ${feature.iconBg} flex items-center justify-center shrink-0`}>
+                            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                              <path d="M2 5L4.5 7.5L8 3" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          </div>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className={`flex justify-center ${isReversed ? 'md:[direction:ltr]' : ''}`}>
+                    <div className="relative w-48 h-48 md:w-56 md:h-56">
+                      <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${feature.iconBg} opacity-10`} />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <feature.icon size={80} className="text-[#2f2f2f]/15" strokeWidth={1} />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-[#5f5d56] leading-relaxed max-w-xl">{highlight.desc}</p>
-              </div>
-            </div>
-          </div>
+              </motion.div>
+            );
+          })}
         </div>
 
+        {/* Compact grid — remaining features */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {rest.map((f) => (
-            <div
+          {gridFeatures.map((f, i) => (
+            <motion.div
               key={f.title}
-              className="group p-6 rounded-2xl bg-white/80 border border-[#e8e6df] hover:border-[#f58a2d]/25 hover:shadow-md hover:shadow-[#f58a2d]/5 transition-shadow duration-200"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: i * 0.06 }}
+              className="feature-card-hover group p-6 rounded-2xl bg-white/80 border border-[#e8e6df] cursor-default"
             >
-              <div className="w-11 h-11 rounded-xl bg-[#f58a2d]/8 flex items-center justify-center mb-4 group-hover:bg-[#f58a2d]/12 transition-colors duration-200">
+              <div className="w-11 h-11 rounded-xl bg-[#f58a2d]/8 flex items-center justify-center mb-4 group-hover:bg-[#f58a2d]/15 transition-colors duration-200">
                 <f.icon size={21} className="text-[#f58a2d]" />
               </div>
               <h3 className="text-[15px] font-bold text-[#2f2f2f]">{f.title}</h3>
               <p className="mt-1.5 text-[13px] text-[#78766d] leading-relaxed">{f.desc}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -203,9 +270,13 @@ function FeatureSection() {
   );
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/*  STATS                                                                    */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
 const stats = [
   { icon: Zap, value: '12+', label: 'Funktioner' },
-  { icon: Heart, value: '100%', label: 'Gratis' },
+  { icon: Heart, value: 'Freemium', label: 'Gratis basisfunktioner' },
   { icon: Globe, value: 'Dansk', label: 'Bygget i DK' },
   { icon: Lock, value: 'Sikker', label: 'Krypteret data' },
 ];
@@ -215,18 +286,29 @@ function StatsSection() {
     <section className="py-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {stats.map((s) => (
-            <div key={s.label} className="text-center p-5 rounded-2xl bg-white/60 border border-[#e8e6df]">
+          {stats.map((s, i) => (
+            <motion.div
+              key={s.label}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: i * 0.1 }}
+              className="text-center p-5 rounded-2xl bg-white/60 border border-[#e8e6df]"
+            >
               <s.icon size={22} className="mx-auto text-[#f58a2d] mb-3" />
               <p className="text-2xl font-extrabold text-[#2f2f2f] tracking-tight">{s.value}</p>
               <p className="text-[12px] text-[#9a978f] font-medium mt-0.5">{s.label}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
     </section>
   );
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/*  HOW IT WORKS                                                             */
+/* ═══════════════════════════════════════════════════════════════════════════ */
 
 const steps = [
   { num: '1', title: 'Opret din familie', desc: 'Download appen og opret en familieprofil. Vælg jeres familiemodel — co-parenting, sammensat eller under samme tag.', icon: Users },
@@ -240,20 +322,33 @@ function HowItWorksSection() {
       <div className="absolute inset-0 bg-gradient-to-b from-[#f2f1ed] via-[#f7f6f2] to-white/50 pointer-events-none" />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="text-center mb-16">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
           <h2 className="text-3xl sm:text-4xl font-extrabold text-[#2f2f2f] tracking-tight">
             Kom i gang på 3 trin
           </h2>
           <p className="mt-3 text-[#78766d] text-[1.05rem]">
             Det tager under 5 minutter at sætte op.
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
           <div className="hidden md:block absolute top-[52px] left-[20%] right-[20%] h-[2px] bg-gradient-to-r from-[#f58a2d]/20 via-[#f58a2d]/30 to-[#f58a2d]/20" />
 
-          {steps.map((s) => (
-            <div key={s.num} className="text-center relative">
+          {steps.map((s, i) => (
+            <motion.div
+              key={s.num}
+              className="text-center relative"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.15 }}
+            >
               <div className="relative inline-block mb-5">
                 <div
                   className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-white shadow-lg shadow-[#f58a2d]/20 relative z-10"
@@ -267,13 +362,17 @@ function HowItWorksSection() {
               </div>
               <h3 className="text-lg font-bold text-[#2f2f2f]">{s.title}</h3>
               <p className="mt-2 text-[14px] text-[#78766d] max-w-[280px] mx-auto leading-relaxed">{s.desc}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
     </section>
   );
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/*  ABOUT                                                                    */
+/* ═══════════════════════════════════════════════════════════════════════════ */
 
 const familyTypes = [
   { icon: HandHeart, label: 'Co-parenting', desc: 'Fast eller fleksibel samværsplan' },
@@ -290,7 +389,12 @@ function AboutSection() {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid md:grid-cols-2 gap-16 items-center">
-          <div>
+          <motion.div
+            initial={{ opacity: 0, x: -40 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
             <h2 className="text-3xl sm:text-4xl font-extrabold text-white leading-[1.1] tracking-tight">
               Bygget til familier
               <span
@@ -309,18 +413,22 @@ function AboutSection() {
               Vi tror på, at mindre friktion i hverdagen giver mere tid til det der virkelig tæller:
               at være sammen med dem, man holder af.
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-2 gap-4">
-            {familyTypes.map((item) => (
-              <div
+            {familyTypes.map((item, i) => (
+              <motion.div
                 key={item.label}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: i * 0.1 }}
                 className="p-5 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-colors duration-200"
               >
                 <item.icon size={22} className="text-[#f58a2d] mb-3" />
                 <p className="text-[14px] font-semibold text-white">{item.label}</p>
                 <p className="text-[12px] text-white/50 mt-1">{item.desc}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -329,18 +437,28 @@ function AboutSection() {
   );
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/*  CTA                                                                      */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
 function CTASection() {
   return (
     <section className="py-24">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative text-center rounded-[2rem] p-12 md:p-20 overflow-hidden">
+        <motion.div
+          className="relative text-center rounded-[2rem] p-12 md:p-20 overflow-hidden"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="absolute inset-0 bg-gradient-to-br from-[#fef3e7] via-[#fff0de] to-[#fde8d0]" />
           <div className="absolute top-[-80px] right-[-40px] w-[300px] h-[300px] rounded-full bg-[#f58a2d]/10 blur-xl pointer-events-none" />
           <div className="absolute bottom-[-60px] left-[-30px] w-[250px] h-[250px] rounded-full bg-[#f58a2d]/8 blur-xl pointer-events-none" />
 
           <div className="relative z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 text-[#e8773f] text-xs font-bold mb-6 shadow-sm">
-              <Sparkles size={14} /> Gratis at bruge
+              <Sparkles size={14} /> Kom i gang i dag
             </div>
 
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#2f2f2f] tracking-tight">
@@ -349,7 +467,7 @@ function CTASection() {
               <span style={{ color: '#f58a2d' }}>hverdagen?</span>
             </h2>
             <p className="mt-4 text-[#5f5d56] max-w-md mx-auto text-[1.05rem] leading-relaxed">
-              Hent Huska gratis og kom i gang med at skabe mere struktur og mindre friktion i din families hverdag.
+              Hent Huska og kom i gang med at skabe mere struktur og mindre friktion i din families hverdag.
             </p>
 
             <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
@@ -366,11 +484,15 @@ function CTASection() {
               </a>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/*  PAGE                                                                     */
+/* ═══════════════════════════════════════════════════════════════════════════ */
 
 export default function LandingPage() {
   return (
