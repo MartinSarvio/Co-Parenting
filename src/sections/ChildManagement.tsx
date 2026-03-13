@@ -193,8 +193,8 @@ export function ChildManagement() {
         className="flex items-center justify-between"
       >
         <div>
-          <h1 className="text-2xl font-semibold text-[#2f2f2d]">Børn</h1>
-          <p className="text-[#75736b]">Administrer dine børn</p>
+          <h1 className="text-2xl font-semibold text-foreground">Børn</h1>
+          <p className="text-muted-foreground">Administrer dine børn</p>
         </div>
         <Button disabled={!canAddChild} onClick={() => setIsAddOpen(true)}>
           <Plus className="w-4 h-4 mr-1" />
@@ -233,8 +233,8 @@ export function ChildManagement() {
               >
                 <Card
                   className={cn(
-                    "border-slate-200 bg-white cursor-pointer transition-all",
-                    isSelected && "border-[#f3c59d] ring-2 ring-[#ffe7d2]"
+                    "border-slate-200 bg-card cursor-pointer transition-all",
+                    isSelected && "border-orange-tint ring-2 ring-[#ffe7d2]"
                   )}
                   onClick={() => setCurrentChildId(child.id)}
                 >
@@ -242,23 +242,23 @@ export function ChildManagement() {
                     <div className="absolute top-3 right-3 z-10">
                       <button
                         onClick={(e) => { e.stopPropagation(); setMenuOpenForChild(menuOpenForChild === child.id ? null : child.id); }}
-                        className="flex h-8 w-8 items-center justify-center rounded-[8px] text-[#78766d] hover:bg-[#f0efe8] transition-colors"
+                        className="flex h-8 w-8 items-center justify-center rounded-[8px] text-muted-foreground hover:bg-muted transition-colors"
                       >
                         <MoreVertical className="h-4 w-4" />
                       </button>
                       {/* Dropdown popover */}
                       {menuOpenForChild === child.id && (
-                        <div className="absolute right-0 top-full mt-1 w-40 rounded-[8px] bg-white shadow-lg border border-[#e5e3dc] z-20 overflow-hidden">
+                        <div className="absolute right-0 top-full mt-1 w-40 rounded-[8px] bg-card shadow-lg border border-border z-20 overflow-hidden">
                           <button
                             onClick={(e) => { e.stopPropagation(); handleEditChild(child.id); setMenuOpenForChild(null); }}
-                            className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left hover:bg-[#faf9f6] transition-colors"
+                            className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left hover:bg-card transition-colors"
                           >
                             <Edit3 className="h-3.5 w-3.5 text-[#f58a2d]" />
-                            <span className="text-[13px] font-medium text-[#2f2f2d]">Rediger</span>
+                            <span className="text-[13px] font-medium text-foreground">Rediger</span>
                           </button>
                           <button
                             onClick={(e) => { e.stopPropagation(); handleRemoveChild(child.id); setMenuOpenForChild(null); }}
-                            className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left hover:bg-[#faf9f6] transition-colors"
+                            className="flex w-full items-center gap-2.5 px-3 py-2.5 text-left hover:bg-card transition-colors"
                           >
                             <Trash2 className="h-3.5 w-3.5 text-[#e53e3e]" />
                             <span className="text-[13px] font-medium text-[#e53e3e]">Fjern</span>
@@ -269,7 +269,7 @@ export function ChildManagement() {
                     <div className="flex items-start gap-3">
                       <Avatar className="w-14 h-14 border-2 border-white shadow-sm">
                         <AvatarImage src={child.avatar} />
-                        <AvatarFallback className="bg-[#fff2e6] text-[#bf6722] text-lg">
+                        <AvatarFallback className="bg-orange-tint text-[#bf6722] text-lg">
                           {child.name[0]}
                         </AvatarFallback>
                       </Avatar>
@@ -282,7 +282,7 @@ export function ChildManagement() {
                             </p>
                           </div>
                           {isSelected && (
-                            <Badge className="bg-[#2f2f2f] text-white hover:bg-[#2f2f2f]">Valgt</Badge>
+                            <Badge className="bg-primary text-white hover:bg-primary">Valgt</Badge>
                           )}
                         </div>
 
@@ -367,14 +367,14 @@ export function ChildManagement() {
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.15}
           onDragEnd={(_: unknown, info: { offset: { x: number } }) => { if (info.offset.x > 100) setEditingChild(null); }}
-          className="fixed inset-0 z-50 bg-[#f7f6f2] flex flex-col"
+          className="fixed inset-0 z-50 bg-background flex flex-col"
           style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
         >
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-[#eeedea]">
-            <button onClick={() => setEditingChild(null)} className="flex items-center justify-center text-[#5f5d56] hover:text-[#2f2f2d] transition-colors">
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
+            <button onClick={() => setEditingChild(null)} className="flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <h2 className="text-[17px] font-bold text-[#2f2f2d]">Rediger barn</h2>
+            <h2 className="text-[17px] font-bold text-foreground">Rediger barn</h2>
           </div>
           <div className="flex-1 overflow-y-auto px-4 py-4 pb-[calc(env(safe-area-inset-bottom,0px)+100px)]">
             <div className="max-w-[430px] mx-auto space-y-3">
@@ -388,7 +388,7 @@ export function ChildManagement() {
                       <button key={seed} type="button"
                         onClick={() => setNewChild(prev => ({ ...prev, avatar: url }))}
                         className={cn("flex flex-col items-center gap-0.5 rounded-lg p-1.5 shrink-0 transition-all",
-                          isSelected ? "bg-[#fff2e6] ring-2 ring-[#f58a2d]" : "hover:bg-[#f0efe8]"
+                          isSelected ? "bg-orange-tint ring-2 ring-ring" : "hover:bg-muted"
                         )}>
                         <Avatar className="h-12 w-12">
                           <AvatarImage src={url} />
@@ -445,24 +445,24 @@ export function ChildManagement() {
                 <Label>Institutionstype</Label>
                 <button
                   onClick={() => setSelectOpen('institutionType')}
-                  className="w-full flex items-center justify-between rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] px-3 py-2.5 text-left text-[14px]"
+                  className="w-full flex items-center justify-between rounded-[8px] border border-border bg-card px-3 py-2.5 text-left text-[14px]"
                 >
-                  <span className={newChild.institutionType === 'none' ? 'text-[#9a978f]' : 'text-[#2f2f2d]'}>
+                  <span className={newChild.institutionType === 'none' ? 'text-muted-foreground' : 'text-foreground'}>
                     {getInstitutionTypeLabel(newChild.institutionType) || 'Vælg institutionstype'}
                   </span>
-                  <ChevronDown className="h-4 w-4 text-[#9a978f]" />
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
                 </button>
               </div>
               <div className="space-y-2">
                 <Label>Samværsordning</Label>
                 <button
                   onClick={() => setSelectOpen('custodyArrangement')}
-                  className="w-full flex items-center justify-between rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] px-3 py-2.5 text-left text-[14px]"
+                  className="w-full flex items-center justify-between rounded-[8px] border border-border bg-card px-3 py-2.5 text-left text-[14px]"
                 >
-                  <span className={newChild.custodyArrangement === 'none' ? 'text-[#9a978f]' : 'text-[#2f2f2d]'}>
+                  <span className={newChild.custodyArrangement === 'none' ? 'text-muted-foreground' : 'text-foreground'}>
                     {newChild.custodyArrangement === '7/7' ? '7/7 ordning' : newChild.custodyArrangement === '10/4' ? '10/4 ordning' : newChild.custodyArrangement === '14/0' ? '14/0 (fuld forældremyndighed)' : newChild.custodyArrangement === 'custom' ? 'Individuel aftale' : 'Vælg samværsordning'}
                   </span>
-                  <ChevronDown className="h-4 w-4 text-[#9a978f]" />
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
                 </button>
               </div>
               <Button onClick={handleUpdateChild} className="w-full">
@@ -484,14 +484,14 @@ export function ChildManagement() {
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.15}
           onDragEnd={(_: unknown, info: { offset: { x: number } }) => { if (info.offset.x > 100) setIsAddOpen(false); }}
-          className="fixed inset-0 z-50 bg-[#f7f6f2] flex flex-col"
+          className="fixed inset-0 z-50 bg-background flex flex-col"
           style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
         >
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-[#eeedea]">
-            <button onClick={() => setIsAddOpen(false)} className="flex items-center justify-center text-[#5f5d56] hover:text-[#2f2f2d] transition-colors">
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
+            <button onClick={() => setIsAddOpen(false)} className="flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
               <ArrowLeft className="h-5 w-5" />
             </button>
-            <h2 className="text-[17px] font-bold text-[#2f2f2d]">Tilføj nyt barn</h2>
+            <h2 className="text-[17px] font-bold text-foreground">Tilføj nyt barn</h2>
           </div>
           <div className="flex-1 overflow-y-auto px-4 py-4 pb-[calc(env(safe-area-inset-bottom,0px)+100px)]">
             <div className="max-w-[430px] mx-auto space-y-3">
@@ -505,7 +505,7 @@ export function ChildManagement() {
                       <button key={seed} type="button"
                         onClick={() => setNewChild(prev => ({ ...prev, avatar: url }))}
                         className={cn("flex flex-col items-center gap-0.5 rounded-lg p-1.5 shrink-0 transition-all",
-                          isSelected ? "bg-[#fff2e6] ring-2 ring-[#f58a2d]" : "hover:bg-[#f0efe8]"
+                          isSelected ? "bg-orange-tint ring-2 ring-ring" : "hover:bg-muted"
                         )}>
                         <Avatar className="h-12 w-12">
                           <AvatarImage src={url} />
@@ -585,24 +585,24 @@ export function ChildManagement() {
                 <Label>Institutionstype</Label>
                 <button
                   onClick={() => setSelectOpen('institutionType')}
-                  className="w-full flex items-center justify-between rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] px-3 py-2.5 text-left text-[14px]"
+                  className="w-full flex items-center justify-between rounded-[8px] border border-border bg-card px-3 py-2.5 text-left text-[14px]"
                 >
-                  <span className={newChild.institutionType === 'none' ? 'text-[#9a978f]' : 'text-[#2f2f2d]'}>
+                  <span className={newChild.institutionType === 'none' ? 'text-muted-foreground' : 'text-foreground'}>
                     {getInstitutionTypeLabel(newChild.institutionType) || 'Vælg institutionstype'}
                   </span>
-                  <ChevronDown className="h-4 w-4 text-[#9a978f]" />
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
                 </button>
               </div>
               <div className="space-y-2">
                 <Label>Samværsordning</Label>
                 <button
                   onClick={() => setSelectOpen('custodyArrangement')}
-                  className="w-full flex items-center justify-between rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] px-3 py-2.5 text-left text-[14px]"
+                  className="w-full flex items-center justify-between rounded-[8px] border border-border bg-card px-3 py-2.5 text-left text-[14px]"
                 >
-                  <span className={newChild.custodyArrangement === 'none' ? 'text-[#9a978f]' : 'text-[#2f2f2d]'}>
+                  <span className={newChild.custodyArrangement === 'none' ? 'text-muted-foreground' : 'text-foreground'}>
                     {newChild.custodyArrangement === '7/7' ? '7/7 ordning' : newChild.custodyArrangement === '10/4' ? '10/4 ordning' : newChild.custodyArrangement === '14/0' ? '14/0 (fuld forældremyndighed)' : newChild.custodyArrangement === 'custom' ? 'Individuel aftale' : 'Vælg samværsordning'}
                   </span>
-                  <ChevronDown className="h-4 w-4 text-[#9a978f]" />
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
                 </button>
               </div>
               <Button onClick={handleAddChild} className="w-full flex items-center justify-center gap-2" disabled={isSaving}>
@@ -630,12 +630,12 @@ export function ChildManagement() {
               onClick={() => setSelectOpen(null)}
             />
             <motion.div
-              className="fixed inset-x-4 bottom-4 z-[81] rounded-xl bg-white shadow-xl border border-[#e5e3dc] max-w-[400px] mx-auto max-h-[80vh] overflow-y-auto"
+              className="fixed inset-x-4 bottom-4 z-[81] rounded-xl bg-card shadow-xl border border-border max-w-[400px] mx-auto max-h-[80vh] overflow-y-auto"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 16 }}
             >
-              <p className="px-4 pt-3.5 pb-2 text-[13px] font-semibold text-[#78766d]">Institutionstype</p>
+              <p className="px-4 pt-3.5 pb-2 text-[13px] font-semibold text-muted-foreground">Institutionstype</p>
               {[
                 { value: 'vuggestue', label: 'Vuggestue' },
                 { value: 'børnehave', label: 'Børnehave' },
@@ -647,11 +647,11 @@ export function ChildManagement() {
                   key={opt.value}
                   onClick={() => { setNewChild(prev => ({ ...prev, institutionType: opt.value })); setSelectOpen(null); }}
                   className={cn(
-                    "flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-[#faf9f6] transition-colors",
-                    newChild.institutionType === opt.value && "bg-[#fff2e6]"
+                    "flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-card transition-colors",
+                    newChild.institutionType === opt.value && "bg-orange-tint"
                   )}
                 >
-                  <span className="text-[14px] font-semibold text-[#2f2f2d]">{opt.label}</span>
+                  <span className="text-[14px] font-semibold text-foreground">{opt.label}</span>
                 </button>
               ))}
             </motion.div>
@@ -671,12 +671,12 @@ export function ChildManagement() {
               onClick={() => setSelectOpen(null)}
             />
             <motion.div
-              className="fixed inset-x-4 bottom-4 z-[81] rounded-xl bg-white shadow-xl border border-[#e5e3dc] max-w-[400px] mx-auto max-h-[80vh] overflow-y-auto"
+              className="fixed inset-x-4 bottom-4 z-[81] rounded-xl bg-card shadow-xl border border-border max-w-[400px] mx-auto max-h-[80vh] overflow-y-auto"
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 16 }}
             >
-              <p className="px-4 pt-3.5 pb-2 text-[13px] font-semibold text-[#78766d]">Samværsordning</p>
+              <p className="px-4 pt-3.5 pb-2 text-[13px] font-semibold text-muted-foreground">Samværsordning</p>
               {[
                 { value: '7/7', label: '7/7 ordning' },
                 { value: '10/4', label: '10/4 ordning' },
@@ -688,11 +688,11 @@ export function ChildManagement() {
                   key={opt.value}
                   onClick={() => { setNewChild(prev => ({ ...prev, custodyArrangement: opt.value })); setSelectOpen(null); }}
                   className={cn(
-                    "flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-[#faf9f6] transition-colors",
-                    newChild.custodyArrangement === opt.value && "bg-[#fff2e6]"
+                    "flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-card transition-colors",
+                    newChild.custodyArrangement === opt.value && "bg-orange-tint"
                   )}
                 >
-                  <span className="text-[14px] font-semibold text-[#2f2f2d]">{opt.label}</span>
+                  <span className="text-[14px] font-semibold text-foreground">{opt.label}</span>
                 </button>
               ))}
             </motion.div>

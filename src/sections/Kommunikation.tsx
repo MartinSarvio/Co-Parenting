@@ -189,7 +189,7 @@ export function Kommunikation() {
   if (showNewThread) {
     return (
       <div
-        className="fixed inset-0 z-50 flex flex-col bg-[#f7f6f2]"
+        className="fixed inset-0 z-50 flex flex-col bg-background"
         style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
         <ConfirmCloseDialog
@@ -198,7 +198,7 @@ export function Kommunikation() {
           onConfirm={() => { setConfirmClose(false); setShowNewThread(false); setNewThreadTitle(''); setNewThreadCategory('institution'); }}
         />
         {/* Header: < | Ny samtale | Gem */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#e5e3dc]">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-border">
           <button
             onClick={() => {
               if (newThreadTitle.trim()) {
@@ -207,15 +207,15 @@ export function Kommunikation() {
                 setShowNewThread(false);
               }
             }}
-            className="w-9 flex items-center justify-center text-[#2f2f2d]"
+            className="w-9 flex items-center justify-center text-foreground"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
-          <h2 className="text-[17px] font-semibold text-[#2f2f2d]">Ny samtale</h2>
+          <h2 className="text-[17px] font-semibold text-foreground">Ny samtale</h2>
           <button
             onClick={handleCreateThread}
             disabled={!newThreadTitle.trim() || isSaving}
-            className="text-[15px] font-semibold text-[#2f2f2f] disabled:opacity-30"
+            className="text-[15px] font-semibold text-foreground disabled:opacity-30"
           >
             Gem
           </button>
@@ -226,7 +226,7 @@ export function Kommunikation() {
 
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <p className="text-[12px] font-semibold text-[#78766d] uppercase tracking-wide">Kategori</p>
+              <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide">Kategori</p>
               <div className="flex gap-2 flex-wrap">
                 {threadCategoryTemplates.map((template) => (
                   <button
@@ -241,8 +241,8 @@ export function Kommunikation() {
                     className={cn(
                       "shrink-0 rounded-full border px-3.5 py-1.5 text-[13px] font-medium",
                       newThreadCategory === template.key
-                        ? "border-[#f3c59d] bg-white text-[#2f2f2d]"
-                        : "border-[#e4cdb7] bg-[#fff7ef] text-[#946539]"
+                        ? "border-orange-tint bg-card text-foreground"
+                        : "border-[#e4cdb7] bg-orange-tint text-[#946539]"
                     )}
                   >
                     {template.label}
@@ -252,12 +252,12 @@ export function Kommunikation() {
             </div>
 
             <div className="space-y-1.5">
-              <p className="text-[12px] font-semibold text-[#78766d] uppercase tracking-wide">Titel</p>
+              <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide">Titel</p>
               <Input
                 value={newThreadTitle}
                 onChange={(e) => setNewThreadTitle(e.target.value)}
                 placeholder="Titel på samtalen (fx Institution: sygedage)"
-                className="bg-white rounded-[8px]"
+                className="bg-card rounded-[8px]"
                 autoFocus
               />
             </div>
@@ -307,35 +307,35 @@ export function Kommunikation() {
                     }
                   }}
                   onClick={() => setSelectedThreadId(thread.id)}
-                  className="relative flex items-start gap-3 px-3 sm:px-4 py-3.5 border-b border-[#f2f1ed] cursor-pointer bg-[#f7f6f2] active:bg-[#eeeee8] transition-colors"
+                  className="relative flex items-start gap-3 px-3 sm:px-4 py-3.5 border-b border-border cursor-pointer bg-background active:bg-card transition-colors"
                 >
-                  <div className="w-11 h-11 rounded-full bg-[#fff2e6] flex items-center justify-center flex-shrink-0">
+                  <div className="w-11 h-11 rounded-full bg-orange-tint flex items-center justify-center flex-shrink-0">
                     <span className="text-lg font-bold text-[#bf6722]">
                       {thread.title[0]}
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-[14px] font-semibold text-[#2f2f2d] truncate">{thread.title}</h3>
+                      <h3 className="text-[14px] font-semibold text-foreground truncate">{thread.title}</h3>
                       {lastMessage && (
-                        <span className="text-[11px] text-[#9a978f] shrink-0 ml-2">
+                        <span className="text-[11px] text-muted-foreground shrink-0 ml-2">
                           {formatMessageDate(lastMessage.timestamp)}
                         </span>
                       )}
                     </div>
                     {lastMessage ? (
-                      <p className="text-[13px] text-[#78766d] truncate mt-0.5">
-                        <span className="font-medium text-[#5f5d56]">
+                      <p className="text-[13px] text-muted-foreground truncate mt-0.5">
+                        <span className="font-medium text-muted-foreground">
                           {users.find(u => u.id === lastMessage.senderId)?.name}:
                         </span>{' '}
                         {lastMessage.content}
                       </p>
                     ) : (
-                      <p className="text-[13px] text-[#9a978f] mt-0.5">Ingen beskeder endnu</p>
+                      <p className="text-[13px] text-muted-foreground mt-0.5">Ingen beskeder endnu</p>
                     )}
                   </div>
                   {thread.unreadCount > 0 && (
-                    <Badge className="bg-[#2f2f2f] text-white shrink-0 self-center">
+                    <Badge className="bg-primary text-white shrink-0 self-center">
                       {thread.unreadCount}
                     </Badge>
                   )}
@@ -346,14 +346,14 @@ export function Kommunikation() {
           
           {visibleThreads.length === 0 && (
             <div className="text-center py-16">
-              <div className="w-20 h-20 mx-auto rounded-full bg-[#fff2e6] flex items-center justify-center mb-4">
+              <div className="w-20 h-20 mx-auto rounded-full bg-orange-tint flex items-center justify-center mb-4">
                 <MessageSquarePlus className="w-10 h-10 text-[#f58a2d]" />
               </div>
-              <h3 className="text-lg font-semibold text-[#2f2f2d] mb-1">Ingen samtaler endnu</h3>
-              <p className="text-sm text-[#9a978f] mb-5">Opret en ny chat for at starte en samtale</p>
+              <h3 className="text-lg font-semibold text-foreground mb-1">Ingen samtaler endnu</h3>
+              <p className="text-sm text-muted-foreground mb-5">Opret en ny chat for at starte en samtale</p>
               <Button
                 onClick={() => setShowNewThread(true)}
-                className="rounded-full bg-[#2f2f2f] text-white hover:bg-[#1a1a1a] px-6"
+                className="rounded-full bg-primary text-white hover:bg-primary px-6"
               >
                 <MessageSquarePlus className="h-4 w-4 mr-2" />
                 Opret ny chat
@@ -368,7 +368,7 @@ export function Kommunikation() {
   // Chat View — fullscreen overlay
   return (
     <div
-      className="fixed inset-x-0 top-0 bottom-0 z-40 flex flex-col bg-[#f7f6f2]"
+      className="fixed inset-x-0 top-0 bottom-0 z-40 flex flex-col bg-background"
       style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 58px)' }}
     >
       {/* Messages */}
@@ -415,16 +415,16 @@ export function Kommunikation() {
             void handleAttachmentSelect(event, 'document');
           }}
         />
-        <div className="flex items-end gap-2 rounded-[22px] bg-white/90 backdrop-blur-md border border-[#e5e3dc]/60 shadow-[0_2px_16px_rgba(0,0,0,0.08)] px-2 py-1.5">
+        <div className="flex items-end gap-2 rounded-[22px] bg-card/90 backdrop-blur-md border border-border/60 shadow-[0_2px_16px_rgba(0,0,0,0.08)] px-2 py-1.5">
           <button
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56] active:scale-95 transition-all"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-background text-muted-foreground active:scale-95 transition-all"
             onClick={() => imageInputRef.current?.click()}
             aria-label="Tilføj billede"
           >
             <ImageIcon className="w-5 h-5" />
           </button>
           <button
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56] active:scale-95 transition-all"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-background text-muted-foreground active:scale-95 transition-all"
             onClick={() => fileInputRef.current?.click()}
             aria-label="Tilføj dokument"
           >
@@ -446,7 +446,7 @@ export function Kommunikation() {
             }}
             placeholder="Skriv en besked..."
             rows={1}
-            className="flex-1 bg-transparent px-3 py-2 text-[14px] text-[#2f2f2d] placeholder:text-[#9a978f] outline-none resize-none max-h-[120px] leading-5"
+            className="flex-1 bg-transparent px-3 py-2 text-[14px] text-foreground placeholder:text-muted-foreground outline-none resize-none max-h-[120px] leading-5"
           />
           <button
             onClick={() => handleSendMessage()}
@@ -509,8 +509,8 @@ const MessageBubble = memo(function MessageBubble({
         <div className={cn(
           "px-4 py-2.5 rounded-2xl",
           isCurrentUser
-            ? "bg-[#2f2f2f] text-white rounded-br-md"
-            : "bg-white border border-[#e5e3dc] text-[#2f2f2d] rounded-bl-md"
+            ? "bg-primary text-white rounded-br-md"
+            : "bg-card border border-border text-foreground rounded-bl-md"
         )}>
           {message.attachments?.map((attachment) => (
             <div key={attachment.id} className="mb-2 last:mb-0">
@@ -522,7 +522,7 @@ const MessageBubble = memo(function MessageBubble({
                   download={attachment.name}
                   className={cn(
                     "flex items-center gap-2 rounded-xl border px-2.5 py-2 text-sm",
-                    isCurrentUser ? "border-white/30 bg-white/10 text-white" : "border-[#e5e3dc] bg-[#f2f1ed] text-[#2f2f2d]"
+                    isCurrentUser ? "border-white/30 bg-card/10 text-white" : "border-border bg-background text-foreground"
                   )}
                 >
                   <FileText className="h-4 w-4" />
@@ -534,11 +534,11 @@ const MessageBubble = memo(function MessageBubble({
           {message.content && <p className="text-sm">{message.content}</p>}
         </div>
         <div className={cn("flex items-center gap-1 mt-1", isCurrentUser ? "justify-end" : "justify-start")}>
-          <span className="text-xs text-[#9a978f]">{formatMessageDate(message.timestamp)}</span>
+          <span className="text-xs text-muted-foreground">{formatMessageDate(message.timestamp)}</span>
           {isCurrentUser && (
             message.readBy.length > 1
               ? <CheckCheck className="w-3 h-3 text-[#f58a2d]" />
-              : <Check className="w-3 h-3 text-[#9a978f]" />
+              : <Check className="w-3 h-3 text-muted-foreground" />
           )}
         </div>
         {/* Per-parent read receipts for professional view */}
@@ -551,13 +551,13 @@ const MessageBubble = memo(function MessageBubble({
                 const hasRead = message.readBy.includes(pid);
                 return (
                   <div key={pid} className="flex items-center gap-1">
-                    <span className={`text-[10px] ${hasRead ? 'text-[#1a7a3a]' : 'text-[#9a978f]'}`}>
+                    <span className={`text-[10px] ${hasRead ? 'text-[#1a7a3a]' : 'text-muted-foreground'}`}>
                       {parent?.name?.split(' ')[0] || 'Ukendt'}
                     </span>
                     {hasRead ? (
                       <CheckCheck className="w-3 h-3 text-[#1a7a3a]" />
                     ) : (
-                      <Check className="w-3 h-3 text-[#9a978f]" />
+                      <Check className="w-3 h-3 text-muted-foreground" />
                     )}
                   </div>
                 );

@@ -357,24 +357,24 @@ export function GroupDetailView() {
   return (
     <div className="-mx-3 sm:-mx-4">
       {/* Group header — sticky banner */}
-      <div className="bg-white p-4 space-y-3 sticky top-0 z-10 shadow-sm">
+      <div className="bg-card p-4 space-y-3 sticky top-0 z-10 shadow-sm">
         <div className="flex items-center gap-3">
           {group.image ? (
             <img src={group.image} alt="" className="w-14 h-14 rounded-xl object-cover shrink-0" />
           ) : (
-            <div className="w-14 h-14 rounded-xl bg-[#eceae2] flex items-center justify-center shrink-0">
-              <Users className="h-7 w-7 text-[#78766d]" />
+            <div className="w-14 h-14 rounded-xl bg-secondary flex items-center justify-center shrink-0">
+              <Users className="h-7 w-7 text-muted-foreground" />
             </div>
           )}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <h2 className="text-[17px] font-bold text-[#2f2f2d]">{group.name}</h2>
-              {group.type === 'closed' && <Lock className="h-3.5 w-3.5 text-[#9a978f]" />}
+              <h2 className="text-[17px] font-bold text-foreground">{group.name}</h2>
+              {group.type === 'closed' && <Lock className="h-3.5 w-3.5 text-muted-foreground" />}
             </div>
-            <p className="text-[12px] text-[#9a978f]">{group.members} medlemmer · {group.type === 'open' ? 'Åben' : 'Lukket'} gruppe</p>
+            <p className="text-[12px] text-muted-foreground">{group.members} medlemmer · {group.type === 'open' ? 'Åben' : 'Lukket'} gruppe</p>
           </div>
         </div>
-        <p className="text-[13px] text-[#5f5d56] leading-relaxed">{group.description}</p>
+        <p className="text-[13px] text-muted-foreground leading-relaxed">{group.description}</p>
 
         {/* Search field (toggled via header icon) */}
         <AnimatePresence>
@@ -386,17 +386,17 @@ export function GroupDetailView() {
               className="overflow-hidden"
             >
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9a978f]" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <input
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
                   placeholder="Søg i opslag..."
-                  className="w-full rounded-xl border border-[#e5e3dc] bg-[#f9f9f7] pl-9 pr-8 py-2 text-[13px] text-[#2f2f2d] placeholder:text-[#c5c3ba] focus:outline-none focus:ring-1 focus:ring-[#f58a2d]"
+                  className="w-full rounded-xl border border-border bg-card pl-9 pr-8 py-2 text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                   autoFocus
                 />
                 {searchText && (
                   <button onClick={() => setSearchText('')} className="absolute right-3 top-1/2 -translate-y-1/2">
-                    <X className="h-4 w-4 text-[#9a978f]" />
+                    <X className="h-4 w-4 text-muted-foreground" />
                   </button>
                 )}
               </div>
@@ -409,13 +409,13 @@ export function GroupDetailView() {
       {group.rules && (
         <button
           onClick={() => setShowRules(!showRules)}
-          className="w-full bg-[#faf9f6] border-y border-[#e5e3dc] px-4 py-3 flex items-center justify-between"
+          className="w-full bg-card border-y border-border px-4 py-3 flex items-center justify-between"
         >
           <div className="flex items-center gap-2">
-            <Shield className="h-4 w-4 text-[#9a978f]" />
-            <span className="text-[13px] font-semibold text-[#5f5d56]">Grupperegler</span>
+            <Shield className="h-4 w-4 text-muted-foreground" />
+            <span className="text-[13px] font-semibold text-muted-foreground">Grupperegler</span>
           </div>
-          {showRules ? <ChevronUp className="h-4 w-4 text-[#9a978f]" /> : <ChevronDown className="h-4 w-4 text-[#9a978f]" />}
+          {showRules ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
         </button>
       )}
       <AnimatePresence>
@@ -424,9 +424,9 @@ export function GroupDetailView() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden bg-[#faf9f6] border-b border-[#e5e3dc]"
+            className="overflow-hidden bg-card border-b border-border"
           >
-            <p className="px-4 py-3 text-[13px] text-[#5f5d56] leading-relaxed">{group.rules}</p>
+            <p className="px-4 py-3 text-[13px] text-muted-foreground leading-relaxed">{group.rules}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -434,13 +434,13 @@ export function GroupDetailView() {
       {/* Members button */}
       <button
         onClick={() => setShowMembers(!showMembers)}
-        className="w-full bg-white border-b border-[#e5e3dc] px-4 py-3 flex items-center justify-between"
+        className="w-full bg-card border-b border-border px-4 py-3 flex items-center justify-between"
       >
         <div className="flex items-center gap-2">
-          <Users className="h-4 w-4 text-[#9a978f]" />
-          <span className="text-[13px] font-semibold text-[#5f5d56]">Medlemmer ({group.members})</span>
+          <Users className="h-4 w-4 text-muted-foreground" />
+          <span className="text-[13px] font-semibold text-muted-foreground">Medlemmer ({group.members})</span>
         </div>
-        {showMembers ? <ChevronUp className="h-4 w-4 text-[#9a978f]" /> : <ChevronDown className="h-4 w-4 text-[#9a978f]" />}
+        {showMembers ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
       </button>
       <AnimatePresence>
         {showMembers && (
@@ -448,20 +448,20 @@ export function GroupDetailView() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden bg-white border-b border-[#e5e3dc]"
+            className="overflow-hidden bg-card border-b border-border"
           >
             <div className="px-4 py-2 space-y-1">
               {members.map(m => (
                 <button
                   key={m.id}
                   onClick={() => { setViewProfileUserId(m.id); setActiveTab('profile'); }}
-                  className="w-full flex items-center gap-3 py-2 text-left active:bg-[#f5f4f0] rounded-lg transition-colors"
+                  className="w-full flex items-center gap-3 py-2 text-left active:bg-card rounded-lg transition-colors"
                 >
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={m.avatar} />
-                    <AvatarFallback className="bg-[#eceae2] text-[#5f5d56] text-xs">{m.name[0]}</AvatarFallback>
+                    <AvatarFallback className="bg-secondary text-muted-foreground text-xs">{m.name[0]}</AvatarFallback>
                   </Avatar>
-                  <span className="text-[13px] font-semibold text-[#2f2f2d] flex-1">{m.name}</span>
+                  <span className="text-[13px] font-semibold text-foreground flex-1">{m.name}</span>
                   {m.role === 'owner' && (
                     <span className="text-[11px] font-semibold text-[#f58a2d] bg-[#f58a2d]/10 px-2 py-0.5 rounded-full">Admin</span>
                   )}
@@ -474,7 +474,7 @@ export function GroupDetailView() {
 
       {/* Pending requests (owner only, closed groups) */}
       {isOwner && group.type === 'closed' && pending.length > 0 && (
-        <div className="bg-[#fff8f0] border-b border-[#f58a2d]/20 px-4 py-3">
+        <div className="bg-orange-tint-light border-b border-[#f58a2d]/20 px-4 py-3">
           <p className="text-[12px] font-semibold text-[#f58a2d] uppercase tracking-wider mb-2">
             Afventende anmodninger ({pending.length})
           </p>
@@ -483,9 +483,9 @@ export function GroupDetailView() {
               <div key={req.userId} className="flex items-center gap-3">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={req.avatar} />
-                  <AvatarFallback className="bg-[#eceae2] text-[#5f5d56] text-xs">{req.name[0]}</AvatarFallback>
+                  <AvatarFallback className="bg-secondary text-muted-foreground text-xs">{req.name[0]}</AvatarFallback>
                 </Avatar>
-                <span className="text-[13px] font-semibold text-[#2f2f2d] flex-1">{req.name}</span>
+                <span className="text-[13px] font-semibold text-foreground flex-1">{req.name}</span>
                 <button
                   onClick={() => approveRequest(req.userId)}
                   className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#f58a2d] text-[11px] font-semibold text-white"
@@ -494,7 +494,7 @@ export function GroupDetailView() {
                 </button>
                 <button
                   onClick={() => rejectRequest(req.userId)}
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-full border border-[#e5e3dc] text-[11px] font-semibold text-[#78766d]"
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-full border border-border text-[11px] font-semibold text-muted-foreground"
                 >
                   <X className="h-3 w-3" /> Afvis
                 </button>
@@ -505,16 +505,16 @@ export function GroupDetailView() {
       )}
 
       {/* Posts section header */}
-      <p className="text-[12px] font-semibold text-[#9a978f] uppercase tracking-wider px-4 pt-4 pb-2">
+      <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider px-4 pt-4 pb-2">
         Opslag ({filteredPosts.length})
       </p>
 
       {/* Posts */}
       <div className="space-y-[6px]">
         {filteredPosts.length === 0 && (
-          <div className="bg-white px-4 py-8 text-center">
-            <p className="text-[14px] text-[#9a978f]">Ingen opslag endnu</p>
-            <p className="text-[12px] text-[#c5c3ba] mt-1">Vær den første til at skrive noget!</p>
+          <div className="bg-card px-4 py-8 text-center">
+            <p className="text-[14px] text-muted-foreground">Ingen opslag endnu</p>
+            <p className="text-[12px] text-muted-foreground mt-1">Vær den første til at skrive noget!</p>
           </div>
         )}
         {filteredPosts.map((post, i) => (
@@ -523,30 +523,30 @@ export function GroupDetailView() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
-            className="bg-white p-4 space-y-2.5"
+            className="bg-card p-4 space-y-2.5"
           >
             <div className="flex items-center gap-2.5">
               <button onClick={() => { setViewProfileUserId(post.userId); setActiveTab('profile'); }}>
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={post.avatar} />
-                  <AvatarFallback className="bg-[#eceae2] text-[#5f5d56] text-xs">{post.name[0]}</AvatarFallback>
+                  <AvatarFallback className="bg-secondary text-muted-foreground text-xs">{post.name[0]}</AvatarFallback>
                 </Avatar>
               </button>
               <div className="flex-1 min-w-0">
                 <div className="flex items-baseline gap-1.5">
                   <button onClick={() => { setViewProfileUserId(post.userId); setActiveTab('profile'); }} className="text-left">
-                    <span className="text-[13px] font-semibold text-[#2f2f2d]">{post.name}</span>
+                    <span className="text-[13px] font-semibold text-foreground">{post.name}</span>
                   </button>
-                  <span className="text-[10px] text-[#b5b3ab]">·</span>
-                  <span className="text-[11px] text-[#9a978f]">{post.time}</span>
+                  <span className="text-[10px] text-muted-foreground">·</span>
+                  <span className="text-[11px] text-muted-foreground">{post.time}</span>
                 </div>
               </div>
-              <button className="p-1 text-[#9a978f]">
+              <button className="p-1 text-muted-foreground">
                 <MoreHorizontal className="h-4 w-4" />
               </button>
             </div>
 
-            <p className="text-[14px] text-[#2f2f2d] leading-relaxed">{post.text}</p>
+            <p className="text-[14px] text-foreground leading-relaxed">{post.text}</p>
 
             {post.image && (
               <img src={post.image} alt="" className="w-full rounded-lg object-cover max-h-60" />
@@ -555,14 +555,14 @@ export function GroupDetailView() {
             <div className="flex items-center gap-3 pt-1">
               <button
                 onClick={() => toggleLike(post.id)}
-                className={cn("flex items-center gap-1.5 text-[12px] font-medium transition-colors", post.liked ? "text-[#ef4444]" : "text-[#6b6960]")}
+                className={cn("flex items-center gap-1.5 text-[12px] font-medium transition-colors", post.liked ? "text-[#ef4444]" : "text-muted-foreground")}
               >
                 <Heart className={cn("h-4 w-4", post.liked && "fill-current")} strokeWidth={2} />
                 {post.likes}
               </button>
               <button
                 onClick={() => setCommentPostId(post.id)}
-                className="flex items-center gap-1.5 text-[12px] font-medium text-[#6b6960]"
+                className="flex items-center gap-1.5 text-[12px] font-medium text-muted-foreground"
               >
                 <MessageCircle className="h-4 w-4" strokeWidth={2} />
                 {post.comments}
@@ -571,17 +571,17 @@ export function GroupDetailView() {
 
             {/* Inline comments preview */}
             {post.commentsList.length > 0 && (
-              <div className="pt-1 space-y-2 border-t border-[#f0efea]">
+              <div className="pt-1 space-y-2 border-t border-border">
                 {post.commentsList.slice(-2).map(c => (
                   <div key={c.id} className="flex gap-2">
                     <button onClick={() => { setViewProfileUserId(c.userId); setActiveTab('profile'); }}>
                       <Avatar className="h-6 w-6">
-                        <AvatarFallback className="bg-[#eceae2] text-[#5f5d56] text-[10px]">{c.name[0]}</AvatarFallback>
+                        <AvatarFallback className="bg-secondary text-muted-foreground text-[10px]">{c.name[0]}</AvatarFallback>
                       </Avatar>
                     </button>
                     <div>
-                      <span className="text-[12px] font-semibold text-[#2f2f2d]">{c.name}</span>
-                      <span className="text-[12px] text-[#5f5d56] ml-1">{c.text}</span>
+                      <span className="text-[12px] font-semibold text-foreground">{c.name}</span>
+                      <span className="text-[12px] text-muted-foreground ml-1">{c.text}</span>
                     </div>
                   </div>
                 ))}
@@ -620,14 +620,14 @@ export function GroupDetailView() {
               <motion.div
                 initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
                 transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-                className="fixed inset-x-0 bottom-0 z-[81] rounded-t-2xl bg-white"
+                className="fixed inset-x-0 bottom-0 z-[81] rounded-t-2xl bg-card"
                 style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
               >
-                <div className="flex justify-center pt-3 pb-1"><div className="h-1 w-10 rounded-full bg-[#d0cec5]" /></div>
+                <div className="flex justify-center pt-3 pb-1"><div className="h-1 w-10 rounded-full bg-muted" /></div>
                 <div className="px-4 pb-4 space-y-3">
                   <div className="flex items-center justify-between">
-                    <button onClick={() => setShowNewPost(false)} className="text-[13px] text-[#78766d]">Annuller</button>
-                    <p className="text-[15px] font-semibold text-[#2f2f2d]">Nyt opslag i {group.name}</p>
+                    <button onClick={() => setShowNewPost(false)} className="text-[13px] text-muted-foreground">Annuller</button>
+                    <p className="text-[15px] font-semibold text-foreground">Nyt opslag i {group.name}</p>
                     <button onClick={handleCreatePost} disabled={!newPostText.trim()} className="flex items-center gap-1 text-[13px] font-semibold text-[#f58a2d] disabled:opacity-40">
                       <Send className="h-3.5 w-3.5" /> Del
                     </button>
@@ -635,7 +635,7 @@ export function GroupDetailView() {
                   <textarea
                     value={newPostText} onChange={(e) => setNewPostText(e.target.value)}
                     placeholder="Hvad vil du dele?"
-                    className="w-full h-28 rounded-xl border border-[#e5e3dc] bg-[#f9f9f7] px-3 py-2.5 text-[14px] text-[#2f2f2d] placeholder:text-[#c5c3ba] resize-none focus:outline-none focus:ring-1 focus:ring-[#f58a2d]"
+                    className="w-full h-28 rounded-xl border border-border bg-card px-3 py-2.5 text-[14px] text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-1 focus:ring-ring"
                     autoFocus
                   />
                   {newPostImage && (
@@ -644,7 +644,7 @@ export function GroupDetailView() {
                       <button onClick={() => setNewPostImage(null)} className="absolute top-2 right-2 h-6 w-6 rounded-full bg-black/50 flex items-center justify-center text-white"><X className="h-3.5 w-3.5" /></button>
                     </div>
                   )}
-                  <button onClick={() => postImageRef.current?.click()} className="flex items-center gap-2 text-[13px] text-[#78766d] hover:text-[#5f5d56] transition-colors">
+                  <button onClick={() => postImageRef.current?.click()} className="flex items-center gap-2 text-[13px] text-muted-foreground hover:text-muted-foreground transition-colors">
                     <ImagePlus className="h-5 w-5" /> Tilføj billede
                   </button>
                   <input ref={postImageRef} type="file" accept="image/*" className="hidden" onChange={handleImageSelect} />
@@ -665,41 +665,41 @@ export function GroupDetailView() {
               <motion.div
                 initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
                 transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-                className="fixed inset-x-0 bottom-0 z-[81] rounded-t-2xl bg-white max-h-[70vh] flex flex-col"
+                className="fixed inset-x-0 bottom-0 z-[81] rounded-t-2xl bg-card max-h-[70vh] flex flex-col"
                 style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
               >
-                <div className="flex justify-center pt-3 pb-1 shrink-0"><div className="h-1 w-10 rounded-full bg-[#d0cec5]" /></div>
+                <div className="flex justify-center pt-3 pb-1 shrink-0"><div className="h-1 w-10 rounded-full bg-muted" /></div>
                 <div className="flex items-center justify-between px-4 pb-2 shrink-0">
-                  <p className="text-[15px] font-semibold text-[#2f2f2d]">Kommentarer</p>
-                  <button onClick={() => { setCommentPostId(null); setCommentText(''); }} className="h-7 w-7 rounded-full bg-[#e8e7e2] flex items-center justify-center">
-                    <X className="h-3.5 w-3.5 text-[#78766d]" />
+                  <p className="text-[15px] font-semibold text-foreground">Kommentarer</p>
+                  <button onClick={() => { setCommentPostId(null); setCommentText(''); }} className="h-7 w-7 rounded-full bg-muted flex items-center justify-center">
+                    <X className="h-3.5 w-3.5 text-muted-foreground" />
                   </button>
                 </div>
                 <div className="flex-1 overflow-y-auto px-4 space-y-3 pb-2">
                   {commentPost.commentsList.length === 0 && (
-                    <p className="text-[13px] text-[#9a978f] text-center py-4">Ingen kommentarer endnu</p>
+                    <p className="text-[13px] text-muted-foreground text-center py-4">Ingen kommentarer endnu</p>
                   )}
                   {commentPost.commentsList.map(c => (
                     <div key={c.id} className="flex gap-2.5">
                       <button onClick={() => { setViewProfileUserId(c.userId); setActiveTab('profile'); }}>
                         <Avatar className="h-7 w-7 shrink-0">
-                          <AvatarFallback className="bg-[#eceae2] text-[#5f5d56] text-[10px]">{c.name[0]}</AvatarFallback>
+                          <AvatarFallback className="bg-secondary text-muted-foreground text-[10px]">{c.name[0]}</AvatarFallback>
                         </Avatar>
                       </button>
                       <div>
-                        <span className="text-[12px] font-semibold text-[#2f2f2d]">{c.name}</span>
-                        <span className="text-[11px] text-[#9a978f] ml-1.5">{c.time}</span>
-                        <p className="text-[13px] text-[#2f2f2d] mt-0.5">{c.text}</p>
+                        <span className="text-[12px] font-semibold text-foreground">{c.name}</span>
+                        <span className="text-[11px] text-muted-foreground ml-1.5">{c.time}</span>
+                        <p className="text-[13px] text-foreground mt-0.5">{c.text}</p>
                       </div>
                     </div>
                   ))}
                 </div>
-                <div className="shrink-0 border-t border-[#e5e3dc] px-4 py-3 flex items-center gap-2">
+                <div className="shrink-0 border-t border-border px-4 py-3 flex items-center gap-2">
                   <input
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                     placeholder="Skriv en kommentar..."
-                    className="flex-1 rounded-full border border-[#e5e3dc] bg-[#f9f9f7] px-3 py-2 text-[13px] text-[#2f2f2d] placeholder:text-[#c5c3ba] focus:outline-none focus:ring-1 focus:ring-[#f58a2d]"
+                    className="flex-1 rounded-full border border-border bg-card px-3 py-2 text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                     onKeyDown={(e) => { if (e.key === 'Enter') addComment(); }}
                   />
                   <button

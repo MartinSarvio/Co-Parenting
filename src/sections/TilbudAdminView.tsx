@@ -147,69 +147,69 @@ function AffiliateTab() {
     <div className="space-y-3">
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#9a978f]" />
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
         <Input
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Søg affiliate-links..."
-          className="pl-8 h-9 text-[13px] rounded-[8px] border-[#e8e6df]"
+          className="pl-8 h-9 text-[13px] rounded-[8px] border-border"
         />
       </div>
 
       {/* Table */}
-      <div className="rounded-[8px] border border-[#e8e6df] bg-white overflow-hidden">
+      <div className="rounded-[8px] border border-border bg-card overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <RefreshCw className="h-5 w-5 text-[#c8c6bc] animate-spin" />
+            <RefreshCw className="h-5 w-5 text-muted-foreground animate-spin" />
           </div>
         ) : filteredLinks.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
-            <ExternalLink className="h-8 w-8 text-[#c8c6bc]" />
-            <p className="text-sm font-semibold text-[#3f3e3a]">Ingen affiliate-links endnu</p>
-            <p className="text-[12px] text-[#78766d]">Opret dit første affiliate-link ovenfor</p>
+            <ExternalLink className="h-8 w-8 text-muted-foreground" />
+            <p className="text-sm font-semibold text-foreground">Ingen affiliate-links endnu</p>
+            <p className="text-[12px] text-muted-foreground">Opret dit første affiliate-link ovenfor</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left min-w-[500px]">
               <thead>
-                <tr className="border-b border-[#f2f1ed]">
-                  <th className="px-3 py-2 text-[11px] font-semibold text-[#9a978f]">Navn</th>
-                  <th className="px-3 py-2 text-[11px] font-semibold text-[#9a978f]">Butik</th>
-                  <th className="px-3 py-2 text-[11px] font-semibold text-[#9a978f]">Kategori</th>
-                  <th className="px-3 py-2 text-[11px] font-semibold text-[#9a978f] text-center">Aktiv</th>
-                  <th className="px-3 py-2 text-[11px] font-semibold text-[#9a978f] text-right">Klik</th>
-                  <th className="px-3 py-2 text-[11px] font-semibold text-[#9a978f]"></th>
+                <tr className="border-b border-border">
+                  <th className="px-3 py-2 text-[11px] font-semibold text-muted-foreground">Navn</th>
+                  <th className="px-3 py-2 text-[11px] font-semibold text-muted-foreground">Butik</th>
+                  <th className="px-3 py-2 text-[11px] font-semibold text-muted-foreground">Kategori</th>
+                  <th className="px-3 py-2 text-[11px] font-semibold text-muted-foreground text-center">Aktiv</th>
+                  <th className="px-3 py-2 text-[11px] font-semibold text-muted-foreground text-right">Klik</th>
+                  <th className="px-3 py-2 text-[11px] font-semibold text-muted-foreground"></th>
                 </tr>
               </thead>
               <tbody>
                 {filteredLinks.map((link, i) => (
-                  <tr key={link.id} className={cn(i % 2 === 0 ? 'bg-white' : 'bg-[#faf9f6]')}>
+                  <tr key={link.id} className={cn(i % 2 === 0 ? 'bg-card' : 'bg-card')}>
                     <td className="px-3 py-2.5">
-                      <p className="text-[12px] font-semibold text-[#2f2f2d]">{link.name}</p>
-                      <p className="text-[10px] text-[#9a978f] truncate max-w-[150px]">{link.url}</p>
+                      <p className="text-[12px] font-semibold text-foreground">{link.name}</p>
+                      <p className="text-[10px] text-muted-foreground truncate max-w-[150px]">{link.url}</p>
                     </td>
-                    <td className="px-3 py-2.5 text-[12px] text-[#5f5d56]">{link.store ?? '—'}</td>
-                    <td className="px-3 py-2.5 text-[12px] text-[#5f5d56]">{link.category ?? '—'}</td>
+                    <td className="px-3 py-2.5 text-[12px] text-muted-foreground">{link.store ?? '—'}</td>
+                    <td className="px-3 py-2.5 text-[12px] text-muted-foreground">{link.category ?? '—'}</td>
                     <td className="px-3 py-2.5 text-center">
                       <IOSSwitch
                         checked={link.is_active}
                         onCheckedChange={(v) => handleToggleActive(link.id, v)}
                       />
                     </td>
-                    <td className="px-3 py-2.5 text-[12px] font-semibold text-[#2f2f2d] text-right">
+                    <td className="px-3 py-2.5 text-[12px] font-semibold text-foreground text-right">
                       {link.click_count}
                     </td>
                     <td className="px-3 py-2.5">
                       <div className="flex gap-1.5 justify-end">
                         <button
                           onClick={() => setEditLink(link)}
-                          className="p-1.5 rounded-[6px] hover:bg-[#f2f1ed] text-[#7a786f] transition-colors"
+                          className="p-1.5 rounded-[6px] hover:bg-background text-muted-foreground transition-colors"
                         >
                           <Pencil className="h-3.5 w-3.5" />
                         </button>
                         <button
                           onClick={() => setDeleteConfirm(link.id)}
-                          className="p-1.5 rounded-[6px] hover:bg-[#fef2f2] text-[#FF3B30] transition-colors"
+                          className="p-1.5 rounded-[6px] hover:bg-red-tint text-[#FF3B30] transition-colors"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
@@ -238,7 +238,7 @@ function AffiliateTab() {
           <DialogHeader>
             <DialogTitle className="text-[15px]">Slet affiliate-link?</DialogTitle>
           </DialogHeader>
-          <p className="text-[13px] text-[#5f5d56]">
+          <p className="text-[13px] text-muted-foreground">
             Er du sikker på at du vil slette dette affiliate-link? Handlingen kan ikke fortrydes.
           </p>
           <div className="flex gap-2 justify-end mt-3">
@@ -378,22 +378,22 @@ function AffiliateCreatePage({
   };
 
   return (
-    <div className="fixed inset-0 z-[60] bg-[#f7f6f2] flex flex-col">
+    <div className="fixed inset-0 z-[60] bg-background flex flex-col">
       {/* Header */}
       <div className="safe-area-pt flex items-center gap-1 px-2 pb-2.5 pt-2">
         <button
           onClick={tryClose}
-          className="flex h-9 w-9 items-center justify-center text-[#30302d]"
+          className="flex h-9 w-9 items-center justify-center text-foreground"
           aria-label="Tilbage"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
-        <h1 className="text-[15px] font-semibold text-[#2f2f2d] flex-1">
+        <h1 className="text-[15px] font-semibold text-foreground flex-1">
           {link ? 'Rediger affiliate-link' : 'Opret affiliate-link'}
         </h1>
         <button
           onClick={tryClose}
-          className="flex h-9 w-9 items-center justify-center text-[#30302d]"
+          className="flex h-9 w-9 items-center justify-center text-foreground"
           aria-label="Luk"
         >
           <XIcon className="h-5 w-5" />
@@ -403,40 +403,40 @@ function AffiliateCreatePage({
       {/* Form */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         <div>
-          <Label className="text-[12px] font-semibold text-[#5f5d56]">Navn *</Label>
-          <Input value={name} onChange={e => setName(e.target.value)} placeholder="F.eks. Bilka Affiliate" className="mt-1 rounded-[8px] border-[#e8e6df] text-[13px]" />
+          <Label className="text-[12px] font-semibold text-muted-foreground">Navn *</Label>
+          <Input value={name} onChange={e => setName(e.target.value)} placeholder="F.eks. Bilka Affiliate" className="mt-1 rounded-[8px] border-border text-[13px]" />
         </div>
         <div>
-          <Label className="text-[12px] font-semibold text-[#5f5d56]">Affiliate-URL *</Label>
-          <Input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://..." className="mt-1 rounded-[8px] border-[#e8e6df] text-[13px]" />
+          <Label className="text-[12px] font-semibold text-muted-foreground">Affiliate-URL *</Label>
+          <Input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://..." className="mt-1 rounded-[8px] border-border text-[13px]" />
         </div>
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <Label className="text-[12px] font-semibold text-[#5f5d56]">Butik</Label>
+            <Label className="text-[12px] font-semibold text-muted-foreground">Butik</Label>
             <Input
               list="affiliate-store-suggestions"
               value={store}
               onChange={e => setStore(e.target.value)}
               placeholder="Skriv eller vælg butik..."
-              className="mt-1 rounded-[8px] border-[#e8e6df] text-[13px]"
+              className="mt-1 rounded-[8px] border-border text-[13px]"
             />
             <datalist id="affiliate-store-suggestions">
               {STORES.map(s => <option key={s} value={s} />)}
             </datalist>
           </div>
           <div>
-            <Label className="text-[12px] font-semibold text-[#5f5d56]">Partner</Label>
-            <Input value={partner} onChange={e => setPartner(e.target.value)} placeholder="Partner-navn" className="mt-1 rounded-[8px] border-[#e8e6df] text-[13px]" />
+            <Label className="text-[12px] font-semibold text-muted-foreground">Partner</Label>
+            <Input value={partner} onChange={e => setPartner(e.target.value)} placeholder="Partner-navn" className="mt-1 rounded-[8px] border-border text-[13px]" />
           </div>
         </div>
         <div>
-          <Label className="text-[12px] font-semibold text-[#5f5d56]">Kategori</Label>
-          <Input value={category} onChange={e => setCategory(e.target.value)} placeholder="F.eks. Elektronik, Mejeri" className="mt-1 rounded-[8px] border-[#e8e6df] text-[13px]" />
+          <Label className="text-[12px] font-semibold text-muted-foreground">Kategori</Label>
+          <Input value={category} onChange={e => setCategory(e.target.value)} placeholder="F.eks. Elektronik, Mejeri" className="mt-1 rounded-[8px] border-border text-[13px]" />
         </div>
 
         {/* Banner Image Upload */}
         <div>
-          <Label className="text-[12px] font-semibold text-[#5f5d56]">Banner-billede</Label>
+          <Label className="text-[12px] font-semibold text-muted-foreground">Banner-billede</Label>
           <input ref={bannerRef} type="file" accept="image/*" onChange={handleBannerSelect} className="hidden" />
           {bannerImage ? (
             <div className="mt-1 space-y-2">
@@ -451,21 +451,21 @@ function AffiliateCreatePage({
                   <button
                     type="button"
                     onClick={() => bannerRef.current?.click()}
-                    className="h-7 w-7 rounded-full bg-white/90 flex items-center justify-center shadow-sm"
+                    className="h-7 w-7 rounded-full bg-card/90 flex items-center justify-center shadow-sm"
                   >
-                    <Pencil className="h-3 w-3 text-[#5f5d56]" />
+                    <Pencil className="h-3 w-3 text-muted-foreground" />
                   </button>
                   <button
                     type="button"
                     onClick={() => { setBannerImage(''); setBannerFile(null); }}
-                    className="h-7 w-7 rounded-full bg-white/90 flex items-center justify-center shadow-sm"
+                    className="h-7 w-7 rounded-full bg-card/90 flex items-center justify-center shadow-sm"
                   >
                     <XIcon className="h-3 w-3 text-[#FF3B30]" />
                   </button>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Label className="text-[11px] text-[#78766d] shrink-0">Position</Label>
+                <Label className="text-[11px] text-muted-foreground shrink-0">Position</Label>
                 <input
                   type="range"
                   min={0}
@@ -474,28 +474,28 @@ function AffiliateCreatePage({
                   onChange={e => setBannerPositionY(Number(e.target.value))}
                   className="flex-1 h-1 accent-[#f58a2d]"
                 />
-                <span className="text-[11px] text-[#9a978f] w-8 text-right">{bannerPositionY}%</span>
+                <span className="text-[11px] text-muted-foreground w-8 text-right">{bannerPositionY}%</span>
               </div>
             </div>
           ) : (
             <button
               type="button"
               onClick={() => bannerRef.current?.click()}
-              className="mt-1 w-full h-24 rounded-[8px] border-2 border-dashed border-[#d0cec5] bg-[#faf9f6] hover:border-[#b0ae9f] flex flex-col items-center justify-center gap-1.5 transition-colors"
+              className="mt-1 w-full h-24 rounded-[8px] border-2 border-dashed border-border bg-card hover:border-border flex flex-col items-center justify-center gap-1.5 transition-colors"
             >
-              <ImagePlus className="h-6 w-6 text-[#c8c6bc]" />
-              <p className="text-[11px] text-[#78766d]">Upload banner-billede</p>
+              <ImagePlus className="h-6 w-6 text-muted-foreground" />
+              <p className="text-[11px] text-muted-foreground">Upload banner-billede</p>
             </button>
           )}
         </div>
 
         <div>
-          <Label className="text-[12px] font-semibold text-[#5f5d56]">Kilde / URL</Label>
-          <Input value={sourceUrl} onChange={e => setSourceUrl(e.target.value)} placeholder="URL til banner-kilde eller partner-side" className="mt-1 rounded-[8px] border-[#e8e6df] text-[13px]" />
+          <Label className="text-[12px] font-semibold text-muted-foreground">Kilde / URL</Label>
+          <Input value={sourceUrl} onChange={e => setSourceUrl(e.target.value)} placeholder="URL til banner-kilde eller partner-side" className="mt-1 rounded-[8px] border-border text-[13px]" />
         </div>
 
-        <div className="flex items-center justify-between rounded-[8px] border border-[#e8e6df] bg-white px-3 py-3">
-          <Label className="text-[13px] font-semibold text-[#2f2f2d]">Aktiv</Label>
+        <div className="flex items-center justify-between rounded-[8px] border border-border bg-card px-3 py-3">
+          <Label className="text-[13px] font-semibold text-foreground">Aktiv</Label>
           <IOSSwitch checked={isActive} onCheckedChange={setIsActive} />
         </div>
       </div>
@@ -588,7 +588,7 @@ function SwipeableBatchRow({ children, onDelete }: { children: React.ReactNode; 
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        className="relative z-10 bg-white"
+        className="relative z-10 bg-card"
         style={{ transform: 'translateX(0)' }}
       >
         {children}
@@ -732,12 +732,12 @@ function PdfImportTab() {
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
-      pending: 'bg-[#f2f1ed] text-[#7a786f]',
-      processing: 'bg-[#fff6ef] text-[#f58a2d]',
-      preview: 'bg-[#e6f7ff] text-[#5AC8FA]',
-      confirmed: 'bg-[#eef9ee] text-[#34C759]',
-      failed: 'bg-[#fef2f2] text-[#FF3B30]',
-      scheduled: 'bg-[#e6f0ff] text-[#007AFF]',
+      pending: 'bg-background text-muted-foreground',
+      processing: 'bg-orange-tint-light text-[#f58a2d]',
+      preview: 'bg-blue-tint text-[#5AC8FA]',
+      confirmed: 'bg-green-tint text-[#34C759]',
+      failed: 'bg-red-tint text-[#FF3B30]',
+      scheduled: 'bg-blue-tint text-[#007AFF]',
     };
     const labels: Record<string, string> = {
       pending: 'Afventer',
@@ -802,17 +802,17 @@ function PdfImportTab() {
     return (
       <div
         key={batch.id}
-        className="flex items-center gap-3 px-3 py-2.5 active:bg-[#f5f4f0] transition-colors cursor-pointer"
+        className="flex items-center gap-3 px-3 py-2.5 active:bg-card transition-colors cursor-pointer"
         onClick={() => setEditBatch(batch)}
       >
         {batch.store ? (
           <StoreBadge storeId={batch.store.toLowerCase().replace(/\s+/g, '')} size="sm" />
         ) : (
-          <FileText className="h-6 w-6 text-[#9a978f] shrink-0" />
+          <FileText className="h-6 w-6 text-muted-foreground shrink-0" />
         )}
         <div className="flex-1 min-w-0">
-          <p className="text-[14px] font-semibold text-[#2f2f2d] truncate">{batch.store || batch.file_name}</p>
-          <p className="text-[12px] text-[#9a978f]">
+          <p className="text-[14px] font-semibold text-foreground truncate">{batch.store || batch.file_name}</p>
+          <p className="text-[12px] text-muted-foreground">
             {batch.valid_from && batch.valid_until
               ? `${new Date(batch.valid_from).toLocaleDateString('da-DK', { day: 'numeric', month: 'short' })} – ${new Date(batch.valid_until).toLocaleDateString('da-DK', { day: 'numeric', month: 'short' })}`
               : batch.file_name}
@@ -822,14 +822,14 @@ function PdfImportTab() {
         <div className="flex items-center gap-2 shrink-0">
           <div className="flex flex-col items-end gap-0.5">
             {isDateActive ? (
-              <span className="rounded-[6px] px-2 py-0.5 text-[10px] font-semibold bg-[#eef9ee] text-[#34C759]">
+              <span className="rounded-[6px] px-2 py-0.5 text-[10px] font-semibold bg-green-tint text-[#34C759]">
                 Aktiv
               </span>
             ) : getStatusBadge(batch.status)}
             {daysLeft && (
               <span className={cn(
                 'text-[10px] font-medium',
-                isExpired ? 'text-[#FF3B30]' : isSoonExpiring ? 'text-[#f58a2d]' : 'text-[#7a786f]'
+                isExpired ? 'text-[#FF3B30]' : isSoonExpiring ? 'text-[#f58a2d]' : 'text-muted-foreground'
               )}>
                 {daysLeft}
               </span>
@@ -859,12 +859,12 @@ function PdfImportTab() {
           {(batch.status === 'preview' || batch.status === 'confirmed') && (
             <button
               onClick={(e) => { e.stopPropagation(); openPreview(batch); }}
-              className="p-1.5 rounded-[6px] hover:bg-[#f2f1ed] text-[#7a786f] transition-colors"
+              className="p-1.5 rounded-[6px] hover:bg-background text-muted-foreground transition-colors"
             >
               <Eye className="h-3.5 w-3.5" />
             </button>
           )}
-          <Info className="h-3.5 w-3.5 text-[#c8c6bc]" />
+          <Info className="h-3.5 w-3.5 text-muted-foreground" />
         </div>
       </div>
     );
@@ -874,31 +874,31 @@ function PdfImportTab() {
     <div className="space-y-3">
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#9a978f]" />
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
         <Input
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Søg tilbudsaviser..."
-          className="pl-8 h-9 text-[13px] rounded-[8px] border-[#e8e6df]"
+          className="pl-8 h-9 text-[13px] rounded-[8px] border-border"
         />
       </div>
 
       {/* ─── AKTIVE TILBUDSAVISER (FLYERS + active uploaded batches) ─── */}
       <div>
-        <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#9a978f] mb-2">
+        <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground mb-2">
           Aktive tilbudsaviser
         </p>
-        <div className="rounded-[8px] border border-[#e8e6df] bg-white overflow-hidden divide-y divide-[#f2f1ed]">
+        <div className="rounded-[8px] border border-border bg-card overflow-hidden divide-y divide-border">
           {flyersWithStatus.map(f => (
             <div
               key={f.id}
-              className="flex items-center gap-3 px-3 py-2.5 active:bg-[#f5f4f0] transition-colors cursor-pointer"
+              className="flex items-center gap-3 px-3 py-2.5 active:bg-card transition-colors cursor-pointer"
               onClick={() => setInfoFlyer(f)}
             >
               <StoreBadge storeId={getFlyerStoreSlug(f)} size="sm" />
               <div className="flex-1 min-w-0">
-                <p className="text-[14px] font-semibold text-[#2f2f2d] truncate">{f.store}</p>
-                <p className="text-[12px] text-[#9a978f]">
+                <p className="text-[14px] font-semibold text-foreground truncate">{f.store}</p>
+                <p className="text-[12px] text-muted-foreground">
                   {f.validFrom} – {f.validUntil} · {f.pages} sider
                 </p>
               </div>
@@ -906,20 +906,20 @@ function PdfImportTab() {
                 <div className="flex flex-col items-end gap-0.5">
                   <span className={cn(
                     'rounded-[6px] px-2 py-0.5 text-[10px] font-semibold',
-                    f.isActive ? 'bg-[#eef9ee] text-[#34C759]' : 'bg-[#fef2f2] text-[#FF3B30]'
+                    f.isActive ? 'bg-green-tint text-[#34C759]' : 'bg-red-tint text-[#FF3B30]'
                   )}>
                     {f.isActive ? 'Aktiv' : 'Udløbet'}
                   </span>
                   {f.isActive && f.daysLeft >= 0 && (
                     <span className={cn(
                       'text-[10px] font-medium',
-                      f.daysLeft <= 2 ? 'text-[#f58a2d]' : 'text-[#7a786f]'
+                      f.daysLeft <= 2 ? 'text-[#f58a2d]' : 'text-muted-foreground'
                     )}>
                       {f.daysLeft === 0 ? 'Udløber i dag' : f.daysLeft === 1 ? 'Udløber i morgen' : `${f.daysLeft} dage`}
                     </span>
                   )}
                 </div>
-                <Info className="h-3.5 w-3.5 text-[#c8c6bc]" />
+                <Info className="h-3.5 w-3.5 text-muted-foreground" />
               </div>
             </div>
           ))}
@@ -934,17 +934,17 @@ function PdfImportTab() {
 
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <RefreshCw className="h-5 w-5 text-[#c8c6bc] animate-spin" />
+          <RefreshCw className="h-5 w-5 text-muted-foreground animate-spin" />
         </div>
       ) : (
         <>
           {/* Kommende tilbudsaviser */}
           {upcomingBatches.length > 0 && (
             <div>
-              <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#9a978f] mb-2">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground mb-2">
                 Kommende tilbudsaviser
               </p>
-              <div className="rounded-[8px] border border-[#e8e6df] bg-white overflow-hidden divide-y divide-[#f2f1ed]">
+              <div className="rounded-[8px] border border-border bg-card overflow-hidden divide-y divide-border">
                 {upcomingBatches.map(b => (
                   <SwipeableBatchRow key={`swipe-${b.id}`} onDelete={() => setDeleteBatchId(b.id)}>
                     {renderBatchCard(b, { showActivate: true })}
@@ -957,10 +957,10 @@ function PdfImportTab() {
           {/* Historik */}
           {otherBatches.length > 0 && (
             <div>
-              <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#9a978f] mb-2">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground mb-2">
                 Historik
               </p>
-              <div className="rounded-[8px] border border-[#e8e6df] bg-white overflow-hidden divide-y divide-[#f2f1ed]">
+              <div className="rounded-[8px] border border-border bg-card overflow-hidden divide-y divide-border">
                 {otherBatches.map(b => (
                   <SwipeableBatchRow key={`swipe-${b.id}`} onDelete={() => setDeleteBatchId(b.id)}>
                     {renderBatchCard(b)}
@@ -973,9 +973,9 @@ function PdfImportTab() {
       )}
 
       {/* Datakilder */}
-      <div className="rounded-[12px] bg-[#faf9f6] p-4 space-y-2 mt-2">
-        <p className="text-[13px] font-semibold text-[#2f2f2d]">Datakilder</p>
-        <p className="text-[12px] text-[#78766d]">
+      <div className="rounded-[12px] bg-card p-4 space-y-2 mt-2">
+        <p className="text-[13px] font-semibold text-foreground">Datakilder</p>
+        <p className="text-[12px] text-muted-foreground">
           Næringsdata leveret af{' '}
           <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener noreferrer" className="text-[#f58a2d] underline">
             Open Food Facts
@@ -1009,7 +1009,7 @@ function PdfImportTab() {
 
           <div className="flex-1 overflow-y-auto -mx-6 px-6">
             {previewItems.length === 0 ? (
-              <p className="text-[13px] text-[#78766d] text-center py-8">Ingen produkter fundet</p>
+              <p className="text-[13px] text-muted-foreground text-center py-8">Ingen produkter fundet</p>
             ) : (
               <div className="space-y-2">
                 {previewItems.map(item => {
@@ -1020,32 +1020,32 @@ function PdfImportTab() {
                       className={cn(
                         'rounded-[8px] border p-2.5 transition-colors',
                         item.is_rejected
-                          ? 'border-[#fecaca] bg-[#fef2f2] opacity-50'
+                          ? 'border-[#fecaca] bg-red-tint opacity-50'
                           : item.is_confirmed
-                            ? 'border-[#bbf7d0] bg-[#f0fdf4]'
+                            ? 'border-[#bbf7d0] bg-green-tint'
                             : lowConfidence
-                              ? 'border-[#fde68a] bg-[#fffbeb]'
-                              : 'border-[#e8e6df] bg-white'
+                              ? 'border-[#fde68a] bg-yellow-tint'
+                              : 'border-border bg-card'
                       )}
                     >
                       <div className="flex items-start gap-2">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
-                            <p className="text-[12px] font-semibold text-[#2f2f2d]">{item.title}</p>
+                            <p className="text-[12px] font-semibold text-foreground">{item.title}</p>
                             {lowConfidence && (
                               <AlertTriangle className="h-3 w-3 text-[#f59e0b] shrink-0" />
                             )}
                           </div>
                           <div className="flex gap-3 mt-0.5">
                             {item.price && <p className="text-[11px] text-[#34C759] font-semibold">{item.price} kr</p>}
-                            {item.original_price && <p className="text-[11px] text-[#9a978f] line-through">{item.original_price} kr</p>}
+                            {item.original_price && <p className="text-[11px] text-muted-foreground line-through">{item.original_price} kr</p>}
                             {item.discount && <p className="text-[11px] text-[#f58a2d]">{item.discount}</p>}
                           </div>
                           <div className="flex gap-2 mt-0.5">
-                            {item.category && <p className="text-[10px] text-[#7a786f]">{item.category}</p>}
-                            {item.unit && <p className="text-[10px] text-[#7a786f]">· {item.unit}</p>}
+                            {item.category && <p className="text-[10px] text-muted-foreground">{item.category}</p>}
+                            {item.unit && <p className="text-[10px] text-muted-foreground">· {item.unit}</p>}
                             {item.confidence != null && (
-                              <p className={cn('text-[10px]', lowConfidence ? 'text-[#f59e0b]' : 'text-[#9a978f]')}>
+                              <p className={cn('text-[10px]', lowConfidence ? 'text-[#f59e0b]' : 'text-muted-foreground')}>
                                 {Math.round(item.confidence * 100)}% sikkerhed
                               </p>
                             )}
@@ -1056,7 +1056,7 @@ function PdfImportTab() {
                             ) : (
                               <button
                                 onClick={(e) => { e.stopPropagation(); handleScanBarcode(item.id); }}
-                                className="text-[10px] text-[#9a978f] hover:text-[#5AC8FA] flex items-center gap-0.5"
+                                className="text-[10px] text-muted-foreground hover:text-[#5AC8FA] flex items-center gap-0.5"
                               >
                                 <ScanBarcode className="h-2.5 w-2.5" />
                                 Scan stregkode
@@ -1071,7 +1071,7 @@ function PdfImportTab() {
                               'p-1.5 rounded-[6px] transition-colors',
                               item.is_confirmed
                                 ? 'bg-[#34C759] text-white'
-                                : 'hover:bg-[#eef9ee] text-[#34C759]'
+                                : 'hover:bg-green-tint text-[#34C759]'
                             )}
                           >
                             <Check className="h-3.5 w-3.5" />
@@ -1082,7 +1082,7 @@ function PdfImportTab() {
                               'p-1.5 rounded-[6px] transition-colors',
                               item.is_rejected
                                 ? 'bg-[#FF3B30] text-white'
-                                : 'hover:bg-[#fef2f2] text-[#FF3B30]'
+                                : 'hover:bg-red-tint text-[#FF3B30]'
                             )}
                           >
                             <XIcon className="h-3.5 w-3.5" />
@@ -1097,7 +1097,7 @@ function PdfImportTab() {
           </div>
 
           {previewBatch?.status === 'preview' && previewItems.length > 0 && (
-            <div className="flex gap-2 justify-end pt-3 border-t border-[#f2f1ed]">
+            <div className="flex gap-2 justify-end pt-3 border-t border-border">
               <Button
                 variant="outline"
                 size="sm"
@@ -1129,10 +1129,10 @@ function PdfImportTab() {
             </DialogTitle>
           </DialogHeader>
           {infoFlyer && (
-            <div className="space-y-2 text-[13px] text-[#5f5d56]">
-              <p><span className="font-medium text-[#2f2f2d]">Gyldig:</span> {infoFlyer.validFrom} – {infoFlyer.validUntil}</p>
-              <p><span className="font-medium text-[#2f2f2d]">Sider:</span> {infoFlyer.pages}</p>
-              <p><span className="font-medium text-[#2f2f2d]">Status:</span> {infoFlyer.isActive ? 'Aktiv' : 'Udløbet'}</p>
+            <div className="space-y-2 text-[13px] text-muted-foreground">
+              <p><span className="font-medium text-foreground">Gyldig:</span> {infoFlyer.validFrom} – {infoFlyer.validUntil}</p>
+              <p><span className="font-medium text-foreground">Sider:</span> {infoFlyer.pages}</p>
+              <p><span className="font-medium text-foreground">Status:</span> {infoFlyer.isActive ? 'Aktiv' : 'Udløbet'}</p>
               {infoFlyer.webUrl && (
                 <a
                   href={infoFlyer.webUrl}
@@ -1325,22 +1325,22 @@ function PdfImportCreatePage({
   };
 
   return (
-    <div className="fixed inset-0 z-[60] bg-[#f7f6f2] flex flex-col">
+    <div className="fixed inset-0 z-[60] bg-background flex flex-col">
       {/* Header */}
       <div className="safe-area-pt flex items-center gap-1 px-2 pb-2.5 pt-2">
         <button
           onClick={tryClose}
-          className="flex h-9 w-9 items-center justify-center text-[#30302d]"
+          className="flex h-9 w-9 items-center justify-center text-foreground"
           aria-label="Tilbage"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
-        <h1 className="text-[15px] font-semibold text-[#2f2f2d] flex-1">
+        <h1 className="text-[15px] font-semibold text-foreground flex-1">
           {isEdit ? 'Rediger tilbudsavis' : 'Opret tilbudsavis'}
         </h1>
         <button
           onClick={tryClose}
-          className="flex h-9 w-9 items-center justify-center text-[#30302d]"
+          className="flex h-9 w-9 items-center justify-center text-foreground"
           aria-label="Luk"
         >
           <XIcon className="h-5 w-5" />
@@ -1351,13 +1351,13 @@ function PdfImportCreatePage({
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {/* Store selection */}
         <div>
-          <Label className="text-[12px] font-semibold text-[#5f5d56]">Butikskæde *</Label>
+          <Label className="text-[12px] font-semibold text-muted-foreground">Butikskæde *</Label>
           <input
             list="pdf-store-suggestions"
             value={store}
             onChange={e => setStore(e.target.value)}
             placeholder="Skriv eller vælg butik..."
-            className="mt-1 w-full h-9 rounded-[8px] border border-[#e8e6df] bg-white px-2.5 text-[13px] text-[#2f2f2d]"
+            className="mt-1 w-full h-9 rounded-[8px] border border-border bg-card px-2.5 text-[13px] text-foreground"
           />
           <datalist id="pdf-store-suggestions">
             {STORES.map(s => <option key={s} value={s} />)}
@@ -1367,7 +1367,7 @@ function PdfImportCreatePage({
         {/* PDF Upload */}
         {!isEdit ? (
           <div>
-            <Label className="text-[12px] font-semibold text-[#5f5d56]">PDF-fil *</Label>
+            <Label className="text-[12px] font-semibold text-muted-foreground">PDF-fil *</Label>
             <input ref={fileRef} type="file" accept=".pdf" onChange={handleFileSelect} className="hidden" />
             <div
               onDragOver={e => { e.preventDefault(); setDragOver(true); }}
@@ -1376,30 +1376,30 @@ function PdfImportCreatePage({
               onClick={() => fileRef.current?.click()}
               className={cn(
                 'mt-1 rounded-[8px] border-2 border-dashed p-6 text-center transition-colors cursor-pointer',
-                dragOver ? 'border-[#f58a2d] bg-[#fff6ef]' : 'border-[#d0cec5] bg-[#faf9f6] hover:border-[#b0ae9f]'
+                dragOver ? 'border-[#f58a2d] bg-orange-tint-light' : 'border-border bg-card hover:border-border'
               )}
             >
               {pdfFile ? (
                 <div className="flex flex-col items-center gap-2">
                   <FileText className="h-8 w-8 text-[#34C759]" />
-                  <p className="text-[13px] font-semibold text-[#2f2f2d]">{pdfFile.name}</p>
-                  <p className="text-[11px] text-[#78766d]">{(pdfFile.size / 1024 / 1024).toFixed(1)} MB — Klik for at ændre</p>
+                  <p className="text-[13px] font-semibold text-foreground">{pdfFile.name}</p>
+                  <p className="text-[11px] text-muted-foreground">{(pdfFile.size / 1024 / 1024).toFixed(1)} MB — Klik for at ændre</p>
                 </div>
               ) : (
                 <div className="flex flex-col items-center gap-2">
-                  <Upload className="h-8 w-8 text-[#c8c6bc]" />
-                  <p className="text-[13px] font-semibold text-[#3f3e3a]">Upload tilbudsavis (PDF)</p>
-                  <p className="text-[11px] text-[#78766d]">Træk og slip eller klik for at vælge fil (max 70 MB)</p>
+                  <Upload className="h-8 w-8 text-muted-foreground" />
+                  <p className="text-[13px] font-semibold text-foreground">Upload tilbudsavis (PDF)</p>
+                  <p className="text-[11px] text-muted-foreground">Træk og slip eller klik for at vælge fil (max 70 MB)</p>
                 </div>
               )}
             </div>
           </div>
         ) : (
-          <div className="flex items-center gap-3 rounded-[8px] border border-[#e8e6df] bg-white px-3 py-3">
-            <FileText className="h-5 w-5 text-[#9a978f] shrink-0" />
+          <div className="flex items-center gap-3 rounded-[8px] border border-border bg-card px-3 py-3">
+            <FileText className="h-5 w-5 text-muted-foreground shrink-0" />
             <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-semibold text-[#2f2f2d] truncate">{batch.file_name}</p>
-              <p className="text-[10px] text-[#78766d]">PDF kan ikke ændres efter upload</p>
+              <p className="text-[13px] font-semibold text-foreground truncate">{batch.file_name}</p>
+              <p className="text-[10px] text-muted-foreground">PDF kan ikke ændres efter upload</p>
             </div>
           </div>
         )}
@@ -1407,7 +1407,7 @@ function PdfImportCreatePage({
         {/* Replace existing batch */}
         {!isEdit && replaceOptions.length > 0 && (
           <div>
-            <Label className="text-[12px] font-semibold text-[#5f5d56]">Erstatter eksisterende avis (valgfrit)</Label>
+            <Label className="text-[12px] font-semibold text-muted-foreground">Erstatter eksisterende avis (valgfrit)</Label>
             <select
               value={replaceBatchId ?? ''}
               onChange={e => {
@@ -1415,7 +1415,7 @@ function PdfImportCreatePage({
                 setReplaceBatchId(id);
                 if (id) setValidFrom(new Date().toISOString().slice(0, 10));
               }}
-              className="mt-1 w-full h-9 rounded-[8px] border border-[#e8e6df] bg-white px-2.5 text-[13px] text-[#2f2f2d]"
+              className="mt-1 w-full h-9 rounded-[8px] border border-border bg-card px-2.5 text-[13px] text-foreground"
             >
               <option value="">Ingen — ny avis</option>
               {replaceOptions.map(o => (
@@ -1428,21 +1428,21 @@ function PdfImportCreatePage({
         {/* Date range */}
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <Label className="text-[12px] font-semibold text-[#5f5d56]">Gyldig fra</Label>
+            <Label className="text-[12px] font-semibold text-muted-foreground">Gyldig fra</Label>
             <Input
               type="date"
               value={validFrom}
               onChange={e => setValidFrom(e.target.value)}
-              className="mt-1 rounded-[8px] border-[#e8e6df] text-[13px]"
+              className="mt-1 rounded-[8px] border-border text-[13px]"
             />
           </div>
           <div>
-            <Label className="text-[12px] font-semibold text-[#5f5d56]">Gyldig til</Label>
+            <Label className="text-[12px] font-semibold text-muted-foreground">Gyldig til</Label>
             <Input
               type="date"
               value={validUntil}
               onChange={e => setValidUntil(e.target.value)}
-              className="mt-1 rounded-[8px] border-[#e8e6df] text-[13px]"
+              className="mt-1 rounded-[8px] border-border text-[13px]"
             />
           </div>
         </div>

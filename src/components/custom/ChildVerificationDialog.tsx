@@ -88,7 +88,7 @@ export function ChildVerificationDialog({ children, householdId, userId, onVerif
 
   return (
     <div className="min-h-[100svh] flex items-center justify-center bg-gradient-to-b from-slate-50 to-white px-4">
-      <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-lg">
+      <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-card p-6 shadow-lg">
         <div className="mb-6 text-center">
           <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-blue-50">
             <svg className="h-7 w-7 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -195,7 +195,7 @@ export function FlyerViewer() {
 
           {/* Bottom Sheet */}
           <motion.div
-            className="fixed inset-x-0 bottom-0 z-[81] mx-auto max-w-[430px] flex flex-col bg-[#f7f6f2] rounded-t-3xl shadow-[0_-8px_40px_rgba(0,0,0,0.12)]"
+            className="fixed inset-x-0 bottom-0 z-[81] mx-auto max-w-[430px] flex flex-col bg-background rounded-t-3xl shadow-[0_-8px_40px_rgba(0,0,0,0.12)]"
             style={{ maxHeight: sheetMaxHeight }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
@@ -204,7 +204,7 @@ export function FlyerViewer() {
           >
             {/* Drag handle */}
             <div className="flex justify-center pt-3 pb-1 shrink-0">
-              <div className="h-1 w-10 rounded-full bg-[#d8d7cf]" />
+              <div className="h-1 w-10 rounded-full bg-border" />
             </div>
 
             {/* Header: store name + page counter + close */}
@@ -216,19 +216,19 @@ export function FlyerViewer() {
                 >
                   {flyer?.storeInitial}
                 </div>
-                <span className="text-[15px] font-bold text-[#2f2f2d]">{flyer?.store}</span>
+                <span className="text-[15px] font-bold text-foreground">{flyer?.store}</span>
               </div>
               <div className="flex items-center gap-3">
                 {!loading && !error && (
-                  <span className="text-[12px] font-semibold text-[#9a978f]">
+                  <span className="text-[12px] font-semibold text-muted-foreground">
                     {currentPage + 1} / {pageCount}
                   </span>
                 )}
                 <button
                   onClick={close}
-                  className="flex h-7 w-7 items-center justify-center rounded-full bg-[#e8e7e2] active:scale-95 transition-transform"
+                  className="flex h-7 w-7 items-center justify-center rounded-full bg-muted active:scale-95 transition-transform"
                 >
-                  <X className="h-3.5 w-3.5 text-[#78766d]" />
+                  <X className="h-3.5 w-3.5 text-muted-foreground" />
                 </button>
               </div>
             </div>
@@ -239,8 +239,8 @@ export function FlyerViewer() {
               {loading && !error && (
                 <div className="flex items-center justify-center py-20">
                   <div className="flex flex-col items-center gap-3">
-                    <Loader2 className="h-7 w-7 animate-spin text-[#78766d]" />
-                    <p className="text-[13px] text-[#9a978f]">Indlæser tilbudsavis...</p>
+                    <Loader2 className="h-7 w-7 animate-spin text-muted-foreground" />
+                    <p className="text-[13px] text-muted-foreground">Indlæser tilbudsavis...</p>
                   </div>
                 </div>
               )}
@@ -251,8 +251,8 @@ export function FlyerViewer() {
                   <div className="flex flex-col items-center gap-3 px-8 text-center">
                     {!flyer?.hasFlyer ? (
                       <>
-                        <p className="text-[14px] font-semibold text-[#2f2f2d]">Avisen er ikke tilgængelig i appen</p>
-                        <p className="text-[13px] text-[#9a978f]">Se tilbudsavisen direkte på {flyer?.store}s hjemmeside</p>
+                        <p className="text-[14px] font-semibold text-foreground">Avisen er ikke tilgængelig i appen</p>
+                        <p className="text-[13px] text-muted-foreground">Se tilbudsavisen direkte på {flyer?.store}s hjemmeside</p>
                         <a
                           href={flyer?.webUrl}
                           target="_blank"
@@ -266,13 +266,13 @@ export function FlyerViewer() {
                       </>
                     ) : (
                       <>
-                        <p className="text-[14px] font-semibold text-[#2f2f2d]">Kunne ikke indlæse avisen</p>
-                        <p className="text-[13px] text-[#9a978f]">Prøv igen senere.</p>
+                        <p className="text-[14px] font-semibold text-foreground">Kunne ikke indlæse avisen</p>
+                        <p className="text-[13px] text-muted-foreground">Prøv igen senere.</p>
                       </>
                     )}
                     <button
                       onClick={close}
-                      className="mt-2 px-4 py-2 rounded-full bg-[#2f2f2f] text-white text-[13px] font-semibold active:scale-[0.97] transition-transform"
+                      className="mt-2 px-4 py-2 rounded-full bg-primary text-white text-[13px] font-semibold active:scale-[0.97] transition-transform"
                     >
                       Luk
                     </button>
@@ -329,17 +329,17 @@ export function FlyerViewer() {
                       {currentPage > 0 && (
                         <button
                           onClick={prevPage}
-                          className="absolute left-1.5 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-lg active:scale-95 transition-transform"
+                          className="absolute left-1.5 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-card/80 backdrop-blur-sm shadow-lg active:scale-95 transition-transform"
                         >
-                          <ChevronLeft className="h-4 w-4 text-[#2f2f2d]" />
+                          <ChevronLeft className="h-4 w-4 text-foreground" />
                         </button>
                       )}
                       {currentPage < pageCount - 1 && (
                         <button
                           onClick={nextPage}
-                          className="absolute right-1.5 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-lg active:scale-95 transition-transform"
+                          className="absolute right-1.5 top-1/2 -translate-y-1/2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-card/80 backdrop-blur-sm shadow-lg active:scale-95 transition-transform"
                         >
-                          <ChevronRight className="h-4 w-4 text-[#2f2f2d]" />
+                          <ChevronRight className="h-4 w-4 text-foreground" />
                         </button>
                       )}
                     </>
@@ -359,14 +359,14 @@ export function FlyerViewer() {
                           top: `${Math.min((selectedHotspot.enrichment.y + selectedHotspot.enrichment.height) * 100, 70)}%`,
                         }}
                       >
-                        <div className="bg-white rounded-[8px] shadow-[0_4px_24px_rgba(0,0,0,0.18)] p-3 flex flex-col gap-2">
+                        <div className="bg-card rounded-[8px] shadow-[0_4px_24px_rgba(0,0,0,0.18)] p-3 flex flex-col gap-2">
                           {/* Name input */}
                           <input
                             type="text"
                             value={productName}
                             onChange={(e) => setProductName(e.target.value)}
                             placeholder="Produktnavn..."
-                            className="w-full rounded-lg border border-[#e5e3dc] bg-[#f8f7f3] px-3 py-2 text-[14px] text-[#2f2f2d] placeholder:text-[#b5b3ab] outline-none focus:border-[#f58a2d] transition-colors"
+                            className="w-full rounded-lg border border-border bg-card px-3 py-2 text-[14px] text-foreground placeholder:text-muted-foreground outline-none focus:border-[#f58a2d] transition-colors"
                             autoFocus
                             onKeyDown={(e) => { if (e.key === 'Enter') handleAddToCart(); }}
                           />
@@ -384,7 +384,7 @@ export function FlyerViewer() {
                             {/* Cancel */}
                             <button
                               onClick={() => { setSelectedHotspot(null); setProductName(''); }}
-                              className="px-3 py-1.5 rounded-lg text-[13px] font-medium text-[#78766d] active:bg-[#e8e7e2] transition-colors"
+                              className="px-3 py-1.5 rounded-lg text-[13px] font-medium text-muted-foreground active:bg-muted transition-colors"
                             >
                               Annuller
                             </button>

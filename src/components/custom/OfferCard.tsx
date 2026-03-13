@@ -18,7 +18,7 @@ export function OfferCard({ offer, isAdded, inCart, nutriscoreGrade, onSelect }:
   const up = calculateUnitPrice(offer.price, offer.unit);
 
   return (
-    <div className="relative min-w-[150px] max-w-[150px] snap-start shrink-0 rounded-[8px] bg-white p-3 flex flex-col overflow-visible">
+    <div className="relative min-w-[150px] max-w-[150px] snap-start shrink-0 rounded-[8px] bg-card p-3 flex flex-col overflow-visible">
       {nutriscoreGrade && (
         <NutriScoreBadge grade={nutriscoreGrade} size="sm" className="absolute top-1 left-1 z-10" />
       )}
@@ -39,20 +39,20 @@ export function OfferCard({ offer, isAdded, inCart, nutriscoreGrade, onSelect }:
       ) : (
         <div className="flex items-center gap-1.5 mb-1.5">
           <StoreBadge storeName={offer.store} storeColor={offer.storeColor} storeInitial={offer.store[0]} size="sm" />
-          <span className="text-[10px] font-semibold text-[#9a978f] truncate">{offer.store}</span>
+          <span className="text-[10px] font-semibold text-muted-foreground truncate">{offer.store}</span>
         </div>
       )}
-      <p className="text-[13px] font-semibold text-[#2f2f2d] leading-snug line-clamp-2">{offer.title}</p>
+      <p className="text-[13px] font-semibold text-foreground leading-snug line-clamp-2">{offer.title}</p>
       {offer.unit && (
-        <p className="text-[10px] text-[#9a978f] mt-0.5">{offer.unit}</p>
+        <p className="text-[10px] text-muted-foreground mt-0.5">{offer.unit}</p>
       )}
       <div className="flex items-baseline gap-1.5 mt-auto pt-1.5">
-        <span className="text-[15px] font-bold text-[#2f2f2d]">{offer.price}.-</span>
-        <span className="text-[11px] text-[#9a978f] line-through">{offer.originalPrice}.-</span>
+        <span className="text-[15px] font-bold text-foreground">{offer.price}.-</span>
+        <span className="text-[11px] text-muted-foreground line-through">{offer.originalPrice}.-</span>
         <span className="text-[10px] font-bold text-white bg-[#ef4444] rounded-full px-1.5 py-0.5 ml-auto">{offer.discount}</span>
       </div>
       {up && (
-        <p className="text-[10px] text-[#78766d] mt-0.5">{up.formatted}</p>
+        <p className="text-[10px] text-muted-foreground mt-0.5">{up.formatted}</p>
       )}
       <button
         onClick={() => onSelect(offer)}
@@ -60,7 +60,7 @@ export function OfferCard({ offer, isAdded, inCart, nutriscoreGrade, onSelect }:
           "mt-2 w-full py-1.5 rounded-lg text-[12px] font-semibold active:scale-[0.97] transition-all",
           isAdded
             ? "bg-[#22c55e]/10 text-[#22c55e]"
-            : "bg-[#2f2f2f] text-white"
+            : "bg-primary text-white"
         )}
       >
         {isAdded ? (

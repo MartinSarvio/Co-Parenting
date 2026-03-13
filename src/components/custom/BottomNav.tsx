@@ -28,17 +28,17 @@ function OversightIcon({ active, className }: { active: boolean; className?: str
     <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       {active ? (
         <>
-          <rect x="3" y="3" width="8" height="8" rx="1.5" fill="#000" />
-          <rect x="13" y="3" width="8" height="8" rx="1.5" fill="#000" />
-          <rect x="3" y="13" width="8" height="8" rx="1.5" fill="#000" />
-          <rect x="13" y="13" width="8" height="8" rx="1.5" fill="#000" />
+          <rect x="3" y="3" width="8" height="8" rx="1.5" fill="currentColor" />
+          <rect x="13" y="3" width="8" height="8" rx="1.5" fill="currentColor" />
+          <rect x="3" y="13" width="8" height="8" rx="1.5" fill="currentColor" />
+          <rect x="13" y="13" width="8" height="8" rx="1.5" fill="currentColor" />
         </>
       ) : (
         <>
-          <rect x="3" y="3" width="8" height="8" rx="1.5" stroke="#000" strokeWidth="1.8" />
-          <rect x="13" y="3" width="8" height="8" rx="1.5" stroke="#000" strokeWidth="1.8" />
-          <rect x="3" y="13" width="8" height="8" rx="1.5" stroke="#000" strokeWidth="1.8" />
-          <rect x="13" y="13" width="8" height="8" rx="1.5" stroke="#000" strokeWidth="1.8" />
+          <rect x="3" y="3" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.8" />
+          <rect x="13" y="3" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.8" />
+          <rect x="3" y="13" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.8" />
+          <rect x="13" y="13" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.8" />
         </>
       )}
     </svg>
@@ -49,10 +49,10 @@ function SamvaerIcon({ active, className }: { active: boolean; className?: strin
   const sw = active ? 2.4 : 1.8;
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M17 1l4 4-4 4" stroke="#000" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M3 11V9a4 4 0 014-4h14" stroke="#000" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M7 23l-4-4 4-4" stroke="#000" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M21 13v2a4 4 0 01-4 4H3" stroke="#000" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M17 1l4 4-4 4" stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M3 11V9a4 4 0 014-4h14" stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M7 23l-4-4 4-4" stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M21 13v2a4 4 0 01-4 4H3" stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -61,8 +61,8 @@ function KalenderIcon({ active, className }: { active: boolean; className?: stri
   if (active) {
     return (
       <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2" y="3" width="20" height="19" rx="3" fill="#000" />
-        <path d="M8 1v4M16 1v4" stroke="#000" strokeWidth="2" strokeLinecap="round" />
+        <rect x="2" y="3" width="20" height="19" rx="3" fill="currentColor" />
+        <path d="M8 1v4M16 1v4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
         <rect x="6" y="10" width="3" height="2.5" rx="0.5" fill="#fff" />
         <rect x="10.5" y="10" width="3" height="2.5" rx="0.5" fill="#fff" />
         <rect x="15" y="10" width="3" height="2.5" rx="0.5" fill="#fff" />
@@ -73,14 +73,14 @@ function KalenderIcon({ active, className }: { active: boolean; className?: stri
   }
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="2" y="3" width="20" height="19" rx="3" stroke="#000" strokeWidth="1.8" />
-      <path d="M8 1v4M16 1v4" stroke="#000" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M2 8h20" stroke="#000" strokeWidth="1.8" />
-      <rect x="6" y="11" width="3" height="2.5" rx="0.5" fill="#000" />
-      <rect x="10.5" y="11" width="3" height="2.5" rx="0.5" fill="#000" />
-      <rect x="15" y="11" width="3" height="2.5" rx="0.5" fill="#000" />
-      <rect x="6" y="16" width="3" height="2.5" rx="0.5" fill="#000" />
-      <rect x="10.5" y="16" width="3" height="2.5" rx="0.5" fill="#000" />
+      <rect x="2" y="3" width="20" height="19" rx="3" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M8 1v4M16 1v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M2 8h20" stroke="currentColor" strokeWidth="1.8" />
+      <rect x="6" y="11" width="3" height="2.5" rx="0.5" fill="currentColor" />
+      <rect x="10.5" y="11" width="3" height="2.5" rx="0.5" fill="currentColor" />
+      <rect x="15" y="11" width="3" height="2.5" rx="0.5" fill="currentColor" />
+      <rect x="6" y="16" width="3" height="2.5" rx="0.5" fill="currentColor" />
+      <rect x="10.5" y="16" width="3" height="2.5" rx="0.5" fill="currentColor" />
     </svg>
   );
 }
@@ -89,17 +89,17 @@ function AfleveringIcon({ active, className }: { active: boolean; className?: st
   if (active) {
     return (
       <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="12" cy="7" r="4" fill="#000" />
-        <path d="M4 21v-2a6 6 0 0112 0v2" fill="#000" />
-        <path d="M16 11l2 2 4-4" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx="12" cy="7" r="4" fill="currentColor" />
+        <path d="M4 21v-2a6 6 0 0112 0v2" fill="currentColor" />
+        <path d="M16 11l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     );
   }
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="12" cy="7" r="4" stroke="#000" strokeWidth="1.8" />
-      <path d="M4 21v-2a6 6 0 0112 0v2" stroke="#000" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M16 11l2 2 4-4" stroke="#000" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="12" cy="7" r="4" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M4 21v-2a6 6 0 0112 0v2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M16 11l2 2 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -107,9 +107,9 @@ function AfleveringIcon({ active, className }: { active: boolean; className?: st
 function MereIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="5" cy="12" r="1.5" fill="#000" />
-      <circle cx="12" cy="12" r="1.5" fill="#000" />
-      <circle cx="19" cy="12" r="1.5" fill="#000" />
+      <circle cx="5" cy="12" r="1.5" fill="currentColor" />
+      <circle cx="12" cy="12" r="1.5" fill="currentColor" />
+      <circle cx="19" cy="12" r="1.5" fill="currentColor" />
     </svg>
   );
 }
@@ -118,15 +118,15 @@ function OpgaverIcon({ active, className }: { active: boolean; className?: strin
   if (active) {
     return (
       <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="3" y="3" width="18" height="18" rx="3" fill="#000" />
+        <rect x="3" y="3" width="18" height="18" rx="3" fill="currentColor" />
         <path d="M9 12l2 2 4-4" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     );
   }
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="3" y="3" width="18" height="18" rx="3" stroke="#000" strokeWidth="1.8" />
-      <path d="M9 12l2 2 4-4" stroke="#000" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -135,9 +135,9 @@ function MadHjemIcon({ active, className }: { active: boolean; className?: strin
   const sw = active ? 2.4 : 1.8;
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2" stroke="#000" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M7 2v20" stroke="#000" strokeWidth={sw} strokeLinecap="round" />
-      <path d="M21 15V2v0a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm0 0v7" stroke="#000" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2" stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M7 2v20" stroke="currentColor" strokeWidth={sw} strokeLinecap="round" />
+      <path d="M21 15V2v0a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm0 0v7" stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -243,17 +243,17 @@ export function BottomNav() {
         aria-current={isActive ? 'page' : undefined}
         className={cn(
           'relative flex flex-1 min-w-0 flex-col items-center justify-center gap-1 px-0.5 py-1 transition-colors duration-200',
-          isActive ? 'text-[#000]' : 'text-[#78766d] hover:text-[#4a4945]'
+          isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
         )}
       >
         {CustomIcon ? (
           <CustomIcon aria-hidden="true" active={isActive} className="h-6 w-6" />
         ) : (
-          <LucideIcon aria-hidden="true" className={cn('h-6 w-6 transition-colors', isActive ? 'text-[#000]' : 'text-[#9d9b93]')} />
+          <LucideIcon aria-hidden="true" className={cn('h-6 w-6 transition-colors', isActive ? 'text-foreground' : 'text-muted-foreground')} />
         )}
         <span aria-hidden="true" className={cn(
           "w-full truncate px-0.5 text-center text-[10px] font-semibold leading-tight tracking-[-0.01em]",
-          isActive ? 'text-[#000]' : ''
+          isActive ? 'text-foreground' : ''
         )}>
           {item.label}
         </span>
@@ -263,7 +263,7 @@ export function BottomNav() {
 
   if (shouldShowProfessionalNav) {
     return (
-      <nav aria-label="Hovednavigation" className="safe-area-pb fixed inset-x-0 bottom-0 z-50 mx-auto max-w-[430px] bg-[#f2f1ed]">
+      <nav aria-label="Hovednavigation" className="safe-area-pb fixed inset-x-0 bottom-0 z-50 mx-auto max-w-[430px] bg-background">
         <div className="mx-auto flex h-[54px] w-full max-w-[430px] items-center justify-between px-1 pt-2">
           {professionalNavItems.map((item) => renderNavButton(item))}
         </div>
@@ -272,7 +272,7 @@ export function BottomNav() {
   }
 
   return (
-    <nav aria-label="Hovednavigation" className="safe-area-pb fixed inset-x-0 bottom-0 z-50 mx-auto max-w-[430px] bg-[#f2f1ed]">
+    <nav aria-label="Hovednavigation" className="safe-area-pb fixed inset-x-0 bottom-0 z-50 mx-auto max-w-[430px] bg-background">
       <div className="mx-auto flex h-[54px] w-full max-w-[430px] items-center justify-between px-1 pt-2">
         {mainNavItems.map((item) => renderNavButton(item, true))}
 
@@ -282,7 +282,7 @@ export function BottomNav() {
           aria-expanded={moreOpen}
           className={cn(
             'relative flex flex-1 min-w-0 flex-col items-center justify-center gap-1 px-0.5 py-1 transition-colors duration-200',
-            'text-[#000]'
+            'text-foreground'
           )}
         >
           <MereIcon aria-hidden="true" className="h-6 w-6" />
@@ -313,11 +313,11 @@ export function BottomNav() {
                     className={cn(
                       'flex flex-col items-center gap-2 rounded-[8px] py-4 transition-colors',
                       isActive
-                        ? 'bg-[#fff2e6] text-[#2f2f2d]'
-                        : 'text-[#3f3e3a] hover:bg-[#f2f1ec]'
+                        ? 'bg-orange-tint text-foreground'
+                        : 'text-foreground hover:bg-background'
                     )}
                   >
-                    <Icon aria-hidden="true" className={cn('h-6 w-6', isActive ? 'text-[#f58a2d]' : 'text-[#5f5d56]')} />
+                    <Icon aria-hidden="true" className={cn('h-6 w-6', isActive ? 'text-[#f58a2d]' : 'text-muted-foreground')} />
                     <span className="text-[12px] font-semibold tracking-[-0.01em]">{item.label}</span>
                   </button>
                 );

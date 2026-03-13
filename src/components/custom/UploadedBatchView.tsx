@@ -78,8 +78,8 @@ export function UploadedBatchView({ batchId, inCartNames, onAddProduct }: Upload
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center gap-2">
-        <p className="text-[14px] font-semibold text-[#3f3e3a]">Ingen produkter endnu</p>
-        <p className="text-[12px] text-[#78766d]">PDF'en er muligvis ved at blive analyseret</p>
+        <p className="text-[14px] font-semibold text-foreground">Ingen produkter endnu</p>
+        <p className="text-[12px] text-muted-foreground">PDF'en er muligvis ved at blive analyseret</p>
       </div>
     );
   }
@@ -88,28 +88,28 @@ export function UploadedBatchView({ batchId, inCartNames, onAddProduct }: Upload
     <div className="space-y-4 pb-4">
       {grouped.map(([category, catItems]) => (
         <div key={category}>
-          <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#9a978f] mb-1.5 px-1">{category}</p>
-          <div className="rounded-[8px] border border-[#e8e6df] bg-white overflow-hidden divide-y divide-[#f2f1ed]">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground mb-1.5 px-1">{category}</p>
+          <div className="rounded-[8px] border border-border bg-card overflow-hidden divide-y divide-border">
             {catItems.map((item) => {
               const inCart = inCartNames?.has(item.title.toLowerCase());
               const isAdded = addedId === item.id;
               return (
                 <div key={item.id} className="flex items-center gap-3 px-3 py-2.5">
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-semibold text-[#2f2f2d] truncate">{item.title}</p>
+                    <p className="text-[13px] font-semibold text-foreground truncate">{item.title}</p>
                     <div className="flex items-center gap-2 mt-0.5">
                       {item.price && (
                         <span className="text-[13px] font-bold text-[#f58a2d]">{item.price} kr</span>
                       )}
                       {item.original_price && (
-                        <span className="text-[11px] text-[#9a978f] line-through">{item.original_price} kr</span>
+                        <span className="text-[11px] text-muted-foreground line-through">{item.original_price} kr</span>
                       )}
                       {item.discount && (
                         <span className="text-[10px] font-semibold text-white bg-[#ef4444] rounded-full px-1.5 py-0.5">{item.discount}</span>
                       )}
                     </div>
                     {item.unit && (
-                      <p className="text-[10px] text-[#78766d] mt-0.5">{item.unit}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">{item.unit}</p>
                     )}
                   </div>
                   <button

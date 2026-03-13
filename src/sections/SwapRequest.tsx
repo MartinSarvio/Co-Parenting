@@ -80,21 +80,21 @@ export function SwapRequest() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f6f2]">
+    <div className="min-h-screen bg-background">
       {/* Header: ← centreret titel X */}
-      <div className="sticky top-0 z-30 flex items-center border-b border-[#e5e3dc] bg-[#f7f6f2]/95 px-4 py-3 backdrop-blur-sm"
+      <div className="sticky top-0 z-30 flex items-center border-b border-border bg-background/95 px-4 py-3 backdrop-blur-sm"
         style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
       >
         <button
           onClick={handleBack}
-          className="flex h-9 w-9 items-center justify-center rounded-xl text-[#5f5d56] hover:bg-[#ecebe6] transition-colors"
+          className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-secondary transition-colors"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
-        <h1 className="flex-1 text-center text-[17px] font-bold text-[#2f2f2d]">Anmod om bytte</h1>
+        <h1 className="flex-1 text-center text-[17px] font-bold text-foreground">Anmod om bytte</h1>
         <button
           onClick={handleBack}
-          className="flex h-9 w-9 items-center justify-center rounded-xl text-[#5f5d56] hover:bg-[#ecebe6] transition-colors"
+          className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground hover:bg-secondary transition-colors"
         >
           <X className="h-4.5 w-4.5" />
         </button>
@@ -103,17 +103,17 @@ export function SwapRequest() {
       <div className="mx-auto max-w-[430px] space-y-5 px-4 py-5">
         {/* Selected date */}
         {swapRequestDate && (
-          <div className="rounded-2xl border border-[#e5e3dc] bg-white p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Valgt dag</p>
-            <p className="mt-1 text-lg font-bold text-[#2f2f2d]">
+          <div className="rounded-2xl border border-border bg-card p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Valgt dag</p>
+            <p className="mt-1 text-lg font-bold text-foreground">
               {format(swapRequestDate, 'EEEE d. MMMM yyyy', { locale: da })}
             </p>
           </div>
         )}
 
         {/* Recipient picker */}
-        <div className="rounded-2xl border border-[#e5e3dc] bg-white p-4 space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Send til</p>
+        <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Send til</p>
           <div className="flex flex-col gap-2">
             {otherParents.map((user) => {
               const isSelected = selectedRecipient === user.id;
@@ -126,8 +126,8 @@ export function SwapRequest() {
                   className={cn(
                     "flex items-center gap-3 rounded-xl border p-3 transition-colors",
                     isSelected
-                      ? "border-[#f3c59d] bg-[#fff2e6]"
-                      : "border-[#e5e3dc] bg-[#f8f7f3] hover:bg-[#f2f1ec]"
+                      ? "border-orange-tint bg-orange-tint"
+                      : "border-border bg-card hover:bg-background"
                   )}
                 >
                   <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
@@ -142,7 +142,7 @@ export function SwapRequest() {
                       {user.name[0]}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="text-[14px] font-semibold text-[#2f2f2d]">{user.name}</span>
+                  <span className="text-[14px] font-semibold text-foreground">{user.name}</span>
                   {isSelected && (
                     <span className="ml-auto text-xs font-semibold text-[#f58a2d]">Valgt</span>
                   )}
@@ -153,14 +153,14 @@ export function SwapRequest() {
         </div>
 
         {/* Reason */}
-        <div className="rounded-2xl border border-[#e5e3dc] bg-white p-4 space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Begrundelse</p>
+        <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Begrundelse</p>
           <Textarea
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder="Fx arbejde torsdag eftermiddag, ønsker bytte med fredag."
             rows={4}
-            className="rounded-xl border-[#e5e3dc] bg-[#f8f7f3]"
+            className="rounded-xl border-border bg-card"
           />
         </div>
 

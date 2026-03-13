@@ -301,11 +301,11 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
             </div>
             <div>
               <h1 className="text-[2.2rem] font-extrabold tracking-[-0.04em] bg-gradient-to-br from-[#f7a95c] via-[#f58a2d] to-[#e8773f] bg-clip-text text-transparent mb-1">Huska</h1>
-              <p className="text-[0.85rem] text-[#78766d] max-w-sm mx-auto">
+              <p className="text-[0.85rem] text-muted-foreground max-w-sm mx-auto">
                 Husk alt det vigtige i familien. Overblik, struktur og mindre friktion.
               </p>
             </div>
-            <div className="flex justify-center gap-4 text-[13px] text-[#9a978f]">
+            <div className="flex justify-center gap-4 text-[13px] text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Shield className="w-4 h-4" />
                 <span>Sikkert</span>
@@ -334,7 +334,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
               <div className="text-center pt-1">
                 <button
                   onClick={onSwitchToLogin}
-                  className="text-[13px] text-[#9a978f]"
+                  className="text-[13px] text-muted-foreground"
                 >
                   Har du allerede en konto?{' '}
                   <span className="font-semibold text-[#f58a2d]">Log ind</span>
@@ -353,8 +353,8 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
             className="space-y-5"
           >
             <div className="text-center">
-              <h2 className="text-[1.4rem] font-bold text-[#2f2f2d] tracking-tight mb-1">Vælg din familietype</h2>
-              <p className="text-[13px] text-[#78766d]">Dette hjælper os med at tilpasse appen til dine behov</p>
+              <h2 className="text-[1.4rem] font-bold text-foreground tracking-tight mb-1">Vælg din familietype</h2>
+              <p className="text-[13px] text-muted-foreground">Dette hjælper os med at tilpasse appen til dine behov</p>
             </div>
             <RadioGroup
               value={data.familyType || ''}
@@ -367,17 +367,17 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
                   htmlFor={type.value}
                   className={`flex items-start gap-3 p-3.5 rounded-[8px] border-2 cursor-pointer transition-all ${
                     data.familyType === type.value
-                      ? 'border-[#f58a2d] bg-[#fff8f0]'
-                      : 'border-[#e5e3dc] hover:border-[#d4d1c9]'
+                      ? 'border-[#f58a2d] bg-orange-tint-light'
+                      : 'border-border hover:border-border'
                   }`}
                 >
                   <RadioGroupItem value={type.value} id={type.value} className="mt-1" />
-                  <div className={`p-2 rounded-[8px] ${data.familyType === type.value ? 'bg-[#f58a2d] text-white' : 'bg-[#f2f1ed] text-[#78766d]'}`}>
+                  <div className={`p-2 rounded-[8px] ${data.familyType === type.value ? 'bg-[#f58a2d] text-white' : 'bg-background text-muted-foreground'}`}>
                     {type.icon}
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold text-[#2f2f2d] text-[14px]">{type.label}</p>
-                    <p className="text-[12px] text-[#9a978f]">{type.description}</p>
+                    <p className="font-semibold text-foreground text-[14px]">{type.label}</p>
+                    <p className="text-[12px] text-muted-foreground">{type.description}</p>
                   </div>
                 </Label>
               ))}
@@ -394,44 +394,44 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
             className="space-y-5"
           >
             <div className="text-center">
-              <h2 className="text-[1.4rem] font-bold text-[#2f2f2d] tracking-tight mb-1">Opret din konto</h2>
-              <p className="text-[13px] text-[#78766d]">Dine oplysninger gemmes sikkert</p>
+              <h2 className="text-[1.4rem] font-bold text-foreground tracking-tight mb-1">Opret din konto</h2>
+              <p className="text-[13px] text-muted-foreground">Dine oplysninger gemmes sikkert</p>
             </div>
             <div className="space-y-2">
               <div className="space-y-1.5">
-                <Label htmlFor="parentName" className="text-[13px] text-[#5f5d56] font-medium">Dit navn</Label>
+                <Label htmlFor="parentName" className="text-[13px] text-muted-foreground font-medium">Dit navn</Label>
                 <Input
                   id="parentName"
                   value={data.parentName}
                   onChange={(e) => updateData('parentName', e.target.value)}
                   placeholder="F.eks. Sarah"
-                  className="h-[50px] text-[15px] bg-white/80 border-[#e5e3dc] rounded-[8px] placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
+                  className="h-[50px] text-[15px] bg-card/80 border-border rounded-[8px] placeholder:text-muted-foreground focus-visible:border-[#f58a2d] focus-visible:ring-ring/20"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="parentEmail" className="text-[13px] text-[#5f5d56] font-medium">Din email</Label>
+                <Label htmlFor="parentEmail" className="text-[13px] text-muted-foreground font-medium">Din email</Label>
                 <Input
                   id="parentEmail"
                   type="email"
                   value={data.parentEmail}
                   onChange={(e) => updateData('parentEmail', e.target.value)}
                   placeholder="sarah@example.com"
-                  className="h-[50px] text-[15px] bg-white/80 border-[#e5e3dc] rounded-[8px] placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
+                  className="h-[50px] text-[15px] bg-card/80 border-border rounded-[8px] placeholder:text-muted-foreground focus-visible:border-[#f58a2d] focus-visible:ring-ring/20"
                   autoCapitalize="none"
                   autoCorrect="off"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="parentPassword" className="text-[13px] text-[#5f5d56] font-medium">Adgangskode</Label>
+                <Label htmlFor="parentPassword" className="text-[13px] text-muted-foreground font-medium">Adgangskode</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#b5b2a8] z-10" />
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-muted-foreground z-10" />
                   <Input
                     id="parentPassword"
                     type="password"
                     value={data.parentPassword}
                     onChange={(e) => updateData('parentPassword', e.target.value)}
                     placeholder="Mindst 6 tegn"
-                    className="h-[50px] pl-11 text-[15px] bg-white/80 border-[#e5e3dc] rounded-[8px] placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
+                    className="h-[50px] pl-11 text-[15px] bg-card/80 border-border rounded-[8px] placeholder:text-muted-foreground focus-visible:border-[#f58a2d] focus-visible:ring-ring/20"
                   />
                 </div>
               </div>
@@ -448,28 +448,28 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
             className="space-y-5"
           >
             <div className="text-center">
-              <h2 className="text-[1.4rem] font-bold text-[#2f2f2d] tracking-tight mb-1">Tilføj dit barn</h2>
-              <p className="text-[13px] text-[#78766d]">Du kan tilføje flere børn senere</p>
+              <h2 className="text-[1.4rem] font-bold text-foreground tracking-tight mb-1">Tilføj dit barn</h2>
+              <p className="text-[13px] text-muted-foreground">Du kan tilføje flere børn senere</p>
             </div>
             <div className="space-y-2">
               <div className="space-y-1.5">
-                <Label htmlFor="childName" className="text-[13px] text-[#5f5d56] font-medium">Barnets navn</Label>
+                <Label htmlFor="childName" className="text-[13px] text-muted-foreground font-medium">Barnets navn</Label>
                 <Input
                   id="childName"
                   value={data.childName}
                   onChange={(e) => updateData('childName', e.target.value)}
                   placeholder="F.eks. Emma"
-                  className="h-[50px] text-[15px] bg-white/80 border-[#e5e3dc] rounded-[8px] placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
+                  className="h-[50px] text-[15px] bg-card/80 border-border rounded-[8px] placeholder:text-muted-foreground focus-visible:border-[#f58a2d] focus-visible:ring-ring/20"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="childBirthDate" className="text-[13px] text-[#5f5d56] font-medium">Barnets fødselsdato</Label>
+                <Label htmlFor="childBirthDate" className="text-[13px] text-muted-foreground font-medium">Barnets fødselsdato</Label>
                 <Input
                   id="childBirthDate"
                   type="date"
                   value={data.childBirthDate}
                   onChange={(e) => updateData('childBirthDate', e.target.value)}
-                  className="h-[50px] text-[15px] bg-white/80 border-[#e5e3dc] rounded-[8px] placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
+                  className="h-[50px] text-[15px] bg-card/80 border-border rounded-[8px] placeholder:text-muted-foreground focus-visible:border-[#f58a2d] focus-visible:ring-ring/20"
                 />
               </div>
             </div>
@@ -485,24 +485,24 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
             className="space-y-5"
           >
             <div className="text-center">
-              <h2 className="text-[1.4rem] font-bold text-[#2f2f2d] tracking-tight mb-1">Inviter den anden forælder</h2>
-              <p className="text-[13px] text-[#78766d]">Send en invitation til at deltage i familien</p>
+              <h2 className="text-[1.4rem] font-bold text-foreground tracking-tight mb-1">Inviter den anden forælder</h2>
+              <p className="text-[13px] text-muted-foreground">Send en invitation til at deltage i familien</p>
             </div>
             <div className="space-y-2">
               <div className="space-y-1.5">
-                <Label htmlFor="otherParentEmail" className="text-[13px] text-[#5f5d56] font-medium">Den anden forælders email</Label>
+                <Label htmlFor="otherParentEmail" className="text-[13px] text-muted-foreground font-medium">Den anden forælders email</Label>
                 <Input
                   id="otherParentEmail"
                   type="email"
                   value={data.otherParentEmail}
                   onChange={(e) => updateData('otherParentEmail', e.target.value)}
                   placeholder="michael@example.com"
-                  className="h-[50px] text-[15px] bg-white/80 border-[#e5e3dc] rounded-[8px] placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
+                  className="h-[50px] text-[15px] bg-card/80 border-border rounded-[8px] placeholder:text-muted-foreground focus-visible:border-[#f58a2d] focus-visible:ring-ring/20"
                   autoCapitalize="none"
                   autoCorrect="off"
                 />
               </div>
-              <div className="rounded-[8px] bg-[#fff2e6] border border-[#f3c59d] p-4">
+              <div className="rounded-[8px] bg-orange-tint border border-orange-tint p-4">
                 <div className="flex items-start gap-3">
                   <MessageCircle className="w-5 h-5 text-[#f58a2d] mt-0.5 shrink-0" />
                   <div className="text-[13px] text-[#9a622f]">
@@ -513,7 +513,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
               </div>
               <button
                 onClick={() => setStep(5)}
-                className="w-full text-[13px] text-[#9a978f] py-2 transition-all active:scale-[0.98]"
+                className="w-full text-[13px] text-muted-foreground py-2 transition-all active:scale-[0.98]"
               >
                 Spring over — jeg er alene
               </button>
@@ -531,10 +531,10 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
               className="space-y-5"
             >
               <div className="text-center">
-                <h2 className="text-[1.4rem] font-bold text-[#2f2f2d] tracking-tight mb-1">Hverdagsopsætning</h2>
-                <p className="text-[13px] text-[#78766d]">I får fokus på madplan, kalender, indkøb og opgaver.</p>
+                <h2 className="text-[1.4rem] font-bold text-foreground tracking-tight mb-1">Hverdagsopsætning</h2>
+                <p className="text-[13px] text-muted-foreground">I får fokus på madplan, kalender, indkøb og opgaver.</p>
               </div>
-              <div className="rounded-[8px] bg-[#fff2e6] border border-[#f3c59d] p-4">
+              <div className="rounded-[8px] bg-orange-tint border border-orange-tint p-4">
                 <div className="flex items-start gap-3">
                   <Heart className="w-5 h-5 text-[#f58a2d] mt-0.5 shrink-0" />
                   <div className="text-[13px] text-[#9a622f]">
@@ -555,8 +555,8 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
             className="space-y-5"
           >
             <div className="text-center">
-              <h2 className="text-[1.4rem] font-bold text-[#2f2f2d] tracking-tight mb-1">Vælg samværsmodel</h2>
-              <p className="text-[13px] text-[#78766d]">Du kan altid ændre dette senere</p>
+              <h2 className="text-[1.4rem] font-bold text-foreground tracking-tight mb-1">Vælg samværsmodel</h2>
+              <p className="text-[13px] text-muted-foreground">Du kan altid ændre dette senere</p>
             </div>
             <RadioGroup
               value={data.custodyPattern || ''}
@@ -569,14 +569,14 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
                   htmlFor={pattern.value}
                   className={`flex items-center gap-3 p-3.5 rounded-[8px] border-2 cursor-pointer transition-all ${
                     data.custodyPattern === pattern.value
-                      ? 'border-[#f58a2d] bg-[#fff8f0]'
-                      : 'border-[#e5e3dc] hover:border-[#d4d1c9]'
+                      ? 'border-[#f58a2d] bg-orange-tint-light'
+                      : 'border-border hover:border-border'
                   }`}
                 >
                   <RadioGroupItem value={pattern.value} id={pattern.value} />
                   <div className="flex-1">
-                    <p className="font-semibold text-[#2f2f2d] text-[14px]">{pattern.label}</p>
-                    <p className="text-[12px] text-[#9a978f]">{pattern.description}</p>
+                    <p className="font-semibold text-foreground text-[14px]">{pattern.label}</p>
+                    <p className="text-[12px] text-muted-foreground">{pattern.description}</p>
                   </div>
                 </Label>
               ))}
@@ -593,40 +593,40 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
             className="space-y-5"
           >
             <div className="text-center">
-              <div className="w-20 h-20 mx-auto rounded-full bg-[#e8f5e9] flex items-center justify-center mb-4">
+              <div className="w-20 h-20 mx-auto rounded-full bg-green-tint flex items-center justify-center mb-4">
                 <CheckCircle className="w-10 h-10 text-[#4caf50]" />
               </div>
-              <h2 className="text-[1.4rem] font-bold text-[#2f2f2d] tracking-tight mb-1">Du er klar!</h2>
-              <p className="text-[13px] text-[#78766d]">Her er et overblik over din opsætning</p>
+              <h2 className="text-[1.4rem] font-bold text-foreground tracking-tight mb-1">Du er klar!</h2>
+              <p className="text-[13px] text-muted-foreground">Her er et overblik over din opsætning</p>
             </div>
             <div className="space-y-2.5">
-              <div className="flex items-center gap-3 p-3 bg-white/80 rounded-[8px] border border-[#e5e3dc]">
-                <div className="w-10 h-10 rounded-full bg-[#fff2e6] flex items-center justify-center">
+              <div className="flex items-center gap-3 p-3 bg-card/80 rounded-[8px] border border-border">
+                <div className="w-10 h-10 rounded-full bg-orange-tint flex items-center justify-center">
                   <Users className="w-5 h-5 text-[#f58a2d]" />
                 </div>
                 <div>
-                  <p className="font-semibold text-[#2f2f2d] text-[14px]">{data.parentName}</p>
-                  <p className="text-[12px] text-[#9a978f]">Forælder</p>
+                  <p className="font-semibold text-foreground text-[14px]">{data.parentName}</p>
+                  <p className="text-[12px] text-muted-foreground">Forælder</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-white/80 rounded-[8px] border border-[#e5e3dc]">
-                <div className="w-10 h-10 rounded-full bg-[#fff2e6] flex items-center justify-center">
+              <div className="flex items-center gap-3 p-3 bg-card/80 rounded-[8px] border border-border">
+                <div className="w-10 h-10 rounded-full bg-orange-tint flex items-center justify-center">
                   <Heart className="w-5 h-5 text-[#f58a2d]" />
                 </div>
                 <div>
-                  <p className="font-semibold text-[#2f2f2d] text-[14px]">{data.childName}</p>
-                  <p className="text-[12px] text-[#9a978f]">Barn</p>
+                  <p className="font-semibold text-foreground text-[14px]">{data.childName}</p>
+                  <p className="text-[12px] text-muted-foreground">Barn</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 p-3 bg-white/80 rounded-[8px] border border-[#e5e3dc]">
-                <div className="w-10 h-10 rounded-full bg-[#f2f1ed] flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-[#78766d]" />
+              <div className="flex items-center gap-3 p-3 bg-card/80 rounded-[8px] border border-border">
+                <div className="w-10 h-10 rounded-full bg-background flex items-center justify-center">
+                  <Calendar className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="font-semibold text-[#2f2f2d] text-[14px]">
+                  <p className="font-semibold text-foreground text-[14px]">
                     {data.familyType === 'same-household' ? 'Hverdagsmode' : `${data.custodyPattern} Ordning`}
                   </p>
-                  <p className="text-[12px] text-[#9a978f]">
+                  <p className="text-[12px] text-muted-foreground">
                     {data.familyType === 'same-household' ? 'Samboende familie' : 'Samværsmodel'}
                   </p>
                 </div>
@@ -641,39 +641,26 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
   };
 
   return (
-    <div
-      className="fixed inset-0 flex flex-col"
-      style={{ touchAction: 'none', overscrollBehavior: 'none', overflow: 'hidden' }}
-      onTouchMove={(e) => {
-        const target = e.target as HTMLElement;
-        if (!target.closest('input, textarea, [data-scrollable]')) e.preventDefault();
-      }}
-    >
+    <div className="fixed inset-0 flex flex-col overflow-hidden">
       {/* RibbonBanner baggrund */}
       <div className="absolute inset-0">
         <RibbonBanner />
       </div>
 
       {/* Content overlay */}
-      <div
-        className="relative z-10 flex flex-col h-full"
-        style={{
-          paddingTop: 'env(safe-area-inset-top, 0px)',
-          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-        }}
-      >
-        <div className="flex-1 overflow-y-auto flex items-center justify-center py-8" style={{ paddingLeft: 'max(env(safe-area-inset-left), 24px)', paddingRight: 'max(env(safe-area-inset-right), 24px)' }} data-scrollable>
+      <div className="relative z-10 flex flex-col h-full" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+        <div className="flex-1 overflow-y-auto flex items-center justify-center px-6 py-8">
           <div className="w-full max-w-sm">
-            <div className="bg-white/95 backdrop-blur-xl rounded-3xl px-6 py-7 shadow-[0_8px_40px_rgba(0,0,0,0.12)]">
+            <div className="bg-card/95 backdrop-blur-xl rounded-3xl px-6 py-8 shadow-[0_8px_40px_rgba(0,0,0,0.12)]">
 
               {/* Progress bar */}
               {step > 0 && (
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[13px] text-[#9a978f]">Trin {step} af 6</span>
+                    <span className="text-[13px] text-muted-foreground">Trin {step} af 6</span>
                     <span className="text-[13px] font-semibold text-[#b96424]">{Math.round((step / 6) * 100)}%</span>
                   </div>
-                  <div className="h-2 bg-[#f2f1ed] rounded-full overflow-hidden">
+                  <div className="h-2 bg-background rounded-full overflow-hidden">
                     <motion.div
                       className="h-full bg-gradient-to-r from-[#f7a95c] to-[#f58a2d]"
                       initial={{ width: 0 }}
@@ -696,7 +683,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
                     <button
                       onClick={handleBack}
                       disabled={isSubmitting}
-                      className="flex-1 h-[48px] rounded-[8px] border-2 border-[#e5e3dc] bg-white/80 text-[#5f5d56] font-semibold text-[15px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
+                      className="flex-1 h-[48px] rounded-[8px] border-2 border-border bg-card/80 text-muted-foreground font-semibold text-[15px] flex items-center justify-center gap-2 transition-all active:scale-[0.98] disabled:opacity-50"
                     >
                       <ChevronLeft className="w-4 h-4" />
                       Tilbage

@@ -153,44 +153,44 @@ export function MeetingMinutesView() {
         <OverblikSidePanel />
         <div className="space-y-3">
           <div className="space-y-1.5">
-            <Label className="text-[12px] font-semibold text-[#78766d]">Titel</Label>
+            <Label className="text-[12px] font-semibold text-muted-foreground">Titel</Label>
             <Input
               value={newMinutes.title}
               onChange={(e) => setNewMinutes({...newMinutes, title: e.target.value})}
               placeholder="F.eks. Samværssamtale - August 2024"
-              className="rounded-[8px] border-[#e5e3dc] bg-white"
+              className="rounded-[8px] border-border bg-card"
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-[12px] font-semibold text-[#78766d]">Dato</Label>
+            <Label className="text-[12px] font-semibold text-muted-foreground">Dato</Label>
             <Input
               type="date"
               value={newMinutes.date}
               onChange={(e) => setNewMinutes({...newMinutes, date: e.target.value})}
-              className="rounded-[8px] border-[#e5e3dc] bg-white"
+              className="rounded-[8px] border-border bg-card"
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-[12px] font-semibold text-[#78766d]">Sted</Label>
+            <Label className="text-[12px] font-semibold text-muted-foreground">Sted</Label>
             <Input
               value={newMinutes.location}
               onChange={(e) => setNewMinutes({...newMinutes, location: e.target.value})}
               placeholder="F.eks. Familierådgivningen"
-              className="rounded-[8px] border-[#e5e3dc] bg-white"
+              className="rounded-[8px] border-border bg-card"
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-[12px] font-semibold text-[#78766d]">Dagsorden</Label>
+            <Label className="text-[12px] font-semibold text-muted-foreground">Dagsorden</Label>
             <Textarea
               value={newMinutes.agenda}
               onChange={(e) => setNewMinutes({...newMinutes, agenda: e.target.value})}
               placeholder="Hvad skal drøftes på mødet?"
-              className="rounded-[8px] border-[#e5e3dc] bg-white min-h-[80px] resize-none"
+              className="rounded-[8px] border-border bg-card min-h-[80px] resize-none"
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-[12px] font-semibold text-[#78766d]">Dokumenter (valgfri)</Label>
-            <label className="flex cursor-pointer items-center gap-2 rounded-[8px] border border-dashed border-[#d8d7cf] bg-white px-4 py-3 text-[13px] text-[#78766d] transition-colors active:bg-[#f0efe8]">
+            <Label className="text-[12px] font-semibold text-muted-foreground">Dokumenter (valgfri)</Label>
+            <label className="flex cursor-pointer items-center gap-2 rounded-[8px] border border-dashed border-border bg-card px-4 py-3 text-[13px] text-muted-foreground transition-colors active:bg-muted">
               <Upload className="h-4 w-4" />
               Upload dokument
               <input
@@ -213,12 +213,12 @@ export function MeetingMinutesView() {
             {attachments.length > 0 && (
               <div className="space-y-1.5">
                 {attachments.map((att, i) => (
-                  <div key={i} className="flex items-center justify-between rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-2">
+                  <div key={i} className="flex items-center justify-between rounded-[8px] border border-border bg-card px-3 py-2">
                     <div className="flex items-center gap-2 min-w-0">
-                      <FileText className="h-4 w-4 shrink-0 text-[#78766d]" />
-                      <span className="truncate text-[13px] text-[#2f2f2d]">{att.name}</span>
+                      <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      <span className="truncate text-[13px] text-foreground">{att.name}</span>
                     </div>
-                    <button onClick={() => setAttachments(prev => prev.filter((_, idx) => idx !== i))} className="shrink-0 p-1 text-[#9a978f] transition-colors active:text-red-500">
+                    <button onClick={() => setAttachments(prev => prev.filter((_, idx) => idx !== i))} className="shrink-0 p-1 text-muted-foreground transition-colors active:text-red-500">
                       <X className="h-4 w-4" />
                     </button>
                   </div>
@@ -431,8 +431,8 @@ export function MeetingMinutesView() {
         className="flex items-center justify-between"
       >
         <div>
-          <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Mødereferater</h1>
-          <p className="text-[13px] text-[#78766d]">
+          <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-foreground">Mødereferater</h1>
+          <p className="text-[13px] text-muted-foreground">
             {isProfessionalView
               ? 'Dokumentation fra samtaler'
               : 'Referater fra jeres møder'}
@@ -463,12 +463,12 @@ export function MeetingMinutesView() {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#78766d]" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           placeholder="Søg i referater..."
           value={minutesSearchQuery}
           onChange={(e) => setMinutesSearchQuery(e.target.value)}
-          className="pl-10 bg-white border-[#e5e3dc] rounded-[8px] text-sm text-[#2f2f2d] placeholder:text-[#b0aea5] focus:border-[#c7ccf0] focus:ring-[#c7ccf0] h-11"
+          className="pl-10 bg-card border-border rounded-[8px] text-sm text-foreground placeholder:text-muted-foreground focus:border-[#c7ccf0] focus:ring-[#c7ccf0] h-11"
         />
       </div>
 

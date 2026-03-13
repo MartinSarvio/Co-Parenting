@@ -53,8 +53,8 @@ export function NutritionSection({ product, compact }: NutritionSectionProps) {
   ].filter(Boolean) as Array<{ label: string; value: string }>;
 
   return (
-    <div className={`rounded-[8px] bg-[#f2f1ed] p-3 ${compact ? 'space-y-2' : 'space-y-3'}`}>
-      <p className="text-[12px] font-semibold text-[#78766d]">Næringsindhold pr. 100g</p>
+    <div className={`rounded-[8px] bg-background p-3 ${compact ? 'space-y-2' : 'space-y-3'}`}>
+      <p className="text-[12px] font-semibold text-muted-foreground">Næringsindhold pr. 100g</p>
 
       {/* Badges */}
       {hasBadges && (
@@ -74,7 +74,7 @@ export function NutritionSection({ product, compact }: NutritionSectionProps) {
           {macros.map(n => (
             <div key={n.label} className="text-center">
               <p className="text-[14px] font-black" style={{ color: n.color }}>{n.value}</p>
-              <p className="text-[10px] text-[#9a978f]">{n.label}</p>
+              <p className="text-[10px] text-muted-foreground">{n.label}</p>
             </div>
           ))}
         </div>
@@ -85,8 +85,8 @@ export function NutritionSection({ product, compact }: NutritionSectionProps) {
         <div className="grid grid-cols-2 gap-x-4 gap-y-1">
           {detailNutrients.map(n => (
             <div key={n.label} className="flex items-center justify-between">
-              <span className="text-[12px] text-[#78766d]">{n.label}</span>
-              <span className="text-[12px] font-semibold text-[#2f2f2d]">{n.value}</span>
+              <span className="text-[12px] text-muted-foreground">{n.label}</span>
+              <span className="text-[12px] font-semibold text-foreground">{n.value}</span>
             </div>
           ))}
         </div>
@@ -98,7 +98,7 @@ export function NutritionSection({ product, compact }: NutritionSectionProps) {
           {product.allergens.map(tag => (
             <span
               key={tag}
-              className="inline-flex items-center rounded-full bg-[#e8e7e0] px-2 py-0.5 text-[10px] font-semibold text-[#78766d]"
+              className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground"
             >
               {getAllergenLabel(tag)}
             </span>

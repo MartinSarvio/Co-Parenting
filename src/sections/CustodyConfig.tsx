@@ -141,7 +141,7 @@ function WeekAssignmentGrid({
   const readOnly = !onToggle;
   return (
     <div className="space-y-3">
-      <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">{label}</p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
       <div className="grid grid-cols-7 gap-1.5">
         {swapDays.map(day => {
           const assignedId = assignments[day.value] || parent1Id;
@@ -158,14 +158,14 @@ function WeekAssignmentGrid({
                 isHighlighted
                   ? "border-amber-400 bg-amber-50 ring-1 ring-amber-300"
                   : isMe
-                    ? "border-[#2f2f2f] bg-[#2f2f2f]"
-                    : "border-[#f3c59d] bg-[#fff2e6]",
+                    ? "border-primary bg-primary"
+                    : "border-orange-tint bg-orange-tint",
                 readOnly && "cursor-default"
               )}
             >
               <span className={cn(
                 "text-[10px] font-bold uppercase",
-                isHighlighted ? "text-amber-700" : isMe ? "text-[#b0ada4]" : "text-[#c87a30]"
+                isHighlighted ? "text-amber-700" : isMe ? "text-muted-foreground" : "text-[#c87a30]"
               )}>
                 {day.label.slice(0, 3)}
               </span>
@@ -174,7 +174,7 @@ function WeekAssignmentGrid({
                 isHighlighted
                   ? "bg-amber-400/30 text-amber-800"
                   : isMe
-                    ? "bg-white/20 text-white"
+                    ? "bg-card/20 text-white"
                     : "bg-[#f58a2d]/20 text-[#c87a30]"
               )}>
                 {isMe ? parent1Name : parent2Name}
@@ -186,17 +186,17 @@ function WeekAssignmentGrid({
       {showLegend && (
         <div className="flex items-center justify-center gap-4 pt-1">
           <div className="flex items-center gap-1.5">
-            <div className="h-2.5 w-2.5 rounded-full bg-[#2f2f2f]" />
-            <span className="text-[11px] text-[#75736b]">{parent1Name}</span>
+            <div className="h-2.5 w-2.5 rounded-full bg-primary" />
+            <span className="text-[11px] text-muted-foreground">{parent1Name}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="h-2.5 w-2.5 rounded-full bg-[#f58a2d]" />
-            <span className="text-[11px] text-[#75736b]">{parent2Name}</span>
+            <span className="text-[11px] text-muted-foreground">{parent2Name}</span>
           </div>
           {highlightDays && highlightDays.length > 0 && (
             <div className="flex items-center gap-1.5">
               <div className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-              <span className="text-[11px] text-[#75736b]">Samværsdag</span>
+              <span className="text-[11px] text-muted-foreground">Samværsdag</span>
             </div>
           )}
         </div>
@@ -224,7 +224,7 @@ function ParentPicker({
 }) {
   return (
     <div className="space-y-2.5">
-      <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">{label}</p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
       <div className="grid grid-cols-2 gap-2.5">
         {[
           { id: parent1Id, name: parent1Name, isSelf: true },
@@ -239,21 +239,21 @@ function ParentPicker({
               className={cn(
                 "flex items-center justify-center gap-2 rounded-[12px] border-2 p-3 text-left transition-all",
                 isSel
-                  ? "border-[#f58a2d] bg-[#fff8f0]"
-                  : "border-[#e5e3dc] bg-white hover:border-[#d4d1c9]"
+                  ? "border-[#f58a2d] bg-orange-tint-light"
+                  : "border-border bg-card hover:border-border"
               )}
             >
               <div className={cn(
                 "h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold",
                 parent.isSelf
-                  ? "bg-[#2f2f2f] text-white"
+                  ? "bg-primary text-white"
                   : "bg-[#f58a2d] text-white"
               )}>
                 {parent.name[0]}
               </div>
               <span className={cn(
                 "text-[13px] font-semibold",
-                isSel ? "text-[#bf6722]" : "text-[#2f2f2d]"
+                isSel ? "text-[#bf6722]" : "text-foreground"
               )}>
                 {parent.name}
                 {parent.isSelf && <span className="text-[11px] font-normal text-[#9e9b93]"> (Dig)</span>}
@@ -695,7 +695,7 @@ export function CustodyConfig() {
         return (
           <div className="space-y-4">
             <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Skiftedetaljer</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Skiftedetaljer</p>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label className="text-xs">Skiftedag</Label>
@@ -704,7 +704,7 @@ export function CustodyConfig() {
                     onValueChange={(v) => setConfig({ ...config, swapDay: parseInt(v) })}
                     title="Skiftedag"
                     options={swapDays.map(day => ({ value: day.value.toString(), label: day.label }))}
-                    className="h-10 rounded-[8px] border-[#e5e3dc]"
+                    className="h-10 rounded-[8px] border-border"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -713,7 +713,7 @@ export function CustodyConfig() {
                     type="time"
                     value={config.swapTime}
                     onChange={(e) => setConfig({ ...config, swapTime: e.target.value })}
-                    className="h-10 rounded-[8px] border-[#e5e3dc]"
+                    className="h-10 rounded-[8px] border-border"
                   />
                 </div>
               </div>
@@ -758,7 +758,7 @@ export function CustodyConfig() {
                   type="date"
                   value={config.startDate}
                   onChange={(e) => setConfig({ ...config, startDate: e.target.value })}
-                  className="h-10 rounded-[8px] border-[#e5e3dc]"
+                  className="h-10 rounded-[8px] border-border"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -769,7 +769,7 @@ export function CustodyConfig() {
                     onValueChange={(v) => setConfig({ ...config, swapDay: parseInt(v) })}
                     title="Skiftedag"
                     options={swapDays.map(day => ({ value: day.value.toString(), label: day.label }))}
-                    className="h-10 rounded-[8px] border-[#e5e3dc]"
+                    className="h-10 rounded-[8px] border-border"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -778,7 +778,7 @@ export function CustodyConfig() {
                     type="time"
                     value={config.swapTime}
                     onChange={(e) => setConfig({ ...config, swapTime: e.target.value })}
-                    className="h-10 rounded-[8px] border-[#e5e3dc]"
+                    className="h-10 rounded-[8px] border-border"
                   />
                 </div>
               </div>
@@ -830,7 +830,7 @@ export function CustodyConfig() {
         return (
           <div className="space-y-4">
             <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Skiftedetaljer</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Skiftedetaljer</p>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label className="text-xs">Skiftedag</Label>
@@ -839,7 +839,7 @@ export function CustodyConfig() {
                     onValueChange={(v) => setConfig({ ...config, swapDay: parseInt(v) })}
                     title="Skiftedag"
                     options={swapDays.map(day => ({ value: day.value.toString(), label: day.label }))}
-                    className="h-10 rounded-[8px] border-[#e5e3dc]"
+                    className="h-10 rounded-[8px] border-border"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -848,7 +848,7 @@ export function CustodyConfig() {
                     type="time"
                     value={config.swapTime}
                     onChange={(e) => setConfig({ ...config, swapTime: e.target.value })}
-                    className="h-10 rounded-[8px] border-[#e5e3dc]"
+                    className="h-10 rounded-[8px] border-border"
                   />
                 </div>
               </div>
@@ -883,7 +883,7 @@ export function CustodyConfig() {
                   type="date"
                   value={config.startDate}
                   onChange={(e) => setConfig({ ...config, startDate: e.target.value })}
-                  className="h-10 rounded-[8px] border-[#e5e3dc]"
+                  className="h-10 rounded-[8px] border-border"
                 />
               </div>
               <div className="space-y-1.5">
@@ -892,7 +892,7 @@ export function CustodyConfig() {
                   type="time"
                   value={config.swapTime}
                   onChange={(e) => setConfig({ ...config, swapTime: e.target.value })}
-                  className="h-10 rounded-[8px] border-[#e5e3dc]"
+                  className="h-10 rounded-[8px] border-border"
                 />
               </div>
             </div>
@@ -958,7 +958,7 @@ export function CustodyConfig() {
                       ...prev,
                       supervisedConfig: { ...prev.supervisedConfig, frequencyWeeks: e.target.value === '' ? 0 : parseInt(e.target.value, 10) },
                     }))}
-                    className="bg-white"
+                    className="bg-card"
                   />
                 </div>
                 <div className="space-y-2">
@@ -972,7 +972,7 @@ export function CustodyConfig() {
                       ...prev,
                       supervisedConfig: { ...prev.supervisedConfig, durationHours: e.target.value === '' ? 0 : parseInt(e.target.value, 10) },
                     }))}
-                    className="bg-white"
+                    className="bg-card"
                   />
                 </div>
               </div>
@@ -986,7 +986,7 @@ export function CustodyConfig() {
                     ...prev,
                     supervisedConfig: { ...prev.supervisedConfig, startTime: e.target.value },
                   }))}
-                  className="bg-white"
+                  className="bg-card"
                 />
               </div>
 
@@ -1020,7 +1020,7 @@ export function CustodyConfig() {
                             },
                           };
                         })}
-                        className={isSelected ? 'bg-amber-500 text-white hover:bg-amber-600' : 'bg-white'}
+                        className={isSelected ? 'bg-amber-500 text-white hover:bg-amber-600' : 'bg-card'}
                       >
                         {day.label}
                       </Button>
@@ -1047,7 +1047,7 @@ export function CustodyConfig() {
                     { value: 'institution', label: 'Institution/familiecenter' },
                     { value: 'other', label: 'Andet' },
                   ]}
-                  className="bg-white"
+                  className="bg-card"
                 />
                 <Input
                   value={config.supervisedConfig.location}
@@ -1056,7 +1056,7 @@ export function CustodyConfig() {
                     supervisedConfig: { ...prev.supervisedConfig, location: e.target.value },
                   }))}
                   placeholder="Fx legeplads, bibliotek, familiecenter"
-                  className="bg-white"
+                  className="bg-card"
                 />
               </div>
 
@@ -1070,7 +1070,7 @@ export function CustodyConfig() {
                       supervisedConfig: { ...prev.supervisedConfig, supervisorRequired: true, supervisorName: e.target.value },
                     }))}
                     placeholder="Navn på tilsynsførende"
-                    className="bg-white"
+                    className="bg-card"
                   />
                 </div>
               )}
@@ -1084,7 +1084,7 @@ export function CustodyConfig() {
                     supervisedConfig: { ...prev.supervisedConfig, notes: e.target.value },
                   }))}
                   placeholder="Evt. særlige aftaler"
-                  className="bg-white"
+                  className="bg-card"
                 />
               </div>
             </div>
@@ -1106,7 +1106,7 @@ export function CustodyConfig() {
           <div className="space-y-5">
             {/* Skiftetype — card-style picker */}
             <div className="space-y-2.5">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Skiftetype</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Skiftetype</p>
               <div className="grid grid-cols-2 gap-2.5">
                 {([
                   { value: 'after_daycare',  label: 'Institution',   subtitle: 'Efter vuggestue / børnehave', icon: Calendar },
@@ -1127,23 +1127,23 @@ export function CustodyConfig() {
                       className={cn(
                         "flex flex-col items-start gap-1.5 rounded-[8px] border-2 p-3 text-left transition-all cursor-pointer",
                         sel
-                          ? "border-[#f58a2d] bg-[#fff8f0]"
-                          : "border-[#e5e3dc] bg-white hover:border-[#d4d1c9]"
+                          ? "border-[#f58a2d] bg-orange-tint-light"
+                          : "border-border bg-card hover:border-border"
                       )}
                     >
                       <div className="flex items-center gap-2">
                         <div className={cn(
                           "flex h-7 w-7 items-center justify-center rounded-[8px]",
-                          sel ? "bg-[#f58a2d]" : "bg-[#f0efe8]"
+                          sel ? "bg-[#f58a2d]" : "bg-muted"
                         )}>
-                          <Icon className={cn("h-3.5 w-3.5", sel ? "text-white" : "text-[#75736b]")} />
+                          <Icon className={cn("h-3.5 w-3.5", sel ? "text-white" : "text-muted-foreground")} />
                         </div>
                         <span className={cn(
                           "text-[13px] font-bold",
-                          sel ? "text-[#bf6722]" : "text-[#2f2f2d]"
+                          sel ? "text-[#bf6722]" : "text-foreground"
                         )}>{opt.label}</span>
                       </div>
-                      <p className="text-[11px] leading-tight text-[#75736b]">{opt.subtitle}</p>
+                      <p className="text-[11px] leading-tight text-muted-foreground">{opt.subtitle}</p>
                     </button>
                   );
                 })}
@@ -1152,7 +1152,7 @@ export function CustodyConfig() {
 
             {/* Tidspunkt */}
             <div className="space-y-1.5">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Tidspunkt for skifte</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Tidspunkt for skifte</p>
               <Input
                 type="time"
                 value={config.customWeekConfig.handoverTime}
@@ -1160,13 +1160,13 @@ export function CustodyConfig() {
                   ...prev,
                   customWeekConfig: { ...prev.customWeekConfig, handoverTime: e.target.value },
                 }))}
-                className="h-11 rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] text-base"
+                className="h-11 rounded-[8px] border-border bg-card text-base"
               />
             </div>
 
             {/* Skiftedage — pill toggles */}
             <div className="space-y-2.5">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Skiftedage</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Skiftedage</p>
               <div className="flex flex-wrap gap-2">
                 {swapDays.map(day => {
                   const isActive = config.customWeekConfig.handoverDays.includes(day.value);
@@ -1179,7 +1179,7 @@ export function CustodyConfig() {
                         "rounded-full px-3.5 py-1.5 text-sm font-medium transition-all",
                         isActive
                           ? "bg-[#f58a2d] text-white shadow-[0_2px_8px_rgba(245,138,45,0.25)]"
-                          : "border border-[#e5e3dc] bg-[#faf9f6] text-[#75736b] hover:border-[#d4d1c9]"
+                          : "border border-border bg-card text-muted-foreground hover:border-border"
                       )}
                     >
                       {day.label.slice(0, 3)}
@@ -1240,10 +1240,10 @@ export function CustodyConfig() {
         animate={{ opacity: 1, y: 0 }}
         className="text-center"
       >
-        <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-[8px] border border-[#f3c59d] bg-[#fff2e6]">
+        <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-[8px] border border-orange-tint bg-orange-tint">
           <Calendar className="h-8 w-8 text-[#f58a2d]" />
         </div>
-        <h1 className="text-2xl font-semibold text-[#2f2f2d]">Samværsplan</h1>
+        <h1 className="text-2xl font-semibold text-foreground">Samværsplan</h1>
         {household?.caseNumber && (
           <Badge variant="outline" className="mt-2">
             Sagsnr: {household.caseNumber}
@@ -1259,22 +1259,22 @@ export function CustodyConfig() {
         className="flex justify-center gap-4"
       >
         {meUser && (
-          <div className="flex items-center gap-2 rounded-[8px] border border-[#2f2f2f] bg-[#2f2f2f] px-4 py-2">
+          <div className="flex items-center gap-2 rounded-[8px] border border-primary bg-primary px-4 py-2">
             <Avatar className="w-8 h-8">
               <AvatarImage src={meUser.avatar} />
-              <AvatarFallback className="bg-[#4f4b45] text-xs text-white">
+              <AvatarFallback className="bg-primary text-xs text-white">
                 {meUser.name[0]}
               </AvatarFallback>
             </Avatar>
             <div>
               <p className="text-sm font-medium text-white">{meUser.name}</p>
-              <p className="text-xs text-[#dfddd5]">Dig</p>
+              <p className="text-xs text-muted-foreground">Dig</p>
             </div>
           </div>
         )}
         <div className={cn(
           "flex items-center gap-2 rounded-[8px] border px-4 py-2",
-          "border-[#f3c59d] bg-[#fff2e6]"
+          "border-orange-tint bg-orange-tint"
         )}>
           <Avatar className="w-8 h-8">
             {otherUser && <AvatarImage src={otherUser.avatar} />}
@@ -1299,7 +1299,7 @@ export function CustodyConfig() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <div className="sticky top-0 z-10 bg-white -mx-4">
+        <div className="sticky top-0 z-10 bg-card -mx-4">
           <div className="flex items-center">
             {[
               { value: 'general', label: 'Generelt' },
@@ -1311,14 +1311,14 @@ export function CustodyConfig() {
                 onClick={() => setActiveTab(tab.value)}
                 className={cn(
                   'relative flex-1 py-3 text-center text-[14px] font-semibold transition-colors',
-                  activeTab === tab.value ? 'text-[#2f2f2d]' : 'text-[#b0ada4]'
+                  activeTab === tab.value ? 'text-foreground' : 'text-muted-foreground'
                 )}
               >
                 {tab.label}
                 {activeTab === tab.value && (
                   <motion.div
                     layoutId="custody-underline"
-                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#2f2f2d] rounded-full"
+                    className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-full"
                     transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                   />
                 )}
@@ -1343,28 +1343,28 @@ export function CustodyConfig() {
                     className={cn(
                       "flex flex-col items-start gap-2 rounded-[8px] border-2 p-3.5 text-left transition-all min-h-[120px] cursor-pointer",
                       isSelected
-                        ? "border-[#f58a2d] bg-[#fff8f0]"
-                        : "border-[#e5e3dc] bg-white hover:border-[#d4d1c9]"
+                        ? "border-[#f58a2d] bg-orange-tint-light"
+                        : "border-border bg-card hover:border-border"
                     )}
                   >
                     <div className="flex items-center gap-2">
                       <div className={cn(
                         "flex h-7 w-7 items-center justify-center rounded-[8px]",
-                        isSelected ? "bg-[#f58a2d]" : "bg-[#f0efe8]"
+                        isSelected ? "bg-[#f58a2d]" : "bg-muted"
                       )}>
-                        <Icon className={cn("h-3.5 w-3.5", isSelected ? "text-white" : "text-[#75736b]")} />
+                        <Icon className={cn("h-3.5 w-3.5", isSelected ? "text-white" : "text-muted-foreground")} />
                       </div>
                       <span className={cn(
                         "text-[13px] font-bold",
-                        isSelected ? "text-[#bf6722]" : "text-[#2f2f2d]"
+                        isSelected ? "text-[#bf6722]" : "text-foreground"
                       )}>{opt.label}</span>
                     </div>
-                    <p className="text-[11px] leading-tight text-[#75736b]">{opt.subtitle}</p>
+                    <p className="text-[11px] leading-tight text-muted-foreground">{opt.subtitle}</p>
                     <div className="flex gap-[3px] pt-0.5">
                       {opt.preview.map((isMe, i) => (
                         <div key={i} className={cn(
                           "h-[6px] w-[6px] rounded-full",
-                          isMe ? "bg-[#2f2f2f]" : "bg-[#f58a2d]"
+                          isMe ? "bg-primary" : "bg-[#f58a2d]"
                         )} />
                       ))}
                     </div>
@@ -1382,14 +1382,14 @@ export function CustodyConfig() {
         {activeTab === 'holidays' && (
           <div className="space-y-4 mt-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-[15px] font-bold text-[#2f2f2d] flex items-center gap-2">
+              <h3 className="text-[15px] font-bold text-foreground flex items-center gap-2">
                 <Sun className="w-4 h-4 text-[#f58a2d]" />
                 Ferie og helligdage
               </h3>
               <Button
                 size="sm"
                 variant="ghost"
-                className="text-[#2f2f2d]"
+                className="text-foreground"
                 onClick={() => setHolidaySelectOpen(true)}
               >
                 <Plus className="w-4 h-4 mr-1" />
@@ -1400,20 +1400,20 @@ export function CustodyConfig() {
             {/* User-added holidays */}
             {custodyPlan?.holidays && custodyPlan.holidays.length > 0 && (
               <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Dine ferieperioder</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Dine ferieperioder</p>
                 {custodyPlan.holidays.map((holiday) => {
                   const parentUser = users.find(u => u.id === holiday.parentId);
                   return (
                     <div
                       key={holiday.id}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-[8px] bg-[#f8f7f3]"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-[8px] bg-card"
                     >
-                      <div className="w-7 h-7 rounded-lg bg-[#fff2e6] flex items-center justify-center">
+                      <div className="w-7 h-7 rounded-lg bg-orange-tint flex items-center justify-center">
                         <Sun className="w-3.5 h-3.5 text-[#f58a2d]" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] font-medium text-[#2f2f2d] truncate">{holiday.name}</p>
-                        <p className="text-[11px] text-[#b0ada4]">
+                        <p className="text-[13px] font-medium text-foreground truncate">{holiday.name}</p>
+                        <p className="text-[11px] text-muted-foreground">
                           {format(parseISO(holiday.startDate), 'dd. MMM yyyy', { locale: da })} – {format(parseISO(holiday.endDate), 'dd. MMM yyyy', { locale: da })}
                           {holiday.alternateYears
                             ? ` · ${holiday.parentId === currentUser?.id ? 'dig' : parentUser?.name ?? 'Forælder 2'} i ${new Date().getFullYear()}`
@@ -1423,7 +1423,7 @@ export function CustodyConfig() {
                       {parentUser && (
                         <Avatar className="w-7 h-7 border border-white shadow-sm">
                           <AvatarImage src={parentUser.avatar} />
-                          <AvatarFallback className="text-[10px] font-semibold bg-[#f0efe8] text-[#75736b]">
+                          <AvatarFallback className="text-[10px] font-semibold bg-muted text-muted-foreground">
                             {parentUser.name[0]}
                           </AvatarFallback>
                         </Avatar>
@@ -1436,16 +1436,16 @@ export function CustodyConfig() {
 
             {/* Pre-populated Danish holidays list */}
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Danske helligdage</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Danske helligdage</p>
               <div className="space-y-1">
                 {DANISH_HOLIDAYS.map((h) => (
                   <div
                     key={h.name}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-[8px] bg-[#f8f7f3]"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-[8px] bg-card"
                   >
                     <div className={cn(
                       "w-7 h-7 rounded-lg flex items-center justify-center",
-                      h.type === 'period' ? "bg-[#e8f4f0]" : "bg-[#fff2e6]"
+                      h.type === 'period' ? "bg-green-tint" : "bg-orange-tint"
                     )}>
                       <Sun className={cn(
                         "w-3.5 h-3.5",
@@ -1453,12 +1453,12 @@ export function CustodyConfig() {
                       )} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-medium text-[#2f2f2d]">{h.name}</p>
-                      <p className="text-[11px] text-[#b0ada4]">
+                      <p className="text-[13px] font-medium text-foreground">{h.name}</p>
+                      <p className="text-[11px] text-muted-foreground">
                         {h.type === 'period' ? 'Ferieperiode' : h.monthDay.split('-').reverse().join('/')}
                       </p>
                     </div>
-                    <Badge variant="outline" className="text-[10px] border-[#e5e3dc] text-[#b0ada4]">
+                    <Badge variant="outline" className="text-[10px] border-border text-muted-foreground">
                       {h.type === 'period' ? 'Ferie' : 'Helligdag'}
                     </Badge>
                   </div>
@@ -1472,14 +1472,14 @@ export function CustodyConfig() {
         {activeTab === 'special' && (
           <div className="space-y-4 mt-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-[15px] font-bold text-[#2f2f2d] flex items-center gap-2">
+              <h3 className="text-[15px] font-bold text-foreground flex items-center gap-2">
                 <Gift className="w-4 h-4 text-[#9b59b6]" />
                 Særlige dage
               </h3>
               <Button
                 size="sm"
                 variant="ghost"
-                className="text-[#2f2f2d]"
+                className="text-foreground"
                 onClick={() => { resetSpecialForm(); setAddFormType('special'); }}
               >
                 <Plus className="w-4 h-4 mr-1" />
@@ -1492,14 +1492,14 @@ export function CustodyConfig() {
                 {custodyPlan.specialDays.map((day) => (
                   <div
                     key={day.id}
-                    className="flex items-center gap-3 px-3 py-2.5 rounded-[8px] bg-[#f8f7f3]"
+                    className="flex items-center gap-3 px-3 py-2.5 rounded-[8px] bg-card"
                   >
-                    <div className="w-7 h-7 rounded-lg bg-[#f3e8f9] flex items-center justify-center">
+                    <div className="w-7 h-7 rounded-lg bg-blue-tint flex items-center justify-center">
                       <Gift className="w-3.5 h-3.5 text-[#9b59b6]" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-medium text-[#2f2f2d] truncate">{day.description}</p>
-                      <p className="text-[11px] text-[#b0ada4]">
+                      <p className="text-[13px] font-medium text-foreground truncate">{day.description}</p>
+                      <p className="text-[11px] text-muted-foreground">
                         {format(parseISO(day.date), 'dd. MMMM yyyy', { locale: da })}
                         {day.alternateYears && ' · skiftende år'}
                       </p>
@@ -1508,10 +1508,10 @@ export function CustodyConfig() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 rounded-[8px] bg-[#f8f7f3]">
-                <Gift className="w-10 h-10 text-[#d4d1c9] mx-auto mb-2" />
-                <p className="text-[14px] font-medium text-[#75736b]">Ingen særlige dage</p>
-                <p className="text-[12px] text-[#b0ada4]">Tilføj fødselsdage, mærkedage mv.</p>
+              <div className="text-center py-8 rounded-[8px] bg-card">
+                <Gift className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
+                <p className="text-[14px] font-medium text-muted-foreground">Ingen særlige dage</p>
+                <p className="text-[12px] text-muted-foreground">Tilføj fødselsdage, mærkedage mv.</p>
               </div>
             )}
           </div>
@@ -1527,7 +1527,7 @@ export function CustodyConfig() {
         <Button
           onClick={handleSave}
           disabled={isSaving}
-          className="w-full h-14 text-lg font-semibold bg-[#2f2f2f] text-white hover:bg-[#242424]"
+          className="w-full h-14 text-lg font-semibold bg-primary text-white hover:bg-primary"
         >
           <Save className="w-5 h-5 mr-2" />
           Gem ændringer
@@ -1537,24 +1537,24 @@ export function CustodyConfig() {
 
       {/* Full-page add form portal */}
       {addFormType && createPortal(
-        <div className="fixed inset-0 z-[10000] bg-white flex flex-col">
+        <div className="fixed inset-0 z-[10000] bg-card flex flex-col">
           {/* Header */}
           <div
-            className="flex items-center px-4 py-3 border-b border-[#e5e3dc] bg-white"
+            className="flex items-center px-4 py-3 border-b border-border bg-card"
             style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
           >
             <button
               onClick={() => setAddFormType(null)}
-              className="flex h-9 w-9 items-center justify-center rounded-[8px] text-[#5f5d56] hover:bg-[#ecebe6] transition-colors"
+              className="flex h-9 w-9 items-center justify-center rounded-[8px] text-muted-foreground hover:bg-secondary transition-colors"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
-            <h1 className="flex-1 text-center text-[17px] font-bold text-[#2f2f2d]">
+            <h1 className="flex-1 text-center text-[17px] font-bold text-foreground">
               {addFormType === 'holiday' ? 'Tilføj ferie' : 'Tilføj særlig dag'}
             </h1>
             <button
               onClick={() => setAddFormType(null)}
-              className="flex h-9 w-9 items-center justify-center rounded-[8px] text-[#5f5d56] hover:bg-[#ecebe6] transition-colors"
+              className="flex h-9 w-9 items-center justify-center rounded-[8px] text-muted-foreground hover:bg-secondary transition-colors"
             >
               <X className="h-4.5 w-4.5" />
             </button>
@@ -1567,40 +1567,40 @@ export function CustodyConfig() {
                 <>
                   {/* Holiday name */}
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Navn</Label>
+                    <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Navn</Label>
                     <Input
                       value={holidayName}
                       onChange={(e) => setHolidayName(e.target.value)}
                       placeholder="Fx Påskeferie, Sommerferie..."
-                      className="rounded-[8px] border-[#e5e3dc] bg-[#f8f7f3]"
+                      className="rounded-[8px] border-border bg-card"
                     />
                   </div>
 
                   {/* Start + end dates */}
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
-                      <Label className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Fra dato</Label>
+                      <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Fra dato</Label>
                       <Input
                         type="date"
                         value={holidayStart}
                         onChange={(e) => setHolidayStart(e.target.value)}
-                        className="rounded-[8px] border-[#e5e3dc] bg-[#f8f7f3]"
+                        className="rounded-[8px] border-border bg-card"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Til dato</Label>
+                      <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Til dato</Label>
                       <Input
                         type="date"
                         value={holidayEnd}
                         onChange={(e) => setHolidayEnd(e.target.value)}
-                        className="rounded-[8px] border-[#e5e3dc] bg-[#f8f7f3]"
+                        className="rounded-[8px] border-border bg-card"
                       />
                     </div>
                   </div>
 
                   {/* Parent picker */}
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Hvem har barnet</Label>
+                    <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Hvem har barnet</Label>
                     <div className="grid grid-cols-2 gap-2.5">
                       {[
                         { id: parent1Id, name: parent1Name, isSelf: true },
@@ -1613,27 +1613,27 @@ export function CustodyConfig() {
                           className={cn(
                             "flex items-center gap-2 rounded-[8px] border p-3 transition-colors",
                             holidayParent === parent.id
-                              ? "border-[#f3c59d] bg-[#fff2e6]"
-                              : "border-[#e5e3dc] bg-[#f8f7f3] hover:bg-[#f2f1ec]"
+                              ? "border-orange-tint bg-orange-tint"
+                              : "border-border bg-card hover:bg-background"
                           )}
                         >
                           <div className={cn(
                             "w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold",
-                            parent.isSelf ? "bg-[#2f2f2f] text-white" : "bg-[#f58a2d] text-white"
+                            parent.isSelf ? "bg-primary text-white" : "bg-[#f58a2d] text-white"
                           )}>
                             {parent.name[0]}
                           </div>
-                          <span className="text-[13px] font-semibold text-[#2f2f2d]">{parent.name}</span>
+                          <span className="text-[13px] font-semibold text-foreground">{parent.name}</span>
                         </button>
                       ))}
                     </div>
                   </div>
 
                   {/* Alternating years */}
-                  <div className="flex items-center justify-between rounded-[8px] border border-[#e5e3dc] bg-[#f8f7f3] p-4">
+                  <div className="flex items-center justify-between rounded-[8px] border border-border bg-card p-4">
                     <div>
-                      <p className="text-[14px] font-semibold text-[#2f2f2d]">Skiftende år</p>
-                      <p className="text-[12px] text-[#75736b]">Forældrene skifter hvert år</p>
+                      <p className="text-[14px] font-semibold text-foreground">Skiftende år</p>
+                      <p className="text-[12px] text-muted-foreground">Forældrene skifter hvert år</p>
                     </div>
                     <IOSSwitch checked={holidayAlternate} onCheckedChange={setHolidayAlternate} />
                   </div>
@@ -1641,7 +1641,7 @@ export function CustodyConfig() {
                   {/* Submit */}
                   <Button
                     onClick={handleAddHoliday}
-                    className="w-full rounded-[8px] py-6 text-[15px] font-semibold bg-[#2f2f2f] text-white hover:bg-[#242424]"
+                    className="w-full rounded-[8px] py-6 text-[15px] font-semibold bg-primary text-white hover:bg-primary"
                   >
                     Tilføj ferie
                   </Button>
@@ -1650,29 +1650,29 @@ export function CustodyConfig() {
                 <>
                   {/* Special day description */}
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Beskrivelse</Label>
+                    <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Beskrivelse</Label>
                     <Input
                       value={specialDescription}
                       onChange={(e) => setSpecialDescription(e.target.value)}
                       placeholder="Fx Annes fødselsdag, Julefrokost..."
-                      className="rounded-[8px] border-[#e5e3dc] bg-[#f8f7f3]"
+                      className="rounded-[8px] border-border bg-card"
                     />
                   </div>
 
                   {/* Date */}
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Dato</Label>
+                    <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Dato</Label>
                     <Input
                       type="date"
                       value={specialDate}
                       onChange={(e) => setSpecialDate(e.target.value)}
-                      className="rounded-[8px] border-[#e5e3dc] bg-[#f8f7f3]"
+                      className="rounded-[8px] border-border bg-card"
                     />
                   </div>
 
                   {/* Type */}
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Type</Label>
+                    <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Type</Label>
                     <div className="grid grid-cols-3 gap-2">
                       {([
                         { value: 'birthday' as const, label: 'Fødselsdag', Icon: Cake },
@@ -1686,12 +1686,12 @@ export function CustodyConfig() {
                           className={cn(
                             "flex flex-col items-center gap-1 rounded-[8px] border p-3 transition-colors",
                             specialType === t.value
-                              ? "border-[#f3c59d] bg-[#fff2e6]"
-                              : "border-[#e5e3dc] bg-[#f8f7f3] hover:bg-[#f2f1ec]"
+                              ? "border-orange-tint bg-orange-tint"
+                              : "border-border bg-card hover:bg-background"
                           )}
                         >
-                          <t.Icon className={cn("w-5 h-5", specialType === t.value ? "text-[#f58a2d]" : "text-[#75736b]")} />
-                          <span className="text-[11px] font-semibold text-[#2f2f2d]">{t.label}</span>
+                          <t.Icon className={cn("w-5 h-5", specialType === t.value ? "text-[#f58a2d]" : "text-muted-foreground")} />
+                          <span className="text-[11px] font-semibold text-foreground">{t.label}</span>
                         </button>
                       ))}
                     </div>
@@ -1699,7 +1699,7 @@ export function CustodyConfig() {
 
                   {/* Parent picker */}
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Hvem har barnet</Label>
+                    <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Hvem har barnet</Label>
                     <div className="grid grid-cols-2 gap-2.5">
                       {[
                         { id: parent1Id, name: parent1Name, isSelf: true },
@@ -1712,27 +1712,27 @@ export function CustodyConfig() {
                           className={cn(
                             "flex items-center gap-2 rounded-[8px] border p-3 transition-colors",
                             specialParent === parent.id
-                              ? "border-[#f3c59d] bg-[#fff2e6]"
-                              : "border-[#e5e3dc] bg-[#f8f7f3] hover:bg-[#f2f1ec]"
+                              ? "border-orange-tint bg-orange-tint"
+                              : "border-border bg-card hover:bg-background"
                           )}
                         >
                           <div className={cn(
                             "w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold",
-                            parent.isSelf ? "bg-[#2f2f2f] text-white" : "bg-[#f58a2d] text-white"
+                            parent.isSelf ? "bg-primary text-white" : "bg-[#f58a2d] text-white"
                           )}>
                             {parent.name[0]}
                           </div>
-                          <span className="text-[13px] font-semibold text-[#2f2f2d]">{parent.name}</span>
+                          <span className="text-[13px] font-semibold text-foreground">{parent.name}</span>
                         </button>
                       ))}
                     </div>
                   </div>
 
                   {/* Alternating years */}
-                  <div className="flex items-center justify-between rounded-[8px] border border-[#e5e3dc] bg-[#f8f7f3] p-4">
+                  <div className="flex items-center justify-between rounded-[8px] border border-border bg-card p-4">
                     <div>
-                      <p className="text-[14px] font-semibold text-[#2f2f2d]">Skiftende år</p>
-                      <p className="text-[12px] text-[#75736b]">Forældrene skifter hvert år</p>
+                      <p className="text-[14px] font-semibold text-foreground">Skiftende år</p>
+                      <p className="text-[12px] text-muted-foreground">Forældrene skifter hvert år</p>
                     </div>
                     <IOSSwitch checked={specialAlternate} onCheckedChange={setSpecialAlternate} />
                   </div>
@@ -1740,7 +1740,7 @@ export function CustodyConfig() {
                   {/* Submit */}
                   <Button
                     onClick={handleAddSpecialDay}
-                    className="w-full rounded-[8px] py-6 text-[15px] font-semibold bg-[#2f2f2f] text-white hover:bg-[#242424]"
+                    className="w-full rounded-[8px] py-6 text-[15px] font-semibold bg-primary text-white hover:bg-primary"
                   >
                     Tilføj særlig dag
                   </Button>
@@ -1754,24 +1754,24 @@ export function CustodyConfig() {
 
       {/* Multi-select holiday portal */}
       {holidaySelectOpen && createPortal(
-        <div className="fixed inset-0 z-[10000] bg-white flex flex-col">
+        <div className="fixed inset-0 z-[10000] bg-card flex flex-col">
           {/* Header */}
           <div
-            className="flex items-center px-4 py-3 border-b border-[#e5e3dc] bg-white"
+            className="flex items-center px-4 py-3 border-b border-border bg-card"
             style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
           >
             <button
               onClick={() => { setHolidaySelectOpen(false); setSelectedHolidays({}); }}
-              className="flex h-9 w-9 items-center justify-center rounded-[8px] text-[#5f5d56] hover:bg-[#ecebe6] transition-colors"
+              className="flex h-9 w-9 items-center justify-center rounded-[8px] text-muted-foreground hover:bg-secondary transition-colors"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
-            <h1 className="flex-1 text-center text-[17px] font-bold text-[#2f2f2d]">
+            <h1 className="flex-1 text-center text-[17px] font-bold text-foreground">
               Vælg helligdage
             </h1>
             <button
               onClick={() => { setHolidaySelectOpen(false); setSelectedHolidays({}); }}
-              className="flex h-9 w-9 items-center justify-center rounded-[8px] text-[#5f5d56] hover:bg-[#ecebe6] transition-colors"
+              className="flex h-9 w-9 items-center justify-center rounded-[8px] text-muted-foreground hover:bg-secondary transition-colors"
             >
               <X className="h-4.5 w-4.5" />
             </button>
@@ -1804,15 +1804,15 @@ export function CustodyConfig() {
                         className={cn(
                           "w-full flex items-center gap-3 px-3 py-3 rounded-[8px] transition-colors text-left",
                           alreadyAssigned
-                            ? "bg-[#f0efe8] opacity-60"
+                            ? "bg-muted opacity-60"
                             : isSelected
-                              ? "bg-[#fff2e6] border border-[#f3c59d]"
-                              : "bg-[#f8f7f3] border border-transparent hover:bg-[#f2f1ec]"
+                              ? "bg-orange-tint border border-orange-tint"
+                              : "bg-card border border-transparent hover:bg-background"
                         )}
                       >
                         <div className={cn(
                           "w-7 h-7 rounded-lg flex items-center justify-center shrink-0",
-                          h.type === 'period' ? "bg-[#e8f4f0]" : "bg-[#fff2e6]"
+                          h.type === 'period' ? "bg-green-tint" : "bg-orange-tint"
                         )}>
                           <Sun className={cn(
                             "w-3.5 h-3.5",
@@ -1820,8 +1820,8 @@ export function CustodyConfig() {
                           )} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[13px] font-medium text-[#2f2f2d]">{h.name}</p>
-                          <p className="text-[11px] text-[#b0ada4]">
+                          <p className="text-[13px] font-medium text-foreground">{h.name}</p>
+                          <p className="text-[11px] text-muted-foreground">
                             {h.type === 'period' ? 'Ferieperiode' : h.monthDay.split('-').reverse().join('/')}
                           </p>
                         </div>
@@ -1848,7 +1848,7 @@ export function CustodyConfig() {
                         >
                           <div className="px-3 pb-3 pt-2 ml-10 space-y-3">
                             <div className="space-y-1.5">
-                              <p className="text-[11px] font-semibold uppercase tracking-wide text-[#75736b]">Hvem har barnet</p>
+                              <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Hvem har barnet</p>
                               <div className="flex gap-2">
                                 {[
                                   { id: parent1Id, name: parent1Name, isSelf: true },
@@ -1864,13 +1864,13 @@ export function CustodyConfig() {
                                     className={cn(
                                       "flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[12px] font-semibold transition-colors",
                                       selectedHolidays[h.name]?.parentId === parent.id
-                                        ? "border-[#f3c59d] bg-[#fff2e6] text-[#bf6722]"
-                                        : "border-[#e5e3dc] bg-white text-[#2f2f2d]"
+                                        ? "border-orange-tint bg-orange-tint text-[#bf6722]"
+                                        : "border-border bg-card text-foreground"
                                     )}
                                   >
                                     <div className={cn(
                                       "w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold",
-                                      parent.isSelf ? "bg-[#2f2f2f] text-white" : "bg-[#f58a2d] text-white"
+                                      parent.isSelf ? "bg-primary text-white" : "bg-[#f58a2d] text-white"
                                     )}>
                                       {parent.name[0]}
                                     </div>
@@ -1880,7 +1880,7 @@ export function CustodyConfig() {
                               </div>
                             </div>
                             <div className="flex items-center justify-between">
-                              <span className="text-[12px] text-[#75736b]">Skiftende år</span>
+                              <span className="text-[12px] text-muted-foreground">Skiftende år</span>
                               <IOSSwitch
                                 checked={selectedHolidays[h.name]?.alternateYears ?? false}
                                 onCheckedChange={(checked) => setSelectedHolidays(prev => ({
@@ -1905,7 +1905,7 @@ export function CustodyConfig() {
                   resetHolidayForm();
                   setAddFormType('holiday');
                 }}
-                className="w-full flex items-center justify-center gap-2 rounded-[8px] border-2 border-dashed border-[#d8d7cf] bg-[#faf9f6] py-4 text-[14px] font-semibold text-[#4a4945] transition-all hover:border-[#cccbc3] active:scale-[0.98] mt-4"
+                className="w-full flex items-center justify-center gap-2 rounded-[8px] border-2 border-dashed border-border bg-card py-4 text-[14px] font-semibold text-foreground transition-all hover:border-border active:scale-[0.98] mt-4"
               >
                 <Plus className="h-4 w-4" />
                 Tilføj egen helligdag
@@ -1915,13 +1915,13 @@ export function CustodyConfig() {
 
           {/* Sticky bottom bar */}
           <div
-            className="border-t border-[#e5e3dc] bg-white px-4 py-3"
+            className="border-t border-border bg-card px-4 py-3"
             style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 12px)' }}
           >
             <Button
               onClick={handleAddSelectedHolidays}
               disabled={Object.keys(selectedHolidays).length === 0}
-              className="w-full rounded-[8px] py-6 text-[15px] font-semibold bg-[#2f2f2f] text-white hover:bg-[#242424] disabled:opacity-40"
+              className="w-full rounded-[8px] py-6 text-[15px] font-semibold bg-primary text-white hover:bg-primary disabled:opacity-40"
             >
               Tilføj valgte ({Object.keys(selectedHolidays).length})
             </Button>

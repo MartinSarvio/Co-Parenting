@@ -40,8 +40,8 @@ export function GiftOfferDetailSheet({ open, onOpenChange, offer, onAddToWishlis
         >
           <StoreBadge storeName={offer.store} storeColor={offer.storeColor} storeInitial={offer.store[0]} size="lg" />
           <div>
-            <p className="text-[15px] font-bold text-[#2f2f2d]">{offer.store}</p>
-            <p className="text-[12px] text-[#9a978f]">Gyldig til {offer.validUntil}</p>
+            <p className="text-[15px] font-bold text-foreground">{offer.store}</p>
+            <p className="text-[12px] text-muted-foreground">Gyldig til {offer.validUntil}</p>
           </div>
           <span className="ml-auto text-[12px] font-bold text-white bg-[#ef4444] rounded-full px-2 py-0.5">
             {offer.discount}
@@ -51,11 +51,11 @@ export function GiftOfferDetailSheet({ open, onOpenChange, offer, onAddToWishlis
         {/* Product info */}
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="text-[17px] font-bold text-[#2f2f2d]">{offer.title}</h3>
+            <h3 className="text-[17px] font-bold text-foreground">{offer.title}</h3>
             {nutriscoreGrade && <NutriScoreBadge grade={nutriscoreGrade} size="md" />}
           </div>
           {offer.description && (
-            <p className="text-[13px] text-[#78766d] mt-1 leading-relaxed">{offer.description}</p>
+            <p className="text-[13px] text-muted-foreground mt-1 leading-relaxed">{offer.description}</p>
           )}
         </div>
 
@@ -65,14 +65,14 @@ export function GiftOfferDetailSheet({ open, onOpenChange, offer, onAddToWishlis
             {offer.price.toLocaleString('da-DK')},-
           </span>
           {offer.originalPrice > 0 && (
-            <span className="text-[15px] text-[#9a978f] line-through">
+            <span className="text-[15px] text-muted-foreground line-through">
               {offer.originalPrice.toLocaleString('da-DK')},-
             </span>
           )}
         </div>
 
         {saving > 0 && (
-          <div className="flex items-center gap-2 px-3 py-2 rounded-[8px] bg-[#fef3c7]">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-[8px] bg-yellow-tint">
             <span className="text-[13px] font-semibold text-[#92400e]">
               Du sparer {saving.toLocaleString('da-DK')} kr
             </span>

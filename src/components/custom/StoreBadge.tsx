@@ -40,7 +40,7 @@ export function StoreBadge({ storeId, storeName, storeColor, storeInitial, size 
       <div
         className={cn(
           'absolute inset-0 flex items-center justify-center font-bold',
-          needsDarkText(color) ? 'text-[#2f2f2d]' : 'text-white',
+          needsDarkText(color) ? 'text-foreground' : 'text-white',
           size !== 'lg' ? 'rounded-full' : 'rounded-[8px]',
           s.text,
         )}

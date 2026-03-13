@@ -145,7 +145,7 @@ export function HouseholdSetup({ onComplete }: HouseholdSetupProps) {
                   className={`w-full flex items-center gap-3 p-3 rounded-[8px] border transition-all text-left ${
                     selectedType === type.value
                       ? 'border-[#f7a95c] bg-orange-50 shadow-sm'
-                      : 'border-slate-200 bg-white hover:border-slate-300'
+                      : 'border-slate-200 bg-card hover:border-slate-300'
                   }`}
                 >
                   <div className={`p-2 rounded-[8px] ${selectedType === type.value ? 'bg-orange-100 text-orange-600' : 'bg-slate-100 text-slate-500'}`}>

@@ -105,15 +105,15 @@ export function TopBar() {
       if (docFormMode) setDocFormMode(null);
     };
     return (
-      <header className="safe-area-pt fixed inset-x-0 top-0 z-50 mx-auto max-w-[430px] bg-[#faf9f6]">
+      <header className="safe-area-pt fixed inset-x-0 top-0 z-50 mx-auto max-w-[430px] bg-card">
         <div className="flex items-center justify-between px-4 pb-2.5 pt-2">
           <button onClick={onBack} className="transition-colors">
-            <ChevronLeft className="h-5 w-5 text-[#4a4945]" />
+            <ChevronLeft className="h-5 w-5 text-foreground" />
           </button>
-          <h2 className="text-lg font-semibold text-[#2f2f2d]">{formTitle}</h2>
+          <h2 className="text-lg font-semibold text-foreground">{formTitle}</h2>
           {docFormMode ? (
             <button onClick={onBack} className="transition-colors">
-              <X className="h-5 w-5 text-[#4a4945]" />
+              <X className="h-5 w-5 text-foreground" />
             </button>
           ) : (
             <div className="w-5" />
@@ -128,10 +128,10 @@ export function TopBar() {
       <header className={cn(
         "safe-area-pt fixed inset-x-0 top-0 z-50 mx-auto max-w-[430px] transition-colors",
         activeTab === 'kalender-week' || activeTab === 'feed'
-          ? "bg-[#f2f1ed] border-b-0"
+          ? "bg-background border-b-0"
           : isExpensePage
             ? "bg-transparent border-transparent border-b"
-            : "bg-[#f2f1ed]"
+            : "bg-background"
       )}>
         {activeTab === 'kalender-week' ? (
           /* ── Kalender uge-header: [<] Måned + M/T/O/T/F/L/S ── */
@@ -140,25 +140,25 @@ export function TopBar() {
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => { setCalendarWeekViewDate(null); setActiveTab('kalender'); setYearDropdownOpen(false); }}
-                  className="flex h-9 w-9 items-center justify-center text-[#4a4944] transition-colors"
+                  className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
                   aria-label="Tilbage til kalender"
                 >
                   <ChevronLeft className="h-5 w-5" />
                 </button>
-                <span className="text-[15px] font-semibold text-[#2f2f2d] capitalize">
+                <span className="text-[15px] font-semibold text-foreground capitalize">
                   {format(calendarWeekViewDate || new Date(), 'MMMM', { locale: da })}
                 </span>
               </div>
               <div className="relative">
                 <button
                   onClick={() => setYearDropdownOpen(!yearDropdownOpen)}
-                  className="flex items-center gap-1 text-[15px] font-semibold text-[#2f2f2d] transition-colors"
+                  className="flex items-center gap-1 text-[15px] font-semibold text-foreground transition-colors"
                 >
                   {(calendarWeekViewDate || new Date()).getFullYear()}
-                  <ChevronDown className="h-3.5 w-3.5 text-[#78766d]" />
+                  <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
                 </button>
                 {yearDropdownOpen && (
-                  <div className="absolute right-0 top-full z-50 mt-1 rounded-xl border border-[#e5e3dc] bg-white py-1 shadow-lg">
+                  <div className="absolute right-0 top-full z-50 mt-1 rounded-xl border border-border bg-card py-1 shadow-lg">
                     {(() => {
                       const currentYear = (calendarWeekViewDate || new Date()).getFullYear();
                       return [currentYear - 2, currentYear - 1, currentYear, currentYear + 1, currentYear + 2].map(y => (
@@ -173,7 +173,7 @@ export function TopBar() {
                           }}
                           className={cn(
                             "block w-full px-5 py-1.5 text-center text-sm font-medium transition-colors",
-                            y === currentYear ? "text-[#f58a2d]" : "text-[#2f2f2d] hover:bg-[#f5f3ee]"
+                            y === currentYear ? "text-[#f58a2d]" : "text-foreground hover:bg-card"
                           )}
                         >
                           {y}
@@ -190,7 +190,7 @@ export function TopBar() {
                   key={`wd-${i}`}
                   className={cn(
                     "py-1.5 text-center text-[11px] font-semibold",
-                    i >= 5 ? "text-[#b0876a]" : "text-[#78766d]"
+                    i >= 5 ? "text-[#b0876a]" : "text-muted-foreground"
                   )}
                 >
                   {letter}
@@ -203,12 +203,12 @@ export function TopBar() {
           <div className="mx-auto flex w-full max-w-[430px] items-center px-3 pb-2.5 pt-2 relative">
             <button
               onClick={() => setHandoverAction(null)}
-              className="flex h-9 w-9 items-center justify-center text-[#30302d]"
+              className="flex h-9 w-9 items-center justify-center text-foreground"
               aria-label="Tilbage"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
-            <h1 className="absolute inset-x-0 text-center text-[15px] font-semibold text-[#2f2f2d] pointer-events-none">
+            <h1 className="absolute inset-x-0 text-center text-[15px] font-semibold text-foreground pointer-events-none">
               Tilføj til pakkeliste
             </h1>
           </div>
@@ -218,7 +218,7 @@ export function TopBar() {
             <div className="flex items-center gap-0.5">
               <button
                 onClick={() => setCalendarDate(addMonths(calendarDate, -1))}
-                className="flex h-9 w-9 items-center justify-center text-[#4a4944] transition-colors"
+                className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
                 aria-label="Forrige måned"
               >
                 <ChevronLeft className="h-5 w-5" />
@@ -228,7 +228,7 @@ export function TopBar() {
                   setSideMenuContext('kalender');
                   setSideMenuOpen(!sideMenuOpen);
                 }}
-                className="flex h-9 w-9 items-center justify-center text-[#30302d] transition-colors"
+                className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
                 aria-label="Menu"
               >
                 <Menu className="h-5 w-5" />
@@ -237,7 +237,7 @@ export function TopBar() {
 
             <button
               onClick={() => setCalendarDate(new Date())}
-              className="rounded-[8px] px-3 py-1.5 text-[13px] font-semibold text-[#4a4944] hover:bg-[#e8e7e2] transition-colors"
+              className="rounded-[8px] px-3 py-1.5 text-[13px] font-semibold text-foreground hover:bg-muted transition-colors"
             >
               I dag
             </button>
@@ -245,14 +245,14 @@ export function TopBar() {
             <div className="flex items-center gap-0.5">
               <button
                 onClick={() => setCalendarAddOpen(true)}
-                className="flex h-9 w-9 items-center justify-center text-[#4a4944] transition-colors"
+                className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
                 aria-label="Ny aftale"
               >
                 <Plus className="h-5 w-5" />
               </button>
               <button
                 onClick={() => setCalendarDate(addMonths(calendarDate, 1))}
-                className="flex h-9 w-9 items-center justify-center text-[#4a4944] transition-colors"
+                className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
                 aria-label="Næste måned"
               >
                 <ChevronRight className="h-5 w-5" />
@@ -264,7 +264,7 @@ export function TopBar() {
           <div className="mx-auto flex w-full max-w-[430px] items-center gap-1 px-3 pb-2.5 pt-2">
             <button
               onClick={() => setKommunikationThreadId(null)}
-              className="flex h-9 w-9 items-center justify-center text-[#30302d] transition-colors"
+              className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
               aria-label="Tilbage til samtaler"
             >
               <ChevronLeft className="h-5 w-5" />
@@ -274,12 +274,12 @@ export function TopBar() {
               onClick={() => visibleThreads.length > 1 && setThreadSwitcherOpen(true)}
               className="flex flex-1 min-w-0 items-center gap-2"
             >
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#fff2e6]">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-orange-tint">
                 <span className="text-sm font-bold text-[#bf6722]">{chatThread.title[0]}</span>
               </div>
-              <span className="truncate text-sm font-semibold text-[#2f2f2d]">{chatThread.title}</span>
+              <span className="truncate text-sm font-semibold text-foreground">{chatThread.title}</span>
               {visibleThreads.length > 1 && (
-                <ChevronDown className="h-3.5 w-3.5 shrink-0 text-[#8a887f]" />
+                <ChevronDown className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
               )}
             </button>
 
@@ -290,15 +290,15 @@ export function TopBar() {
           <div className="mx-auto flex w-full max-w-[430px] items-center gap-1 px-4 pb-2.5 pt-2">
             <button
               onClick={() => { setActiveTab('feed'); }}
-              className="flex h-9 w-9 items-center justify-center text-[#30302d] transition-colors"
+              className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
               aria-label="Tilbage"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
-            <p className="text-[15px] font-semibold text-[#2f2f2d] flex-1 truncate">{viewGroupName || 'Gruppe'}</p>
+            <p className="text-[15px] font-semibold text-foreground flex-1 truncate">{viewGroupName || 'Gruppe'}</p>
             <button
               onClick={() => setGroupDetailSearchOpen(!groupDetailSearchOpen)}
-              className="flex h-9 w-9 items-center justify-center text-[#30302d] transition-colors"
+              className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
               aria-label="Søg"
             >
               <Search className="h-5 w-5" />
@@ -309,19 +309,19 @@ export function TopBar() {
           <div className="mx-auto flex w-full max-w-[430px] items-center gap-1 px-4 pb-2.5 pt-2">
             <button
               onClick={() => { setActiveTab('feed'); }}
-              className="flex h-9 w-9 items-center justify-center text-[#30302d] transition-colors"
+              className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
               aria-label="Tilbage"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
-            <p className="text-[15px] font-semibold text-[#2f2f2d] flex-1">Ny gruppe</p>
+            <p className="text-[15px] font-semibold text-foreground flex-1">Ny gruppe</p>
             <button
               onClick={() => {
                 // Scroll to settings section
                 const el = document.getElementById('create-group-settings');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="flex h-9 w-9 items-center justify-center text-[#30302d] transition-colors"
+              className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
               aria-label="Indstillinger"
             >
               <Settings className="h-5 w-5" />
@@ -332,17 +332,17 @@ export function TopBar() {
           <div className="mx-auto flex w-full max-w-[430px] items-center gap-1 px-4 pb-2.5 pt-2">
             <button
               onClick={() => { setActiveTab(previousTab || 'feed'); }}
-              className="flex h-9 w-9 items-center justify-center text-[#30302d] transition-colors"
+              className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
               aria-label="Tilbage"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
-            <p className="text-[15px] font-semibold text-[#2f2f2d] flex-1">Profil</p>
+            <p className="text-[15px] font-semibold text-foreground flex-1">Profil</p>
           </div>
         ) : activeTab === 'feed' && showGrupper ? (
           /* ── Grupper header ── */
           <div className="mx-auto flex w-full max-w-[430px] items-center justify-center px-4 pb-2.5 pt-2">
-            <p className="text-[15px] font-semibold text-[#2f2f2d]">Grupper</p>
+            <p className="text-[15px] font-semibold text-foreground">Grupper</p>
           </div>
         ) : activeTab === 'feed' && feedTab === 'tilbud' && tilbudStoreId ? (
           /* ── Tilbudsavis butik-header ── */
@@ -358,7 +358,7 @@ export function TopBar() {
               <div className="mx-auto flex w-full max-w-[430px] items-center gap-1.5 px-4 pb-2.5 pt-2">
                 <button
                   onClick={() => { setTilbudStoreId(null); if (isUploaded) setUploadedBatchMeta(null); }}
-                  className="flex h-9 w-9 items-center justify-center text-[#30302d] transition-colors"
+                  className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
                   aria-label="Tilbage"
                 >
                   <ChevronLeft className="h-5 w-5" />
@@ -369,9 +369,9 @@ export function TopBar() {
                   <StoreBadge storeId={storeFlyer ? getFlyerStoreSlug(storeFlyer) : tilbudStoreId} size="sm" />
                 )}
                 <div className="flex-1 min-w-0">
-                  <p className="text-[15px] font-bold text-[#2f2f2d] truncate">{displayName}</p>
+                  <p className="text-[15px] font-bold text-foreground truncate">{displayName}</p>
                   {displayFrom && displayUntil && (
-                    <p className="text-[10px] text-[#9a978f]">{displayFrom} – {displayUntil}</p>
+                    <p className="text-[10px] text-muted-foreground">{displayFrom} – {displayUntil}</p>
                   )}
                 </div>
                 {!isUploaded && storeFlyer?.hasFlyer ? (
@@ -404,7 +404,7 @@ export function TopBar() {
             <button
               onClick={() => setFeedTab('nyheder')}
               className={cn("flex h-9 w-9 items-center justify-center rounded-full transition-colors",
-                feedTab === 'nyheder' ? "bg-[#2f2f2f] text-white" : "text-[#78766d]"
+                feedTab === 'nyheder' ? "bg-primary text-white" : "text-muted-foreground"
               )}
               aria-label="Nyheder"
             >
@@ -415,7 +415,7 @@ export function TopBar() {
               <button
                 onClick={() => setFeedTab('tilbud')}
                 className={cn("flex h-9 w-9 items-center justify-center rounded-full transition-colors",
-                  feedTab === 'tilbud' ? "bg-[#2f2f2f] text-white" : "text-[#78766d]"
+                  feedTab === 'tilbud' ? "bg-primary text-white" : "text-muted-foreground"
                 )}
                 aria-label="Tilbud"
               >
@@ -424,7 +424,7 @@ export function TopBar() {
               <button
                 onClick={() => setFeedTab('forum')}
                 className={cn("flex h-9 w-9 items-center justify-center rounded-full transition-colors",
-                  feedTab === 'forum' ? "bg-[#2f2f2f] text-white" : "text-[#78766d]"
+                  feedTab === 'forum' ? "bg-primary text-white" : "text-muted-foreground"
                 )}
                 aria-label="Forum"
               >
@@ -441,22 +441,22 @@ export function TopBar() {
                   setSideMenuContext('settings');
                   setSideMenuOpen(!sideMenuOpen);
                 }}
-                className="flex items-center justify-center text-[#30302d] hover:text-[#1a1a1a] transition-colors"
+                className="flex items-center justify-center text-foreground hover:text-foreground transition-colors"
                 aria-label="Menu"
               >
                 <Menu className="h-5 w-5" />
               </button>
-              <span className="text-sm font-medium text-[#78766d] ml-0.5">Platformanalyse</span>
+              <span className="text-sm font-medium text-muted-foreground ml-0.5">Platformanalyse</span>
             </div>
             <div className="flex min-w-0 justify-center">
               <button
                 onClick={() => setAnalyticsPeriodSelectorOpen(true)}
-                className="mx-auto flex h-9 min-w-0 items-center gap-2 px-1 text-[#343430] transition-colors hover:text-[#1a1a1a]"
+                className="mx-auto flex h-9 min-w-0 items-center gap-2 px-1 text-foreground transition-colors hover:text-foreground"
               >
                 <span className="truncate text-sm font-medium">
                   {analyticsPeriod === 'today' ? 'I dag' : analyticsPeriod === 'week' ? 'Uge' : analyticsPeriod === 'month' ? 'Måned' : 'Alt'}
                 </span>
-                <ChevronDown className="h-4 w-4 shrink-0 text-[#8a887f]" />
+                <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
               </button>
             </div>
             <div className="flex items-center justify-self-end gap-1" />
@@ -470,18 +470,18 @@ export function TopBar() {
                   setSideMenuContext('settings');
                   setSideMenuOpen(!sideMenuOpen);
                 }}
-                className="flex items-center justify-center text-[#30302d] hover:text-[#1a1a1a] transition-colors"
+                className="flex items-center justify-center text-foreground hover:text-foreground transition-colors"
                 aria-label="Menu"
               >
                 <Menu className="h-5 w-5" />
               </button>
-              <span className="text-sm font-medium text-[#78766d] ml-0.5">Nyheder</span>
+              <span className="text-sm font-medium text-muted-foreground ml-0.5">Nyheder</span>
             </div>
             <div className="flex min-w-0 justify-center" />
             <div className="flex items-center justify-self-end gap-1">
               <button
                 onClick={() => setNyhederAdminCreateOpen(true)}
-                className="flex h-9 w-9 items-center justify-center text-[#4a4944] transition-colors"
+                className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
                 aria-label="Opret"
               >
                 <Plus className="h-5 w-5" />
@@ -497,28 +497,28 @@ export function TopBar() {
                   setSideMenuContext('settings');
                   setSideMenuOpen(!sideMenuOpen);
                 }}
-                className="flex items-center justify-center text-[#30302d] hover:text-[#1a1a1a] transition-colors"
+                className="flex items-center justify-center text-foreground hover:text-foreground transition-colors"
                 aria-label="Menu"
               >
                 <Menu className="h-5 w-5" />
               </button>
-              <span className="text-sm font-medium text-[#78766d] ml-0.5">Tilbudsadmin</span>
+              <span className="text-sm font-medium text-muted-foreground ml-0.5">Tilbudsadmin</span>
             </div>
             <div className="flex min-w-0 justify-center">
               <button
                 onClick={() => setTilbudAdminTabSelectorOpen(true)}
-                className="mx-auto flex h-9 min-w-0 items-center gap-2 px-1 text-[#343430] transition-colors hover:text-[#1a1a1a]"
+                className="mx-auto flex h-9 min-w-0 items-center gap-2 px-1 text-foreground transition-colors hover:text-foreground"
               >
                 <span className="truncate text-sm font-medium">
                   {tilbudAdminTab === 'affiliates' ? 'Affiliate-links' : 'Tilbudsaviser'}
                 </span>
-                <ChevronDown className="h-4 w-4 shrink-0 text-[#8a887f]" />
+                <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
               </button>
             </div>
             <div className="flex items-center justify-self-end gap-1">
               <button
                 onClick={() => setTilbudAdminCreateOpen(true)}
-                className="flex h-9 w-9 items-center justify-center text-[#4a4944] transition-colors"
+                className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
                 aria-label="Opret"
               >
                 <Plus className="h-5 w-5" />
@@ -532,7 +532,7 @@ export function TopBar() {
               {settingsDetailView ? (
                 <button
                   onClick={() => setSettingsDetailView(null)}
-                  className="flex h-9 w-9 items-center justify-center text-[#30302d] transition-colors"
+                  className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
                   aria-label="Tilbage"
                 >
                   <ChevronLeft className="h-5 w-5" />
@@ -543,13 +543,13 @@ export function TopBar() {
                     setSideMenuContext('settings');
                     setSideMenuOpen(!sideMenuOpen);
                   }}
-                  className="flex items-center justify-center text-[#30302d] hover:text-[#1a1a1a] transition-colors"
+                  className="flex items-center justify-center text-foreground hover:text-foreground transition-colors"
                   aria-label="Menu"
                 >
                   <Menu className="h-5 w-5" />
                 </button>
               )}
-              <span className="text-sm font-medium text-[#78766d] ml-0.5">
+              <span className="text-sm font-medium text-muted-foreground ml-0.5">
                 {settingsDetailView
                   ? (activeSettingsTab === 'info' ? 'Info' : activeSettingsTab === 'notifications' ? 'Notifikationer' : 'Indstillinger')
                   : activeSettingsTab === 'appearance' ? 'Visning'
@@ -571,7 +571,7 @@ export function TopBar() {
                   setSideMenuContext('overblik');
                   setSideMenuOpen(!sideMenuOpen);
                 }}
-                className="flex items-center justify-center text-[#30302d] hover:text-[#1a1a1a] transition-colors"
+                className="flex items-center justify-center text-foreground hover:text-foreground transition-colors"
                 aria-label="Menu"
               >
                 <Menu className="h-5 w-5" />
@@ -579,7 +579,7 @@ export function TopBar() {
               {docSection === 'family' && (
                 <button
                   onClick={() => setDocAction('upload')}
-                  className="flex h-9 w-9 items-center justify-center rounded-[8px] text-[#30302d] transition-colors active:bg-[#e8e7e0]"
+                  className="flex h-9 w-9 items-center justify-center rounded-[8px] text-foreground transition-colors active:bg-muted"
                   aria-label="Upload dokument"
                 >
                   <Upload className="h-5 w-5" />
@@ -587,14 +587,14 @@ export function TopBar() {
               )}
             </div>
             <div className="flex min-w-0 justify-center">
-              <span className="text-[15px] font-bold text-[#2f2f2d]">Dokumenter</span>
+              <span className="text-[15px] font-bold text-foreground">Dokumenter</span>
             </div>
             <div className="flex items-center justify-self-end gap-1">
               <button
                 onClick={() => setDocSection('official')}
                 className={cn(
                   "flex h-9 w-9 items-center justify-center rounded-[8px] transition-colors",
-                  docSection === 'official' ? "text-[#2f2f2d] bg-[#e8e7e0]" : "text-[#9a978f]"
+                  docSection === 'official' ? "text-foreground bg-muted" : "text-muted-foreground"
                 )}
                 aria-label="Officielle blanketter"
               >
@@ -604,7 +604,7 @@ export function TopBar() {
                 onClick={() => setDocSection('family')}
                 className={cn(
                   "flex h-9 w-9 items-center justify-center rounded-[8px] transition-colors",
-                  docSection === 'family' ? "text-[#2f2f2d] bg-[#e8e7e0]" : "text-[#9a978f]"
+                  docSection === 'family' ? "text-foreground bg-muted" : "text-muted-foreground"
                 )}
                 aria-label="Vores dokumenter"
               >
@@ -619,7 +619,7 @@ export function TopBar() {
               {activeTab === 'notifikationer' ? (
                 <button
                   onClick={() => setActiveTab(previousTab || 'dashboard')}
-                  className="flex h-9 w-9 items-center justify-center text-[#30302d] transition-colors"
+                  className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
                   aria-label="Tilbage"
                 >
                   <ChevronLeft className="h-5 w-5" />
@@ -635,7 +635,7 @@ export function TopBar() {
               ) : activeTab === 'budget' && showBudgetEdit ? (
                 <button
                   onClick={() => setShowBudgetEdit(false)}
-                  className="flex h-9 w-9 items-center justify-center text-[#30302d] transition-colors"
+                  className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
                   aria-label="Tilbage"
                 >
                   <ChevronLeft className="h-5 w-5" />
@@ -652,18 +652,18 @@ export function TopBar() {
                 <>
                   <button
                     onClick={() => setKommunikationAction('new-thread')}
-                    className="flex items-center justify-center text-[#30302d] hover:text-[#1a1a1a] transition-colors"
+                    className="flex items-center justify-center text-foreground hover:text-foreground transition-colors"
                     aria-label="Ny samtale"
                   >
                     <Plus className="h-5 w-5" />
                   </button>
-                  <span className="text-sm font-medium text-[#78766d] ml-0.5">Chat</span>
+                  <span className="text-sm font-medium text-muted-foreground ml-0.5">Chat</span>
                 </>
               ) : activeTab === 'handover' ? (
                 <>
                   <button
                     onClick={() => setHandoverAction('add-pakkeliste')}
-                    className="flex items-center justify-center text-[#30302d] hover:text-[#1a1a1a] transition-colors"
+                    className="flex items-center justify-center text-foreground hover:text-foreground transition-colors"
                     aria-label="Tilføj til pakkeliste"
                   >
                     <Plus className="h-5 w-5" />
@@ -691,7 +691,7 @@ export function TopBar() {
                     }}
                     className={cn(
                       "flex items-center justify-center transition-colors",
-                      isExpenseWhiteText ? "text-white hover:text-white/80" : "text-[#30302d] hover:text-[#1a1a1a]"
+                      isExpenseWhiteText ? "text-white hover:text-white/80" : "text-foreground hover:text-foreground"
                     )}
                     aria-label="Menu"
                   >
@@ -703,12 +703,12 @@ export function TopBar() {
                       : madSubTab === 'fridge' ? 'Køleskab'
                       : madSubTab === null ? 'Mad'
                       : null;
-                    return label ? <span className="text-sm font-medium text-[#78766d] ml-0.5">{label}</span> : null;
+                    return label ? <span className="text-sm font-medium text-muted-foreground ml-0.5">{label}</span> : null;
                   })()}
                   {isAdminVisible && (
                     <button
                       onClick={() => setAdminSearchOpen(true)}
-                      className="flex h-9 w-9 items-center justify-center text-[#30302d] hover:text-[#1a1a1a] transition-colors"
+                      className="flex h-9 w-9 items-center justify-center text-foreground hover:text-foreground transition-colors"
                       aria-label="Søg brugere"
                     >
                       <Search className="h-5 w-5" />
@@ -736,16 +736,16 @@ export function TopBar() {
               )}
               {activeTab === 'budget' && (
                 showBudgetEdit ? (
-                  <span className="text-sm font-semibold text-[#2f2f2d]">Sæt budget</span>
+                  <span className="text-sm font-semibold text-foreground">Sæt budget</span>
                 ) : (
                   <button
                     onClick={() => setBudgetPeriodSelectorOpen(true)}
-                    className="mx-auto flex h-9 min-w-0 items-center gap-2 px-1 text-[#2f2f2d] transition-colors"
+                    className="mx-auto flex h-9 min-w-0 items-center gap-2 px-1 text-foreground transition-colors"
                   >
                     <span className="truncate text-sm font-medium">
                       {budgetPeriod === 'monthly' ? 'Månedlig' : 'Årlig'}
                     </span>
-                    <ChevronDown className="h-4 w-4 shrink-0 text-[#8a887f]" />
+                    <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
                   </button>
                 )
               )}
@@ -767,17 +767,17 @@ export function TopBar() {
               {isAdminVisible && (
                 <button
                   onClick={() => setAdminCategorySelectorOpen(true)}
-                  className="mx-auto flex h-9 min-w-0 items-center gap-2 px-1 text-[#343430] transition-colors hover:text-[#1a1a1a]"
+                  className="mx-auto flex h-9 min-w-0 items-center gap-2 px-1 text-foreground transition-colors hover:text-foreground"
                 >
                   <span className="truncate text-sm font-medium">
                     {adminCategoryLabels[adminCategoryFilter] ?? 'Alle brugere'}
                   </span>
-                  <ChevronDown className="h-4 w-4 shrink-0 text-[#8a887f]" />
+                  <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
                 </button>
               )}
               {!isAdminVisible && !showProfessionalView && !isExpensePage && !isAnalyse && activeTab === 'dashboard' && (
                 <div className="mx-auto flex h-9 max-w-[170px] min-w-0 items-center gap-2 px-1 sm:max-w-[190px]">
-                  <span className="truncate text-sm font-semibold text-[#2f2f2d]">
+                  <span className="truncate text-sm font-semibold text-foreground">
                     {dashboardFamilyLabel ?? 'Familie'}
                   </span>
                 </div>
@@ -785,17 +785,17 @@ export function TopBar() {
               {!isAdminVisible && !showProfessionalView && currentChild && !isExpensePage && !isAnalyse && activeTab !== 'dashboard' && (
                 <button
                   onClick={() => setChildSelectorOpen(true)}
-                  className="mx-auto flex h-9 max-w-[170px] min-w-0 items-center gap-2 px-1 text-[#343430] transition-colors hover:text-[#1a1a1a] sm:max-w-[190px]"
+                  className="mx-auto flex h-9 max-w-[170px] min-w-0 items-center gap-2 px-1 text-foreground transition-colors hover:text-foreground sm:max-w-[190px]"
                   aria-label={`Valgt barn: ${currentChild.name}. Klik for at skifte`}
                 >
                   <Avatar className="h-6 w-6 shrink-0">
                     <AvatarImage src={currentChild.avatar} />
-                    <AvatarFallback className="bg-[#ecebe6] text-xs text-[#4d4c47]">
+                    <AvatarFallback className="bg-secondary text-xs text-foreground">
                       {currentChild.name[0]}
                     </AvatarFallback>
                   </Avatar>
                   <span className="truncate text-sm font-medium">{currentChild.name}</span>
-                  <ChevronDown className="h-4 w-4 shrink-0 text-[#8a887f]" aria-hidden="true" />
+                  <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
                 </button>
               )}
 
@@ -810,7 +810,7 @@ export function TopBar() {
                 </button>
               )}
               {showProfessionalView && allowProfessionalTools && (
-                <Badge variant="outline" className="h-8 border-[#d8d7cf] bg-[#f8f7f3] px-3 text-[#41403c]">
+                <Badge variant="outline" className="h-8 border-border bg-card px-3 text-foreground">
                   <Briefcase className="mr-1 h-3.5 w-3.5" aria-hidden="true" />
                   Sagsbehandler
                 </Badge>
@@ -823,14 +823,14 @@ export function TopBar() {
                 <>
                   <button
                     onClick={() => setMadAction('open-recipes')}
-                    className="flex h-9 w-9 items-center justify-center text-[#4a4944] transition-colors"
+                    className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
                     aria-label="Opskrifter"
                   >
                     <BookOpen className="h-5 w-5" aria-hidden="true" />
                   </button>
                   <button
                     onClick={() => setMadAction('add-meal')}
-                    className="flex h-9 w-9 items-center justify-center text-[#4a4944] transition-colors"
+                    className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
                     aria-label="Tilføj ret"
                   >
                     <Plus className="h-5 w-5" aria-hidden="true" />
@@ -840,7 +840,7 @@ export function TopBar() {
                 /* ── Opgaver: Tilføj ── */
                 <button
                   onClick={() => setOpgaverAction('add')}
-                  className="flex h-9 w-9 items-center justify-center text-[#4a4944] transition-colors"
+                  className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
                   aria-label="Tilføj"
                 >
                   <Plus className="h-5 w-5" aria-hidden="true" />
@@ -849,7 +849,7 @@ export function TopBar() {
                 /* ── Milepæle: Tilføj ── */
                 <button
                   onClick={() => setMilestonesAction('add')}
-                  className="flex h-9 w-9 items-center justify-center text-[#4a4944] transition-colors"
+                  className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
                   aria-label="Tilføj milepæl"
                 >
                   <Plus className="h-5 w-5" aria-hidden="true" />
@@ -858,7 +858,7 @@ export function TopBar() {
                 /* ── Mødereferater: Tilføj ── */
                 <button
                   onClick={() => setMeetingAction('add')}
-                  className="flex h-9 w-9 items-center justify-center text-[#4a4944] transition-colors"
+                  className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
                   aria-label="Nyt referat"
                 >
                   <Plus className="h-5 w-5" aria-hidden="true" />
@@ -868,14 +868,14 @@ export function TopBar() {
                 <>
                   <button
                     onClick={() => setMadAction('generate-shopping')}
-                    className="flex h-9 w-9 items-center justify-center text-[#4a4944] transition-colors"
+                    className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
                     aria-label="Generer fra madplan"
                   >
                     <UtensilsCrossed className="h-5 w-5" aria-hidden="true" />
                   </button>
                   <button
                     onClick={() => setMadAction('from-meal-plan')}
-                    className="flex h-9 w-9 items-center justify-center text-[#4a4944] transition-colors"
+                    className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
                     aria-label="Tilføj vare"
                   >
                     <Plus className="h-5 w-5" aria-hidden="true" />
@@ -885,7 +885,7 @@ export function TopBar() {
                 /* ── Uge-skabeloner: Opret ny ── */
                 <button
                   onClick={() => setMadAction('templates-add')}
-                  className="flex h-9 w-9 items-center justify-center text-[#4a4944] transition-colors"
+                  className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
                   aria-label="Opret uge-skabelon"
                 >
                   <Plus className="h-5 w-5" aria-hidden="true" />
@@ -894,7 +894,7 @@ export function TopBar() {
                 /* ── Hurtige valg: Tilføj ── */
                 <button
                   onClick={() => setMadAction('quick-setup-add')}
-                  className="flex h-9 w-9 items-center justify-center text-[#4a4944] transition-colors"
+                  className="flex h-9 w-9 items-center justify-center text-foreground transition-colors"
                   aria-label="Tilføj hurtig tilvalg"
                 >
                   <Plus className="h-5 w-5" aria-hidden="true" />
@@ -913,14 +913,14 @@ export function TopBar() {
                 <>
                   <button
                     onClick={() => setAdminRefresh(true)}
-                    className="flex h-9 w-9 items-center justify-center text-[#4a4944] transition-colors hover:text-[#1a1a1a]"
+                    className="flex h-9 w-9 items-center justify-center text-foreground transition-colors hover:text-foreground"
                     aria-label="Opdater brugere"
                   >
                     <Clock className="h-5 w-5" aria-hidden="true" />
                   </button>
                   <button
                     onClick={() => setAdminCreateOpen(true)}
-                    className="flex h-9 w-9 items-center justify-center text-[#4a4944] transition-colors hover:text-[#1a1a1a]"
+                    className="flex h-9 w-9 items-center justify-center text-foreground transition-colors hover:text-foreground"
                     aria-label="Opret bruger"
                   >
                     <UserPlus className="h-5 w-5" aria-hidden="true" />
@@ -932,7 +932,7 @@ export function TopBar() {
                   {!isExpensePage && (
                     <button
                       onClick={() => setActiveTab('notifikationer')}
-                      className="relative flex items-center justify-center text-[#4a4944] transition-colors hover:text-[#1a1a1a]"
+                      className="relative flex items-center justify-center text-foreground transition-colors hover:text-foreground"
                       aria-label={unreadNotifications > 0 ? `${unreadNotifications} ulæste notifikationer` : 'Notifikationer'}
                     >
                       <Bell className="h-5 w-5" aria-hidden="true" />
@@ -969,8 +969,8 @@ export function TopBar() {
 
       {/* Avatar bottom sheet — always available */}
       <Sheet open={avatarSheetOpen} onOpenChange={setAvatarSheetOpen}>
-        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
-          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-border bg-background shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-muted shrink-0" />
           <SheetHeader className="pb-0 px-4 shrink-0">
             <SheetTitle className="sr-only">Brugermenu</SheetTitle>
             <div className="flex items-center gap-3 py-2">
@@ -987,11 +987,11 @@ export function TopBar() {
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0">
-                <p className="font-semibold text-[#2f2f2d] truncate">{currentUser?.name}</p>
-                <p className="text-xs text-[#78766d] truncate">{currentUser?.email}</p>
-                <p className="text-xs text-[#6e6a61]">{modeLabel} · {billingLabel}</p>
+                <p className="font-semibold text-foreground truncate">{currentUser?.name}</p>
+                <p className="text-xs text-muted-foreground truncate">{currentUser?.email}</p>
+                <p className="text-xs text-muted-foreground">{modeLabel} · {billingLabel}</p>
                 {currentUser?.role === 'professional' && (
-                  <p className="text-xs text-[#6e6a61]">{currentUser.organization}</p>
+                  <p className="text-xs text-muted-foreground">{currentUser.organization}</p>
                 )}
               </div>
             </div>
@@ -1000,12 +1000,12 @@ export function TopBar() {
             {allowProfessionalTools && (
               <button
                 onClick={() => { setProfessionalView(!isProfessionalView); setAvatarSheetOpen(false); }}
-                className="flex flex-col items-center gap-2 rounded-[8px] py-4 text-[#3f3e3a] hover:bg-[#f2f1ec] transition-colors"
+                className="flex flex-col items-center gap-2 rounded-[8px] py-4 text-foreground hover:bg-background transition-colors"
               >
                 {isProfessionalView ? (
-                  <User className="h-6 w-6 text-[#5f5d56]" aria-hidden="true" />
+                  <User className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
                 ) : (
-                  <Briefcase className="h-6 w-6 text-[#5f5d56]" aria-hidden="true" />
+                  <Briefcase className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
                 )}
                 <span className="text-[12px] font-semibold tracking-[-0.01em]">
                   {isProfessionalView ? 'Forældrevisning' : 'Professionel'}
@@ -1014,14 +1014,14 @@ export function TopBar() {
             )}
             <button
               onClick={() => { setActiveTab('settings'); setAvatarSheetOpen(false); }}
-              className="flex flex-col items-center gap-2 rounded-[8px] py-4 text-[#3f3e3a] hover:bg-[#f2f1ec] transition-colors"
+              className="flex flex-col items-center gap-2 rounded-[8px] py-4 text-foreground hover:bg-background transition-colors"
             >
-              <Settings className="h-6 w-6 text-[#5f5d56]" aria-hidden="true" />
+              <Settings className="h-6 w-6 text-muted-foreground" aria-hidden="true" />
               <span className="text-[12px] font-semibold tracking-[-0.01em]">Indstillinger</span>
             </button>
             <button
               onClick={() => { logoutUser(); logout(); }}
-              className="flex flex-col items-center gap-2 rounded-[8px] py-4 text-[#b56522] hover:bg-[#fef2e6] transition-colors"
+              className="flex flex-col items-center gap-2 rounded-[8px] py-4 text-[#b56522] hover:bg-orange-tint transition-colors"
             >
               <LogOut className="h-6 w-6" aria-hidden="true" />
               <span className="text-[12px] font-semibold tracking-[-0.01em]">Log ud</span>
@@ -1032,21 +1032,21 @@ export function TopBar() {
 
       {/* Child selector bottom sheet */}
       <Sheet open={childSelectorOpen} onOpenChange={setChildSelectorOpen}>
-        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
-          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-border bg-background shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-muted shrink-0" />
           <SheetHeader className="pb-0 px-4 shrink-0">
-            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Vælg barn</SheetTitle>
+            <SheetTitle className="text-center text-[1.05rem] text-foreground">Vælg barn</SheetTitle>
           </SheetHeader>
           <div className="flex flex-col gap-1 px-4 py-3 pb-[calc(env(safe-area-inset-bottom,0px)+24px)]">
             {children.map(child => (
               <button
                 key={child.id}
                 onClick={() => setChildSelectorOpen(false)}
-                className="flex items-center gap-3 rounded-[8px] px-3 py-3 text-left text-[#3f3e3a] hover:bg-[#f2f1ec] transition-colors"
+                className="flex items-center gap-3 rounded-[8px] px-3 py-3 text-left text-foreground hover:bg-background transition-colors"
               >
                 <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
                   <AvatarImage src={child.avatar} />
-                  <AvatarFallback className="bg-[#ecebe6] text-sm text-[#4d4c47]">
+                  <AvatarFallback className="bg-secondary text-sm text-foreground">
                     {child.name[0]}
                   </AvatarFallback>
                 </Avatar>
@@ -1059,17 +1059,17 @@ export function TopBar() {
 
       {/* Expense filter selector bottom sheet */}
       <Sheet open={expenseFilterSelectorOpen} onOpenChange={setExpenseFilterSelectorOpen}>
-        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
-          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-border bg-background shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-muted shrink-0" />
           <SheetHeader className="pb-0 px-4 shrink-0">
-            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Filtrer udgifter</SheetTitle>
+            <SheetTitle className="text-center text-[1.05rem] text-foreground">Filtrer udgifter</SheetTitle>
           </SheetHeader>
           <div className="flex flex-col gap-1 px-4 py-3 pb-[calc(env(safe-area-inset-bottom,0px)+24px)]">
             {Object.entries(expenseFilterLabels).map(([key, label]) => (
               <button
                 key={key}
                 onClick={() => { setExpenseFilter(key); setExpenseFilterSelectorOpen(false); }}
-                className="flex items-center gap-3 rounded-[8px] px-3 py-3 text-left text-[#3f3e3a] hover:bg-[#f2f1ec] transition-colors"
+                className="flex items-center gap-3 rounded-[8px] px-3 py-3 text-left text-foreground hover:bg-background transition-colors"
               >
                 <span className="text-[14px] font-semibold">{label}</span>
                 {expenseFilter === key && (
@@ -1083,15 +1083,15 @@ export function TopBar() {
 
       {/* Wish person selector bottom sheet */}
       <Sheet open={wishPersonSelectorOpen} onOpenChange={setWishPersonSelectorOpen}>
-        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
-          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-border bg-background shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-muted shrink-0" />
           <SheetHeader className="pb-0 px-4 shrink-0">
-            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Filtrer person</SheetTitle>
+            <SheetTitle className="text-center text-[1.05rem] text-foreground">Filtrer person</SheetTitle>
           </SheetHeader>
           <div className="flex flex-col gap-1 px-4 py-3 pb-[calc(env(safe-area-inset-bottom,0px)+24px)]">
             <button
               onClick={() => { setWishPersonFilter('all'); setWishPersonSelectorOpen(false); }}
-              className="flex items-center gap-3 rounded-[8px] px-3 py-3 text-left text-[#3f3e3a] hover:bg-[#f2f1ec] transition-colors"
+              className="flex items-center gap-3 rounded-[8px] px-3 py-3 text-left text-foreground hover:bg-background transition-colors"
             >
               <span className="text-[14px] font-semibold">Alle personer</span>
               {wishPersonFilter === 'all' && (
@@ -1102,7 +1102,7 @@ export function TopBar() {
               <button
                 key={u.id}
                 onClick={() => { setWishPersonFilter(u.id); setWishPersonSelectorOpen(false); }}
-                className="flex items-center gap-3 rounded-[8px] px-3 py-3 text-left text-[#3f3e3a] hover:bg-[#f2f1ec] transition-colors"
+                className="flex items-center gap-3 rounded-[8px] px-3 py-3 text-left text-foreground hover:bg-background transition-colors"
               >
                 <span className="text-[14px] font-semibold">{u.name}</span>
                 {wishPersonFilter === u.id && (
@@ -1116,17 +1116,17 @@ export function TopBar() {
 
       {/* Analyse person selector bottom sheet */}
       <Sheet open={analysePersonSelectorOpen} onOpenChange={setAnalysePersonSelectorOpen}>
-        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
-          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-border bg-background shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-muted shrink-0" />
           <SheetHeader className="pb-0 px-4 shrink-0">
-            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Filtrer person</SheetTitle>
+            <SheetTitle className="text-center text-[1.05rem] text-foreground">Filtrer person</SheetTitle>
           </SheetHeader>
           <div className="flex flex-col gap-1 px-4 py-3 pb-[calc(env(safe-area-inset-bottom,0px)+24px)]">
             {analyseFamilyMembers.map(m => (
               <button
                 key={m.id ?? 'alle'}
                 onClick={() => { setAnalysePersonId(m.id); setAnalysePersonSelectorOpen(false); }}
-                className="flex items-center gap-3 rounded-[8px] px-3 py-3 text-left text-[#3f3e3a] hover:bg-[#f2f1ec] transition-colors"
+                className="flex items-center gap-3 rounded-[8px] px-3 py-3 text-left text-foreground hover:bg-background transition-colors"
               >
                 <span className="text-[14px] font-semibold">{m.name}</span>
                 {analysePersonId === m.id && (
@@ -1140,22 +1140,22 @@ export function TopBar() {
 
       {/* Thread switcher bottom sheet */}
       <Sheet open={threadSwitcherOpen} onOpenChange={setThreadSwitcherOpen}>
-        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
-          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-border bg-background shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-muted shrink-0" />
           <SheetHeader className="pb-0 px-4 shrink-0">
-            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Skift samtale</SheetTitle>
+            <SheetTitle className="text-center text-[1.05rem] text-foreground">Skift samtale</SheetTitle>
           </SheetHeader>
           <div className="flex flex-col gap-1 px-4 py-3 pb-[calc(env(safe-area-inset-bottom,0px)+24px)]">
             {visibleThreads.map(thread => (
               <button
                 key={thread.id}
                 onClick={() => { setKommunikationThreadId(thread.id); setThreadSwitcherOpen(false); }}
-                className="flex items-center gap-3 rounded-xl px-3 py-3 text-left hover:bg-[#f2f1ec] transition-colors"
+                className="flex items-center gap-3 rounded-xl px-3 py-3 text-left hover:bg-background transition-colors"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#fff2e6]">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-orange-tint">
                   <span className="text-lg font-bold text-[#bf6722]">{thread.title[0]}</span>
                 </div>
-                <span className="flex-1 truncate text-[14px] font-semibold text-[#2f2f2d]">{thread.title}</span>
+                <span className="flex-1 truncate text-[14px] font-semibold text-foreground">{thread.title}</span>
                 {thread.id === kommunikationThreadId && (
                   <span className="text-xs font-semibold text-[#f58a2d]">Aktiv</span>
                 )}
@@ -1167,17 +1167,17 @@ export function TopBar() {
 
       {/* Budget period selector bottom sheet */}
       <Sheet open={budgetPeriodSelectorOpen} onOpenChange={setBudgetPeriodSelectorOpen}>
-        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
-          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-border bg-background shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-muted shrink-0" />
           <SheetHeader className="pb-0 px-4 shrink-0">
-            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Vælg periode</SheetTitle>
+            <SheetTitle className="text-center text-[1.05rem] text-foreground">Vælg periode</SheetTitle>
           </SheetHeader>
           <div className="flex flex-col gap-1 px-4 py-3 pb-[calc(env(safe-area-inset-bottom,0px)+24px)]">
             {([['monthly', 'Månedlig'], ['yearly', 'Årlig']] as const).map(([value, label]) => (
               <button
                 key={value}
                 onClick={() => { setBudgetPeriod(value); setBudgetPeriodSelectorOpen(false); }}
-                className="flex items-center gap-3 rounded-[8px] px-3 py-3 text-left text-[#3f3e3a] hover:bg-[#f2f1ec] transition-colors"
+                className="flex items-center gap-3 rounded-[8px] px-3 py-3 text-left text-foreground hover:bg-background transition-colors"
               >
                 <span className="text-[14px] font-semibold">{label}</span>
                 {budgetPeriod === value && (
@@ -1191,17 +1191,17 @@ export function TopBar() {
 
       {/* Wish cover image bottom sheet */}
       <Sheet open={wishCoverSheetOpen} onOpenChange={setWishCoverSheetOpen}>
-        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
-          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-border bg-background shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-muted shrink-0" />
           <SheetHeader className="pb-0 px-4 shrink-0">
-            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Coverbillede</SheetTitle>
+            <SheetTitle className="text-center text-[1.05rem] text-foreground">Coverbillede</SheetTitle>
           </SheetHeader>
           <div className="flex flex-col gap-1 px-4 py-3 pb-[calc(env(safe-area-inset-bottom,0px)+24px)]">
             <button
               onClick={() => { setWishCoverImageOpen(true); setWishCoverSheetOpen(false); }}
-              className="flex items-center gap-3 rounded-[8px] px-3 py-3 text-left text-[#3f3e3a] hover:bg-[#f2f1ec] transition-colors"
+              className="flex items-center gap-3 rounded-[8px] px-3 py-3 text-left text-foreground hover:bg-background transition-colors"
             >
-              <Camera className="h-5 w-5 text-[#78766d]" />
+              <Camera className="h-5 w-5 text-muted-foreground" />
               <span className="text-[14px] font-semibold">Vælg nyt billede</span>
             </button>
             {wishCoverImage && (
@@ -1218,17 +1218,17 @@ export function TopBar() {
 
       {/* Admin category filter bottom sheet */}
       <Sheet open={adminCategorySelectorOpen} onOpenChange={setAdminCategorySelectorOpen}>
-        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
-          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-border bg-background shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-muted shrink-0" />
           <SheetHeader className="pb-0 px-4 shrink-0">
-            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Filtrer brugere</SheetTitle>
+            <SheetTitle className="text-center text-[1.05rem] text-foreground">Filtrer brugere</SheetTitle>
           </SheetHeader>
           <div className="flex flex-col gap-1 px-4 py-3 pb-[calc(env(safe-area-inset-bottom,0px)+24px)]">
             {Object.entries(adminCategoryLabels).map(([key, label]) => (
               <button
                 key={key}
                 onClick={() => { setAdminCategoryFilter(key); setAdminCategorySelectorOpen(false); }}
-                className="flex items-center gap-3 rounded-[8px] px-3 py-3 text-left text-[#3f3e3a] hover:bg-[#f2f1ec] transition-colors"
+                className="flex items-center gap-3 rounded-[8px] px-3 py-3 text-left text-foreground hover:bg-background transition-colors"
               >
                 <span className="text-[14px] font-semibold">{label}</span>
                 {adminCategoryFilter === key && (
@@ -1242,17 +1242,17 @@ export function TopBar() {
 
       {/* Analytics period selector bottom sheet */}
       <Sheet open={analyticsPeriodSelectorOpen} onOpenChange={setAnalyticsPeriodSelectorOpen}>
-        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
-          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-border bg-background shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-muted shrink-0" />
           <SheetHeader className="pb-0 px-4 shrink-0">
-            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Vælg periode</SheetTitle>
+            <SheetTitle className="text-center text-[1.05rem] text-foreground">Vælg periode</SheetTitle>
           </SheetHeader>
           <div className="flex flex-col gap-1 px-4 py-3 pb-[calc(env(safe-area-inset-bottom,0px)+24px)]">
             {([['today', 'I dag'], ['week', 'Uge'], ['month', 'Måned'], ['all', 'Alt']] as const).map(([value, label]) => (
               <button
                 key={value}
                 onClick={() => { setAnalyticsPeriod(value); setAnalyticsPeriodSelectorOpen(false); }}
-                className="flex items-center gap-3 rounded-[8px] px-3 py-3 text-left text-[#3f3e3a] hover:bg-[#f2f1ec] transition-colors"
+                className="flex items-center gap-3 rounded-[8px] px-3 py-3 text-left text-foreground hover:bg-background transition-colors"
               >
                 <span className="text-[14px] font-semibold">{label}</span>
                 {analyticsPeriod === value && (
@@ -1266,17 +1266,17 @@ export function TopBar() {
 
       {/* Tilbudsadmin tab selector bottom sheet */}
       <Sheet open={tilbudAdminTabSelectorOpen} onOpenChange={setTilbudAdminTabSelectorOpen}>
-        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
-          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+        <SheetContent side="bottom" hideClose className="flex max-h-[90vh] flex-col rounded-t-[28px] border-border bg-background shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-muted shrink-0" />
           <SheetHeader className="pb-0 px-4 shrink-0">
-            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Vælg fane</SheetTitle>
+            <SheetTitle className="text-center text-[1.05rem] text-foreground">Vælg fane</SheetTitle>
           </SheetHeader>
           <div className="flex flex-col gap-1 px-4 py-3 pb-[calc(env(safe-area-inset-bottom,0px)+24px)]">
             {([['affiliates', 'Affiliate-links'], ['pdf-import', 'Tilbudsaviser']] as const).map(([value, label]) => (
               <button
                 key={value}
                 onClick={() => { setTilbudAdminTab(value); setTilbudAdminTabSelectorOpen(false); }}
-                className="flex items-center gap-3 rounded-[8px] px-3 py-3 text-left text-[#3f3e3a] hover:bg-[#f2f1ec] transition-colors"
+                className="flex items-center gap-3 rounded-[8px] px-3 py-3 text-left text-foreground hover:bg-background transition-colors"
               >
                 <span className="text-[14px] font-semibold">{label}</span>
                 {tilbudAdminTab === value && (

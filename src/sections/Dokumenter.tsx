@@ -171,7 +171,7 @@ export function Dokumenter() {
         <div className="space-y-3">
           {/* File picker */}
           <div className="space-y-1.5">
-            <Label className="text-[12px] font-semibold text-[#78766d]">Fil</Label>
+            <Label className="text-[12px] font-semibold text-muted-foreground">Fil</Label>
             <input
               ref={fileRef}
               type="file"
@@ -181,16 +181,16 @@ export function Dokumenter() {
             />
             <button
               onClick={() => fileRef.current?.click()}
-              className="flex w-full items-center gap-3 rounded-[8px] border border-dashed border-[#d8d7cf] bg-white px-4 py-3 text-left active:bg-[#f0efe8]"
+              className="flex w-full items-center gap-3 rounded-[8px] border border-dashed border-border bg-card px-4 py-3 text-left active:bg-muted"
             >
-              <Upload className="h-5 w-5 text-[#9b9a93]" />
+              <Upload className="h-5 w-5 text-muted-foreground" />
               <div className="flex-1">
                 {uploadedFileName ? (
-                  <p className="text-[13px] font-medium text-[#2f2f2d]">{uploadedFileName}</p>
+                  <p className="text-[13px] font-medium text-foreground">{uploadedFileName}</p>
                 ) : (
                   <>
-                    <p className="text-[13px] text-[#78766d]">Vælg fil</p>
-                    <p className="text-[11px] text-[#9b9a93]">PDF, JPG, PNG, DOC (maks 10 MB)</p>
+                    <p className="text-[13px] text-muted-foreground">Vælg fil</p>
+                    <p className="text-[11px] text-muted-foreground">PDF, JPG, PNG, DOC (maks 10 MB)</p>
                   </>
                 )}
               </div>
@@ -198,17 +198,17 @@ export function Dokumenter() {
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-[12px] font-semibold text-[#78766d]">Titel</Label>
+            <Label className="text-[12px] font-semibold text-muted-foreground">Titel</Label>
             <Input
               value={newDoc.title}
               onChange={(e) => setNewDoc((prev) => ({ ...prev, title: e.target.value }))}
               placeholder="f.eks. Samværsaftale 2025"
-              className="rounded-[8px] border-[#e5e3dc] bg-white"
+              className="rounded-[8px] border-border bg-card"
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-[12px] font-semibold text-[#78766d]">Type</Label>
+            <Label className="text-[12px] font-semibold text-muted-foreground">Type</Label>
             <SelectSheet
               value={newDoc.type}
               onValueChange={(v) => setNewDoc((prev) => ({ ...prev, type: v as Document['type'] }))}
@@ -222,20 +222,20 @@ export function Dokumenter() {
                 { value: 'contract', label: 'Kontrakt' },
                 { value: 'other', label: 'Andet' },
               ]}
-              className="rounded-[8px] border-[#e5e3dc] bg-white"
+              className="rounded-[8px] border-border bg-card"
             />
           </div>
 
           {children.length > 0 && (
             <div className="space-y-1.5">
-              <Label className="text-[12px] font-semibold text-[#78766d]">Barn (valgfri)</Label>
+              <Label className="text-[12px] font-semibold text-muted-foreground">Barn (valgfri)</Label>
               <SelectSheet
                 value={newDoc.childId}
                 onValueChange={(v) => setNewDoc((prev) => ({ ...prev, childId: v }))}
                 title="Barn"
                 placeholder="Valgfrit"
                 options={[{ value: 'none', label: 'Ingen' }, ...children.map((c) => ({ value: c.id, label: c.name }))]}
-                className="rounded-[8px] border-[#e5e3dc] bg-white"
+                className="rounded-[8px] border-border bg-card"
               />
             </div>
           )}
@@ -260,18 +260,18 @@ export function Dokumenter() {
       {/* Search + Info icon */}
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9b9a93]" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={docSection === 'official' ? 'Søg i blanketter...' : 'Søg i dokumenter...'}
-            className="rounded-[8px] border-[#d8d7cf] bg-white pl-10"
+            className="rounded-[8px] border-border bg-card pl-10"
           />
         </div>
         {docSection === 'official' && (
           <button
             onClick={() => setInfoOpen(true)}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] border border-[#d8d7cf] bg-white text-[#78766d] transition-colors active:bg-[#f0efe8]"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] border border-border bg-card text-muted-foreground transition-colors active:bg-muted"
             aria-label="Info"
           >
             <Info className="h-4.5 w-4.5" />
@@ -288,7 +288,7 @@ export function Dokumenter() {
               Officielle Familieretshuset blanketter
             </DialogTitle>
           </DialogHeader>
-          <p className="text-[13px] leading-relaxed text-[#5f5d56]">
+          <p className="text-[13px] leading-relaxed text-muted-foreground">
             Disse blanketter bruges i forbindelse med sager om samvær, bopæl, forældremyndighed og mægling.
             Tryk på en blanket for at se detaljer.
           </p>
@@ -305,8 +305,8 @@ export function Dokumenter() {
               className={cn(
                 'shrink-0 rounded-full border px-3 py-1.5 text-[11px] font-medium whitespace-nowrap',
                 categoryFilter === 'all'
-                  ? 'border-[#2f2f2d] bg-[#2f2f2d] text-white'
-                  : 'border-[#d8d7cf] bg-white text-[#5f5d56]'
+                  ? 'border-primary bg-primary text-white'
+                  : 'border-border bg-card text-muted-foreground'
               )}
             >
               Alle
@@ -318,8 +318,8 @@ export function Dokumenter() {
                 className={cn(
                   'shrink-0 rounded-full border px-3 py-1.5 text-[11px] font-medium whitespace-nowrap',
                   categoryFilter === key
-                    ? 'border-[#2f2f2d] bg-[#2f2f2d] text-white'
-                    : 'border-[#d8d7cf] bg-white text-[#5f5d56]'
+                    ? 'border-primary bg-primary text-white'
+                    : 'border-border bg-card text-muted-foreground'
                 )}
               >
                 {label}
@@ -329,9 +329,9 @@ export function Dokumenter() {
 
           {/* Template list */}
           {filteredTemplates.length === 0 ? (
-            <div className="rounded-[8px] border border-dashed border-[#d8d7cf] bg-[#faf9f6] py-8 text-center">
-              <FileText className="mx-auto h-8 w-8 text-[#c8c6bc]" />
-              <p className="mt-2 text-[13px] text-[#78766d]">Ingen blanketter matcher din søgning</p>
+            <div className="rounded-[8px] border border-dashed border-border bg-card py-8 text-center">
+              <FileText className="mx-auto h-8 w-8 text-muted-foreground" />
+              <p className="mt-2 text-[13px] text-muted-foreground">Ingen blanketter matcher din søgning</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -341,18 +341,18 @@ export function Dokumenter() {
                   <button
                     key={template.id}
                     onClick={() => setSelectedTemplate(template)}
-                    className="flex w-full items-center gap-3 rounded-[8px] border border-[#e8e7e0] bg-white px-4 py-3.5 text-left transition-colors hover:bg-[#faf9f6]"
+                    className="flex w-full items-center gap-3 rounded-[8px] border border-border bg-card px-4 py-3.5 text-left transition-colors hover:bg-card"
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-[#f0f7ff] text-[#2563eb]">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-blue-tint text-[#2563eb]">
                       <CategoryIcon className="h-5 w-5" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-semibold text-[#2f2f2d] leading-tight">{template.title}</p>
-                      <p className="mt-0.5 text-[11px] text-[#78766d]">
+                      <p className="text-[13px] font-semibold text-foreground leading-tight">{template.title}</p>
+                      <p className="mt-0.5 text-[11px] text-muted-foreground">
                         {familieretshusetKategorier[template.category]} · {template.pages} sider
                       </p>
                     </div>
-                    <ChevronRight className="h-4 w-4 shrink-0 text-[#c8c6bc]" />
+                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
                   </button>
                 );
               })}
@@ -361,10 +361,10 @@ export function Dokumenter() {
 
           {/* Template detail sheet */}
           <Sheet open={!!selectedTemplate} onOpenChange={(open) => { if (!open) setSelectedTemplate(null); }}>
-            <SheetContent side="bottom" hideClose className="max-h-[80vh] overflow-y-auto rounded-t-3xl border-[#d8d7cf] bg-[#faf9f6] px-4 pb-8 pt-4">
-              <div data-drag-handle className="mx-auto mb-3 h-1 w-10 rounded-full bg-[#d8d7cf]" />
+            <SheetContent side="bottom" hideClose className="max-h-[80vh] overflow-y-auto rounded-t-3xl border-border bg-card px-4 pb-8 pt-4">
+              <div data-drag-handle className="mx-auto mb-3 h-1 w-10 rounded-full bg-border" />
               <SheetHeader className="pb-2">
-                <SheetTitle className="text-center text-lg font-bold text-[#2f2f2d]">
+                <SheetTitle className="text-center text-lg font-bold text-foreground">
                   {selectedTemplate?.title}
                 </SheetTitle>
               </SheetHeader>
@@ -373,30 +373,30 @@ export function Dokumenter() {
                 return (
                   <div className="space-y-2 pt-1">
                     <div className="flex items-center gap-2">
-                      <Badge className="bg-[#f0f7ff] text-[#2563eb]">
+                      <Badge className="bg-blue-tint text-[#2563eb]">
                         <CategoryIcon className="mr-1 h-3 w-3" />
                         {familieretshusetKategorier[selectedTemplate.category]}
                       </Badge>
-                      <Badge variant="outline" className="border-[#d8d7cf] text-[#5f5d56]">
+                      <Badge variant="outline" className="border-border text-muted-foreground">
                         {selectedTemplate.pages} sider
                       </Badge>
-                      <Badge variant="outline" className="border-[#d8d7cf] text-[#5f5d56]">
+                      <Badge variant="outline" className="border-border text-muted-foreground">
                         PDF
                       </Badge>
                     </div>
 
-                    <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-4">
-                      <p className="text-[13px] leading-relaxed text-[#4a4945]">
+                    <div className="rounded-[8px] border border-border bg-card p-4">
+                      <p className="text-[13px] leading-relaxed text-foreground">
                         {selectedTemplate.description}
                       </p>
                     </div>
 
-                    <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-4">
-                      <p className="text-[12px] font-semibold text-[#78766d] uppercase tracking-[0.05em]">Filnavn</p>
-                      <p className="mt-1 text-[13px] text-[#2f2f2d]">{selectedTemplate.filename}</p>
+                    <div className="rounded-[8px] border border-border bg-card p-4">
+                      <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-[0.05em]">Filnavn</p>
+                      <p className="mt-1 text-[13px] text-foreground">{selectedTemplate.filename}</p>
                     </div>
 
-                    <div className="rounded-[8px] border border-[#d1e5f7] bg-[#f0f7ff] p-4">
+                    <div className="rounded-[8px] border border-[#d1e5f7] bg-blue-tint p-4">
                       <p className="text-[12px] font-semibold text-[#1e40af]">Sådan bruger du blanketten</p>
                       <ol className="mt-2 space-y-1.5 text-[12px] text-[#3b7dd8]">
                         <li className="flex items-start gap-2">
@@ -449,17 +449,17 @@ export function Dokumenter() {
       {docSection === 'family' && (
         <>
           {filteredFamilyDocs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-3 rounded-[8px] border border-dashed border-[#d8d7cf] bg-[#faf9f6] py-12 text-center">
-              <FolderOpen className="h-10 w-10 text-[#c8c6bc]" />
+            <div className="flex flex-col items-center justify-center gap-3 rounded-[8px] border border-dashed border-border bg-card py-12 text-center">
+              <FolderOpen className="h-10 w-10 text-muted-foreground" />
               <div>
-                <p className="text-[13px] font-semibold text-[#3f3e3a]">Ingen dokumenter endnu</p>
-                <p className="mt-1 text-[11px] text-[#78766d]">
+                <p className="text-[13px] font-semibold text-foreground">Ingen dokumenter endnu</p>
+                <p className="mt-1 text-[11px] text-muted-foreground">
                   Upload underskrevne aftaler og vigtige dokumenter her
                 </p>
               </div>
               <Button
                 variant="outline"
-                className="mt-1 rounded-[8px] border-[#d8d7cf] text-sm"
+                className="mt-1 rounded-[8px] border-border text-sm"
                 onClick={() => setDocFormMode('upload')}
               >
                 <Plus className="mr-1.5 h-4 w-4" />
@@ -474,24 +474,24 @@ export function Dokumenter() {
                   <button
                     key={doc.id}
                     onClick={() => setSelectedDocument(doc)}
-                    className="flex w-full items-center gap-3 rounded-[8px] border border-[#e8e7e0] bg-white px-4 py-3.5 text-left transition-colors hover:bg-[#faf9f6]"
+                    className="flex w-full items-center gap-3 rounded-[8px] border border-border bg-card px-4 py-3.5 text-left transition-colors hover:bg-card"
                   >
                     <div className={cn(
                       'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl',
-                      doc.isOfficial ? 'bg-[#f0f7ff] text-[#2563eb]' : 'bg-[#fff2e6] text-[#f58a2d]'
+                      doc.isOfficial ? 'bg-blue-tint text-[#2563eb]' : 'bg-orange-tint text-[#f58a2d]'
                     )}>
                       <FileText className="h-5 w-5" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="truncate text-[13px] font-semibold text-[#2f2f2d]">{doc.title}</p>
-                      <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-[#78766d]">
+                      <p className="truncate text-[13px] font-semibold text-foreground">{doc.title}</p>
+                      <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">
                         <span>{documentTypeLabels[doc.type] || doc.type}</span>
-                        {child && <><span className="text-[#d0cec5]">·</span><span>{child.name}</span></>}
-                        <span className="text-[#d0cec5]">·</span>
+                        {child && <><span className="text-muted-foreground">·</span><span>{child.name}</span></>}
+                        <span className="text-muted-foreground">·</span>
                         <span>{format(parseISO(doc.uploadedAt), 'd. MMM yyyy', { locale: da })}</span>
                       </div>
                     </div>
-                    <ChevronRight className="h-4 w-4 shrink-0 text-[#c8c6bc]" />
+                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
                   </button>
                 );
               })}
@@ -500,58 +500,58 @@ export function Dokumenter() {
 
           {/* Family document detail sheet */}
           <Sheet open={!!selectedDocument} onOpenChange={(open) => { if (!open) setSelectedDocument(null); }}>
-            <SheetContent side="bottom" hideClose className="max-h-[70vh] overflow-y-auto rounded-t-3xl border-[#d8d7cf] bg-[#faf9f6] px-4 pb-8 pt-4">
-              <div data-drag-handle className="mx-auto mb-3 h-1 w-10 rounded-full bg-[#d8d7cf]" />
+            <SheetContent side="bottom" hideClose className="max-h-[70vh] overflow-y-auto rounded-t-3xl border-border bg-card px-4 pb-8 pt-4">
+              <div data-drag-handle className="mx-auto mb-3 h-1 w-10 rounded-full bg-border" />
               <SheetHeader className="pb-2">
-                <SheetTitle className="text-center text-lg font-bold text-[#2f2f2d]">
+                <SheetTitle className="text-center text-lg font-bold text-foreground">
                   {selectedDocument?.title}
                 </SheetTitle>
               </SheetHeader>
               {selectedDocument && (
                 <div className="space-y-2 pt-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant="outline" className="border-[#d8d7cf] text-[#5f5d56]">
+                    <Badge variant="outline" className="border-border text-muted-foreground">
                       {documentTypeLabels[selectedDocument.type] || selectedDocument.type}
                     </Badge>
                     {selectedDocument.isOfficial && (
-                      <Badge className="bg-[#f0f7ff] text-[#2563eb]">
+                      <Badge className="bg-blue-tint text-[#2563eb]">
                         <Shield className="mr-1 h-3 w-3" />
                         Officielt
                       </Badge>
                     )}
                   </div>
 
-                  <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-4 space-y-2">
+                  <div className="rounded-[8px] border border-border bg-card p-4 space-y-2">
                     <div className="flex justify-between text-[12px]">
-                      <span className="text-[#78766d]">Uploadet af</span>
-                      <span className="font-medium text-[#2f2f2d]">
+                      <span className="text-muted-foreground">Uploadet af</span>
+                      <span className="font-medium text-foreground">
                         {users.find((u) => u.id === selectedDocument.uploadedBy)?.name || 'Ukendt'}
                       </span>
                     </div>
                     <div className="flex justify-between text-[12px]">
-                      <span className="text-[#78766d]">Dato</span>
-                      <span className="font-medium text-[#2f2f2d]">
+                      <span className="text-muted-foreground">Dato</span>
+                      <span className="font-medium text-foreground">
                         {format(parseISO(selectedDocument.uploadedAt), 'd. MMMM yyyy', { locale: da })}
                       </span>
                     </div>
                     {selectedDocument.childId && (
                       <div className="flex justify-between text-[12px]">
-                        <span className="text-[#78766d]">Barn</span>
-                        <span className="font-medium text-[#2f2f2d]">
+                        <span className="text-muted-foreground">Barn</span>
+                        <span className="font-medium text-foreground">
                           {children.find((c) => c.id === selectedDocument.childId)?.name || '-'}
                         </span>
                       </div>
                     )}
                     <div className="flex justify-between text-[12px]">
-                      <span className="text-[#78766d]">Delt med</span>
-                      <span className="font-medium text-[#2f2f2d]">
+                      <span className="text-muted-foreground">Delt med</span>
+                      <span className="font-medium text-foreground">
                         {selectedDocument.sharedWith.length} personer
                       </span>
                     </div>
                     {selectedDocument.validFrom && (
                       <div className="flex justify-between text-[12px]">
-                        <span className="text-[#78766d]">Gyldig fra</span>
-                        <span className="font-medium text-[#2f2f2d]">
+                        <span className="text-muted-foreground">Gyldig fra</span>
+                        <span className="font-medium text-foreground">
                           {format(parseISO(selectedDocument.validFrom), 'd. MMM yyyy', { locale: da })}
                         </span>
                       </div>

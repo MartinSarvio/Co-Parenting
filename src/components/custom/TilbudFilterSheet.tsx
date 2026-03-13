@@ -82,7 +82,7 @@ export function TilbudFilterSheet({ open, onOpenChange, filters, onFiltersChange
 
         {/* Sortering */}
         <div>
-          <p className="text-[12px] font-semibold text-[#9a978f] uppercase tracking-wider mb-2">Sortering</p>
+          <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Sortering</p>
           <div className="flex flex-wrap gap-2">
             {SORT_OPTIONS.map(opt => (
               <button
@@ -91,8 +91,8 @@ export function TilbudFilterSheet({ open, onOpenChange, filters, onFiltersChange
                 className={cn(
                   "px-3.5 py-1.5 rounded-full text-[13px] font-semibold transition-colors",
                   filters.sortBy === opt.key
-                    ? "bg-[#2f2f2f] text-white"
-                    : "bg-[#eceae2] text-[#5f5d56]"
+                    ? "bg-primary text-white"
+                    : "bg-secondary text-muted-foreground"
                 )}
               >
                 {opt.label}
@@ -105,7 +105,7 @@ export function TilbudFilterSheet({ open, onOpenChange, filters, onFiltersChange
         {availableCategories.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[12px] font-semibold text-[#9a978f] uppercase tracking-wider">Kategorier</p>
+              <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider">Kategorier</p>
               {filters.enabledCategories.size > 0 && (
                 <button
                   onClick={() => onFiltersChange({ ...filters, enabledCategories: new Set() })}
@@ -125,8 +125,8 @@ export function TilbudFilterSheet({ open, onOpenChange, filters, onFiltersChange
                     filters.enabledCategories.has(cat)
                       ? "bg-[#f58a2d] text-white"
                       : filters.enabledCategories.size > 0
-                        ? "bg-[#eceae2] text-[#9a978f]"
-                        : "bg-[#eceae2] text-[#5f5d56]"
+                        ? "bg-secondary text-muted-foreground"
+                        : "bg-secondary text-muted-foreground"
                   )}
                 >
                   {cat}
@@ -139,7 +139,7 @@ export function TilbudFilterSheet({ open, onOpenChange, filters, onFiltersChange
         {/* Nutri-Score */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <p className="text-[12px] font-semibold text-[#9a978f] uppercase tracking-wider">Nutri-Score</p>
+            <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider">Nutri-Score</p>
             {filters.nutriScoreFilter.size > 0 && (
               <button
                 onClick={() => onFiltersChange({ ...filters, nutriScoreFilter: new Set() })}
@@ -159,7 +159,7 @@ export function TilbudFilterSheet({ open, onOpenChange, filters, onFiltersChange
                   className={cn(
                     "flex h-9 w-9 items-center justify-center rounded-full text-[14px] font-bold transition-all",
                     filters.nutriScoreFilter.has(grade)
-                      ? "ring-2 ring-offset-2 ring-[#2f2f2f] scale-110"
+                      ? "ring-2 ring-offset-2 ring-primary scale-110"
                       : !active ? "opacity-30" : ""
                   )}
                   style={{ backgroundColor: color, color: grade === 'c' ? '#2f2f2d' : '#fff' }}
@@ -175,7 +175,7 @@ export function TilbudFilterSheet({ open, onOpenChange, filters, onFiltersChange
         {storeId === null && (
           <div>
             <div className="flex items-center justify-between mb-2">
-              <p className="text-[12px] font-semibold text-[#9a978f] uppercase tracking-wider">Butikker</p>
+              <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider">Butikker</p>
               {filters.enabledStores.size > 0 && (
                 <button
                   onClick={() => onFiltersChange({ ...filters, enabledStores: new Set() })}
@@ -202,7 +202,7 @@ export function TilbudFilterSheet({ open, onOpenChange, filters, onFiltersChange
                     )}
                   >
                     <StoreBadge storeId={slug} size="md" />
-                    <span className="text-[10px] font-semibold text-[#5f5d56]">{flyer.store}</span>
+                    <span className="text-[10px] font-semibold text-muted-foreground">{flyer.store}</span>
                   </button>
                 );
               })}
@@ -214,7 +214,7 @@ export function TilbudFilterSheet({ open, onOpenChange, filters, onFiltersChange
         {hasActiveFilters(filters) && (
           <button
             onClick={reset}
-            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-[#eceae2] text-[13px] font-semibold text-[#5f5d56] active:scale-[0.98] transition-transform"
+            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-secondary text-[13px] font-semibold text-muted-foreground active:scale-[0.98] transition-transform"
           >
             <RotateCcw className="h-3.5 w-3.5" /> Nulstil filtre
           </button>

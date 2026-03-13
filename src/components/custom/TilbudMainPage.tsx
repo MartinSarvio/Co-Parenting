@@ -255,7 +255,7 @@ export function TilbudMainPage({
   return (
     <>
       {/* ── Dagstilbud (alle butikker) ── */}
-      <p className="text-[13px] font-semibold text-[#2f2f2d] px-1">Dagstilbud</p>
+      <p className="text-[13px] font-semibold text-foreground px-1">Dagstilbud</p>
       <div className="flex gap-2 overflow-x-auto snap-x pt-3 pb-2 scrollbar-hide -mx-2 px-2">
         {filteredOffers.map((offer) => (
           <OfferCard
@@ -268,20 +268,20 @@ export function TilbudMainPage({
           />
         ))}
         {filteredOffers.length === 0 && (
-          <p className="text-[13px] text-[#9a978f] py-4 px-2">Ingen tilbud matcher dine filtre</p>
+          <p className="text-[13px] text-muted-foreground py-4 px-2">Ingen tilbud matcher dine filtre</p>
         )}
       </div>
 
       {/* ── Tilbudsaviser (covers) ── */}
       <div className="px-1">
-        <p className="text-[13px] font-semibold text-[#2f2f2d]">Tilbudsaviser</p>
+        <p className="text-[13px] font-semibold text-foreground">Tilbudsaviser</p>
       </div>
       <div className="flex gap-2.5 overflow-x-auto snap-x pb-2 scrollbar-hide -mx-2 px-2">
         {FLYERS.map((flyer) => (
           <button
             key={flyer.id}
             onClick={() => { trackEvent({ eventType: 'product_click', targetId: flyer.id, targetType: 'flyer', page: 'tilbud', metadata: { store: flyer.store } }); onSelectStore(flyer.id); }}
-            className="min-w-[140px] max-w-[140px] snap-start shrink-0 rounded-[8px] overflow-hidden bg-white active:scale-[0.97] transition-transform text-left"
+            className="min-w-[140px] max-w-[140px] snap-start shrink-0 rounded-[8px] overflow-hidden bg-card active:scale-[0.97] transition-transform text-left"
           >
             {flyer.coverImage ? (
               <img src={flyer.coverImage} alt={flyer.store} className="w-full h-[170px] object-cover object-top" />
@@ -291,17 +291,17 @@ export function TilbudMainPage({
                 style={{ backgroundColor: flyer.storeColor + '18' }}
               >
                 <StoreBadge storeId={getFlyerStoreSlug(flyer)} size="lg" />
-                <span className="text-[14px] font-bold text-[#2f2f2d]">{flyer.store}</span>
-                {flyer.label && <span className="text-[10px] text-[#9a978f]">{flyer.label}</span>}
+                <span className="text-[14px] font-bold text-foreground">{flyer.store}</span>
+                {flyer.label && <span className="text-[10px] text-muted-foreground">{flyer.label}</span>}
               </div>
             )}
             <div className="p-2.5">
               <div className="flex items-center gap-1.5">
                 <StoreBadge storeId={getFlyerStoreSlug(flyer)} size="sm" />
-                <p className="text-[13px] font-bold text-[#2f2f2d]">{flyer.store}{flyer.label ? ` · ${flyer.label}` : ''}</p>
+                <p className="text-[13px] font-bold text-foreground">{flyer.store}{flyer.label ? ` · ${flyer.label}` : ''}</p>
               </div>
-              <p className="text-[10px] text-[#9a978f] mt-0.5">{flyer.validFrom} – {flyer.validUntil}</p>
-              <p className="text-[10px] text-[#9a978f]">{flyer.pages} sider</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">{flyer.validFrom} – {flyer.validUntil}</p>
+              <p className="text-[10px] text-muted-foreground">{flyer.pages} sider</p>
             </div>
           </button>
         ))}
@@ -314,29 +314,29 @@ export function TilbudMainPage({
               setUploadedBatchMeta({ store: ub.store, storeColor: ub.storeColor, validFrom: ub.validFrom, validUntil: ub.validUntil, totalProducts: ub.totalProducts });
               onSelectStore(`uploaded-${ub.id}`);
             }}
-            className="min-w-[140px] max-w-[140px] snap-start shrink-0 rounded-[8px] overflow-hidden bg-white active:scale-[0.97] transition-transform text-left"
+            className="min-w-[140px] max-w-[140px] snap-start shrink-0 rounded-[8px] overflow-hidden bg-card active:scale-[0.97] transition-transform text-left"
           >
             <div
               className="w-full h-[170px] flex flex-col items-center justify-center gap-2"
               style={{ backgroundColor: ub.storeColor + '18' }}
             >
               <StoreBadge storeName={ub.store} storeColor={ub.storeColor} storeInitial={ub.storeInitial} size="lg" />
-              <span className="text-[14px] font-bold text-[#2f2f2d]">{ub.store}</span>
+              <span className="text-[14px] font-bold text-foreground">{ub.store}</span>
             </div>
             <div className="p-2.5">
               <div className="flex items-center gap-1.5">
                 <StoreBadge storeName={ub.store} storeColor={ub.storeColor} storeInitial={ub.storeInitial} size="sm" />
-                <p className="text-[13px] font-bold text-[#2f2f2d]">{ub.store}</p>
+                <p className="text-[13px] font-bold text-foreground">{ub.store}</p>
               </div>
-              <p className="text-[10px] text-[#9a978f] mt-0.5">{ub.validFrom} – {ub.validUntil}</p>
-              <p className="text-[10px] text-[#9a978f]">{ub.totalProducts} produkter</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">{ub.validFrom} – {ub.validUntil}</p>
+              <p className="text-[10px] text-muted-foreground">{ub.totalProducts} produkter</p>
             </div>
           </button>
         ))}
       </div>
 
       {/* ── Gave & ønskeliste tilbud ── */}
-      <p className="text-[13px] font-semibold text-[#2f2f2d] px-1">Gave & ønskeliste</p>
+      <p className="text-[13px] font-semibold text-foreground px-1">Gave & ønskeliste</p>
       <div className="flex gap-1.5 overflow-x-auto snap-x pb-2 scrollbar-hide -mx-2 px-2">
         {giftOffers.map((offer) => (
           <button
@@ -370,7 +370,7 @@ export function TilbudMainPage({
               </span>
             </div>
             <div className="mt-1.5 px-0.5 h-[52px] overflow-hidden">
-              <h3 className="text-[12px] font-semibold text-[#2f2f2d] leading-snug line-clamp-2">{offer.title}</h3>
+              <h3 className="text-[12px] font-semibold text-foreground leading-snug line-clamp-2">{offer.title}</h3>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <p className="text-[14px] font-bold text-[#f58a2d]">{offer.price.toLocaleString('da-DK')},-</p>
                 {(() => { const g = matchNutriScore(offer.title, nutriMap); return g ? <NutriScoreBadge grade={g} size="sm" /> : null; })()}
@@ -381,7 +381,7 @@ export function TilbudMainPage({
       </div>
 
       {/* ── Sponsoreret ── */}
-      <p className="text-[13px] font-semibold text-[#2f2f2d] px-1">Sponsoreret</p>
+      <p className="text-[13px] font-semibold text-foreground px-1">Sponsoreret</p>
       <div ref={sponsorRef} className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide -mx-2 px-2">
         {[...allSponsors, ...allSponsors].map((ad, i) => (
           <a
@@ -416,16 +416,16 @@ export function TilbudMainPage({
                   className="w-full h-full flex flex-col items-center justify-center"
                   style={{ background: ad.banner_color || '#1a1a2e' }}
                 >
-                  <span className={`text-[20px] font-black tracking-wide ${ad.banner_color?.includes('#f5e6d3') ? 'text-[#2f2f2d]' : 'text-white'}`}>{ad.name}</span>
+                  <span className={`text-[20px] font-black tracking-wide ${ad.banner_color?.includes('#f5e6d3') ? 'text-foreground' : 'text-white'}`}>{ad.name}</span>
                   {ad.banner_subtitle && (
-                    <span className={`text-[11px] font-medium mt-0.5 ${ad.banner_color?.includes('#f5e6d3') ? 'text-[#5f5d56]' : 'text-white/70'}`}>{ad.banner_subtitle}</span>
+                    <span className={`text-[11px] font-medium mt-0.5 ${ad.banner_color?.includes('#f5e6d3') ? 'text-muted-foreground' : 'text-white/70'}`}>{ad.banner_subtitle}</span>
                   )}
                 </div>
               )}
             </div>
-            <p className="text-[13px] font-semibold text-[#2f2f2d] mt-1.5 leading-tight line-clamp-1">{ad.name}</p>
+            <p className="text-[13px] font-semibold text-foreground mt-1.5 leading-tight line-clamp-1">{ad.name}</p>
             {ad.category && (
-              <p className="text-[11px] text-[#9a978f] mt-0.5 line-clamp-1">{ad.category}</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{ad.category}</p>
             )}
           </a>
         ))}
@@ -444,7 +444,7 @@ export function TilbudMainPage({
             "flex h-11 w-11 items-center justify-center rounded-full shadow-lg transition-colors",
             hasActiveFilters(filters)
               ? "bg-[#f58a2d] text-white"
-              : "bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+              : "bg-primary text-white hover:bg-primary"
           )}
           aria-label="Filter"
         >
@@ -452,7 +452,7 @@ export function TilbudMainPage({
         </button>
         <button
           onClick={() => setShowSearch(true)}
-          className="flex h-11 w-11 items-center justify-center rounded-full bg-[#2f2f2f] text-white shadow-lg hover:bg-[#1a1a1a] transition-colors"
+          className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-white shadow-lg hover:bg-primary transition-colors"
           aria-label="Søg"
         >
           <Search className="h-4.5 w-4.5" />
@@ -461,7 +461,7 @@ export function TilbudMainPage({
 
       <button
         onClick={onBack}
-        className="fixed right-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-[#2f2f2f] text-white shadow-lg hover:bg-[#1a1a1a] transition-colors"
+        className="fixed right-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-primary text-white shadow-lg hover:bg-primary transition-colors"
         style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }}
         aria-label="Tilbage"
       >

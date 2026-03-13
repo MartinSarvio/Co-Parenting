@@ -323,7 +323,7 @@ export function KalenderWeekView() {
     <>
       {/* Week grid — edge-to-edge, no extra padding */}
       <div
-        className="relative flex flex-col bg-white"
+        className="relative flex flex-col bg-card"
         style={{ height: 'calc(100svh - env(safe-area-inset-top, 0px) - 74px)' }}
       >
         {/* Scrollable weeks */}
@@ -345,8 +345,8 @@ export function KalenderWeekView() {
               <div key={weekStart.toISOString()}>
                 {/* Year separator */}
                 {showYearSeparator && (
-                  <div className="px-3 py-2 bg-[#eeedea]">
-                    <p className="text-[13px] font-bold text-[#2f2f2d]">
+                  <div className="px-3 py-2 bg-card">
+                    <p className="text-[13px] font-bold text-foreground">
                       {addDays(weekStart, 3).getFullYear()}
                     </p>
                   </div>
@@ -354,11 +354,11 @@ export function KalenderWeekView() {
 
                 {/* Week separator with week number */}
                 <div className="flex items-center gap-2 px-3 py-1">
-                  <div className="flex-1 h-px bg-[#e8e7e2]" />
+                  <div className="flex-1 h-px bg-muted" />
                   <span className="text-[10px] font-semibold text-[#f58a2d] whitespace-nowrap">
                     uge {weekNum}
                   </span>
-                  <div className="flex-1 h-px bg-[#e8e7e2]" />
+                  <div className="flex-1 h-px bg-muted" />
                 </div>
 
                 {/* Week row — full width 7 columns */}
@@ -381,8 +381,8 @@ export function KalenderWeekView() {
                         key={day.toISOString()}
                         className={cn(
                           "p-1 min-h-[inherit] flex flex-col",
-                          isWeekend && "bg-[#fdfcfa]",
-                          isSelected && "bg-[#fff8f0]"
+                          isWeekend && "bg-card",
+                          isSelected && "bg-orange-tint-light"
                         )}
                         onPointerDown={() => {
                           longPressTimer.current = setTimeout(() => openAddEventForDay(day), 500);
@@ -406,7 +406,7 @@ export function KalenderWeekView() {
                               ? "bg-[#f58a2d] text-white"
                               : dayNum === 1
                                 ? "text-[#f58a2d] font-bold"
-                                : isWeekend ? "text-[#b0876a]" : "text-[#2f2f2d]"
+                                : isWeekend ? "text-[#b0876a]" : "text-foreground"
                           )}>
                             {dayNum}
                           </div>
@@ -415,7 +415,7 @@ export function KalenderWeekView() {
                         {/* Date label (dd/mm) */}
                         <p className={cn(
                           "text-[8px] text-center mb-1 shrink-0",
-                          isWeekend ? "text-[#c4a98e]" : "text-[#b0ada4]"
+                          isWeekend ? "text-[#c4a98e]" : "text-muted-foreground"
                         )}>
                           {format(day, 'dd/MM')}
                         </p>
@@ -441,7 +441,7 @@ export function KalenderWeekView() {
                             );
                           })}
                           {dayEvents.length > 5 && (
-                            <p className="text-[7px] text-center text-[#a09e96]">
+                            <p className="text-[7px] text-center text-muted-foreground">
                               +{dayEvents.length - 5}
                             </p>
                           )}
@@ -458,7 +458,7 @@ export function KalenderWeekView() {
         {/* Floating "Dag" button — bottom-left */}
         <button
           onClick={() => setDayViewDate(selectedDay)}
-          className="absolute left-4 z-10 rounded-full bg-white/80 backdrop-blur-sm border border-[#e5e3dc] px-4 py-2 shadow-sm text-[13px] font-semibold text-[#2f2f2d] hover:bg-white/95 transition-colors"
+          className="absolute left-4 z-10 rounded-full bg-card/80 backdrop-blur-sm border border-border px-4 py-2 shadow-sm text-[13px] font-semibold text-foreground hover:bg-card/95 transition-colors"
           style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }}
         >
           Dag
@@ -467,21 +467,21 @@ export function KalenderWeekView() {
 
       {/* Event Detail Bottom Sheet */}
       <Sheet open={eventDetailOpen} onOpenChange={setEventDetailOpen}>
-        <SheetContent side="bottom" hideClose className="flex max-h-[85vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
-          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+        <SheetContent side="bottom" hideClose className="flex max-h-[85vh] flex-col rounded-t-[28px] border-border bg-background shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+          <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-muted shrink-0" />
           <SheetHeader className="px-4 pb-2 shrink-0">
-            <SheetTitle className="text-center text-[1.05rem] text-[#2f2f2d]">Aftaledetaljer</SheetTitle>
+            <SheetTitle className="text-center text-[1.05rem] text-foreground">Aftaledetaljer</SheetTitle>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto px-4 pb-[calc(env(safe-area-inset-bottom,0px)+24px)]">
             {selectedEvent && (
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded-full" style={{ backgroundColor: getEventColor(selectedEvent.type) }} />
-                  <p className="text-[15px] font-semibold text-[#2f2f2d]">{selectedEvent.title}</p>
+                  <p className="text-[15px] font-semibold text-foreground">{selectedEvent.title}</p>
                 </div>
-                <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-3 space-y-2">
-                  <div className="flex items-center gap-2 text-sm text-[#4a4945]">
-                    <Clock className="h-4 w-4 text-[#78766d]" />
+                <div className="rounded-[8px] border border-border bg-card p-3 space-y-2">
+                  <div className="flex items-center gap-2 text-sm text-foreground">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
                     <span>
                       {format(safeParse(selectedEvent.startDate) ?? new Date(), 'EEEE d. MMMM yyyy · HH:mm', { locale: da })}
                       {selectedEvent.endDate && selectedEvent.endDate !== selectedEvent.startDate && (
@@ -490,24 +490,24 @@ export function KalenderWeekView() {
                     </span>
                   </div>
                   {selectedEvent.location && (
-                    <div className="flex items-center gap-2 text-sm text-[#4a4945]">
-                      <MapPin className="h-4 w-4 text-[#78766d]" />
+                    <div className="flex items-center gap-2 text-sm text-foreground">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
                       <span>{selectedEvent.location}</span>
                     </div>
                   )}
-                  <div className="flex items-center gap-2 text-sm text-[#4a4945]">
-                    <Calendar className="h-4 w-4 text-[#78766d]" />
+                  <div className="flex items-center gap-2 text-sm text-foreground">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
                     <span>{EVENT_TYPE_LABELS[selectedEvent.type] || selectedEvent.type}</span>
                   </div>
                 </div>
                 {selectedEvent.description && (
-                  <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-3">
-                    <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] mb-1">Beskrivelse</p>
-                    <p className="text-sm text-[#4a4945] whitespace-pre-wrap">{selectedEvent.description}</p>
+                  <div className="rounded-[8px] border border-border bg-card p-3">
+                    <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground mb-1">Beskrivelse</p>
+                    <p className="text-sm text-foreground whitespace-pre-wrap">{selectedEvent.description}</p>
                   </div>
                 )}
                 {selectedEvent.createdBy && (
-                  <p className="text-[11px] text-[#78766d]">
+                  <p className="text-[11px] text-muted-foreground">
                     Oprettet af {users.find(u => u.id === selectedEvent.createdBy)?.name ?? 'ukendt'}
                   </p>
                 )}
@@ -528,7 +528,7 @@ export function KalenderWeekView() {
                     Slet
                   </Button>
                   <Button
-                    className="flex-1 rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+                    className="flex-1 rounded-[8px] bg-primary text-white hover:bg-primary"
                     onClick={() => setEventDetailOpen(false)}
                   >
                     Luk
@@ -556,24 +556,24 @@ export function KalenderWeekView() {
             onDragEnd={(_: unknown, info: { offset: { x: number }; velocity: { x: number } }) => {
               if (info.offset.x > 80 || info.velocity.x > 500) setDayViewDate(null);
             }}
-            className="fixed inset-0 z-[55] bg-[#f7f6f2] flex flex-col"
+            className="fixed inset-0 z-[55] bg-background flex flex-col"
             style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
           >
             {/* Header: < (back to week) ... x (close to calendar) */}
-            <div className="flex items-center px-4 py-3 border-b border-[#eeedea]">
+            <div className="flex items-center px-4 py-3 border-b border-border">
               <button
                 onClick={() => setDayViewDate(null)}
-                className="flex h-9 w-9 items-center justify-center text-[#5f5d56] hover:text-[#2f2f2d] transition-colors"
+                className="flex h-9 w-9 items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Tilbage til uge"
               >
                 <ArrowLeft className="h-5 w-5" />
               </button>
-              <h2 className="flex-1 text-center text-[17px] font-bold text-[#2f2f2d] capitalize">
+              <h2 className="flex-1 text-center text-[17px] font-bold text-foreground capitalize">
                 {format(dayViewDate, 'EEEE d. MMMM', { locale: da })}
               </h2>
               <button
                 onClick={closeToCalendar}
-                className="flex h-9 w-9 items-center justify-center text-[#5f5d56] hover:text-[#2f2f2d] transition-colors"
+                className="flex h-9 w-9 items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Luk til kalender"
               >
                 <X className="h-5 w-5" />
@@ -589,10 +589,10 @@ export function KalenderWeekView() {
                   return (
                     <div key={hour} className="absolute inset-x-0" style={{ top: `${i * 60}px` }}>
                       <div className="flex items-start">
-                        <span className="w-14 shrink-0 pr-2 text-right text-[11px] text-[#a09e96] -mt-[7px]">
+                        <span className="w-14 shrink-0 pr-2 text-right text-[11px] text-muted-foreground -mt-[7px]">
                           {`${hour.toString().padStart(2, '0')}:00`}
                         </span>
-                        <div className="flex-1 border-t border-[#e8e7e0]" />
+                        <div className="flex-1 border-t border-border" />
                       </div>
                     </div>
                   );
@@ -621,11 +621,11 @@ export function KalenderWeekView() {
                         }}
                       >
                         <p className="text-[12px] font-semibold truncate" style={{ color }}>{event.title}</p>
-                        <p className="text-[10px] text-[#78766d]">
+                        <p className="text-[10px] text-muted-foreground">
                           {format(start, 'HH:mm')} – {format(end, 'HH:mm')}
                         </p>
                         {event.location && (
-                          <p className="text-[10px] text-[#a09e96] truncate">{event.location}</p>
+                          <p className="text-[10px] text-muted-foreground truncate">{event.location}</p>
                         )}
                       </button>
                     );
@@ -651,7 +651,7 @@ export function KalenderWeekView() {
             {/* Floating "+" button — bottom-left (same spot as "Dag") */}
             <button
               onClick={openAddEvent}
-              className="absolute left-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-[#2f2f2f] text-white shadow-lg hover:bg-[#1a1a1a] transition-colors"
+              className="absolute left-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-primary text-white shadow-lg hover:bg-primary transition-colors"
               style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }}
               aria-label="Tilføj begivenhed"
             >
@@ -671,19 +671,19 @@ export function KalenderWeekView() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-            className="fixed inset-0 z-[60] bg-[#f7f6f2] flex flex-col"
+            className="fixed inset-0 z-[60] bg-background flex flex-col"
             style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
           >
             {/* Header */}
-            <div className="flex items-center gap-3 px-4 py-3 border-b border-[#eeedea]">
+            <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
               <button
                 onClick={() => setAddEventOpen(false)}
-                className="flex h-9 w-9 items-center justify-center text-[#5f5d56] hover:text-[#2f2f2d] transition-colors"
+                className="flex h-9 w-9 items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Tilbage"
               >
                 <ArrowLeft className="h-5 w-5" />
               </button>
-              <h2 className="text-[17px] font-bold text-[#2f2f2d]">Ny begivenhed</h2>
+              <h2 className="text-[17px] font-bold text-foreground">Ny begivenhed</h2>
             </div>
 
             {/* Form */}

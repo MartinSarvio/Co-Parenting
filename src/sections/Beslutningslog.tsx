@@ -142,10 +142,10 @@ export function Beslutningslog() {
     <div className="space-y-1.5 py-1">
       <OverblikSidePanel />
       <div className="flex items-center justify-between">
-        <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Beslutningslog</h1>
+        <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-foreground">Beslutningslog</h1>
         <Button
           onClick={() => setAddOpen(true)}
-          className="h-9 gap-1.5 rounded-[8px] bg-[#2f2f2f] px-4 text-sm text-white hover:bg-[#1a1a1a]"
+          className="h-9 gap-1.5 rounded-[8px] bg-primary px-4 text-sm text-white hover:bg-primary"
         >
           <Plus className="h-4 w-4" />
           Ny beslutning
@@ -161,8 +161,8 @@ export function Beslutningslog() {
             className={cn(
               'flex-1 rounded-[8px] py-1.5 text-[12px] font-semibold transition-all',
               filterStatus === s
-                ? 'bg-[#2f2f2f] text-white'
-                : 'bg-[#ecebe5] text-[#5f5d56] hover:bg-[#e0deda]'
+                ? 'bg-primary text-white'
+                : 'bg-secondary text-muted-foreground hover:bg-muted'
             )}
           >
             {s === 'all' ? 'Alle' : s === 'proposed' ? 'Foreslået' : s === 'approved' ? 'Godkendt' : 'Afvist'}
@@ -171,15 +171,15 @@ export function Beslutningslog() {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-[#d0cec5] bg-[#faf9f6] py-16 text-center">
-          <ClipboardList className="h-10 w-10 text-[#c8c6bc]" />
+        <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-border bg-card py-16 text-center">
+          <ClipboardList className="h-10 w-10 text-muted-foreground" />
           <div>
-            <p className="text-sm font-semibold text-[#3f3e3a]">Ingen beslutninger endnu</p>
-            <p className="mt-1 text-[12px] text-[#78766d]">Dokumentér vigtige beslutninger om børnene</p>
+            <p className="text-sm font-semibold text-foreground">Ingen beslutninger endnu</p>
+            <p className="mt-1 text-[12px] text-muted-foreground">Dokumentér vigtige beslutninger om børnene</p>
           </div>
           <Button
             variant="outline"
-            className="mt-1 h-9 rounded-[8px] border-[#d0cec5] px-4 text-sm"
+            className="mt-1 h-9 rounded-[8px] border-border px-4 text-sm"
             onClick={() => setAddOpen(true)}
           >
             <Plus className="mr-1.5 h-4 w-4" /> Tilføj beslutning
@@ -207,7 +207,7 @@ export function Beslutningslog() {
               <div
                 key={decision.id}
                 className={cn(
-                  "rounded-[8px] border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border-l-[3px]",
+                  "rounded-[8px] border border-border bg-card px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border-l-[3px]",
                   isMyProposal ? "border-l-[#2f2f2f]" : "border-l-[#f58a2d]"
                 )}
               >
@@ -218,20 +218,20 @@ export function Beslutningslog() {
                         <BadgeIcon className="h-3 w-3" />
                         {badge.label}
                       </span>
-                      <span className="rounded-[8px] bg-[#ecebe5] px-2 py-0.5 text-[11px] font-medium text-[#5f5d56]">
+                      <span className="rounded-[8px] bg-secondary px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
                         {categoryOptions.find(c => c.value === decision.category)?.label}
                       </span>
                       {child && (
-                        <span className="text-[11px] text-[#78766d]">{child.name}</span>
+                        <span className="text-[11px] text-muted-foreground">{child.name}</span>
                       )}
                     </div>
-                    <p className="mt-1.5 text-[14px] font-semibold text-[#2f2f2d]">{decision.title}</p>
-                    <p className="mt-0.5 text-[12px] text-[#4a4945] leading-relaxed">{decision.description}</p>
+                    <p className="mt-1.5 text-[14px] font-semibold text-foreground">{decision.title}</p>
+                    <p className="mt-0.5 text-[12px] text-foreground leading-relaxed">{decision.description}</p>
                     {decision.notes && (
-                      <p className="mt-1 text-[12px] text-[#78766d] italic">{decision.notes}</p>
+                      <p className="mt-1 text-[12px] text-muted-foreground italic">{decision.notes}</p>
                     )}
-                    <div className="mt-2 flex items-center gap-3 text-[11px] text-[#78766d]">
-                      <span className={cn("font-semibold", isMyProposal ? "text-[#2f2f2f]" : "text-[#f58a2d]")}>
+                    <div className="mt-2 flex items-center gap-3 text-[11px] text-muted-foreground">
+                      <span className={cn("font-semibold", isMyProposal ? "text-foreground" : "text-[#f58a2d]")}>
                         {isMyProposal ? 'Dit forslag' : `${proposer?.name ?? 'Ukendt'}s forslag`}
                       </span>
                       <span>{format(new Date(decision.createdAt), 'd. MMM yyyy', { locale: da })}</span>
@@ -242,13 +242,13 @@ export function Beslutningslog() {
                         </span>
                       )}
                       {!hasCoParentOnApp && decision.status === 'proposed' && (
-                        <span className="text-[11px] text-[#b0ada4] italic">
+                        <span className="text-[11px] text-muted-foreground italic">
                           Co-parent ikke tilknyttet
                         </span>
                       )}
                     </div>
                     {(decision.validFrom || decision.validUntil) && (
-                      <div className="mt-1 text-[11px] text-[#78766d]">
+                      <div className="mt-1 text-[11px] text-muted-foreground">
                         Gyldig: {decision.validFrom ? format(new Date(decision.validFrom), 'd. MMM yyyy', { locale: da }) : '—'}
                         {decision.validUntil ? ` → ${format(new Date(decision.validUntil), 'd. MMM yyyy', { locale: da })}` : ''}
                       </div>
@@ -259,7 +259,7 @@ export function Beslutningslog() {
                           const doc = documents.find(d => d.id === docId);
                           if (!doc) return null;
                           return (
-                            <span key={docId} className="inline-flex items-center gap-1 rounded-md bg-[#f2f1ed] px-2 py-0.5 text-[11px] text-[#5f5d56]">
+                            <span key={docId} className="inline-flex items-center gap-1 rounded-md bg-background px-2 py-0.5 text-[11px] text-muted-foreground">
                               <Paperclip className="h-3 w-3" />
                               {doc.title}
                             </span>
@@ -304,7 +304,7 @@ export function Beslutningslog() {
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="h-8 rounded-[8px] px-2 text-[#c8c6bc] hover:text-rose-500"
+                      className="h-8 rounded-[8px] px-2 text-muted-foreground hover:text-rose-500"
                       onClick={() => { deleteDecision(decision.id); toast.success('Beslutning slettet'); }}
                     >
                       <X className="h-3.5 w-3.5" />
@@ -326,11 +326,11 @@ export function Beslutningslog() {
       {/* Ny beslutning — fullscreen page */}
       {addOpen && (
         <div
-          className="fixed inset-0 z-50 flex flex-col bg-[#f7f6f2]"
+          className="fixed inset-0 z-50 flex flex-col bg-background"
           style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
         >
           {/* Header: < | Ny beslutning | Gem */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-[#e5e3dc]">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
             <button
               onClick={() => {
                 if (title.trim() || description.trim() || notes.trim()) {
@@ -339,15 +339,15 @@ export function Beslutningslog() {
                   setAddOpen(false);
                 }
               }}
-              className="w-9 flex items-center justify-center text-[#2f2f2d]"
+              className="w-9 flex items-center justify-center text-foreground"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
-            <h2 className="text-[17px] font-semibold text-[#2f2f2d]">Ny beslutning</h2>
+            <h2 className="text-[17px] font-semibold text-foreground">Ny beslutning</h2>
             <button
               onClick={handleAdd}
               disabled={!title.trim() || !description.trim() || isSaving}
-              className="text-[15px] font-semibold text-[#2f2f2f] disabled:opacity-30"
+              className="text-[15px] font-semibold text-foreground disabled:opacity-30"
             >
               Gem
             </button>
@@ -358,49 +358,49 @@ export function Beslutningslog() {
 
             <div className="space-y-3">
               <div className="space-y-1">
-                <Label htmlFor="dec-title" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Titel</Label>
+                <Label htmlFor="dec-title" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Titel</Label>
                 <Input
                   id="dec-title"
                   value={title}
                   onChange={e => setTitle(e.target.value)}
                   placeholder="f.eks. Skift af dagpleje"
-                  className="rounded-[8px] border-[#d8d7cf] bg-white"
+                  className="rounded-[8px] border-border bg-card"
                   autoFocus
                 />
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="dec-desc" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Beskrivelse</Label>
+                <Label htmlFor="dec-desc" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Beskrivelse</Label>
                 <Textarea
                   id="dec-desc"
                   value={description}
                   onChange={e => setDescription(e.target.value)}
                   placeholder="Beskriv beslutningen og baggrunden..."
-                  className="min-h-[80px] resize-none rounded-[8px] border-[#d8d7cf] bg-white text-sm"
+                  className="min-h-[80px] resize-none rounded-[8px] border-border bg-card text-sm"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-2">
                 <div className="space-y-1">
-                  <Label htmlFor="dec-category" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Kategori</Label>
+                  <Label htmlFor="dec-category" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Kategori</Label>
                   <SelectSheet
                     value={category}
                     onValueChange={v => setCategory(v as DecisionCategory)}
                     title="Kategori"
                     options={categoryOptions.map(c => ({ value: c.value, label: c.label }))}
-                    className="rounded-[8px] border-[#d8d7cf] bg-white"
+                    className="rounded-[8px] border-border bg-card"
                   />
                 </div>
                 {children.length > 0 && (
                   <div className="space-y-1">
-                    <Label htmlFor="dec-child" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Barn</Label>
+                    <Label htmlFor="dec-child" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Barn</Label>
                     <SelectSheet
                       value={childId}
                       onValueChange={setChildId}
                       title="Barn"
                       placeholder="Ingen"
                       options={[{ value: 'none', label: 'Ingen' }, ...children.map(c => ({ value: c.id, label: c.name }))]}
-                      className="rounded-[8px] border-[#d8d7cf] bg-white"
+                      className="rounded-[8px] border-border bg-card"
                     />
                   </div>
                 )}
@@ -408,41 +408,41 @@ export function Beslutningslog() {
 
               <div className="grid grid-cols-2 gap-2 overflow-hidden">
                 <div className="space-y-1 min-w-0 overflow-hidden">
-                  <Label htmlFor="dec-from" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Gyldig fra</Label>
+                  <Label htmlFor="dec-from" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Gyldig fra</Label>
                   <Input
                     id="dec-from"
                     type="date"
                     value={validFrom}
                     onChange={e => setValidFrom(e.target.value)}
-                    className="rounded-[8px] border-[#d8d7cf] bg-white"
+                    className="rounded-[8px] border-border bg-card"
                   />
                 </div>
                 <div className="space-y-1 min-w-0 overflow-hidden">
-                  <Label htmlFor="dec-until" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Gyldig til</Label>
+                  <Label htmlFor="dec-until" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Gyldig til</Label>
                   <Input
                     id="dec-until"
                     type="date"
                     value={validUntil}
                     onChange={e => setValidUntil(e.target.value)}
-                    className="rounded-[8px] border-[#d8d7cf] bg-white"
+                    className="rounded-[8px] border-border bg-card"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="dec-notes" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Noter (valgfrit)</Label>
+                <Label htmlFor="dec-notes" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Noter (valgfrit)</Label>
                 <Textarea
                   id="dec-notes"
                   value={notes}
                   onChange={e => setNotes(e.target.value)}
                   placeholder="Supplerende bemærkninger..."
-                  className="min-h-[50px] resize-none rounded-[8px] border-[#d8d7cf] bg-white text-sm"
+                  className="min-h-[50px] resize-none rounded-[8px] border-border bg-card text-sm"
                 />
               </div>
 
               {/* Vedhæft dokumenter */}
               <div className="space-y-1.5">
-                <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Vedhæft dokumenter</Label>
+                <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Vedhæft dokumenter</Label>
                 {documents.length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
                     {documents.map(doc => {
@@ -457,8 +457,8 @@ export function Beslutningslog() {
                           className={cn(
                             "flex items-center gap-1.5 rounded-[8px] px-2.5 py-1.5 text-[12px] font-medium transition-all",
                             isSelected
-                              ? "bg-[#fff2e6] border border-[#f3c59d] text-[#cc6f1f]"
-                              : "bg-[#f2f1ed] border border-transparent text-[#5f5d56] hover:bg-[#eae8e2]"
+                              ? "bg-orange-tint border border-orange-tint text-[#cc6f1f]"
+                              : "bg-background border border-transparent text-muted-foreground hover:bg-muted"
                           )}
                         >
                           <FileText className="h-3 w-3" />
@@ -479,7 +479,7 @@ export function Beslutningslog() {
                   type="button"
                   disabled={isUploading}
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex items-center gap-1.5 rounded-[8px] border border-dashed border-[#d8d7cf] bg-white px-3 py-2 text-[12px] font-medium text-[#5f5d56] hover:bg-[#f2f1ed] transition-all disabled:opacity-50"
+                  className="flex items-center gap-1.5 rounded-[8px] border border-dashed border-border bg-card px-3 py-2 text-[12px] font-medium text-muted-foreground hover:bg-background transition-all disabled:opacity-50"
                 >
                   {isUploading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
                   {isUploading ? 'Uploader...' : 'Upload dokument'}
@@ -493,7 +493,7 @@ export function Beslutningslog() {
                   Beslutningen sendes automatisk til {otherParent?.name}
                 </p>
               ) : (
-                <p className="text-[12px] text-[#b0ada4] italic">
+                <p className="text-[12px] text-muted-foreground italic">
                   Co-parent ikke tilknyttet — beslutningen gemmes kun lokalt
                 </p>
               )}

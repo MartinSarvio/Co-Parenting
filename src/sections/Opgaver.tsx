@@ -317,7 +317,7 @@ export function Opgaver() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setFilter('all')}
-                className="flex items-center gap-1.5 rounded-full bg-[#2f2f2f] px-3 py-1.5 text-sm font-medium text-white transition-all"
+                className="flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-sm font-medium text-white transition-all"
               >
                 {(() => {
                   const cat = shoppingCategories.find(c => c.value === filter);
@@ -345,26 +345,26 @@ export function Opgaver() {
           }} title="Tilføj ny opgave">
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <Label className="text-[12px] font-semibold text-[#78766d]">Titel</Label>
+                <Label className="text-[12px] font-semibold text-muted-foreground">Titel</Label>
                 <Input
                   value={newTask.title}
                   onChange={(e) => setNewTask({...newTask, title: e.target.value})}
                   placeholder="F.eks. Køb skolebøger"
-                  className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] focus:border-[#f58a2d]"
+                  className="rounded-[8px] border-border bg-card focus:border-[#f58a2d]"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-[12px] font-semibold text-[#78766d]">Kategori</Label>
+                <Label className="text-[12px] font-semibold text-muted-foreground">Kategori</Label>
                 <SelectSheet
                   value={newTask.category}
                   onValueChange={(v) => setNewTask({...newTask, category: v as Task['category']})}
                   title="Kategori"
                   options={categories.filter(c => c.value !== 'all').map(cat => ({ value: cat.value, label: cat.label }))}
-                  className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6]"
+                  className="rounded-[8px] border-border bg-card"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-[12px] font-semibold text-[#78766d]">Tildelt til</Label>
+                <Label className="text-[12px] font-semibold text-muted-foreground">Tildelt til</Label>
                 <SelectSheet
                   value={newTask.assignedTo}
                   onValueChange={(v) => setNewTask({...newTask, assignedTo: v})}
@@ -375,16 +375,16 @@ export function Opgaver() {
                     label: user.name,
                     icon: <Avatar className="w-5 h-5"><AvatarImage src={user.avatar} /><AvatarFallback className="text-xs">{user.name[0]}</AvatarFallback></Avatar>,
                   }))}
-                  className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6]"
+                  className="rounded-[8px] border-border bg-card"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-[12px] font-semibold text-[#78766d]">Deadline</Label>
+                <Label className="text-[12px] font-semibold text-muted-foreground">Deadline</Label>
                 <Input
                   type="date"
                   value={newTask.deadline}
                   onChange={(e) => setNewTask({...newTask, deadline: e.target.value})}
-                  className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] focus:border-[#f58a2d]"
+                  className="rounded-[8px] border-border bg-card focus:border-[#f58a2d]"
                 />
               </div>
               <button
@@ -426,7 +426,7 @@ export function Opgaver() {
                       transition={{ delay: index * 0.05 }}
                     >
                       <SwipeableTaskCard onDelete={() => void deleteTask(task.id)}>
-                        <div className="border-b border-[#f2f1ed] transition-colors">
+                        <div className="border-b border-border transition-colors">
                           <div className="p-3">
                             <div className="flex items-start gap-3">
                               <Checkbox
@@ -489,7 +489,7 @@ export function Opgaver() {
               <h3 className="font-semibold text-slate-700">Fuldført ({completedTasks.length})</h3>
               <div className="space-y-2">
                 {completedTasks.slice(0, 3).map((task) => (
-                  <div key={task.id} className="border-b border-[#f2f1ed]">
+                  <div key={task.id} className="border-b border-border">
                     <div className="p-3">
                       <div className="flex items-start gap-3">
                         <CheckCircle2 className="w-5 h-5 text-green-500 mt-0.5" />
@@ -515,12 +515,12 @@ export function Opgaver() {
       {activeTab === 'cleaning' && (
         <div className="space-y-2 mt-4">
           {/* ── Status card ── */}
-          <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-4">
+          <div className="rounded-[8px] border border-border bg-card p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Status denne uge</p>
-                <p className="mt-1 text-2xl font-bold text-[#2f2f2d]">
-                  {completedCleaning}<span className="text-[#b0ada4]">/{cleaningTasks.length}</span>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Status denne uge</p>
+                <p className="mt-1 text-2xl font-bold text-foreground">
+                  {completedCleaning}<span className="text-muted-foreground">/{cleaningTasks.length}</span>
                 </p>
                 <p className="text-[11px] text-[#9e9b93]">opgaver fuldført</p>
               </div>
@@ -534,7 +534,7 @@ export function Opgaver() {
                     />
                   </svg>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xs font-bold text-[#2f2f2d]">
+                    <span className="text-xs font-bold text-foreground">
                       {cleaningTasks.length > 0 ? Math.round((completedCleaning / cleaningTasks.length) * 100) : 0}%
                     </span>
                   </div>
@@ -547,29 +547,29 @@ export function Opgaver() {
           <BottomSheet open={isAddCleaningOpen} onOpenChange={setIsAddCleaningOpen} title="Tilføj huslig pligt">
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <Label className="text-[12px] font-semibold text-[#78766d]">Opgave</Label>
+                <Label className="text-[12px] font-semibold text-muted-foreground">Opgave</Label>
                 <Input
                   value={newCleaning.title}
                   onChange={(e) => setNewCleaning((prev) => ({ ...prev, title: e.target.value }))}
                   placeholder="Fx vask gulv i køkken"
-                  className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] focus:border-[#f58a2d]"
+                  className="rounded-[8px] border-border bg-card focus:border-[#f58a2d]"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-[12px] font-semibold text-[#78766d]">Område</Label>
+                <Label className="text-[12px] font-semibold text-muted-foreground">Område</Label>
                 <Input
                   value={newCleaning.area}
                   onChange={(e) => setNewCleaning((prev) => ({ ...prev, area: e.target.value }))}
                   placeholder="Fx køkken"
-                  className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] focus:border-[#f58a2d]"
+                  className="rounded-[8px] border-border bg-card focus:border-[#f58a2d]"
                 />
               </div>
               {useMultiParticipant ? (
                 <div className="space-y-1.5">
-                  <Label className="text-[12px] font-semibold text-[#78766d]">Deltagere</Label>
-                  <div className="space-y-1.5 rounded-[8px] border border-[#e5e3dc] p-2">
+                  <Label className="text-[12px] font-semibold text-muted-foreground">Deltagere</Label>
+                  <div className="space-y-1.5 rounded-[8px] border border-border p-2">
                     {users.map((user) => (
-                      <label key={user.id} className="flex items-center gap-2.5 rounded-[8px] px-2 py-1.5 text-[13px] hover:bg-[#faf9f6] transition-colors">
+                      <label key={user.id} className="flex items-center gap-2.5 rounded-[8px] px-2 py-1.5 text-[13px] hover:bg-card transition-colors">
                         <Checkbox
                           checked={newCleaning.participants.includes(user.id)}
                           onCheckedChange={(checked) => {
@@ -593,7 +593,7 @@ export function Opgaver() {
                       const birthYear = child.birthDate ? new Date(child.birthDate).getFullYear() : null;
                       const age = birthYear ? new Date().getFullYear() - birthYear : null;
                       return (
-                        <label key={child.id} className="flex items-center gap-2.5 rounded-[8px] px-2 py-1.5 text-[13px] hover:bg-[#faf9f6] transition-colors">
+                        <label key={child.id} className="flex items-center gap-2.5 rounded-[8px] px-2 py-1.5 text-[13px] hover:bg-card transition-colors">
                           <Checkbox
                             checked={newCleaning.participants.includes(child.id)}
                             onCheckedChange={(checked) => {
@@ -606,7 +606,7 @@ export function Opgaver() {
                             }}
                             className="h-4 w-4"
                           />
-                          {child.name} {age !== null && <span className="text-[#9d9b93]">({age} år)</span>}
+                          {child.name} {age !== null && <span className="text-muted-foreground">({age} år)</span>}
                         </label>
                       );
                     })}
@@ -614,30 +614,30 @@ export function Opgaver() {
                 </div>
               ) : (
                 <div className="space-y-1.5">
-                  <Label className="text-[12px] font-semibold text-[#78766d]">Ansvarlig</Label>
+                  <Label className="text-[12px] font-semibold text-muted-foreground">Ansvarlig</Label>
                   <SelectSheet
                     value={newCleaning.assignedTo}
                     onValueChange={(value) => setNewCleaning((prev) => ({ ...prev, assignedTo: value }))}
                     title="Ansvarlig"
                     placeholder="Vælg person"
                     options={users.map((user) => ({ value: user.id, label: user.name }))}
-                    className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6]"
+                    className="rounded-[8px] border-border bg-card"
                   />
                 </div>
               )}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-[12px] font-semibold text-[#78766d]">Dag</Label>
+                  <Label className="text-[12px] font-semibold text-muted-foreground">Dag</Label>
                   <SelectSheet
                     value={newCleaning.weekday}
                     onValueChange={(value) => setNewCleaning((prev) => ({ ...prev, weekday: value }))}
                     title="Dag"
                     options={weekdayNames.map((day, index) => ({ value: String(index), label: day }))}
-                    className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6]"
+                    className="rounded-[8px] border-border bg-card"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[12px] font-semibold text-[#78766d]">Hyppighed</Label>
+                  <Label className="text-[12px] font-semibold text-muted-foreground">Hyppighed</Label>
                   <SelectSheet
                     value={newCleaning.recurringPattern}
                     onValueChange={(value) => setNewCleaning((prev) => ({ ...prev, recurringPattern: value }))}
@@ -647,7 +647,7 @@ export function Opgaver() {
                       { value: 'biweekly', label: 'Hver 2. uge' },
                       { value: 'monthly', label: 'Månedlig' },
                     ]}
-                    className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6]"
+                    className="rounded-[8px] border-border bg-card"
                   />
                 </div>
               </div>
@@ -662,20 +662,20 @@ export function Opgaver() {
           </BottomSheet>
 
           {cleaningByWeekday.length === 0 ? (
-            <div className="rounded-[8px] border border-dashed border-[#d8d7cf] bg-[#faf9f6] py-8 text-center text-sm text-[#78766d]">
+            <div className="rounded-[8px] border border-dashed border-border bg-card py-8 text-center text-sm text-muted-foreground">
               Ingen rengøringsplan endnu. Tilføj første huslige pligt.
             </div>
           ) : (
             <div className="space-y-5">
               {cleaningByWeekday.map(([weekdayIndex, dayTasks]) => (
                 <div key={weekdayIndex}>
-                  <p className="mb-2 text-[13px] font-bold uppercase tracking-[0.06em] text-[#78766d]">
+                  <p className="mb-2 text-[13px] font-bold uppercase tracking-[0.06em] text-muted-foreground">
                     {weekdayNames[Number(weekdayIndex)]}
                   </p>
                   <div className="space-y-2">
                     {dayTasks.map((task) => (
                       <SwipeableTaskCard key={task.id} onDelete={() => void deleteTask(task.id)}>
-                        <div className="flex items-center gap-3 border-b border-[#f2f1ed] px-3 py-3">
+                        <div className="flex items-center gap-3 border-b border-border px-3 py-3">
                           <Checkbox
                             checked={task.completed}
                             onCheckedChange={(checked) => {
@@ -688,26 +688,26 @@ export function Opgaver() {
                           />
                           <div className="flex-1 min-w-0">
                             <p className={cn(
-                              'text-[14px] font-medium text-[#2f2f2d]',
-                              task.completed && 'line-through text-[#9b9a93]'
+                              'text-[14px] font-medium text-foreground',
+                              task.completed && 'line-through text-muted-foreground'
                             )}>
                               {task.title}
                             </p>
                             <div className="mt-1 flex flex-wrap items-center gap-1.5">
                               {task.area && (
-                                <span className="text-[11px] text-[#78766d]">{task.area}</span>
+                                <span className="text-[11px] text-muted-foreground">{task.area}</span>
                               )}
-                              {task.area && <span className="text-[11px] text-[#d0cec5]">·</span>}
-                              <span className="text-[11px] text-[#78766d]">{getRecurringLabel(task.recurringPattern)}</span>
-                              <span className="text-[11px] text-[#d0cec5]">·</span>
-                              <span className="text-[11px] text-[#78766d]">
+                              {task.area && <span className="text-[11px] text-muted-foreground">·</span>}
+                              <span className="text-[11px] text-muted-foreground">{getRecurringLabel(task.recurringPattern)}</span>
+                              <span className="text-[11px] text-muted-foreground">·</span>
+                              <span className="text-[11px] text-muted-foreground">
                                 {users.find((user) => user.id === task.assignedTo)?.name || 'Ukendt'}
                               </span>
                             </div>
                           </div>
                           <button
                             onClick={() => void deleteTask(task.id)}
-                            className="shrink-0 p-1.5 text-[#c5c4be] hover:text-[#ef4444] transition-colors"
+                            className="shrink-0 p-1.5 text-muted-foreground hover:text-[#ef4444] transition-colors"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
@@ -746,18 +746,18 @@ export function Opgaver() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: '100%' }}
                   transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-                  className="fixed inset-0 z-[9999] flex flex-col bg-[#faf9f6]"
+                  className="fixed inset-0 z-[9999] flex flex-col bg-card"
                   style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
                 >
                   {/* Header */}
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-[#e5e3dc] bg-white">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card">
                     <button
                       onClick={() => { setIsAddShoppingOpen(false); setNewListName(''); }}
-                      className="flex items-center gap-1 text-[15px] font-medium text-[#78766d] active:opacity-70"
+                      className="flex items-center gap-1 text-[15px] font-medium text-muted-foreground active:opacity-70"
                     >
                       <X className="h-5 w-5" />
                     </button>
-                    <h2 className="text-[16px] font-bold text-[#2f2f2d]">Opret indkøbsliste</h2>
+                    <h2 className="text-[16px] font-bold text-foreground">Opret indkøbsliste</h2>
                     <button
                       onClick={handleCreateShoppingList}
                       disabled={!newListName.trim() || isSaving}
@@ -769,12 +769,12 @@ export function Opgaver() {
                   {/* Content */}
                   <div className="flex-1 px-4 pt-6 space-y-4">
                     <div className="space-y-1.5">
-                      <Label className="text-[12px] font-semibold text-[#78766d]">Navn</Label>
+                      <Label className="text-[12px] font-semibold text-muted-foreground">Navn</Label>
                       <Input
                         value={newListName}
                         onChange={(e) => setNewListName(e.target.value)}
                         placeholder="F.eks. Weekendindkøb"
-                        className="rounded-[8px] border-[#e5e3dc] bg-white focus:border-[#f58a2d]"
+                        className="rounded-[8px] border-border bg-card focus:border-[#f58a2d]"
                         autoFocus
                       />
                     </div>
@@ -786,7 +786,7 @@ export function Opgaver() {
             {/* Create list button */}
             <button
               onClick={() => setIsAddShoppingOpen(true)}
-              className="flex w-full items-center justify-center gap-2 rounded-[8px] border-2 border-dashed border-[#d8d7cf] bg-[#faf9f6] py-4 text-[14px] font-semibold text-[#4a4945] transition-all hover:border-[#cccbc3] active:scale-[0.98]"
+              className="flex w-full items-center justify-center gap-2 rounded-[8px] border-2 border-dashed border-border bg-card py-4 text-[14px] font-semibold text-foreground transition-all hover:border-border active:scale-[0.98]"
             >
               <Plus className="h-4 w-4" />
               Opret indkøbsliste
@@ -795,12 +795,12 @@ export function Opgaver() {
             {/* Shopping list cards */}
             {displayLists.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-[8px] bg-[#f2f1ed]">
-                  <ShoppingCart className="h-8 w-8 text-[#b0ada4]" />
+                <div className="flex h-16 w-16 items-center justify-center rounded-[8px] bg-background">
+                  <ShoppingCart className="h-8 w-8 text-muted-foreground" />
                 </div>
                 <div>
-                  <p className="text-[15px] font-semibold text-[#2f2f2d]">Ingen indkøbslister</p>
-                  <p className="text-[13px] text-[#9a978f] mt-1">Opret en liste eller tilføj varer i Mad & Hjem</p>
+                  <p className="text-[15px] font-semibold text-foreground">Ingen indkøbslister</p>
+                  <p className="text-[13px] text-muted-foreground mt-1">Opret en liste eller tilføj varer i Mad & Hjem</p>
                 </div>
               </div>
             ) : (
@@ -819,11 +819,11 @@ export function Opgaver() {
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                     >
-                      <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-4">
+                      <div className="rounded-[8px] border border-border bg-card p-4">
                         <div className="flex items-center justify-between gap-3">
                           <div className="flex-1 min-w-0">
-                            <p className="text-[15px] font-bold text-[#2f2f2d] truncate">{list.name}</p>
-                            <p className="text-[12px] text-[#9a978f] mt-0.5">
+                            <p className="text-[15px] font-bold text-foreground truncate">{list.name}</p>
+                            <p className="text-[12px] text-muted-foreground mt-0.5">
                               {total === 0
                                 ? 'Ingen varer endnu'
                                 : `${purchased}/${total} varer afkrydset`}
@@ -831,12 +831,12 @@ export function Opgaver() {
                           </div>
                           <div className="flex items-center gap-2">
                             {total > 0 && (
-                              <span className="text-[13px] font-bold text-[#2f2f2d]">{pct}%</span>
+                              <span className="text-[13px] font-bold text-foreground">{pct}%</span>
                             )}
                             {list.id !== '__dagligvarer__' && (
                               <button
                                 onClick={() => deleteShoppingList(list.id)}
-                                className="shrink-0 text-[#b0ada4] hover:text-red-500 transition-colors active:scale-95"
+                                className="shrink-0 text-muted-foreground hover:text-red-500 transition-colors active:scale-95"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </button>
@@ -844,7 +844,7 @@ export function Opgaver() {
                           </div>
                         </div>
                         {total > 0 && (
-                          <div className="mt-3 h-1.5 rounded-full bg-[#f0efe8] overflow-hidden">
+                          <div className="mt-3 h-1.5 rounded-full bg-muted overflow-hidden">
                             <div
                               className="h-full rounded-full bg-[#22c55e] transition-all"
                               style={{ width: `${pct}%` }}
@@ -868,36 +868,36 @@ export function Opgaver() {
           <BottomSheet open={isAddCleaningOpen} onOpenChange={setIsAddCleaningOpen} title="Tilføj skabelon som opgave">
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <Label className="text-[12px] font-semibold text-[#78766d]">Opgave</Label>
+                <Label className="text-[12px] font-semibold text-muted-foreground">Opgave</Label>
                 <Input
                   value={newCleaning.title}
                   onChange={(e) => setNewCleaning((prev) => ({ ...prev, title: e.target.value }))}
                   placeholder="Fx vask gulv i køkken"
-                  className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] focus:border-[#f58a2d]"
+                  className="rounded-[8px] border-border bg-card focus:border-[#f58a2d]"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-[12px] font-semibold text-[#78766d]">Område</Label>
+                <Label className="text-[12px] font-semibold text-muted-foreground">Område</Label>
                 <Input
                   value={newCleaning.area}
                   onChange={(e) => setNewCleaning((prev) => ({ ...prev, area: e.target.value }))}
                   placeholder="Fx køkken"
-                  className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] focus:border-[#f58a2d]"
+                  className="rounded-[8px] border-border bg-card focus:border-[#f58a2d]"
                 />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-[12px] font-semibold text-[#78766d]">Dag</Label>
+                  <Label className="text-[12px] font-semibold text-muted-foreground">Dag</Label>
                   <SelectSheet
                     value={newCleaning.weekday}
                     onValueChange={(value) => setNewCleaning((prev) => ({ ...prev, weekday: value }))}
                     title="Dag"
                     options={weekdayNames.map((day, index) => ({ value: String(index), label: day }))}
-                    className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6]"
+                    className="rounded-[8px] border-border bg-card"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[12px] font-semibold text-[#78766d]">Hyppighed</Label>
+                  <Label className="text-[12px] font-semibold text-muted-foreground">Hyppighed</Label>
                   <SelectSheet
                     value={newCleaning.recurringPattern}
                     onValueChange={(value) => setNewCleaning((prev) => ({ ...prev, recurringPattern: value }))}
@@ -907,7 +907,7 @@ export function Opgaver() {
                       { value: 'biweekly', label: 'Hver 2. uge' },
                       { value: 'monthly', label: 'Månedlig' },
                     ]}
-                    className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6]"
+                    className="rounded-[8px] border-border bg-card"
                   />
                 </div>
               </div>
@@ -921,29 +921,29 @@ export function Opgaver() {
             </div>
           </BottomSheet>
 
-          <p className="text-[13px] text-[#78766d]">Tryk på en skabelon for at tilføje den som rengøringsopgave.</p>
+          <p className="text-[13px] text-muted-foreground">Tryk på en skabelon for at tilføje den som rengøringsopgave.</p>
 
           <div className="space-y-2">
             {cleaningTemplates.map((template) => (
               <button
                 key={template.title}
                 onClick={() => addTemplateCleaningTask(template)}
-                className="flex w-full items-center gap-3 rounded-[8px] border border-[#e5e3dc] bg-white p-4 text-left transition-all hover:border-[#cccbc3] active:scale-[0.98]"
+                className="flex w-full items-center gap-3 rounded-[8px] border border-border bg-card p-4 text-left transition-all hover:border-border active:scale-[0.98]"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-[#f0efe8]">
-                  <Layout className="h-5 w-5 text-[#75736b]" />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-muted">
+                  <Layout className="h-5 w-5 text-muted-foreground" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-bold text-[#2f2f2d]">{template.title}</p>
+                  <p className="text-[14px] font-bold text-foreground">{template.title}</p>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="text-[11px] text-[#78766d]">{template.area}</span>
-                    <span className="text-[11px] text-[#d0cec5]">&middot;</span>
-                    <span className="text-[11px] text-[#78766d]">{weekdayNames[template.weekday]}</span>
-                    <span className="text-[11px] text-[#d0cec5]">&middot;</span>
-                    <span className="text-[11px] text-[#78766d]">{getRecurringLabel(template.recurringPattern)}</span>
+                    <span className="text-[11px] text-muted-foreground">{template.area}</span>
+                    <span className="text-[11px] text-muted-foreground">&middot;</span>
+                    <span className="text-[11px] text-muted-foreground">{weekdayNames[template.weekday]}</span>
+                    <span className="text-[11px] text-muted-foreground">&middot;</span>
+                    <span className="text-[11px] text-muted-foreground">{getRecurringLabel(template.recurringPattern)}</span>
                   </div>
                 </div>
-                <Plus className="h-5 w-5 shrink-0 text-[#b0ada4]" />
+                <Plus className="h-5 w-5 shrink-0 text-muted-foreground" />
               </button>
             ))}
           </div>

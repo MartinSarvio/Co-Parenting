@@ -39,7 +39,7 @@ const toWeekdayIndex = (day: Date): number => {
 const getParentDayPalette = (color: 'warm' | 'cool' | 'neutral') => {
   if (color === 'warm') {
     return {
-      card: 'border-[#f4c89f] bg-[#fff2e6]',
+      card: 'border-[#f4c89f] bg-orange-tint',
       text: 'text-[#cc6f1f]',
       avatarClass: 'bg-[#f58a2d] text-white',
     };
@@ -47,16 +47,16 @@ const getParentDayPalette = (color: 'warm' | 'cool' | 'neutral') => {
 
   if (color === 'cool') {
     return {
-      card: 'border-[#2f2f2f] bg-[#2f2f2f]',
+      card: 'border-primary bg-primary',
       text: 'text-white',
-      avatarClass: 'bg-[#4f4b45] text-white',
+      avatarClass: 'bg-primary text-white',
     };
   }
 
   return {
-    card: 'border-[#d8d7cf] bg-[#f4f3ee]',
+    card: 'border-border bg-card',
     text: 'text-[#5f5c53]',
-    avatarClass: 'bg-[#dfddd5] text-[#5f5c53]',
+    avatarClass: 'bg-muted text-[#5f5c53]',
   };
 };
 
@@ -188,8 +188,8 @@ export function Samversplan() {
 
   return (
     <div className="space-y-1.5 py-1">
-      {/* ─── Side panel: CustodyConfig full-screen — portal (skjult for familiemedlemmer) ─── */}
-      {!isFamilyMember && createPortal(
+      {/* ─── Side panel: CustodyConfig full-screen — portal ─── */}
+      {createPortal(
       <AnimatePresence>
         {sideMenuOpen && sideMenuContext === 'samversplan' && (
           <>
@@ -206,14 +206,14 @@ export function Samversplan() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-              className="fixed inset-y-0 left-0 z-[9999] w-full bg-white flex flex-col"
+              className="fixed inset-y-0 left-0 z-[9999] w-full bg-card flex flex-col"
               style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
             >
               <div className="flex items-center justify-between px-5 py-3">
-                <h2 className="text-[17px] font-bold text-[#2f2f2d]">Indstillinger</h2>
+                <h2 className="text-[17px] font-bold text-foreground">Indstillinger</h2>
                 <button
                   onClick={() => setSideMenuOpen(false)}
-                  className="flex h-8 w-8 items-center justify-center text-[#5f5d56] hover:text-[#2f2f2d] transition-colors"
+                  className="flex h-8 w-8 items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -228,19 +228,19 @@ export function Samversplan() {
       document.body
       )}
 
-      {/* Konfigurationsbanner hvis plan ikke er konfigureret (skjult for familiemedlemmer) */}
-      {!isFamilyMember && custodyPlan && !custodyPlan.customWeekConfig && (
-        <Card className="border-[#f3c59d] bg-[#fff2e6]">
+      {/* Konfigurationsbanner hvis plan ikke er konfigureret */}
+      {custodyPlan && !custodyPlan.customWeekConfig && (
+        <Card className="border-orange-tint bg-orange-tint">
           <CardContent className="p-4 text-center space-y-2">
-            <p className="text-[14px] font-semibold text-[#2f2f2d]">
+            <p className="text-[14px] font-semibold text-foreground">
               Bekræft din samværsplan
             </p>
-            <p className="text-[13px] text-[#78766d]">
+            <p className="text-[13px] text-muted-foreground">
               Åbn indstillinger for at konfigurere hvem der har barnet hvornår.
             </p>
             <Button
               onClick={() => { setSideMenuContext('samversplan'); setSideMenuOpen(true); }}
-              className="bg-[#2f2f2f] text-white hover:bg-[#242424]"
+              className="bg-primary text-white hover:bg-primary"
             >
               Konfigurer plan
             </Button>
@@ -255,20 +255,20 @@ export function Samversplan() {
         className="grid grid-cols-1 gap-2 sm:grid-cols-2"
       >
         {meParent && (
-          <div className="flex items-center gap-2 rounded-[12px] border border-[#32302b] bg-[#2f2f2f] px-3 py-2">
+          <div className="flex items-center gap-2 rounded-[12px] border border-border bg-primary px-3 py-2">
             <Avatar className="h-7 w-7">
               <AvatarImage src={meParent.avatar} />
-              <AvatarFallback className="bg-[#4f4b45] text-xs text-white">
+              <AvatarFallback className="bg-primary text-xs text-white">
                 {meParent.name[0]}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
               <p className="truncate text-sm font-medium text-white">{meParent.name}</p>
-              <p className="text-xs text-[#e2e1dc]">Sort</p>
+              <p className="text-xs text-muted-foreground">Sort</p>
             </div>
           </div>
         )}
-        <div className="flex items-center gap-2 rounded-[12px] border border-[#f3c59d] bg-[#fff2e6] px-3 py-2">
+        <div className="flex items-center gap-2 rounded-[12px] border border-orange-tint bg-orange-tint px-3 py-2">
           <Avatar className="h-7 w-7">
             {otherParent && <AvatarImage src={otherParent.avatar} />}
             <AvatarFallback className="bg-[#f58a2d] text-xs text-white">
@@ -290,7 +290,7 @@ export function Samversplan() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="flex items-center justify-between rounded-[8px] border border-[#d8d7cf] bg-[#f8f7f3] p-2"
+        className="flex items-center justify-between rounded-[8px] border border-border bg-card p-2"
       >
         <Button variant="ghost" size="icon" onClick={goToPrevious}>
           <ChevronLeft className="h-5 w-5" />
@@ -298,21 +298,21 @@ export function Samversplan() {
         <button
           type="button"
           onClick={() => setViewMode((prev) => (prev === 'week' ? 'month' : 'week'))}
-          className="rounded-[8px] px-3 py-1 text-center transition-colors hover:bg-[#efeee8]"
+          className="rounded-[8px] px-3 py-1 text-center transition-colors hover:bg-card"
         >
           {viewMode === 'week' ? (
             <>
-              <p className="font-semibold text-[#2f2f2d]">Uge {format(currentDate, 'w', { locale: da })}</p>
-              <p className="text-sm text-[#75736b]">
+              <p className="font-semibold text-foreground">Uge {format(currentDate, 'w', { locale: da })}</p>
+              <p className="text-sm text-muted-foreground">
                 {format(weekStart, 'dd. MMM', { locale: da })} - {format(addDays(weekStart, 6), 'dd. MMM', { locale: da })}
               </p>
             </>
           ) : (
             <>
-              <p className="font-semibold capitalize text-[#2f2f2d]">
+              <p className="font-semibold capitalize text-foreground">
                 {format(currentDate, 'MMMM yyyy', { locale: da })}
               </p>
-              <p className="text-sm text-[#75736b]">Tryk for at skifte tilbage til ugevisning</p>
+              <p className="text-sm text-muted-foreground">Tryk for at skifte tilbage til ugevisning</p>
             </>
           )}
         </button>
@@ -332,9 +332,9 @@ export function Samversplan() {
         transition={{ delay: 0.3 }}
       >
         {viewMode === 'week' ? (
-          <Card className="overflow-hidden border-[#d8d7cf]">
+          <Card className="overflow-hidden border-border">
             <CardContent className="p-0">
-              <div className="grid grid-cols-7 divide-x divide-[#e7e6df]">
+              <div className="grid grid-cols-7 divide-x divide-border">
                 {weekDays.map((day, index) => {
                   const parent = getParentForDay(day);
                   const isToday = isSameDay(day, new Date());
@@ -356,13 +356,13 @@ export function Samversplan() {
                       }}
                       className={cn(
                         "min-h-[120px] p-1.5 transition-colors",
-                        parent ? "cursor-pointer hover:bg-[#f4f2ec]" : "cursor-default opacity-50",
-                        isWeekend && "bg-[#f1f0ea]/65"
+                        parent ? "cursor-pointer hover:bg-card" : "cursor-default opacity-50",
+                        isWeekend && "bg-card/65"
                       )}
                     >
                       <div className={cn(
                         "mb-2 rounded-[8px] py-1 text-center",
-                        isToday && "bg-[#fff2e6]"
+                        isToday && "bg-orange-tint"
                       )}>
                         <p className={cn(
                           "text-xs font-medium",
@@ -372,7 +372,7 @@ export function Samversplan() {
                         </p>
                         <p className={cn(
                           "text-lg font-semibold",
-                          isToday ? "text-[#f58a2d]" : "text-[#2f2f2d]"
+                          isToday ? "text-[#f58a2d]" : "text-foreground"
                         )}>
                           {format(day, 'd')}
                         </p>
@@ -405,16 +405,16 @@ export function Samversplan() {
                 })}
               </div>
               {!isFamilyMember && (
-                <p className="border-t border-[#ecebe4] bg-[#f8f7f3] px-3 py-2 text-xs text-[#75736b]">
+                <p className="border-t border-border bg-card px-3 py-2 text-xs text-muted-foreground">
                   Tryk på en dag for at sende bytteanmodning.
                 </p>
               )}
             </CardContent>
           </Card>
         ) : (
-          <Card className="overflow-hidden border-[#d8d7cf]">
+          <Card className="overflow-hidden border-border">
             <CardContent className="p-0">
-              <div className="grid grid-cols-7 border-b border-[#e7e6df]">
+              <div className="grid grid-cols-7 border-b border-border">
                 {weekdayNames.map((day) => (
                   <div key={day} className="py-2 text-center text-xs font-semibold text-[#726f67]">
                     {day}
@@ -427,7 +427,7 @@ export function Samversplan() {
                     return (
                       <div
                         key={`empty-${idx}`}
-                        className="min-h-[84px] border-b border-r border-[#ecebe4] bg-[#f3f2ec]"
+                        className="min-h-[84px] border-b border-r border-border bg-card"
                       />
                     );
                   }
@@ -445,15 +445,15 @@ export function Samversplan() {
                       onClick={() => parent && openSwapDialog(day)}
                       disabled={!parent}
                       className={cn(
-                        "min-h-[84px] border-b border-r border-[#ecebe4] px-1.5 py-1.5 text-left transition-colors",
-                        parent ? "hover:bg-[#f1efe8]" : "cursor-default opacity-50",
-                        !isCurrentMonthDay && "bg-[#f3f2ec]"
+                        "min-h-[84px] border-b border-r border-border px-1.5 py-1.5 text-left transition-colors",
+                        parent ? "hover:bg-card" : "cursor-default opacity-50",
+                        !isCurrentMonthDay && "bg-card"
                       )}
                     >
                       <div className="mb-1 flex items-center gap-0.5">
                         <div className={cn(
                           "flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold",
-                          isToday ? "bg-[#f58a2d] text-white" : "text-[#5d5a52]"
+                          isToday ? "bg-[#f58a2d] text-white" : "text-foreground"
                         )}>
                           {format(day, 'd')}
                         </div>
@@ -489,7 +489,7 @@ export function Samversplan() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
       >
-        <Card className="border-[#d8d7cf]">
+        <Card className="border-border">
           <CardHeader className="pb-3">
             <CardTitle className="text-lg">
               Kommende skiftedage
@@ -502,15 +502,15 @@ export function Samversplan() {
                 return (
                   <div
                     key={day.toISOString()}
-                    className="flex items-center gap-3 p-3 border-b border-[#f2f1ed]"
+                    className="flex items-center gap-3 p-3 border-b border-border"
                   >
-                    <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[8px] bg-[#eceae2]">
-                      <span className="text-base font-semibold text-[#504d45]">
+                    <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[8px] bg-secondary">
+                      <span className="text-base font-semibold text-foreground">
                         {format(day, 'd')}
                       </span>
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-[#2f2f2d]">{format(day, 'EEEE', { locale: da })}</p>
+                      <p className="font-medium text-foreground">{format(day, 'EEEE', { locale: da })}</p>
                       <p className="text-sm text-[#6f6c64]">
                         Aflevering fra {transition.fromParent.name} til {transition.toParent.name}
                         {custodyPlan?.customWeekConfig?.handoverContext === 'after_daycare'
@@ -518,7 +518,7 @@ export function Samversplan() {
                           : ` kl. ${custodyPlan?.customWeekConfig?.handoverTime || custodyPlan?.swapTime || '16:00'}`}
                       </p>
                     </div>
-                    <Badge variant="outline" className="flex items-center gap-1 border-[#d7d6cd] text-[#625f57]">
+                    <Badge variant="outline" className="flex items-center gap-1 border-border text-foreground">
                       <CheckCircle2 className="h-3 w-3" />
                       Bekræftet
                     </Badge>
@@ -526,7 +526,7 @@ export function Samversplan() {
                 );
               })}
               {transitionsInVisibleRange.length === 0 && (
-                <div className="rounded-[8px] border border-dashed border-[#d1d0c8] bg-[#f4f3ee] p-4 text-sm text-[#747168]">
+                <div className="rounded-[8px] border border-dashed border-border bg-card p-4 text-sm text-[#747168]">
                   Ingen skiftedage i den valgte periode.
                 </div>
               )}

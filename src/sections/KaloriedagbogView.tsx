@@ -408,22 +408,22 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
 
   return (
     <motion.div
-      className="fixed inset-0 z-[60] bg-[#faf9f6] flex flex-col overflow-hidden"
+      className="fixed inset-0 z-[60] bg-card flex flex-col overflow-hidden"
       initial={{ x: '100%' }}
       animate={{ x: 0 }}
       exit={{ x: '100%' }}
       transition={{ type: 'spring', stiffness: 380, damping: 38 }}
     >
       {/* ── Header ── */}
-      <div className="shrink-0 px-4 pt-[env(safe-area-inset-top,16px)] pb-2 bg-[#faf9f6] border-b border-[#e5e3dc]">
+      <div className="shrink-0 px-4 pt-[env(safe-area-inset-top,16px)] pb-2 bg-card border-b border-border">
         <div className="flex items-center gap-3 mb-3 pt-2">
           <button
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center text-[#2f2f2d] active:scale-[0.92] transition-transform"
+            className="flex h-9 w-9 items-center justify-center text-foreground active:scale-[0.92] transition-transform"
           >
             <ArrowLeft className="h-[18px] w-[18px]" />
           </button>
-          <span className="flex-1 text-[15px] font-semibold text-[#9a978f]">Tilføj til {mealLabel}</span>
+          <span className="flex-1 text-[15px] font-semibold text-muted-foreground">Tilføj til {mealLabel}</span>
           <button
             onClick={() => setQuickAddOpen(true)}
             className="flex h-9 w-9 items-center justify-center rounded-lg text-[#f58a2d] active:scale-[0.92] transition-transform"
@@ -434,14 +434,14 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
         </div>
 
         {/* Underline tabs */}
-        <div className="flex border-b border-[#e5e3dc] mb-3">
+        <div className="flex border-b border-border mb-3">
           {(['fodevarer', 'opskrifter', 'produkter'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => { setPickerTab(tab); setSearch(''); setSelectedFoodItem(null); setSelectedRecipe(null); setSelectedDbProduct(null); }}
               className={cn(
                 'relative flex-1 py-2.5 text-[14px] font-semibold transition-colors',
-                pickerTab === tab ? 'text-[#2f2f2d]' : 'text-[#b0ada4]'
+                pickerTab === tab ? 'text-foreground' : 'text-muted-foreground'
               )}
             >
               {tab === 'fodevarer' ? 'Fødevarer' : tab === 'opskrifter' ? 'Opskrifter' : (
@@ -450,7 +450,7 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
               {pickerTab === tab && (
                 <motion.div
                   layoutId="picker-underline"
-                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#2f2f2d] rounded-full"
+                  className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary rounded-full"
                 />
               )}
             </button>
@@ -459,16 +459,16 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
 
         {/* Search bar */}
         <div className="relative mb-3">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#b0ada4]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             type="text"
             placeholder={pickerTab === 'fodevarer' ? 'Søg fødevare, mærke...' : pickerTab === 'opskrifter' ? 'Søg opskrift...' : 'Søg i produktdatabasen...'}
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-10 pr-10 py-2.5 rounded-[8px] bg-[#ecebe5] border-0 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none"
+            className="w-full pl-10 pr-10 py-2.5 rounded-[8px] bg-secondary border-0 text-[14px] text-foreground placeholder:text-muted-foreground outline-none"
           />
           {search.length > 0 && (
-            <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#b0ada4]">
+            <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
               <X className="h-4 w-4" />
             </button>
           )}
@@ -483,14 +483,14 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
               title="Kategori"
               placeholder="Alle kategorier"
               options={[{ value: 'Alle', label: 'Alle kategorier' }, ...foodCategories.map(cat => ({ value: cat, label: cat }))]}
-              className="flex-1 rounded-[8px] h-9 border-[#e5e3dc] bg-white text-[13px] font-semibold"
+              className="flex-1 rounded-[8px] h-9 border-border bg-card text-[13px] font-semibold"
             />
 
             {/* Barcode scanner button */}
             <button
               onClick={handleScanBarcode}
               disabled={scanLoading}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] border border-[#e5e3dc] bg-white text-[#78766d] active:scale-[0.92] transition-transform disabled:opacity-50"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] border border-border bg-card text-muted-foreground active:scale-[0.92] transition-transform disabled:opacity-50"
               title="Scan stregkode"
             >
               {scanLoading ? (
@@ -509,7 +509,7 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
                 onClick={() => setRecipeCategory(cat)}
                 className={cn(
                   'shrink-0 rounded-[8px] px-3.5 py-1.5 text-[12px] font-semibold transition-all',
-                  recipeCategory === cat ? 'bg-[#2f2f2d] text-white' : 'bg-[#ecebe5] text-[#78766d]'
+                  recipeCategory === cat ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground'
                 )}
               >
                 {cat}
@@ -525,35 +525,35 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
           /* ── Food items list ── */
           filteredFoodItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-48 gap-3 text-center px-8">
-              <Search className="h-10 w-10 text-[#d8d7cf]" />
-              <p className="text-[14px] text-[#9a978f]">Ingen fødevarer fundet</p>
-              <p className="text-[12px] text-[#b0ada4]">Prøv et andet søgeord eller scan en stregkode</p>
+              <Search className="h-10 w-10 text-muted-foreground" />
+              <p className="text-[14px] text-muted-foreground">Ingen fødevarer fundet</p>
+              <p className="text-[12px] text-muted-foreground">Prøv et andet søgeord eller scan en stregkode</p>
             </div>
           ) : (
-            <div className="divide-y divide-[#f2f1ed]">
+            <div className="divide-y divide-border">
               {filteredFoodItems.map(item => (
                 <button
                   key={item.id}
                   onClick={() => { setSelectedFoodItem(item); setServingGrams('100'); }}
-                  className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-white transition-colors text-left"
+                  className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-card transition-colors text-left"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="text-[14px] font-semibold text-[#2f2f2d] truncate">{item.name}</p>
+                      <p className="text-[14px] font-semibold text-foreground truncate">{item.name}</p>
                       {item.brand && (
-                        <span className="shrink-0 text-[11px] text-[#9a978f]">{item.brand}</span>
+                        <span className="shrink-0 text-[11px] text-muted-foreground">{item.brand}</span>
                       )}
                     </div>
-                    <p className="text-[11px] text-[#9a978f] mt-0.5">
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
                       {item.category} · P {item.proteinPer100g}g · K {item.carbsPer100g}g · F {item.fatPer100g}g per 100g
                     </p>
                   </div>
                   <div className="flex items-center gap-2 ml-3 shrink-0">
                     <div className="text-right">
                       <p className="text-[15px] font-black text-[#f58a2d]">{item.kcalPer100g}</p>
-                      <p className="text-[10px] text-[#b0ada4]">kcal/100g</p>
+                      <p className="text-[10px] text-muted-foreground">kcal/100g</p>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-[#c0bdb4]" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </button>
               ))}
@@ -563,46 +563,46 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
           /* ── DB Products list ── */
           search.length < 2 ? (
             <div className="flex flex-col items-center justify-center h-48 gap-3 text-center px-8">
-              <Database className="h-10 w-10 text-[#d8d7cf]" />
-              <p className="text-[14px] text-[#9a978f]">Søg i produktdatabasen</p>
-              <p className="text-[12px] text-[#b0ada4]">Indtast mindst 2 tegn for at søge blandt tusindvis af produkter</p>
+              <Database className="h-10 w-10 text-muted-foreground" />
+              <p className="text-[14px] text-muted-foreground">Søg i produktdatabasen</p>
+              <p className="text-[12px] text-muted-foreground">Indtast mindst 2 tegn for at søge blandt tusindvis af produkter</p>
             </div>
           ) : dbLoading ? (
             <div className="flex flex-col items-center justify-center h-48 gap-3">
-              <Loader2 className="h-8 w-8 text-[#b0ada4] animate-spin" />
-              <p className="text-[13px] text-[#9a978f]">Søger...</p>
+              <Loader2 className="h-8 w-8 text-muted-foreground animate-spin" />
+              <p className="text-[13px] text-muted-foreground">Søger...</p>
             </div>
           ) : dbProducts.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-48 gap-3 text-center px-8">
-              <Search className="h-10 w-10 text-[#d8d7cf]" />
-              <p className="text-[14px] text-[#9a978f]">Ingen produkter fundet</p>
-              <p className="text-[12px] text-[#b0ada4]">Prøv et andet søgeord</p>
+              <Search className="h-10 w-10 text-muted-foreground" />
+              <p className="text-[14px] text-muted-foreground">Ingen produkter fundet</p>
+              <p className="text-[12px] text-muted-foreground">Prøv et andet søgeord</p>
             </div>
           ) : (
-            <div className="divide-y divide-[#f2f1ed]">
+            <div className="divide-y divide-border">
               {dbProducts.map((product, idx) => (
                 <button
                   key={product.barcode ?? idx}
                   onClick={() => { setSelectedDbProduct(product); setDbServingGrams('100'); }}
-                  className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-white transition-colors text-left"
+                  className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-card transition-colors text-left"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="text-[14px] font-semibold text-[#2f2f2d] truncate">{product.name}</p>
+                      <p className="text-[14px] font-semibold text-foreground truncate">{product.name}</p>
                       {product.nutriscoreGrade && (
                         <NutriScoreBadge grade={product.nutriscoreGrade} size="sm" />
                       )}
                     </div>
-                    <p className="text-[11px] text-[#9a978f] mt-0.5">
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
                       {product.brand ?? 'Ukendt mærke'} · P {product.proteinPer100g.toFixed(1)}g · K {product.carbsPer100g.toFixed(1)}g · F {product.fatPer100g.toFixed(1)}g per 100g
                     </p>
                   </div>
                   <div className="flex items-center gap-2 ml-3 shrink-0">
                     <div className="text-right">
                       <p className="text-[15px] font-black text-[#f58a2d]">{Math.round(product.kcalPer100g)}</p>
-                      <p className="text-[10px] text-[#b0ada4]">kcal/100g</p>
+                      <p className="text-[10px] text-muted-foreground">kcal/100g</p>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-[#c0bdb4]" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </button>
               ))}
@@ -612,36 +612,36 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
           /* ── Recipes list ── */
           filteredRecipes.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-48 gap-3 text-center px-8">
-              <ChefHat className="h-10 w-10 text-[#d8d7cf]" />
-              <p className="text-[14px] text-[#9a978f]">Ingen opskrifter fundet</p>
-              <p className="text-[12px] text-[#b0ada4]">Prøv et andet søgeord eller kategori</p>
+              <ChefHat className="h-10 w-10 text-muted-foreground" />
+              <p className="text-[14px] text-muted-foreground">Ingen opskrifter fundet</p>
+              <p className="text-[12px] text-muted-foreground">Prøv et andet søgeord eller kategori</p>
             </div>
           ) : (
-            <div className="divide-y divide-[#f2f1ed]">
+            <div className="divide-y divide-border">
               {filteredRecipes.map(recipe => (
                 <button
                   key={recipe.id}
                   onClick={() => { setSelectedRecipe(recipe); setServings(1); }}
-                  className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-white transition-colors text-left"
+                  className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-card transition-colors text-left"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="text-[14px] font-semibold text-[#2f2f2d] truncate">{recipe.name}</p>
+                      <p className="text-[14px] font-semibold text-foreground truncate">{recipe.name}</p>
                       {recipe.isUserRecipe && (
-                        <span className="shrink-0 rounded-full bg-[#fff2e6] text-[#b96424] text-[10px] font-bold px-2 py-0.5">Min</span>
+                        <span className="shrink-0 rounded-full bg-orange-tint text-[#b96424] text-[10px] font-bold px-2 py-0.5">Min</span>
                       )}
                       {recipe.childFriendly && <span className="shrink-0 text-[13px]">👶</span>}
                     </div>
-                    <p className="text-[11px] text-[#9a978f] mt-0.5">
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
                       {recipe.category} · {recipe.servings} port. · P {recipe.nutrition.protein}g · K {recipe.nutrition.carbs}g · F {recipe.nutrition.fat}g
                     </p>
                   </div>
                   <div className="flex items-center gap-2 ml-3 shrink-0">
                     <div className="text-right">
                       <p className="text-[15px] font-black text-[#f58a2d]">{recipe.nutrition.kcal}</p>
-                      <p className="text-[10px] text-[#b0ada4]">kcal/port.</p>
+                      <p className="text-[10px] text-muted-foreground">kcal/port.</p>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-[#c0bdb4]" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </button>
               ))}
@@ -660,28 +660,28 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
               onClick={() => setSelectedFoodItem(null)}
             />
             <motion.div
-              className="absolute bottom-0 left-0 right-0 z-20 bg-white rounded-t-3xl shadow-2xl pb-[env(safe-area-inset-bottom,24px)]"
+              className="absolute bottom-0 left-0 right-0 z-20 bg-card rounded-t-3xl shadow-2xl pb-[env(safe-area-inset-bottom,24px)]"
               initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
               transition={{ type: 'spring', stiffness: 400, damping: 40 }}
             >
               <div className="flex justify-center pt-3 pb-1">
-                <div className="h-1 w-10 rounded-full bg-[#d8d7cf]" />
+                <div className="h-1 w-10 rounded-full bg-border" />
               </div>
               <div className="px-4 pb-4 space-y-4">
                 {/* Name */}
                 <div className="text-center">
-                  <h2 className="text-[18px] font-black text-[#2f2f2d] leading-tight">{selectedFoodItem.name}</h2>
-                  {selectedFoodItem.brand && <p className="text-[12px] text-[#9a978f]">{selectedFoodItem.brand}</p>}
-                  <p className="text-[11px] text-[#b0ada4] mt-0.5">{selectedFoodItem.category} · per 100g: {selectedFoodItem.kcalPer100g} kcal</p>
+                  <h2 className="text-[18px] font-black text-foreground leading-tight">{selectedFoodItem.name}</h2>
+                  {selectedFoodItem.brand && <p className="text-[12px] text-muted-foreground">{selectedFoodItem.brand}</p>}
+                  <p className="text-[11px] text-muted-foreground mt-0.5">{selectedFoodItem.category} · per 100g: {selectedFoodItem.kcalPer100g} kcal</p>
                 </div>
 
                 {/* Gram input */}
-                <div className="rounded-[8px] bg-[#f2f1ed] p-3">
-                  <p className="text-[12px] font-semibold text-[#78766d] mb-2">Mængde i gram</p>
+                <div className="rounded-[8px] bg-background p-3">
+                  <p className="text-[12px] font-semibold text-muted-foreground mb-2">Mængde i gram</p>
                   <div className="flex items-center gap-4">
                     <button
                       onClick={() => setServingGrams(g => String(Math.max(10, (parseFloat(g) || 100) - 50)))}
-                      className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-white text-[#2f2f2d] shadow-sm active:scale-95 transition-transform"
+                      className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-card text-foreground shadow-sm active:scale-95 transition-transform"
                     >
                       <Minus className="h-4 w-4" />
                     </button>
@@ -691,13 +691,13 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
                         inputMode="decimal"
                         value={servingGrams}
                         onChange={e => setServingGrams(e.target.value)}
-                        className="text-[24px] font-black text-[#2f2f2d] text-center bg-transparent border-0 outline-none w-full"
+                        className="text-[24px] font-black text-foreground text-center bg-transparent border-0 outline-none w-full"
                       />
-                      <p className="text-[11px] text-[#9a978f]">gram</p>
+                      <p className="text-[11px] text-muted-foreground">gram</p>
                     </div>
                     <button
                       onClick={() => setServingGrams(g => String((parseFloat(g) || 100) + 50))}
-                      className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-white text-[#2f2f2d] shadow-sm active:scale-95 transition-transform"
+                      className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-card text-foreground shadow-sm active:scale-95 transition-transform"
                     >
                       <Plus className="h-4 w-4" />
                     </button>
@@ -712,14 +712,14 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
                     { label: 'Kulh.', value: calcFood.carbs, unit: 'g', color: '#f59e0b' },
                     { label: 'Fedt', value: calcFood.fat, unit: 'g', color: '#ef4444' },
                   ].map(n => (
-                    <div key={n.label} className="rounded-[8px] bg-[#faf9f6] border border-[#e5e3dc] p-2.5 text-center">
+                    <div key={n.label} className="rounded-[8px] bg-card border border-border p-2.5 text-center">
                       <p className="text-[16px] font-black leading-tight" style={{ color: n.color }}>{n.value}{n.unit}</p>
-                      <p className="text-[10px] text-[#9a978f] mt-0.5">{n.label}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">{n.label}</p>
                     </div>
                   ))}
                 </div>
                 {calcFood.fiber != null && (
-                  <p className="text-[11px] text-[#9a978f] -mt-2 px-1">Kostfibre: {calcFood.fiber}g</p>
+                  <p className="text-[11px] text-muted-foreground -mt-2 px-1">Kostfibre: {calcFood.fiber}g</p>
                 )}
 
                 <button
@@ -745,33 +745,33 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
               onClick={() => setSelectedRecipe(null)}
             />
             <motion.div
-              className="absolute bottom-0 left-0 right-0 z-20 bg-white rounded-t-3xl shadow-2xl pb-[env(safe-area-inset-bottom,24px)]"
+              className="absolute bottom-0 left-0 right-0 z-20 bg-card rounded-t-3xl shadow-2xl pb-[env(safe-area-inset-bottom,24px)]"
               initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
               transition={{ type: 'spring', stiffness: 400, damping: 40 }}
             >
               <div className="flex justify-center pt-3 pb-1">
-                <div className="h-1 w-10 rounded-full bg-[#d8d7cf]" />
+                <div className="h-1 w-10 rounded-full bg-border" />
               </div>
               <div className="px-4 pb-4 space-y-4">
                 <div className="text-center">
-                  <h2 className="text-[18px] font-black text-[#2f2f2d] leading-tight">{selectedRecipe.name}</h2>
-                  <p className="text-[12px] text-[#9a978f] mt-0.5">{selectedRecipe.category} · Opskrift: {selectedRecipe.servings} portioner</p>
+                  <h2 className="text-[18px] font-black text-foreground leading-tight">{selectedRecipe.name}</h2>
+                  <p className="text-[12px] text-muted-foreground mt-0.5">{selectedRecipe.category} · Opskrift: {selectedRecipe.servings} portioner</p>
                 </div>
 
                 {/* Portion adjuster */}
-                <div className="rounded-[8px] bg-[#f2f1ed] p-3">
-                  <p className="text-[12px] font-semibold text-[#78766d] mb-2">Antal portioner</p>
+                <div className="rounded-[8px] bg-background p-3">
+                  <p className="text-[12px] font-semibold text-muted-foreground mb-2">Antal portioner</p>
                   <div className="flex items-center gap-4">
                     <button onClick={() => setServings(s => Math.max(1, s - 1))} disabled={servings <= 1}
-                      className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-white text-[#2f2f2d] shadow-sm disabled:opacity-30 active:scale-95 transition-transform">
+                      className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-card text-foreground shadow-sm disabled:opacity-30 active:scale-95 transition-transform">
                       <Minus className="h-4 w-4" />
                     </button>
                     <div className="flex-1 text-center">
-                      <p className="text-[24px] font-black text-[#2f2f2d]">{servings}</p>
-                      <p className="text-[11px] text-[#9a978f]">portion{servings !== 1 ? 'er' : ''}</p>
+                      <p className="text-[24px] font-black text-foreground">{servings}</p>
+                      <p className="text-[11px] text-muted-foreground">portion{servings !== 1 ? 'er' : ''}</p>
                     </div>
                     <button onClick={() => setServings(s => Math.min(20, s + 1))} disabled={servings >= 20}
-                      className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-white text-[#2f2f2d] shadow-sm disabled:opacity-30 active:scale-95 transition-transform">
+                      className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-card text-foreground shadow-sm disabled:opacity-30 active:scale-95 transition-transform">
                       <Plus className="h-4 w-4" />
                     </button>
                   </div>
@@ -784,14 +784,14 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
                     { label: 'Kulh.', value: scaledRecipe.carbs, unit: 'g', color: '#f59e0b' },
                     { label: 'Fedt', value: scaledRecipe.fat, unit: 'g', color: '#ef4444' },
                   ].map(n => (
-                    <div key={n.label} className="rounded-[8px] bg-[#faf9f6] border border-[#e5e3dc] p-2.5 text-center">
+                    <div key={n.label} className="rounded-[8px] bg-card border border-border p-2.5 text-center">
                       <p className="text-[16px] font-black leading-tight" style={{ color: n.color }}>{n.value}{n.unit}</p>
-                      <p className="text-[10px] text-[#9a978f] mt-0.5">{n.label}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">{n.label}</p>
                     </div>
                   ))}
                 </div>
                 {scaledRecipe.fiber != null && (
-                  <p className="text-[11px] text-[#9a978f] -mt-2 px-1">Kostfibre: {scaledRecipe.fiber}g</p>
+                  <p className="text-[11px] text-muted-foreground -mt-2 px-1">Kostfibre: {scaledRecipe.fiber}g</p>
                 )}
 
                 <button
@@ -816,24 +816,24 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
               onClick={() => setSelectedDbProduct(null)}
             />
             <motion.div
-              className="absolute bottom-0 left-0 right-0 z-20 bg-white rounded-t-3xl shadow-2xl pb-[env(safe-area-inset-bottom,24px)]"
+              className="absolute bottom-0 left-0 right-0 z-20 bg-card rounded-t-3xl shadow-2xl pb-[env(safe-area-inset-bottom,24px)]"
               initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
               transition={{ type: 'spring', stiffness: 400, damping: 40 }}
             >
               <div className="flex justify-center pt-3 pb-1">
-                <div className="h-1 w-10 rounded-full bg-[#d8d7cf]" />
+                <div className="h-1 w-10 rounded-full bg-border" />
               </div>
               <div className="px-4 pb-4 space-y-4">
                 {/* Name + badges */}
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-2">
-                    <h2 className="text-[18px] font-black text-[#2f2f2d] leading-tight">{selectedDbProduct.name}</h2>
+                    <h2 className="text-[18px] font-black text-foreground leading-tight">{selectedDbProduct.name}</h2>
                     {selectedDbProduct.nutriscoreGrade && (
                       <NutriScoreBadge grade={selectedDbProduct.nutriscoreGrade} size="md" />
                     )}
                   </div>
-                  {selectedDbProduct.brand && <p className="text-[12px] text-[#9a978f]">{selectedDbProduct.brand}</p>}
-                  <p className="text-[11px] text-[#b0ada4] mt-0.5">per 100g: {Math.round(selectedDbProduct.kcalPer100g)} kcal</p>
+                  {selectedDbProduct.brand && <p className="text-[12px] text-muted-foreground">{selectedDbProduct.brand}</p>}
+                  <p className="text-[11px] text-muted-foreground mt-0.5">per 100g: {Math.round(selectedDbProduct.kcalPer100g)} kcal</p>
                 </div>
 
                 {/* Allergen pills */}
@@ -842,7 +842,7 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
                     {selectedDbProduct.allergens.map(tag => (
                       <span
                         key={tag}
-                        className="inline-flex items-center rounded-full bg-[#e8e7e0] px-2 py-0.5 text-[10px] font-semibold text-[#78766d]"
+                        className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground"
                       >
                         {allergenTagToLabel(tag)}
                       </span>
@@ -851,12 +851,12 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
                 )}
 
                 {/* Gram input */}
-                <div className="rounded-[8px] bg-[#f2f1ed] p-3">
-                  <p className="text-[12px] font-semibold text-[#78766d] mb-2">Mængde i gram</p>
+                <div className="rounded-[8px] bg-background p-3">
+                  <p className="text-[12px] font-semibold text-muted-foreground mb-2">Mængde i gram</p>
                   <div className="flex items-center gap-4">
                     <button
                       onClick={() => setDbServingGrams(g => String(Math.max(10, (parseFloat(g) || 100) - 50)))}
-                      className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-white text-[#2f2f2d] shadow-sm active:scale-95 transition-transform"
+                      className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-card text-foreground shadow-sm active:scale-95 transition-transform"
                     >
                       <Minus className="h-4 w-4" />
                     </button>
@@ -866,13 +866,13 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
                         inputMode="decimal"
                         value={dbServingGrams}
                         onChange={e => setDbServingGrams(e.target.value)}
-                        className="text-[24px] font-black text-[#2f2f2d] text-center bg-transparent border-0 outline-none w-full"
+                        className="text-[24px] font-black text-foreground text-center bg-transparent border-0 outline-none w-full"
                       />
-                      <p className="text-[11px] text-[#9a978f]">gram</p>
+                      <p className="text-[11px] text-muted-foreground">gram</p>
                     </div>
                     <button
                       onClick={() => setDbServingGrams(g => String((parseFloat(g) || 100) + 50))}
-                      className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-white text-[#2f2f2d] shadow-sm active:scale-95 transition-transform"
+                      className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-card text-foreground shadow-sm active:scale-95 transition-transform"
                     >
                       <Plus className="h-4 w-4" />
                     </button>
@@ -887,14 +887,14 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
                     { label: 'Kulh.', value: calcDbProduct.carbs, unit: 'g', color: '#f59e0b' },
                     { label: 'Fedt', value: calcDbProduct.fat, unit: 'g', color: '#ef4444' },
                   ].map(n => (
-                    <div key={n.label} className="rounded-[8px] bg-[#faf9f6] border border-[#e5e3dc] p-2.5 text-center">
+                    <div key={n.label} className="rounded-[8px] bg-card border border-border p-2.5 text-center">
                       <p className="text-[16px] font-black leading-tight" style={{ color: n.color }}>{n.value}{n.unit}</p>
-                      <p className="text-[10px] text-[#9a978f] mt-0.5">{n.label}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">{n.label}</p>
                     </div>
                   ))}
                 </div>
                 {calcDbProduct.fiber != null && (
-                  <p className="text-[11px] text-[#9a978f] -mt-2 px-1">Kostfibre: {calcDbProduct.fiber}g</p>
+                  <p className="text-[11px] text-muted-foreground -mt-2 px-1">Kostfibre: {calcDbProduct.fiber}g</p>
                 )}
 
                 <button
@@ -914,20 +914,20 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
       <AnimatePresence>
         {quickAddOpen && (
           <motion.div
-            className="fixed inset-0 z-[65] bg-[#faf9f6] flex flex-col overflow-hidden"
+            className="fixed inset-0 z-[65] bg-card flex flex-col overflow-hidden"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', stiffness: 380, damping: 38 }}
           >
-            <div className="flex items-center justify-between px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-[#faf9f6] border-b border-[#e5e3dc]">
+            <div className="flex items-center justify-between px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-card border-b border-border">
               <button
                 onClick={() => setQuickAddOpen(false)}
-                className="flex h-9 w-9 items-center justify-center text-[#2f2f2d] active:scale-[0.92] transition-transform"
+                className="flex h-9 w-9 items-center justify-center text-foreground active:scale-[0.92] transition-transform"
               >
                 <ArrowLeft className="h-[18px] w-[18px]" />
               </button>
-              <h1 className="text-[17px] font-bold text-[#2f2f2d]">Hurtig tilføjelse</h1>
+              <h1 className="text-[17px] font-bold text-foreground">Hurtig tilføjelse</h1>
               <button
                 onClick={handleQuickAdd}
                 className="flex h-9 w-9 items-center justify-center text-[#f58a2d] active:scale-[0.92] transition-transform"
@@ -939,31 +939,31 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
             <div className="flex-1 overflow-y-auto px-4 pt-4 pb-8 space-y-4 max-w-[430px] mx-auto w-full">
               {/* Navn */}
               <div className="space-y-1.5">
-                <label className="text-[12px] font-medium text-[#78766d]">Navn (valgfrit)</label>
+                <label className="text-[12px] font-medium text-muted-foreground">Navn (valgfrit)</label>
                 <input
                   type="text"
                   value={quickAddName}
                   onChange={e => setQuickAddName(e.target.value)}
                   placeholder="F.eks. Rugbrød m. ost"
-                  className="w-full rounded-[8px] border border-[#e5e3dc] px-3 py-2.5 text-[14px] outline-none focus:border-[#f58a2d] bg-white"
+                  className="w-full rounded-[8px] border border-border px-3 py-2.5 text-[14px] outline-none focus:border-[#f58a2d] bg-card"
                 />
               </div>
 
               {/* Måltid */}
               <div className="space-y-1.5">
-                <label className="text-[12px] font-medium text-[#78766d]">Måltid</label>
+                <label className="text-[12px] font-medium text-muted-foreground">Måltid</label>
                 <SelectSheet
                   value={quickAddMeal}
                   onValueChange={setQuickAddMeal}
                   title="Måltid"
                   options={meals.map(m => ({ value: m.key, label: `${m.emoji} ${m.label}` }))}
-                  className="w-full bg-white"
+                  className="w-full bg-card"
                 />
               </div>
 
               {/* Kalorier */}
               <div className="space-y-1.5">
-                <label className="text-[12px] font-medium text-[#78766d]">Kalorier</label>
+                <label className="text-[12px] font-medium text-muted-foreground">Kalorier</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
@@ -971,16 +971,16 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
                     value={quickAddKcal}
                     onChange={e => setQuickAddKcal(e.target.value)}
                     placeholder="0"
-                    className="flex-1 rounded-[8px] border border-[#e5e3dc] px-3 py-2.5 text-[14px] outline-none focus:border-[#f58a2d] bg-white"
+                    className="flex-1 rounded-[8px] border border-border px-3 py-2.5 text-[14px] outline-none focus:border-[#f58a2d] bg-card"
                   />
-                  <span className="text-[13px] text-[#78766d] w-8">kcal</span>
+                  <span className="text-[13px] text-muted-foreground w-8">kcal</span>
                 </div>
               </div>
 
               {/* Fedt */}
               <div className="space-y-1.5">
                 <div className="flex items-center gap-1.5">
-                  <label className="text-[12px] font-medium text-[#78766d]">Fedt i alt</label>
+                  <label className="text-[12px] font-medium text-muted-foreground">Fedt i alt</label>
                 </div>
                 <div className="flex items-center gap-2">
                   <input
@@ -989,16 +989,16 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
                     value={quickAddFat}
                     onChange={e => setQuickAddFat(e.target.value)}
                     placeholder="0"
-                    className="flex-1 rounded-[8px] border border-[#e5e3dc] px-3 py-2.5 text-[14px] outline-none focus:border-[#f58a2d] bg-white"
+                    className="flex-1 rounded-[8px] border border-border px-3 py-2.5 text-[14px] outline-none focus:border-[#f58a2d] bg-card"
                   />
-                  <span className="text-[13px] text-[#78766d] w-8">g</span>
+                  <span className="text-[13px] text-muted-foreground w-8">g</span>
                 </div>
               </div>
 
               {/* Kulhydrater */}
               <div className="space-y-1.5">
                 <div className="flex items-center gap-1.5">
-                  <label className="text-[12px] font-medium text-[#78766d]">Kulhydrater i alt</label>
+                  <label className="text-[12px] font-medium text-muted-foreground">Kulhydrater i alt</label>
                 </div>
                 <div className="flex items-center gap-2">
                   <input
@@ -1007,16 +1007,16 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
                     value={quickAddCarbs}
                     onChange={e => setQuickAddCarbs(e.target.value)}
                     placeholder="0"
-                    className="flex-1 rounded-[8px] border border-[#e5e3dc] px-3 py-2.5 text-[14px] outline-none focus:border-[#f58a2d] bg-white"
+                    className="flex-1 rounded-[8px] border border-border px-3 py-2.5 text-[14px] outline-none focus:border-[#f58a2d] bg-card"
                   />
-                  <span className="text-[13px] text-[#78766d] w-8">g</span>
+                  <span className="text-[13px] text-muted-foreground w-8">g</span>
                 </div>
               </div>
 
               {/* Protein */}
               <div className="space-y-1.5">
                 <div className="flex items-center gap-1.5">
-                  <label className="text-[12px] font-medium text-[#78766d]">Protein</label>
+                  <label className="text-[12px] font-medium text-muted-foreground">Protein</label>
                 </div>
                 <div className="flex items-center gap-2">
                   <input
@@ -1025,9 +1025,9 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
                     value={quickAddProtein}
                     onChange={e => setQuickAddProtein(e.target.value)}
                     placeholder="0"
-                    className="flex-1 rounded-[8px] border border-[#e5e3dc] px-3 py-2.5 text-[14px] outline-none focus:border-[#f58a2d] bg-white"
+                    className="flex-1 rounded-[8px] border border-border px-3 py-2.5 text-[14px] outline-none focus:border-[#f58a2d] bg-card"
                   />
-                  <span className="text-[13px] text-[#78766d] w-8">g</span>
+                  <span className="text-[13px] text-muted-foreground w-8">g</span>
                 </div>
               </div>
             </div>
@@ -1268,35 +1268,35 @@ export function KaloriedagbogView({ onBack }: Props) {
   return (
     <>
       <motion.div
-        className="fixed inset-0 z-[51] bg-[#faf9f6] flex flex-col overflow-hidden"
+        className="fixed inset-0 z-[51] bg-card flex flex-col overflow-hidden"
         initial={{ x: '100%' }}
         animate={{ x: 0 }}
         exit={{ x: '100%' }}
         transition={{ type: 'spring', stiffness: 380, damping: 38 }}
       >
         {/* ── Header ── */}
-        <div className="grid grid-cols-3 items-center px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-[#faf9f6] border-b border-[#e5e3dc]">
+        <div className="grid grid-cols-3 items-center px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-card border-b border-border">
           <div className="flex items-center gap-1 min-w-0">
             <button
               onClick={onBack}
-              className="flex h-9 w-9 shrink-0 items-center justify-center text-[#2f2f2d] active:scale-[0.92] transition-transform"
+              className="flex h-9 w-9 shrink-0 items-center justify-center text-foreground active:scale-[0.92] transition-transform"
             >
               <ArrowLeft className="h-[18px] w-[18px]" />
             </button>
-            <span className="text-sm font-medium text-[#78766d]">Dagbog</span>
+            <span className="text-sm font-medium text-muted-foreground">Dagbog</span>
           </div>
           <button
             onClick={() => setPersonSelectorOpen(true)}
             className="flex items-center justify-center gap-1.5 px-2 py-1"
           >
-            <span className="text-[15px] font-semibold text-[#2f2f2d]">
+            <span className="text-[15px] font-semibold text-foreground">
               {(familyMembers.find(m => m.id === activeMemberId)?.name ?? 'Mig').split(' ')[0]}
             </span>
-            <ChevronDown className="h-3.5 w-3.5 text-[#8a887f]" />
+            <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
           </button>
           <button
             onClick={() => setGoalsOpen(true)}
-            className="flex items-center justify-center justify-self-end h-8 w-8 text-[#78766d]"
+            className="flex items-center justify-center justify-self-end h-8 w-8 text-muted-foreground"
           >
             <Settings className="h-4 w-4" />
           </button>
@@ -1309,18 +1309,18 @@ export function KaloriedagbogView({ onBack }: Props) {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setSelectedDate(format(subDays(new Date(selectedDate), 1), 'yyyy-MM-dd'))}
-                className="flex h-9 w-9 items-center justify-center text-[#78766d] active:scale-95 transition-transform"
+                className="flex h-9 w-9 items-center justify-center text-muted-foreground active:scale-95 transition-transform"
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
               <div className="flex-1 text-center">
-                <p className="text-[15px] font-bold text-[#2f2f2d]">{dateLabel}</p>
-                {!isToday && <p className="text-[11px] text-[#9a978f]">{format(new Date(selectedDate), 'EEEE d. MMMM', { locale: da })}</p>}
+                <p className="text-[15px] font-bold text-foreground">{dateLabel}</p>
+                {!isToday && <p className="text-[11px] text-muted-foreground">{format(new Date(selectedDate), 'EEEE d. MMMM', { locale: da })}</p>}
               </div>
               {/* Future dates enabled */}
               <button
                 onClick={() => setSelectedDate(format(addDays(new Date(selectedDate), 1), 'yyyy-MM-dd'))}
-                className="flex h-9 w-9 items-center justify-center text-[#78766d] active:scale-95 transition-transform"
+                className="flex h-9 w-9 items-center justify-center text-muted-foreground active:scale-95 transition-transform"
               >
                 <ChevronRight className="h-5 w-5" />
               </button>
@@ -1329,33 +1329,33 @@ export function KaloriedagbogView({ onBack }: Props) {
             {/* ── Kalorie-overblik ── */}
             <button
               onClick={() => { setSelectedEntryId(null); setDetailsOpen(true); }}
-              className="w-full rounded-[8px] bg-white border border-[#e5e3dc] p-4 text-left active:scale-[0.98] transition-transform"
+              className="w-full rounded-[8px] bg-card border border-border p-4 text-left active:scale-[0.98] transition-transform"
             >
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <p className="text-[12px] font-semibold uppercase tracking-wide text-[#9a978f]">Kalorier</p>
+                  <p className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">Kalorier</p>
                   <div className="flex items-baseline gap-1 mt-0.5">
                     {displayFormat === 'percent' ? (
                       <>
-                        <span className="text-[32px] font-black text-[#2f2f2d] leading-none">{pct(totals.kcal, goals.kcal)}%</span>
-                        <span className="text-[13px] text-[#9a978f]">af dagligt mål</span>
+                        <span className="text-[32px] font-black text-foreground leading-none">{pct(totals.kcal, goals.kcal)}%</span>
+                        <span className="text-[13px] text-muted-foreground">af dagligt mål</span>
                       </>
                     ) : (
                       <>
-                        <span className="text-[32px] font-black text-[#2f2f2d] leading-none">{totals.kcal}</span>
-                        <span className="text-[13px] text-[#9a978f]">/ {goals.kcal} kcal</span>
+                        <span className="text-[32px] font-black text-foreground leading-none">{totals.kcal}</span>
+                        <span className="text-[13px] text-muted-foreground">/ {goals.kcal} kcal</span>
                       </>
                     )}
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-[11px] text-[#9a978f]">{remainingKcal >= 0 ? 'Tilbage' : 'Over mål'}</p>
+                  <p className="text-[11px] text-muted-foreground">{remainingKcal >= 0 ? 'Tilbage' : 'Over mål'}</p>
                   <p className={cn("text-[22px] font-black leading-none mt-0.5", remainingKcal < 0 ? "text-red-500" : "text-[#34C759]")}>
                     {remainingKcal < 0 ? `+${Math.abs(remainingKcal)}` : remainingKcal}
                   </p>
                 </div>
               </div>
-              <div className="h-3 w-full rounded-full bg-[#f2f1ed] overflow-hidden mb-3">
+              <div className="h-3 w-full rounded-full bg-background overflow-hidden mb-3">
                 <motion.div
                   className="h-full rounded-full"
                   style={{ backgroundColor: kcalColor }}
@@ -1374,13 +1374,13 @@ export function KaloriedagbogView({ onBack }: Props) {
                     <div className="relative">
                       <MacroRing value={m.value} goal={m.goal} color={m.color} size={56} />
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <span className="text-[11px] font-bold text-[#2f2f2d]">
+                        <span className="text-[11px] font-bold text-foreground">
                           {displayFormat === 'percent' ? `${pct(m.value, m.goal)}%` : formatNutrition(m.value, m.goal, '', 'absolute', numberFormat)}
                         </span>
                       </div>
                     </div>
-                    <p className="text-[11px] text-[#78766d]">{m.label}</p>
-                    <p className="text-[10px] text-[#b0ada4]">
+                    <p className="text-[11px] text-muted-foreground">{m.label}</p>
+                    <p className="text-[10px] text-muted-foreground">
                       {displayFormat === 'percent'
                         ? `${pct(m.value, m.goal)}% af mål`
                         : `${formatNutrition(m.value, m.goal, '', 'absolute', numberFormat)}/${m.goal}${m.unit}`}
@@ -1389,21 +1389,21 @@ export function KaloriedagbogView({ onBack }: Props) {
                 ))}
               </div>
               <div className="flex items-center gap-1 mt-3 justify-end">
-                <Info className="h-3 w-3 text-[#b0ada4]" />
-                <p className="text-[11px] text-[#b0ada4]">Tryk for fuld ernæringsdetaljer</p>
+                <Info className="h-3 w-3 text-muted-foreground" />
+                <p className="text-[11px] text-muted-foreground">Tryk for fuld ernæringsdetaljer</p>
               </div>
             </button>
 
             {/* ── Vand ── */}
-            <div className="rounded-[8px] bg-white border border-[#e5e3dc] p-4">
+            <div className="rounded-[8px] bg-card border border-border p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Droplets className="h-4 w-4 text-[#3b82f6]" />
-                  <p className="text-[14px] font-semibold text-[#2f2f2d]">Vand</p>
+                  <p className="text-[14px] font-semibold text-foreground">Vand</p>
                 </div>
-                <p className="text-[13px] font-bold text-[#2f2f2d]">{water} / {goals.water} ml</p>
+                <p className="text-[13px] font-bold text-foreground">{water} / {goals.water} ml</p>
               </div>
-              <div className="h-2 w-full rounded-full bg-[#f2f1ed] overflow-hidden mb-3">
+              <div className="h-2 w-full rounded-full bg-background overflow-hidden mb-3">
                 <div className="h-full rounded-full bg-[#3b82f6] transition-all duration-500" style={{ width: `${pct(water, goals.water)}%` }} />
               </div>
               <div className="flex gap-2">
@@ -1411,7 +1411,7 @@ export function KaloriedagbogView({ onBack }: Props) {
                   <button
                     key={ml}
                     onClick={() => { setWater(prev => Math.min(prev + ml, 5000)); toast.success(`+${ml} ml vand`); }}
-                    className="flex-1 rounded-[8px] bg-[#eff6ff] py-2 text-[12px] font-semibold text-[#3b82f6] active:scale-95 transition-transform"
+                    className="flex-1 rounded-[8px] bg-blue-tint py-2 text-[12px] font-semibold text-[#3b82f6] active:scale-95 transition-transform"
                   >
                     +{ml >= 1000 ? `${ml / 1000}L` : `${ml}`}
                   </button>
@@ -1426,20 +1426,20 @@ export function KaloriedagbogView({ onBack }: Props) {
                 const mealKcal = entries.reduce((s, e) => s + e.kcal, 0);
                 const suggestions = mealPlanSuggestions.filter(mp => MEAL_TYPE_MAP[mp.mealType] === meal.key);
                 return (
-                  <div key={meal.key} className="rounded-[8px] bg-white border border-[#e5e3dc] overflow-hidden">
+                  <div key={meal.key} className="rounded-[8px] bg-card border border-border overflow-hidden">
                     <div className="flex items-center justify-between px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="flex h-9 w-9 items-center justify-center rounded-[8px] text-lg" style={{ backgroundColor: meal.color + '30' }}>
                           {meal.emoji}
                         </div>
                         <div>
-                          <p className="text-[14px] font-semibold text-[#2f2f2d]">{meal.label}</p>
-                          <p className="text-[12px] text-[#9a978f]">{mealKcal > 0 ? `${mealKcal} kcal` : 'Ingen mad logget'}</p>
+                          <p className="text-[14px] font-semibold text-foreground">{meal.label}</p>
+                          <p className="text-[12px] text-muted-foreground">{mealKcal > 0 ? `${mealKcal} kcal` : 'Ingen mad logget'}</p>
                         </div>
                       </div>
                       <button
                         onClick={() => openFoodPicker(meal.key)}
-                        className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-[#f2f1ed] text-[#78766d] active:bg-[#e5e3dc]"
+                        className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-background text-muted-foreground active:bg-muted"
                       >
                         <Plus className="h-4 w-4" />
                       </button>
@@ -1447,9 +1447,9 @@ export function KaloriedagbogView({ onBack }: Props) {
 
                     {/* Meal plan suggestions for this meal */}
                     {suggestions.length > 0 && (
-                      <div className="border-t border-[#f9f8f5]">
+                      <div className="border-t border-border">
                         {suggestions.map(mp => (
-                          <div key={mp.id} className="flex items-center gap-2 px-4 py-2.5 bg-[#fffbf5]">
+                          <div key={mp.id} className="flex items-center gap-2 px-4 py-2.5 bg-card">
                             <CalendarDays className="h-4 w-4 text-[#f58a2d] shrink-0" />
                             <p className="flex-1 text-[13px] font-medium text-[#7a4915] truncate">{mp.title}</p>
                             <span className="text-[10px] text-[#c0a080] font-bold uppercase shrink-0">Planlagt</span>
@@ -1469,7 +1469,7 @@ export function KaloriedagbogView({ onBack }: Props) {
                             </button>
                             <button
                               onClick={() => handleRejectMealPlan(mp)}
-                              className="flex h-7 w-7 items-center justify-center rounded-[8px] text-[#b0ada4] active:scale-90 transition-transform"
+                              className="flex h-7 w-7 items-center justify-center rounded-[8px] text-muted-foreground active:scale-90 transition-transform"
                               title="Afvis"
                             >
                               <X className="h-4 w-4" />
@@ -1480,24 +1480,24 @@ export function KaloriedagbogView({ onBack }: Props) {
                     )}
 
                     {entries.length > 0 && (
-                      <div className="border-t border-[#f2f1ed]">
+                      <div className="border-t border-border">
                         {entries.map(entry => (
                           <button
                             key={entry.id}
                             onClick={() => { setSelectedEntryId(entry.id); setDetailsOpen(true); }}
-                            className="flex w-full items-center justify-between px-4 py-2.5 hover:bg-[#faf9f6] transition-colors border-b border-[#f9f8f5] last:border-0"
+                            className="flex w-full items-center justify-between px-4 py-2.5 hover:bg-card transition-colors border-b border-border last:border-0"
                           >
                             <div className="text-left min-w-0 flex-1">
-                              <p className="text-[13px] font-medium text-[#2f2f2d] truncate">{entry.food}</p>
-                              <p className="text-[11px] text-[#9a978f]">
+                              <p className="text-[13px] font-medium text-foreground truncate">{entry.food}</p>
+                              <p className="text-[11px] text-muted-foreground">
                                 P {entry.protein}g · K {entry.carbs}g · F {entry.fat}g
                                 {entry.time && ` · ${entry.time}`}
                               </p>
                             </div>
                             <div className="flex items-center gap-2 ml-2">
-                              <span className="text-[13px] font-bold text-[#2f2f2d]">{entry.kcal}</span>
-                              <span className="text-[11px] text-[#9a978f]">kcal</span>
-                              <ChevronRight className="h-3.5 w-3.5 text-[#c0bdb4]" />
+                              <span className="text-[13px] font-bold text-foreground">{entry.kcal}</span>
+                              <span className="text-[11px] text-muted-foreground">kcal</span>
+                              <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
                             </div>
                           </button>
                         ))}
@@ -1510,15 +1510,15 @@ export function KaloriedagbogView({ onBack }: Props) {
 
             {/* ── Kalorie-fordeling ── */}
             {todayEntries.length > 0 && (
-              <div className="rounded-[8px] bg-white border border-[#e5e3dc] p-4 space-y-3">
-                <p className="text-[13px] font-bold text-[#2f2f2d]">Fordeling af kalorier</p>
+              <div className="rounded-[8px] bg-card border border-border p-4 space-y-3">
+                <p className="text-[13px] font-bold text-foreground">Fordeling af kalorier</p>
                 <div className="h-4 w-full rounded-full overflow-hidden flex">
                   {totalMacroKcal > 0 && <>
                     <div className="h-full bg-[#3b82f6]" style={{ width: `${proteinPctKcal}%` }} />
                     <div className="h-full bg-[#f59e0b]" style={{ width: `${carbsPctKcal}%` }} />
                     <div className="h-full bg-[#ef4444]" style={{ width: `${fatPctKcal}%` }} />
                   </>}
-                  {totalMacroKcal === 0 && <div className="h-full w-full bg-[#f2f1ed]" />}
+                  {totalMacroKcal === 0 && <div className="h-full w-full bg-background" />}
                 </div>
                 <div className="flex justify-between">
                   {[
@@ -1528,7 +1528,7 @@ export function KaloriedagbogView({ onBack }: Props) {
                   ].map(m => (
                     <div key={m.label} className="flex items-center gap-1.5">
                       <div className={cn("h-2.5 w-2.5 rounded-full", m.color)} />
-                      <span className="text-[11px] text-[#78766d]">{m.label} {m.pct}%</span>
+                      <span className="text-[11px] text-muted-foreground">{m.label} {m.pct}%</span>
                     </div>
                   ))}
                 </div>
@@ -1542,7 +1542,7 @@ export function KaloriedagbogView({ onBack }: Props) {
 
             {selectedEntry ? (
               <div className="space-y-4">
-                <div className="rounded-[8px] bg-[#faf9f6] p-4 space-y-3">
+                <div className="rounded-[8px] bg-card p-4 space-y-3">
                   <div className="grid grid-cols-2 gap-3">
                     {[
                       { label: 'Kalorier', value: formatNutrition(selectedEntry.kcal, goals.kcal, ' kcal', displayFormat, numberFormat), color: '#f58a2d', icon: Flame },
@@ -1550,27 +1550,27 @@ export function KaloriedagbogView({ onBack }: Props) {
                       { label: 'Kulhydrat', value: formatNutrition(selectedEntry.carbs, goals.carbs, 'g', displayFormat, numberFormat), color: '#f59e0b', icon: Wheat },
                       { label: 'Fedt', value: formatNutrition(selectedEntry.fat, goals.fat, 'g', displayFormat, numberFormat), color: '#ef4444', icon: Droplets },
                     ].map(n => (
-                      <div key={n.label} className="rounded-[8px] bg-white border border-[#e5e3dc] p-3 flex items-center gap-3">
+                      <div key={n.label} className="rounded-[8px] bg-card border border-border p-3 flex items-center gap-3">
                         <div className="flex h-8 w-8 items-center justify-center rounded-[8px]" style={{ backgroundColor: n.color + '20' }}>
                           <n.icon className="h-4 w-4" style={{ color: n.color }} />
                         </div>
                         <div>
-                          <p className="text-[11px] text-[#9a978f]">{n.label}</p>
-                          <p className="text-[14px] font-bold text-[#2f2f2d]">{n.value}</p>
+                          <p className="text-[11px] text-muted-foreground">{n.label}</p>
+                          <p className="text-[14px] font-bold text-foreground">{n.value}</p>
                         </div>
                       </div>
                     ))}
                   </div>
                   {(selectedEntry.fiber || selectedEntry.sugar || selectedEntry.salt) && (
-                    <div className="rounded-[8px] bg-white border border-[#e5e3dc] p-3 space-y-2">
-                      <p className="text-[12px] font-semibold text-[#78766d]">Yderligere næring</p>
-                      {selectedEntry.fiber != null && <div className="flex justify-between"><span className="text-[13px] text-[#78766d]">Kostfibre</span><span className="text-[13px] font-semibold text-[#2f2f2d]">{selectedEntry.fiber} g</span></div>}
-                      {selectedEntry.sugar != null && <div className="flex justify-between"><span className="text-[13px] text-[#78766d]">Sukker</span><span className="text-[13px] font-semibold text-[#2f2f2d]">{selectedEntry.sugar} g</span></div>}
-                      {selectedEntry.salt != null && <div className="flex justify-between"><span className="text-[13px] text-[#78766d]">Salt</span><span className="text-[13px] font-semibold text-[#2f2f2d]">{selectedEntry.salt} g</span></div>}
+                    <div className="rounded-[8px] bg-card border border-border p-3 space-y-2">
+                      <p className="text-[12px] font-semibold text-muted-foreground">Yderligere næring</p>
+                      {selectedEntry.fiber != null && <div className="flex justify-between"><span className="text-[13px] text-muted-foreground">Kostfibre</span><span className="text-[13px] font-semibold text-foreground">{selectedEntry.fiber} g</span></div>}
+                      {selectedEntry.sugar != null && <div className="flex justify-between"><span className="text-[13px] text-muted-foreground">Sukker</span><span className="text-[13px] font-semibold text-foreground">{selectedEntry.sugar} g</span></div>}
+                      {selectedEntry.salt != null && <div className="flex justify-between"><span className="text-[13px] text-muted-foreground">Salt</span><span className="text-[13px] font-semibold text-foreground">{selectedEntry.salt} g</span></div>}
                     </div>
                   )}
                   {selectedEntry.servingSize && (
-                    <p className="text-[12px] text-[#9a978f]">Portionsstørrelse: {selectedEntry.servingSize}</p>
+                    <p className="text-[12px] text-muted-foreground">Portionsstørrelse: {selectedEntry.servingSize}</p>
                   )}
                 </div>
                 <button
@@ -1583,17 +1583,17 @@ export function KaloriedagbogView({ onBack }: Props) {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="rounded-[8px] bg-[#faf9f6] p-4">
+                <div className="rounded-[8px] bg-card p-4">
                   <div className="flex justify-between items-center mb-2">
-                    <p className="text-[13px] font-semibold text-[#78766d]">Kalorier i dag</p>
-                    <p className="text-[13px] text-[#9a978f]">{dateLabel}</p>
+                    <p className="text-[13px] font-semibold text-muted-foreground">Kalorier i dag</p>
+                    <p className="text-[13px] text-muted-foreground">{dateLabel}</p>
                   </div>
                   <div className="flex items-baseline gap-2 mb-3">
                     {displayFormat === 'percent' ? (
                       <>
-                        <span className="text-[36px] font-black text-[#2f2f2d] leading-none">{pct(totals.kcal, goals.kcal)}%</span>
+                        <span className="text-[36px] font-black text-foreground leading-none">{pct(totals.kcal, goals.kcal)}%</span>
                         <div>
-                          <p className="text-[12px] text-[#9a978f]">af dagligt mål ({goals.kcal} kcal)</p>
+                          <p className="text-[12px] text-muted-foreground">af dagligt mål ({goals.kcal} kcal)</p>
                           <p className={cn("text-[13px] font-bold", remainingKcal < 0 ? "text-red-500" : "text-[#34C759]")}>
                             {remainingKcal < 0 ? `${Math.abs(remainingKcal)} kcal over mål` : `${remainingKcal} kcal tilbage`}
                           </p>
@@ -1601,9 +1601,9 @@ export function KaloriedagbogView({ onBack }: Props) {
                       </>
                     ) : (
                       <>
-                        <span className="text-[36px] font-black text-[#2f2f2d] leading-none">{totals.kcal}</span>
+                        <span className="text-[36px] font-black text-foreground leading-none">{totals.kcal}</span>
                         <div>
-                          <p className="text-[12px] text-[#9a978f]">af {goals.kcal} kcal mål</p>
+                          <p className="text-[12px] text-muted-foreground">af {goals.kcal} kcal mål</p>
                           <p className={cn("text-[13px] font-bold", remainingKcal < 0 ? "text-red-500" : "text-[#34C759]")}>
                             {remainingKcal < 0 ? `${Math.abs(remainingKcal)} kcal over mål` : `${remainingKcal} kcal tilbage`}
                           </p>
@@ -1611,61 +1611,61 @@ export function KaloriedagbogView({ onBack }: Props) {
                       </>
                     )}
                   </div>
-                  <div className="h-3 w-full rounded-full bg-[#e5e3dc] overflow-hidden">
+                  <div className="h-3 w-full rounded-full bg-muted overflow-hidden">
                     <div className="h-full rounded-full transition-all" style={{ width: `${kcalPct}%`, backgroundColor: kcalColor }} />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <p className="text-[13px] font-bold text-[#2f2f2d] px-1">Makronæring</p>
+                  <p className="text-[13px] font-bold text-foreground px-1">Makronæring</p>
                   {[
                     { label: 'Protein', value: totals.protein, goal: goals.protein, color: '#3b82f6', icon: Dumbbell, kcalPer: 4, recommended: '15–25% af kalorier' },
                     { label: 'Kulhydrat', value: totals.carbs, goal: goals.carbs, color: '#f59e0b', icon: Wheat, kcalPer: 4, recommended: '45–65% af kalorier' },
                     { label: 'Fedt', value: totals.fat, goal: goals.fat, color: '#ef4444', icon: Droplets, kcalPer: 9, recommended: '20–35% af kalorier' },
                     { label: 'Kostfibre', value: totals.fiber, goal: goals.fiber, color: '#22c55e', icon: Flame, kcalPer: 0, recommended: 'Min. 25–30g dagligt' },
                   ].map(m => (
-                    <div key={m.label} className="rounded-[8px] bg-white border border-[#e5e3dc] p-3">
+                    <div key={m.label} className="rounded-[8px] bg-card border border-border p-3">
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="flex items-center gap-2">
                           <div className="flex h-7 w-7 items-center justify-center rounded-[8px]" style={{ backgroundColor: m.color + '20' }}>
                             <m.icon className="h-3.5 w-3.5" style={{ color: m.color }} />
                           </div>
-                          <p className="text-[13px] font-semibold text-[#2f2f2d]">{m.label}</p>
+                          <p className="text-[13px] font-semibold text-foreground">{m.label}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-[13px] font-bold text-[#2f2f2d]">
+                          <p className="text-[13px] font-bold text-foreground">
                             {displayFormat === 'percent'
                               ? `${pct(m.value, m.goal)}%`
                               : `${formatNutrition(m.value, m.goal, '', 'absolute', numberFormat)} / ${m.goal}g`}
                           </p>
-                          {m.kcalPer > 0 && <p className="text-[10px] text-[#9a978f]">{Math.round(m.value * m.kcalPer)} kcal</p>}
+                          {m.kcalPer > 0 && <p className="text-[10px] text-muted-foreground">{Math.round(m.value * m.kcalPer)} kcal</p>}
                         </div>
                       </div>
-                      <div className="h-2 w-full rounded-full bg-[#f2f1ed] overflow-hidden">
+                      <div className="h-2 w-full rounded-full bg-background overflow-hidden">
                         <div className="h-full rounded-full transition-all" style={{ width: `${pct(m.value, m.goal)}%`, backgroundColor: m.color }} />
                       </div>
-                      <p className="text-[10px] text-[#b0ada4] mt-1">{m.recommended}</p>
+                      <p className="text-[10px] text-muted-foreground mt-1">{m.recommended}</p>
                     </div>
                   ))}
                 </div>
 
                 {(totals.sugar > 0 || totals.salt > 0) && (
-                  <div className="rounded-[8px] bg-white border border-[#e5e3dc] p-4 space-y-2">
-                    <p className="text-[13px] font-bold text-[#2f2f2d]">Øvrig ernæring</p>
+                  <div className="rounded-[8px] bg-card border border-border p-4 space-y-2">
+                    <p className="text-[13px] font-bold text-foreground">Øvrig ernæring</p>
                     {totals.sugar > 0 && (
                       <div className="flex justify-between items-center">
-                        <div><p className="text-[13px] text-[#2f2f2d]">Sukker</p><p className="text-[11px] text-[#9a978f]">Max anbefalet: 50g/dag</p></div>
+                        <div><p className="text-[13px] text-foreground">Sukker</p><p className="text-[11px] text-muted-foreground">Max anbefalet: 50g/dag</p></div>
                         <div className="text-right">
-                          <p className="text-[14px] font-bold text-[#2f2f2d]">{Math.round(totals.sugar)} g</p>
+                          <p className="text-[14px] font-bold text-foreground">{Math.round(totals.sugar)} g</p>
                           {totals.sugar > 50 && <p className="text-[10px] text-red-400 font-semibold">Over anbefalet</p>}
                         </div>
                       </div>
                     )}
                     {totals.salt > 0 && (
                       <div className="flex justify-between items-center">
-                        <div><p className="text-[13px] text-[#2f2f2d]">Salt</p><p className="text-[11px] text-[#9a978f]">Max anbefalet: 6g/dag</p></div>
+                        <div><p className="text-[13px] text-foreground">Salt</p><p className="text-[11px] text-muted-foreground">Max anbefalet: 6g/dag</p></div>
                         <div className="text-right">
-                          <p className="text-[14px] font-bold text-[#2f2f2d]">{Math.round(totals.salt * 10) / 10} g</p>
+                          <p className="text-[14px] font-bold text-foreground">{Math.round(totals.salt * 10) / 10} g</p>
                           {totals.salt > 6 && <p className="text-[10px] text-red-400 font-semibold">Over anbefalet</p>}
                         </div>
                       </div>
@@ -1673,20 +1673,20 @@ export function KaloriedagbogView({ onBack }: Props) {
                   </div>
                 )}
 
-                <div className="rounded-[8px] bg-white border border-[#e5e3dc] p-4">
+                <div className="rounded-[8px] bg-card border border-border p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2"><Droplets className="h-4 w-4 text-[#3b82f6]" /><p className="text-[13px] font-semibold text-[#2f2f2d]">Vandindtag</p></div>
-                    <p className="text-[13px] font-bold text-[#2f2f2d]">{water} / {goals.water} ml</p>
+                    <div className="flex items-center gap-2"><Droplets className="h-4 w-4 text-[#3b82f6]" /><p className="text-[13px] font-semibold text-foreground">Vandindtag</p></div>
+                    <p className="text-[13px] font-bold text-foreground">{water} / {goals.water} ml</p>
                   </div>
-                  <div className="h-2 w-full rounded-full bg-[#f2f1ed] overflow-hidden">
+                  <div className="h-2 w-full rounded-full bg-background overflow-hidden">
                     <div className="h-full rounded-full bg-[#3b82f6] transition-all" style={{ width: `${pct(water, goals.water)}%` }} />
                   </div>
-                  <p className="text-[10px] text-[#b0ada4] mt-1">Anbefalet: mindst 2 liter dagligt (ca. 8 glas)</p>
+                  <p className="text-[10px] text-muted-foreground mt-1">Anbefalet: mindst 2 liter dagligt (ca. 8 glas)</p>
                 </div>
 
                 {todayEntries.length > 0 && (
-                  <div className="rounded-[8px] bg-white border border-[#e5e3dc] p-4 space-y-2">
-                    <p className="text-[13px] font-bold text-[#2f2f2d]">Kalorier pr. måltid</p>
+                  <div className="rounded-[8px] bg-card border border-border p-4 space-y-2">
+                    <p className="text-[13px] font-bold text-foreground">Kalorier pr. måltid</p>
                     {customMeals.map(meal => {
                       const entries = todayEntries.filter(e => e.meal === meal.key);
                       if (entries.length === 0) return null;
@@ -1696,10 +1696,10 @@ export function KaloriedagbogView({ onBack }: Props) {
                           <span className="text-base w-6">{meal.emoji}</span>
                           <div className="flex-1">
                             <div className="flex justify-between mb-0.5">
-                              <p className="text-[12px] text-[#78766d]">{meal.label}</p>
-                              <p className="text-[12px] font-semibold text-[#2f2f2d]">{mKcal} kcal</p>
+                              <p className="text-[12px] text-muted-foreground">{meal.label}</p>
+                              <p className="text-[12px] font-semibold text-foreground">{mKcal} kcal</p>
                             </div>
-                            <div className="h-1.5 w-full rounded-full bg-[#f2f1ed] overflow-hidden">
+                            <div className="h-1.5 w-full rounded-full bg-background overflow-hidden">
                               <div className="h-full rounded-full" style={{ width: `${pct(mKcal, totals.kcal)}%`, backgroundColor: meal.color }} />
                             </div>
                           </div>
@@ -1733,7 +1733,7 @@ export function KaloriedagbogView({ onBack }: Props) {
                 onClick={() => setPersonSelectorOpen(false)}
               />
               <motion.div
-                className="fixed inset-x-4 top-[calc(env(safe-area-inset-top,16px)+48px)] z-30 rounded-xl bg-white shadow-xl border border-[#e5e3dc] max-w-[400px] mx-auto overflow-hidden"
+                className="fixed inset-x-4 top-[calc(env(safe-area-inset-top,16px)+48px)] z-30 rounded-xl bg-card shadow-xl border border-border max-w-[400px] mx-auto overflow-hidden"
                 initial={{ opacity: 0, y: -8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
@@ -1744,10 +1744,10 @@ export function KaloriedagbogView({ onBack }: Props) {
                     onClick={() => { setSelectedMemberId(m.id); setPersonSelectorOpen(false); }}
                     className={cn(
                       "flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors",
-                      activeMemberId === m.id ? "bg-[#fff8f0]" : "hover:bg-[#faf9f6]"
+                      activeMemberId === m.id ? "bg-orange-tint-light" : "hover:bg-card"
                     )}
                   >
-                    <span className="text-[14px] font-semibold text-[#2f2f2d]">{m.name}</span>
+                    <span className="text-[14px] font-semibold text-foreground">{m.name}</span>
                     {activeMemberId === m.id && (
                       <span className="ml-auto text-xs font-semibold text-[#f58a2d]">Aktiv</span>
                     )}
@@ -1770,22 +1770,22 @@ export function KaloriedagbogView({ onBack }: Props) {
                 onClick={() => setMealSelectorOpen(false)}
               />
               <motion.div
-                className="fixed inset-x-4 bottom-4 z-30 rounded-xl bg-white shadow-xl border border-[#e5e3dc] max-w-[400px] mx-auto max-h-[80vh] overflow-y-auto"
+                className="fixed inset-x-4 bottom-4 z-30 rounded-xl bg-card shadow-xl border border-border max-w-[400px] mx-auto max-h-[80vh] overflow-y-auto"
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 16 }}
               >
-                <p className="px-4 pt-3.5 pb-2 text-[13px] font-semibold text-[#78766d]">Vælg måltid</p>
+                <p className="px-4 pt-3.5 pb-2 text-[13px] font-semibold text-muted-foreground">Vælg måltid</p>
                 {customMeals.map(meal => (
                   <button
                     key={meal.key}
                     onClick={() => { setMealSelectorOpen(false); openFoodPicker(meal.key); }}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-[#faf9f6] transition-colors"
+                    className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-card transition-colors"
                   >
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg text-base" style={{ backgroundColor: meal.color + '30' }}>
                       {meal.emoji}
                     </div>
-                    <span className="text-[14px] font-semibold text-[#2f2f2d]">{meal.label}</span>
+                    <span className="text-[14px] font-semibold text-foreground">{meal.label}</span>
                   </button>
                 ))}
               </motion.div>
@@ -1812,21 +1812,21 @@ export function KaloriedagbogView({ onBack }: Props) {
       <AnimatePresence>
         {goalsOpen && (
           <motion.div
-            className="fixed inset-0 z-[70] flex flex-col bg-[#faf9f6]"
+            className="fixed inset-0 z-[70] flex flex-col bg-card"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', stiffness: 380, damping: 38 }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-[#faf9f6] border-b border-[#e5e3dc]">
+            <div className="flex items-center justify-between px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-card border-b border-border">
               <button
                 onClick={() => settingsPage ? setSettingsPage(null) : (setGoalsOpen(false), setSettingsPage(null))}
-                className="flex h-9 w-9 items-center justify-center text-[#2f2f2d] active:scale-[0.92] transition-transform"
+                className="flex h-9 w-9 items-center justify-center text-foreground active:scale-[0.92] transition-transform"
               >
                 <ArrowLeft className="h-[18px] w-[18px]" />
               </button>
-              <h1 className="text-[17px] font-bold text-[#2f2f2d]">
+              <h1 className="text-[17px] font-bold text-foreground">
                 {settingsPage === 'visningsformat' ? 'Visningsformat'
                   : settingsPage === 'kaloriemal' ? 'Kaloriemål'
                   : settingsPage === 'makromal' ? 'Makro-mål'
@@ -1853,14 +1853,14 @@ export function KaloriedagbogView({ onBack }: Props) {
                     onClick={() => setSettingsPage(item.key)}
                     className="flex items-center w-full px-4 py-3.5 active:scale-[0.98] transition-transform"
                   >
-                    <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-[#fff2e6] mr-3 shrink-0">
+                    <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-orange-tint mr-3 shrink-0">
                       <item.icon className="h-[18px] w-[18px] text-[#f58a2d]" />
                     </div>
                     <div className="flex-1 text-left">
-                      <p className="text-[14px] font-medium text-[#2f2f2d]">{item.label}</p>
-                      <p className="text-[12px] text-[#9a978f]">{item.desc}</p>
+                      <p className="text-[14px] font-medium text-foreground">{item.label}</p>
+                      <p className="text-[12px] text-muted-foreground">{item.desc}</p>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-[#c5c3ba] shrink-0" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                   </button>
                 ))}
 
@@ -1869,7 +1869,7 @@ export function KaloriedagbogView({ onBack }: Props) {
               /* ── Sektion A: Visningsindstillinger ── */
               <div className="space-y-3">
                 <div className="space-y-1.5">
-                  <p className="text-[12px] font-medium text-[#78766d]">Talformat</p>
+                  <p className="text-[12px] font-medium text-muted-foreground">Talformat</p>
                   <div className="grid grid-cols-2 gap-2">
                     {([['decimal', 'Decimal (0,75)'], ['fraction', 'Brøk (¾)']] as const).map(([val, lbl]) => (
                       <button
@@ -1879,8 +1879,8 @@ export function KaloriedagbogView({ onBack }: Props) {
                         className={cn(
                           "rounded-[8px] border-2 py-2.5 text-[13px] font-semibold transition-all",
                           numberFormat === val
-                            ? "border-[#f58a2d] bg-[#fff8f0] text-[#bf6722]"
-                            : "border-[#e5e3dc] bg-[#faf9f6] text-[#78766d]"
+                            ? "border-[#f58a2d] bg-orange-tint-light text-[#bf6722]"
+                            : "border-border bg-card text-muted-foreground"
                         )}
                       >
                         {lbl}
@@ -1889,7 +1889,7 @@ export function KaloriedagbogView({ onBack }: Props) {
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <p className="text-[12px] font-medium text-[#78766d]">Visning af næringsstoffer</p>
+                  <p className="text-[12px] font-medium text-muted-foreground">Visning af næringsstoffer</p>
                   <div className="grid grid-cols-2 gap-2">
                     {([['absolute', 'Gram / kcal'], ['percent', 'Procent af mål']] as const).map(([val, lbl]) => (
                       <button
@@ -1899,8 +1899,8 @@ export function KaloriedagbogView({ onBack }: Props) {
                         className={cn(
                           "rounded-[8px] border-2 py-2.5 text-[13px] font-semibold transition-all",
                           displayFormat === val
-                            ? "border-[#f58a2d] bg-[#fff8f0] text-[#bf6722]"
-                            : "border-[#e5e3dc] bg-[#faf9f6] text-[#78766d]"
+                            ? "border-[#f58a2d] bg-orange-tint-light text-[#bf6722]"
+                            : "border-border bg-card text-muted-foreground"
                         )}
                       >
                         {lbl}
@@ -1911,7 +1911,7 @@ export function KaloriedagbogView({ onBack }: Props) {
                 <button
                   type="button"
                   onClick={handleSaveSettings}
-                  className="w-full rounded-[8px] bg-[#2f2f2f] py-3 text-[14px] font-bold text-white active:scale-[0.98] transition-transform mt-4"
+                  className="w-full rounded-[8px] bg-primary py-3 text-[14px] font-bold text-white active:scale-[0.98] transition-transform mt-4"
                 >
                   Gem
                 </button>
@@ -1921,7 +1921,7 @@ export function KaloriedagbogView({ onBack }: Props) {
               /* ── Sektion B: Kaloriemål ── */
               <div className="space-y-3">
                 {/* Segmented control */}
-                <div className="grid grid-cols-2 gap-0 rounded-[8px] border border-[#e5e3dc] overflow-hidden">
+                <div className="grid grid-cols-2 gap-0 rounded-[8px] border border-border overflow-hidden">
                   {([['manual', 'Indtast selv'], ['calculator', 'Brug beregner']] as const).map(([val, lbl]) => (
                     <button
                       key={val}
@@ -1930,8 +1930,8 @@ export function KaloriedagbogView({ onBack }: Props) {
                       className={cn(
                         "py-2.5 text-[13px] font-semibold transition-colors",
                         goalMode === val
-                          ? "bg-[#2f2f2f] text-white"
-                          : "bg-white text-[#78766d]"
+                          ? "bg-primary text-white"
+                          : "bg-card text-muted-foreground"
                       )}
                     >
                       {lbl}
@@ -1941,23 +1941,23 @@ export function KaloriedagbogView({ onBack }: Props) {
 
                 {goalMode === 'manual' ? (
                   <div className="space-y-1.5">
-                    <Label className="text-[14px] font-medium text-[#2f2f2d]">Dagligt kaloriemål</Label>
+                    <Label className="text-[14px] font-medium text-foreground">Dagligt kaloriemål</Label>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
                         inputMode="numeric"
                         value={goals.kcal || ''}
                         onChange={e => setGoals(prev => ({ ...prev, kcal: e.target.value === '' ? 0 : parseFloat(e.target.value) }))}
-                        className="flex-1 rounded-[8px] border border-[#e5e3dc] px-3 py-2.5 text-[14px] outline-none focus:border-[#f58a2d] bg-[#faf9f6]"
+                        className="flex-1 rounded-[8px] border border-border px-3 py-2.5 text-[14px] outline-none focus:border-[#f58a2d] bg-card"
                       />
-                      <span className="text-[13px] text-[#78766d] w-8">kcal</span>
+                      <span className="text-[13px] text-muted-foreground w-8">kcal</span>
                     </div>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {/* Køn */}
                     <div className="space-y-1.5">
-                      <p className="text-[12px] font-medium text-[#78766d]">Køn</p>
+                      <p className="text-[12px] font-medium text-muted-foreground">Køn</p>
                       <div className="grid grid-cols-2 gap-2">
                         {([['male', 'Mand'], ['female', 'Kvinde']] as const).map(([val, lbl]) => (
                           <button
@@ -1967,8 +1967,8 @@ export function KaloriedagbogView({ onBack }: Props) {
                             className={cn(
                               "rounded-[8px] border-2 py-2 text-[13px] font-semibold transition-all",
                               calcData.gender === val
-                                ? "border-[#f58a2d] bg-[#fff8f0] text-[#bf6722]"
-                                : "border-[#e5e3dc] text-[#78766d]"
+                                ? "border-[#f58a2d] bg-orange-tint-light text-[#bf6722]"
+                                : "border-border text-muted-foreground"
                             )}
                           >
                             {lbl}
@@ -1985,16 +1985,16 @@ export function KaloriedagbogView({ onBack }: Props) {
                         { key: 'weight', label: 'Vægt', unit: 'kg' },
                       ].map(f => (
                         <div key={f.key} className="space-y-1">
-                          <p className="text-[11px] font-medium text-[#78766d]">{f.label}</p>
+                          <p className="text-[11px] font-medium text-muted-foreground">{f.label}</p>
                           <div className="flex items-center gap-1">
                             <input
                               type="number"
                               inputMode="numeric"
                               value={calcData[f.key as keyof typeof calcData] || ''}
                               onChange={e => setCalcData(prev => ({ ...prev, [f.key]: e.target.value === '' ? 0 : parseFloat(e.target.value) }))}
-                              className="w-full rounded-[8px] border border-[#e5e3dc] px-2 py-2 text-[13px] outline-none focus:border-[#f58a2d] bg-[#faf9f6]"
+                              className="w-full rounded-[8px] border border-border px-2 py-2 text-[13px] outline-none focus:border-[#f58a2d] bg-card"
                             />
-                            <span className="text-[11px] text-[#9a978f] shrink-0">{f.unit}</span>
+                            <span className="text-[11px] text-muted-foreground shrink-0">{f.unit}</span>
                           </div>
                         </div>
                       ))}
@@ -2002,7 +2002,7 @@ export function KaloriedagbogView({ onBack }: Props) {
 
                     {/* Aktivitetsniveau */}
                     <div className="space-y-1.5">
-                      <p className="text-[12px] font-medium text-[#78766d]">Aktivitetsniveau</p>
+                      <p className="text-[12px] font-medium text-muted-foreground">Aktivitetsniveau</p>
                       <div className="space-y-1.5">
                         {ACTIVITY_LEVELS.map(level => (
                           <button
@@ -2012,19 +2012,19 @@ export function KaloriedagbogView({ onBack }: Props) {
                             className={cn(
                               "w-full flex items-center justify-between rounded-[8px] border-2 px-3 py-2.5 text-left transition-all",
                               calcData.activity === level.value
-                                ? "border-[#f58a2d] bg-[#fff8f0]"
-                                : "border-[#e5e3dc]"
+                                ? "border-[#f58a2d] bg-orange-tint-light"
+                                : "border-border"
                             )}
                           >
                             <div>
-                              <p className={cn("text-[13px] font-semibold", calcData.activity === level.value ? "text-[#bf6722]" : "text-[#2f2f2d]")}>
+                              <p className={cn("text-[13px] font-semibold", calcData.activity === level.value ? "text-[#bf6722]" : "text-foreground")}>
                                 {level.label}
                               </p>
-                              <p className="text-[11px] text-[#9a978f]">{level.desc}</p>
+                              <p className="text-[11px] text-muted-foreground">{level.desc}</p>
                             </div>
                             {calcData.activity === level.value && (
                               <div className="h-5 w-5 rounded-full bg-[#f58a2d] flex items-center justify-center">
-                                <div className="h-2 w-2 rounded-full bg-white" />
+                                <div className="h-2 w-2 rounded-full bg-card" />
                               </div>
                             )}
                           </button>
@@ -2034,7 +2034,7 @@ export function KaloriedagbogView({ onBack }: Props) {
 
                     {/* Formål */}
                     <div className="space-y-1.5">
-                      <p className="text-[12px] font-medium text-[#78766d]">Formål</p>
+                      <p className="text-[12px] font-medium text-muted-foreground">Formål</p>
                       <div className="grid grid-cols-3 gap-2">
                         {([
                           { key: 'lose' as const, label: 'Vægttab' },
@@ -2048,14 +2048,14 @@ export function KaloriedagbogView({ onBack }: Props) {
                             className={cn(
                               "rounded-[8px] border-2 py-2.5 px-1 text-center transition-all",
                               calcData.goal === g.key
-                                ? "border-[#f58a2d] bg-[#fff8f0]"
-                                : "border-[#e5e3dc]"
+                                ? "border-[#f58a2d] bg-orange-tint-light"
+                                : "border-border"
                             )}
                           >
-                            <p className={cn("text-[12px] font-semibold", calcData.goal === g.key ? "text-[#bf6722]" : "text-[#2f2f2d]")}>
+                            <p className={cn("text-[12px] font-semibold", calcData.goal === g.key ? "text-[#bf6722]" : "text-foreground")}>
                               {g.label}
                             </p>
-                            <p className="text-[10px] text-[#9a978f] mt-0.5">
+                            <p className="text-[10px] text-muted-foreground mt-0.5">
                               {g.key === 'maintain' ? 'Ingen justering' : `${deficitKcal} kcal/dag`}
                             </p>
                           </button>
@@ -2066,7 +2066,7 @@ export function KaloriedagbogView({ onBack }: Props) {
                     {/* Justeringsfelt — kun ved vægttab/vægtøgning */}
                     {calcData.goal !== 'maintain' && (
                       <div className="space-y-2.5">
-                        <p className="text-[12px] font-medium text-[#78766d]">
+                        <p className="text-[12px] font-medium text-muted-foreground">
                           {calcData.goal === 'lose' ? 'Kalorie-underskud' : 'Kalorie-overskud'}
                         </p>
                         <div className="grid grid-cols-2 gap-2">
@@ -2084,8 +2084,8 @@ export function KaloriedagbogView({ onBack }: Props) {
                               className={cn(
                                 "rounded-[8px] border-2 py-2 text-[12px] font-semibold transition-all",
                                 calcData.deficitMode === val
-                                  ? "border-[#f58a2d] bg-[#fff8f0] text-[#bf6722]"
-                                  : "border-[#e5e3dc] text-[#78766d]"
+                                  ? "border-[#f58a2d] bg-orange-tint-light text-[#bf6722]"
+                                  : "border-border text-muted-foreground"
                               )}
                             >
                               {lbl}
@@ -2101,13 +2101,13 @@ export function KaloriedagbogView({ onBack }: Props) {
                               ...prev,
                               deficitAmount: e.target.value === '' ? 0 : parseFloat(e.target.value),
                             }))}
-                            className="flex-1 rounded-[8px] border border-[#e5e3dc] px-3 py-2.5 text-[14px] outline-none focus:border-[#f58a2d] bg-[#faf9f6]"
+                            className="flex-1 rounded-[8px] border border-border px-3 py-2.5 text-[14px] outline-none focus:border-[#f58a2d] bg-card"
                           />
-                          <span className="text-[13px] text-[#78766d] w-10">
+                          <span className="text-[13px] text-muted-foreground w-10">
                             {calcData.deficitMode === 'percent' ? '%' : 'kcal'}
                           </span>
                         </div>
-                        <p className="text-[11px] text-[#9a978f]">
+                        <p className="text-[11px] text-muted-foreground">
                           {calcData.deficitMode === 'percent'
                             ? `= ${deficitKcal} kcal/dag`
                             : `= ${baseTDEE > 0 ? Math.round((deficitKcal / baseTDEE) * 100) : 0}% af TDEE`}
@@ -2116,13 +2116,13 @@ export function KaloriedagbogView({ onBack }: Props) {
                     )}
 
                     {/* Beregnet TDEE */}
-                    <div className="rounded-[8px] bg-[#fff8f0] border border-[#f3c59d] p-4 text-center">
-                      <p className="text-[12px] text-[#9a978f] mb-1">Dit anbefalede daglige kalorieindtag</p>
+                    <div className="rounded-[8px] bg-orange-tint-light border border-orange-tint p-4 text-center">
+                      <p className="text-[12px] text-muted-foreground mb-1">Dit anbefalede daglige kalorieindtag</p>
                       <p className="text-[36px] font-black text-[#f58a2d] leading-none">{calculatedTDEE}</p>
                       <p className="text-[13px] text-[#cc6f1f] mt-1">kcal / dag</p>
                       {calcData.goal !== 'maintain' && (
-                        <div className="mt-2 pt-2 border-t border-[#f3c59d]">
-                          <p className="text-[11px] text-[#9a978f]">
+                        <div className="mt-2 pt-2 border-t border-orange-tint">
+                          <p className="text-[11px] text-muted-foreground">
                             TDEE: {baseTDEE} kcal — {calcData.goal === 'lose' ? 'underskud' : 'overskud'}: {deficitKcal} kcal ({baseTDEE > 0 ? Math.round((deficitKcal / baseTDEE) * 100) : 0}%)
                           </p>
                         </div>
@@ -2152,7 +2152,7 @@ export function KaloriedagbogView({ onBack }: Props) {
                 <button
                   type="button"
                   onClick={handleSaveSettings}
-                  className="w-full rounded-[8px] bg-[#2f2f2f] py-3 text-[14px] font-bold text-white active:scale-[0.98] transition-transform mt-4"
+                  className="w-full rounded-[8px] bg-primary py-3 text-[14px] font-bold text-white active:scale-[0.98] transition-transform mt-4"
                 >
                   Gem
                 </button>
@@ -2162,12 +2162,12 @@ export function KaloriedagbogView({ onBack }: Props) {
               /* ── Sektion C: Makro-mål ── */
               <div className="space-y-3">
                 <div className="flex items-center justify-end">
-                  <div className="flex rounded-full bg-[#f2f1ed] p-0.5">
+                  <div className="flex rounded-full bg-background p-0.5">
                     <button
                       type="button"
                       onClick={() => setMacroDisplayMode('gram')}
                       className={cn("rounded-full px-3 py-1 text-[11px] font-semibold transition-colors",
-                        macroDisplayMode === 'gram' ? "bg-white text-[#2f2f2d] shadow-sm" : "text-[#78766d]")}
+                        macroDisplayMode === 'gram' ? "bg-card text-foreground shadow-sm" : "text-muted-foreground")}
                     >
                       Gram
                     </button>
@@ -2183,7 +2183,7 @@ export function KaloriedagbogView({ onBack }: Props) {
                         setMacroDisplayMode('percent');
                       }}
                       className={cn("rounded-full px-3 py-1 text-[11px] font-semibold transition-colors",
-                        macroDisplayMode === 'percent' ? "bg-white text-[#2f2f2d] shadow-sm" : "text-[#78766d]")}
+                        macroDisplayMode === 'percent' ? "bg-card text-foreground shadow-sm" : "text-muted-foreground")}
                     >
                       %
                     </button>
@@ -2195,12 +2195,12 @@ export function KaloriedagbogView({ onBack }: Props) {
                   const dp = macroDisplayMode === 'percent' ? macroPctInputs : macroPcts;
                   return (
                     <>
-                      <div className="flex h-2 rounded-full overflow-hidden bg-[#e5e3dc]">
+                      <div className="flex h-2 rounded-full overflow-hidden bg-muted">
                         <div style={{ width: `${dp.protein}%` }} className="bg-[#4a90d9] transition-all" />
                         <div style={{ width: `${dp.carbs}%` }} className="bg-[#22c55e] transition-all" />
                         <div style={{ width: `${dp.fat}%` }} className="bg-[#ef4444] transition-all" />
                       </div>
-                      <div className="flex justify-between text-[10px] text-[#9a978f]">
+                      <div className="flex justify-between text-[10px] text-muted-foreground">
                         <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-[#4a90d9]" />Protein {dp.protein}%</span>
                         <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-[#22c55e]" />Kulhydrat {dp.carbs}%</span>
                         <span className="flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-[#ef4444]" />Fedt {dp.fat}%</span>
@@ -2228,9 +2228,9 @@ export function KaloriedagbogView({ onBack }: Props) {
                         <div className="flex justify-between items-center">
                           <div className="flex items-center gap-2">
                             <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: f.color }} />
-                            <Label className="text-[14px] font-medium text-[#2f2f2d]">{f.label}</Label>
+                            <Label className="text-[14px] font-medium text-foreground">{f.label}</Label>
                           </div>
-                          <span className="text-[11px] text-[#9a978f]">{f.hint}</span>
+                          <span className="text-[11px] text-muted-foreground">{f.hint}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           {macroDisplayMode === 'gram' ? (
@@ -2240,9 +2240,9 @@ export function KaloriedagbogView({ onBack }: Props) {
                                 inputMode="numeric"
                                 value={gramVal || ''}
                                 onChange={e => setGoals(prev => ({ ...prev, [f.key]: e.target.value === '' ? 0 : parseFloat(e.target.value) }))}
-                                className="flex-1 rounded-[8px] border border-[#e5e3dc] px-3 py-2.5 text-[14px] outline-none focus:border-[#f58a2d] bg-[#faf9f6]"
+                                className="flex-1 rounded-[8px] border border-border px-3 py-2.5 text-[14px] outline-none focus:border-[#f58a2d] bg-card"
                               />
-                              <span className="text-[13px] text-[#78766d] w-8">g</span>
+                              <span className="text-[13px] text-muted-foreground w-8">g</span>
                             </>
                           ) : (
                             <>
@@ -2268,13 +2268,13 @@ export function KaloriedagbogView({ onBack }: Props) {
                                     return updated;
                                   });
                                 }}
-                                className="flex-1 rounded-[8px] border border-[#e5e3dc] px-3 py-2.5 text-[14px] outline-none focus:border-[#f58a2d] bg-[#faf9f6]"
+                                className="flex-1 rounded-[8px] border border-border px-3 py-2.5 text-[14px] outline-none focus:border-[#f58a2d] bg-card"
                               />
-                              <span className="text-[13px] text-[#78766d] w-8">%</span>
+                              <span className="text-[13px] text-muted-foreground w-8">%</span>
                             </>
                           )}
                         </div>
-                        <p className="text-[11px] text-[#9a978f]">
+                        <p className="text-[11px] text-muted-foreground">
                           {macroDisplayMode === 'gram'
                             ? `= ${pctVal}% af daglige kalorier`
                             : `= ${goals[f.key as keyof NutritionGoals]}g`
@@ -2294,8 +2294,8 @@ export function KaloriedagbogView({ onBack }: Props) {
                   return (
                     <div key={f.key} className="space-y-1.5">
                       <div className="flex justify-between items-center">
-                        <Label className="text-[14px] font-medium text-[#2f2f2d]">{f.label}</Label>
-                        <span className="text-[11px] text-[#9a978f]">{f.hint}</span>
+                        <Label className="text-[14px] font-medium text-foreground">{f.label}</Label>
+                        <span className="text-[11px] text-muted-foreground">{f.hint}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <input
@@ -2303,9 +2303,9 @@ export function KaloriedagbogView({ onBack }: Props) {
                           inputMode="numeric"
                           value={goalVal || ''}
                           onChange={e => setGoals(prev => ({ ...prev, [f.key]: e.target.value === '' ? 0 : parseFloat(e.target.value) }))}
-                          className="flex-1 rounded-[8px] border border-[#e5e3dc] px-3 py-2.5 text-[14px] outline-none focus:border-[#f58a2d] bg-[#faf9f6]"
+                          className="flex-1 rounded-[8px] border border-border px-3 py-2.5 text-[14px] outline-none focus:border-[#f58a2d] bg-card"
                         />
-                        <span className="text-[13px] text-[#78766d] w-8">{f.unit}</span>
+                        <span className="text-[13px] text-muted-foreground w-8">{f.unit}</span>
                       </div>
                     </div>
                   );
@@ -2313,7 +2313,7 @@ export function KaloriedagbogView({ onBack }: Props) {
                 <button
                   type="button"
                   onClick={handleSaveSettings}
-                  className="w-full rounded-[8px] bg-[#2f2f2f] py-3 text-[14px] font-bold text-white active:scale-[0.98] transition-transform mt-4"
+                  className="w-full rounded-[8px] bg-primary py-3 text-[14px] font-bold text-white active:scale-[0.98] transition-transform mt-4"
                 >
                   Gem
                 </button>
@@ -2322,14 +2322,14 @@ export function KaloriedagbogView({ onBack }: Props) {
             ) : settingsPage === 'maaltider' ? (
               /* ── Sektion D: Måltider ── */
               <div className="space-y-3">
-                <div className="rounded-[8px] overflow-hidden divide-y divide-[#f2f1ed]">
+                <div className="rounded-[8px] overflow-hidden divide-y divide-border">
                   {customMeals.map((meal, idx) => (
                     <div key={meal.key}>
                       {editingMealKey === meal.key ? (
-                        <div className="p-3 space-y-2 bg-[#faf9f6]">
+                        <div className="p-3 space-y-2 bg-card">
                           <div className="flex gap-2">
                             <div className="space-y-1 w-16">
-                              <p className="text-[10px] text-[#9a978f]">Emoji</p>
+                              <p className="text-[10px] text-muted-foreground">Emoji</p>
                               <input
                                 type="text"
                                 value={meal.emoji}
@@ -2337,11 +2337,11 @@ export function KaloriedagbogView({ onBack }: Props) {
                                   const v = e.target.value;
                                   setCustomMeals(prev => prev.map(m => m.key === meal.key ? { ...m, emoji: v } : m));
                                 }}
-                                className="w-full rounded-[8px] border border-[#e5e3dc] px-2 py-1.5 text-center text-[16px] outline-none focus:border-[#f58a2d] bg-white"
+                                className="w-full rounded-[8px] border border-border px-2 py-1.5 text-center text-[16px] outline-none focus:border-[#f58a2d] bg-card"
                               />
                             </div>
                             <div className="space-y-1 flex-1">
-                              <p className="text-[10px] text-[#9a978f]">Navn</p>
+                              <p className="text-[10px] text-muted-foreground">Navn</p>
                               <input
                                 type="text"
                                 value={meal.label}
@@ -2349,7 +2349,7 @@ export function KaloriedagbogView({ onBack }: Props) {
                                   const v = e.target.value;
                                   setCustomMeals(prev => prev.map(m => m.key === meal.key ? { ...m, label: v } : m));
                                 }}
-                                className="w-full rounded-[8px] border border-[#e5e3dc] px-3 py-1.5 text-[13px] outline-none focus:border-[#f58a2d] bg-white"
+                                className="w-full rounded-[8px] border border-border px-3 py-1.5 text-[13px] outline-none focus:border-[#f58a2d] bg-card"
                               />
                             </div>
                           </div>
@@ -2372,7 +2372,7 @@ export function KaloriedagbogView({ onBack }: Props) {
                                 [arr[idx - 1], arr[idx]] = [arr[idx], arr[idx - 1]];
                                 return arr;
                               })}
-                              className="text-[10px] text-[#9a978f] disabled:opacity-30 active:text-[#2f2f2d]"
+                              className="text-[10px] text-muted-foreground disabled:opacity-30 active:text-foreground"
                             >▲</button>
                             <button
                               type="button"
@@ -2382,22 +2382,22 @@ export function KaloriedagbogView({ onBack }: Props) {
                                 [arr[idx], arr[idx + 1]] = [arr[idx + 1], arr[idx]];
                                 return arr;
                               })}
-                              className="text-[10px] text-[#9a978f] disabled:opacity-30 active:text-[#2f2f2d]"
+                              className="text-[10px] text-muted-foreground disabled:opacity-30 active:text-foreground"
                             >▼</button>
                           </div>
                           <span className="text-[16px] w-7 text-center">{meal.emoji}</span>
-                          <p className="flex-1 text-[13px] font-medium text-[#2f2f2d]">{meal.label}</p>
+                          <p className="flex-1 text-[13px] font-medium text-foreground">{meal.label}</p>
                           <button
                             type="button"
                             onClick={() => setEditingMealKey(meal.key)}
-                            className="flex h-7 w-7 items-center justify-center rounded-[8px] text-[#78766d] hover:bg-[#f2f1ed]"
+                            className="flex h-7 w-7 items-center justify-center rounded-[8px] text-muted-foreground hover:bg-background"
                           >
                             <Pencil className="h-3.5 w-3.5" />
                           </button>
                           <button
                             type="button"
                             onClick={() => setCustomMeals(prev => prev.filter(m => m.key !== meal.key))}
-                            className="flex h-7 w-7 items-center justify-center rounded-[8px] text-[#b0ada4] hover:text-red-500 hover:bg-red-50"
+                            className="flex h-7 w-7 items-center justify-center rounded-[8px] text-muted-foreground hover:text-red-500 hover:bg-red-50"
                           >
                             <Trash2 className="h-3.5 w-3.5" />
                           </button>
@@ -2413,14 +2413,14 @@ export function KaloriedagbogView({ onBack }: Props) {
                       const color = MEAL_COLORS[customMeals.length % MEAL_COLORS.length];
                       setCustomMeals(prev => [...prev, { key: `custom_${Date.now()}`, label: 'Nyt måltid', emoji: '🍴', color }]);
                     }}
-                    className="flex-1 rounded-[8px] border-2 border-dashed border-[#d8d7cf] py-2.5 text-[13px] font-semibold text-[#78766d] active:scale-[0.98] transition-transform"
+                    className="flex-1 rounded-[8px] border-2 border-dashed border-border py-2.5 text-[13px] font-semibold text-muted-foreground active:scale-[0.98] transition-transform"
                   >
                     + Tilføj måltid
                   </button>
                   <button
                     type="button"
                     onClick={() => setCustomMeals(DEFAULT_MEALS)}
-                    className="rounded-[8px] border-2 border-[#e5e3dc] px-3 py-2.5 text-[12px] font-semibold text-[#9a978f] active:scale-[0.98] transition-transform"
+                    className="rounded-[8px] border-2 border-border px-3 py-2.5 text-[12px] font-semibold text-muted-foreground active:scale-[0.98] transition-transform"
                   >
                     Nulstil
                   </button>
@@ -2428,7 +2428,7 @@ export function KaloriedagbogView({ onBack }: Props) {
                 <button
                   type="button"
                   onClick={handleSaveSettings}
-                  className="w-full rounded-[8px] bg-[#2f2f2f] py-3 text-[14px] font-bold text-white active:scale-[0.98] transition-transform mt-4"
+                  className="w-full rounded-[8px] bg-primary py-3 text-[14px] font-bold text-white active:scale-[0.98] transition-transform mt-4"
                 >
                   Gem
                 </button>
