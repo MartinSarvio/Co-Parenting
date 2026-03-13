@@ -1,4 +1,4 @@
-import type { Expense, User } from '@/types';
+import type { Expense, User, CustodyPlan, Child } from '@/types';
 import { supabase } from './supabase';
 
 /**
@@ -130,6 +130,151 @@ export function printExpenses(expenses: Expense[], users: User[]): void {
       </tr>
     </tfoot>
   </table>
+</body>
+</html>`;
+
+  const win = window.open('', '_blank');
+  if (!win) return;
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  win.print();
+}
+
+/**
+ * Opens a print dialog with a formatted custody plan.
+ * GDPR: Does NOT include medications, allergies, or emergency contacts.
+ */
+export function exportCustodyPlanPDF(
+  plan: CustodyPlan,
+  child: Child,
+  users: User[],
+): void {
+  const getUserName = (id: string) =>
+    users.find((u) => u.id === id)?.name ?? 'Ukendt';
+
+  const dayNames = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag'];
+
+  const patternLabels: Record<string, string> = {
+    '7/7': '7/7-ordning',
+    '10/4': '10/4-ordning',
+    '14/0': '14/0-ordning',
+    custom: 'Brugerdefineret',
+    alternating: 'Skiftende uger',
+    'weekday-weekend': 'Hverdag/weekend',
+    supervised: 'Overvåget samvær',
+    supervised_limited: 'Begrænset overvåget samvær',
+  };
+
+  const parent1Name = getUserName(child.parent1Id);
+  const parent2Name = getUserName(child.parent2Id);
+
+  // Build weekly schedule rows
+  const scheduleRows = dayNames
+    .map((dayName, i) => {
+      const isParent1 = plan.parent1Days.includes(i);
+      const isParent2 = plan.parent2Days.includes(i);
+      const assignedTo = isParent1 ? parent1Name : isParent2 ? parent2Name : '—';
+      const isSwapDay = plan.swapDay === i;
+      return `<tr${isSwapDay ? ' style="background:#fff8f0"' : ''}>
+        <td>${dayName}${isSwapDay ? ' ↔' : ''}</td>
+        <td>${assignedTo}</td>
+      </tr>`;
+    })
+    .join('');
+
+  // Build holiday rows
+  const holidayRows = (plan.holidays ?? [])
+    .map(
+      (h) => `<tr>
+        <td>${h.name}</td>
+        <td>${h.startDate} — ${h.endDate}</td>
+        <td>${getUserName(h.parentId)}</td>
+        <td>${h.alternateYears ? 'Ja' : 'Nej'}</td>
+      </tr>`,
+    )
+    .join('');
+
+  // Build supervised config section
+  const supervisedSection = plan.supervisedConfig
+    ? `<h2>Overvåget samvær</h2>
+       <table>
+         <tr><td><strong>Frekvens</strong></td><td>Hver ${plan.supervisedConfig.frequencyWeeks}. uge</td></tr>
+         <tr><td><strong>Varighed</strong></td><td>${plan.supervisedConfig.durationHours} timer</td></tr>
+         <tr><td><strong>Sted</strong></td><td>${plan.supervisedConfig.location}</td></tr>
+         ${plan.supervisedConfig.supervisorRequired ? `<tr><td><strong>Tilsynsførende</strong></td><td>${plan.supervisedConfig.supervisorName ?? 'Påkrævet'}</td></tr>` : ''}
+         ${plan.supervisedConfig.startTime ? `<tr><td><strong>Tidspunkt</strong></td><td>${plan.supervisedConfig.startTime}</td></tr>` : ''}
+       </table>`
+    : '';
+
+  const html = `
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <title>Samværsplan — ${child.name}</title>
+  <style>
+    body { font-family: sans-serif; font-size: 12px; color: #222; margin: 2cm; }
+    h1 { font-size: 20px; margin-bottom: 4px; }
+    h2 { font-size: 14px; margin-top: 24px; margin-bottom: 8px; border-bottom: 1px solid #ccc; padding-bottom: 4px; }
+    p.meta { color: #666; font-size: 11px; margin-bottom: 16px; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+    .info-item { font-size: 12px; }
+    .info-label { font-weight: bold; color: #555; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+    th { text-align: left; border-bottom: 2px solid #333; padding: 6px 8px; font-size: 11px; }
+    td { border-bottom: 1px solid #ddd; padding: 6px 8px; }
+    .footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid #ccc; font-size: 10px; color: #999; }
+    @media print { body { margin: 1cm; } }
+  </style>
+</head>
+<body>
+  <h1>Samværsplan</h1>
+  <p class="meta">Eksporteret ${new Date().toLocaleDateString('da-DK')}</p>
+
+  <div class="info-grid">
+    <div class="info-item"><span class="info-label">Barn:</span> ${child.name}</div>
+    <div class="info-item"><span class="info-label">Fødselsdato:</span> ${child.birthDate}</div>
+    <div class="info-item"><span class="info-label">Forælder 1:</span> ${parent1Name}</div>
+    <div class="info-item"><span class="info-label">Forælder 2:</span> ${parent2Name}</div>
+    <div class="info-item"><span class="info-label">Samværsmodel:</span> ${patternLabels[plan.pattern] ?? plan.pattern}</div>
+    <div class="info-item"><span class="info-label">Startdato:</span> ${plan.startDate}</div>
+    ${plan.swapTime ? `<div class="info-item"><span class="info-label">Skiftetidspunkt:</span> ${plan.swapTime}</div>` : ''}
+    ${plan.swapDay !== undefined ? `<div class="info-item"><span class="info-label">Skiftedag:</span> ${dayNames[plan.swapDay]}</div>` : ''}
+  </div>
+
+  <h2>Ugentlig fordeling</h2>
+  <table>
+    <thead>
+      <tr><th>Dag</th><th>Hos</th></tr>
+    </thead>
+    <tbody>${scheduleRows}</tbody>
+  </table>
+
+  ${holidayRows ? `
+  <h2>Ferieaftaler</h2>
+  <table>
+    <thead>
+      <tr><th>Ferie</th><th>Periode</th><th>Hos</th><th>Skifter årligt</th></tr>
+    </thead>
+    <tbody>${holidayRows}</tbody>
+  </table>
+  ` : ''}
+
+  ${supervisedSection}
+
+  ${plan.agreementDate ? `
+  <h2>Aftale</h2>
+  <div class="info-grid">
+    <div class="info-item"><span class="info-label">Aftaledato:</span> ${plan.agreementDate}</div>
+    ${plan.agreementValidUntil ? `<div class="info-item"><span class="info-label">Gyldig til:</span> ${plan.agreementValidUntil}</div>` : ''}
+  </div>
+  ${plan.agreementText ? `<p>${plan.agreementText}</p>` : ''}
+  ` : ''}
+
+  <div class="footer">
+    Genereret fra Huska · ${new Date().toLocaleDateString('da-DK')}
+  </div>
 </body>
 </html>`;
 

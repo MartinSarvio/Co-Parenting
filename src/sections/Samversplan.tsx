@@ -14,6 +14,8 @@ import {
   X
 } from 'lucide-react';
 import { CustodyConfig } from './CustodyConfig';
+import { useIsFamilyMember } from '@/hooks/useIsFamilyMember';
+import { ShareCustodyPlan } from '@/components/custom/ShareCustodyPlan';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   addDays,
@@ -60,6 +62,7 @@ const getParentDayPalette = (color: 'warm' | 'cool' | 'neutral') => {
 
 export function Samversplan() {
   const { users, children, custodyPlans, currentUser, sideMenuOpen, setSideMenuOpen, sideMenuContext, setSideMenuContext, setSwapRequestDate, setActiveTab } = useAppStore();
+  const { isFamilyMember } = useIsFamilyMember();
   const custodyPlan = custodyPlans[0];
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
@@ -174,6 +177,7 @@ export function Samversplan() {
   };
 
   const openSwapDialog = (day: Date) => {
+    if (isFamilyMember) return; // View-only for family members
     setSwapRequestDate(day);
     setActiveTab('swap-request');
   };
@@ -312,9 +316,14 @@ export function Samversplan() {
             </>
           )}
         </button>
-        <Button variant="ghost" size="icon" onClick={goToNext}>
-          <ChevronRight className="h-5 w-5" />
-        </Button>
+        <div className="flex items-center gap-1">
+          {!isFamilyMember && custodyPlan && currentChild && (
+            <ShareCustodyPlan plan={custodyPlan} child={currentChild} />
+          )}
+          <Button variant="ghost" size="icon" onClick={goToNext}>
+            <ChevronRight className="h-5 w-5" />
+          </Button>
+        </div>
       </motion.div>
 
       <motion.div
@@ -395,9 +404,11 @@ export function Samversplan() {
                   );
                 })}
               </div>
-              <p className="border-t border-[#ecebe4] bg-[#f8f7f3] px-3 py-2 text-xs text-[#75736b]">
-                Tryk på en dag for at sende bytteanmodning.
-              </p>
+              {!isFamilyMember && (
+                <p className="border-t border-[#ecebe4] bg-[#f8f7f3] px-3 py-2 text-xs text-[#75736b]">
+                  Tryk på en dag for at sende bytteanmodning.
+                </p>
+              )}
             </CardContent>
           </Card>
         ) : (

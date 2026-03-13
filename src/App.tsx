@@ -137,7 +137,7 @@ function SectionLoading() {
 }
 
 function App() {
-  const { isAuthenticated, isProfessionalView, activeTab, household, currentUser, children, setCurrentUser, setAuthenticated, hydrateFromServer, logout } = useAppStore();
+  const { isAuthenticated, isProfessionalView, activeTab, setActiveTab, household, currentUser, children, setCurrentUser, setAuthenticated, hydrateFromServer, logout } = useAppStore();
   const [isReady, setIsReady] = useState(false);
   const [authScreen, setAuthScreen] = useState<'login' | 'register'>('login');
   const [childVerified, setChildVerified] = useState(false);
@@ -403,8 +403,20 @@ function App() {
     );
   }
 
+  // Blocked tabs for family_member role (GDPR + access control)
+  const FAMILY_MEMBER_BLOCKED_TABS = new Set([
+    'handover', 'mad-hjem', 'opgaver', 'feed', 'kommunikation',
+    'expenses', 'balance', 'send-penge', 'budget', 'gaveoenskeliste',
+    'analyse', 'swap-request', 'meeting-minutes',
+  ]);
+
   // Parent view
   const renderContent = () => {
+    if (currentUser?.role === 'family_member' && FAMILY_MEMBER_BLOCKED_TABS.has(activeTab)) {
+      setActiveTab('dashboard');
+      return null;
+    }
+
     switch (activeTab) {
       case 'dashboard':
         return <ErrorBoundary sectionName="Overblik"><Dashboard /></ErrorBoundary>;
