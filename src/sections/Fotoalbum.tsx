@@ -115,14 +115,14 @@ export function Fotoalbum() {
     <div className="space-y-1.5 py-1">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Fotoalbum</h1>
+          <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-foreground">Fotoalbum</h1>
           {childForPhotos && (
-            <p className="text-[13px] text-[#78766d]">{childForPhotos.name}</p>
+            <p className="text-[13px] text-muted-foreground">{childForPhotos.name}</p>
           )}
         </div>
         <Button
           onClick={() => fileInputRef.current?.click()}
-          className="h-9 gap-1.5 rounded-[8px] bg-[#2f2f2f] px-4 text-sm text-white hover:bg-[#1a1a1a]"
+          className="h-9 gap-1.5 rounded-[8px] bg-primary px-4 text-sm text-white hover:bg-primary"
         >
           <Camera className="h-4 w-4" />
           Tilføj foto
@@ -137,15 +137,15 @@ export function Fotoalbum() {
       </div>
 
       {childPhotos.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-[#d0cec5] bg-[#faf9f6] py-16 text-center">
-          <Camera className="h-10 w-10 text-[#c8c6bc]" />
+        <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-border bg-card py-16 text-center">
+          <Camera className="h-10 w-10 text-muted-foreground" />
           <div>
-            <p className="text-sm font-semibold text-[#3f3e3a]">Ingen fotos endnu</p>
-            <p className="mt-1 text-[12px] text-[#78766d]">Tilføj jeres første minde</p>
+            <p className="text-sm font-semibold text-foreground">Ingen fotos endnu</p>
+            <p className="mt-1 text-[12px] text-muted-foreground">Tilføj jeres første minde</p>
           </div>
           <Button
             variant="outline"
-            className="mt-1 h-9 rounded-[8px] border-[#d0cec5] px-4 text-sm"
+            className="mt-1 h-9 rounded-[8px] border-border px-4 text-sm"
             onClick={() => fileInputRef.current?.click()}
           >
             <Plus className="mr-1.5 h-4 w-4" /> Vælg foto
@@ -157,7 +157,7 @@ export function Fotoalbum() {
             <button
               key={photo.id}
               onClick={() => openLightbox(i)}
-              className="group relative aspect-square overflow-hidden rounded-[8px] bg-[#ecebe5]"
+              className="group relative aspect-square overflow-hidden rounded-[8px] bg-secondary"
             >
               <img
                 src={photo.url}
@@ -171,9 +171,9 @@ export function Fotoalbum() {
 
       {/* Add photo dialog */}
       <Dialog open={addDialogOpen} onOpenChange={(o) => { if (!o) { setAddDialogOpen(false); setPreviewUrl(null); setCaption(''); if (fileInputRef.current) fileInputRef.current.value = ''; } }}>
-        <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
+        <DialogContent className="max-w-sm rounded-3xl border-border bg-card">
           <DialogHeader>
-            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Tilføj foto</DialogTitle>
+            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-foreground">Tilføj foto</DialogTitle>
           </DialogHeader>
           <div className="space-y-2">
             {previewUrl && (
@@ -185,18 +185,18 @@ export function Fotoalbum() {
               placeholder="Tilføj en billedtekst (valgfrit)"
               value={caption}
               onChange={e => setCaption(e.target.value)}
-              className="min-h-[60px] resize-none rounded-[8px] border-[#d8d7cf] bg-white text-sm"
+              className="min-h-[60px] resize-none rounded-[8px] border-border bg-card text-sm"
             />
             <div className="flex gap-2">
               <Button
                 variant="outline"
-                className="flex-1 rounded-[8px] border-[#d8d7cf]"
+                className="flex-1 rounded-[8px] border-border"
                 onClick={() => { setAddDialogOpen(false); setPreviewUrl(null); setCaption(''); if (fileInputRef.current) fileInputRef.current.value = ''; }}
               >
                 Annuller
               </Button>
               <Button
-                className="flex-1 rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+                className="flex-1 rounded-[8px] bg-primary text-white hover:bg-primary"
                 onClick={handleAddPhoto}
                 disabled={!previewUrl || isUploading}
               >
@@ -233,19 +233,19 @@ export function Fotoalbum() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleShare}
-                  className="rounded-full p-2 text-white/70 hover:bg-white/10"
+                  className="rounded-full p-2 text-white/70 hover:bg-card/10"
                 >
                   <Share2 className="h-4 w-4" />
                 </button>
                 <button
                   onClick={() => handleDelete(childPhotos[lightboxIndex].id)}
-                  className="rounded-full p-2 text-white/70 hover:bg-white/10 hover:text-red-400"
+                  className="rounded-full p-2 text-white/70 hover:bg-card/10 hover:text-red-400"
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
                 <button
                   onClick={closeLightbox}
-                  className="rounded-full p-2 text-white/70 hover:bg-white/10"
+                  className="rounded-full p-2 text-white/70 hover:bg-card/10"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -269,7 +269,7 @@ export function Fotoalbum() {
               <button
                 onClick={prevPhoto}
                 disabled={lightboxIndex === 0}
-                className={cn('rounded-full p-2', lightboxIndex === 0 ? 'text-white/20' : 'text-white hover:bg-white/10')}
+                className={cn('rounded-full p-2', lightboxIndex === 0 ? 'text-white/20' : 'text-white hover:bg-card/10')}
               >
                 <ChevronLeft className="h-5 w-5" />
               </button>
@@ -277,7 +277,7 @@ export function Fotoalbum() {
               <button
                 onClick={nextPhoto}
                 disabled={lightboxIndex === childPhotos.length - 1}
-                className={cn('rounded-full p-2', lightboxIndex === childPhotos.length - 1 ? 'text-white/20' : 'text-white hover:bg-white/10')}
+                className={cn('rounded-full p-2', lightboxIndex === childPhotos.length - 1 ? 'text-white/20' : 'text-white hover:bg-card/10')}
               >
                 <ChevronRight className="h-5 w-5" />
               </button>

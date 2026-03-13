@@ -670,7 +670,7 @@ export function FeedView() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="bg-white overflow-hidden cursor-pointer"
+                className="bg-card overflow-hidden cursor-pointer"
                 onClick={() => { if (!isExpanded) trackEvent({ eventType: 'news_view', targetId: news.id, targetType: 'article', page: 'nyheder' }); setExpandedNewsId(isExpanded ? null : news.id); }}
               >
                 <img
@@ -680,11 +680,11 @@ export function FeedView() {
                 />
                 <div className="p-3.5">
                   <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-[14px] font-semibold text-[#2f2f2d] leading-snug flex-1">{news.title}</h3>
+                    <h3 className="text-[14px] font-semibold text-foreground leading-snug flex-1">{news.title}</h3>
                     {isExpanded ? (
-                      <ChevronUp className="h-4 w-4 text-[#9a978f] shrink-0 mt-0.5" />
+                      <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
                     ) : (
-                      <ChevronDown className="h-4 w-4 text-[#9a978f] shrink-0 mt-0.5" />
+                      <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
                     )}
                   </div>
                   <AnimatePresence mode="wait">
@@ -696,7 +696,7 @@ export function FeedView() {
                         exit={{ opacity: 0, height: 0 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <p className="text-[13px] text-[#3a3935] leading-relaxed mt-2">{news.fullText}</p>
+                        <p className="text-[13px] text-foreground leading-relaxed mt-2">{news.fullText}</p>
                         <button
                           onClick={(e) => { e.stopPropagation(); window.open(news.url, '_blank'); }}
                           className="flex items-center gap-1.5 mt-3 text-[13px] font-semibold text-[#f58a2d]"
@@ -710,13 +710,13 @@ export function FeedView() {
                         key="collapsed"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="text-[12px] text-[#5f5d56] leading-relaxed mt-1.5 line-clamp-2"
+                        className="text-[12px] text-muted-foreground leading-relaxed mt-1.5 line-clamp-2"
                       >
                         {news.description}
                       </motion.p>
                     )}
                   </AnimatePresence>
-                  <p className="text-[11px] text-[#9a978f] mt-2">{news.source} · {news.date}</p>
+                  <p className="text-[11px] text-muted-foreground mt-2">{news.source} · {news.date}</p>
                 </div>
               </motion.div>
             );
@@ -768,7 +768,7 @@ export function FeedView() {
               {/* Mine grupper */}
               {myGroups.length > 0 && (
                 <>
-                  <p className="text-[12px] font-semibold text-[#9a978f] uppercase tracking-wider px-4 pt-3 pb-1.5">Mine grupper</p>
+                  <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider px-4 pt-3 pb-1.5">Mine grupper</p>
                   <div className="space-y-[1px]">
                     {myGroups.map((group, i) => (
                       <motion.div
@@ -776,26 +776,26 @@ export function FeedView() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.05 }}
-                        className="flex items-center gap-3 bg-white p-4 cursor-pointer active:bg-[#f5f4f0] transition-colors"
+                        className="flex items-center gap-3 bg-card p-4 cursor-pointer active:bg-card transition-colors"
                         onClick={() => { setViewGroupId(group.id); setViewGroupName(group.name); setActiveTab('group-detail'); }}
                       >
                         {group.image ? (
                           <img src={group.image} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
                         ) : (
-                          <div className="w-10 h-10 rounded-lg bg-[#eceae2] flex items-center justify-center shrink-0">
-                            <Users className="h-5 w-5 text-[#78766d]" />
+                          <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+                            <Users className="h-5 w-5 text-muted-foreground" />
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <p className="text-[14px] font-semibold text-[#2f2f2d]">{group.name}</p>
-                            {group.type === 'closed' && <Lock className="h-3 w-3 text-[#9a978f]" />}
+                            <p className="text-[14px] font-semibold text-foreground">{group.name}</p>
+                            {group.type === 'closed' && <Lock className="h-3 w-3 text-muted-foreground" />}
                           </div>
-                          <p className="text-[11px] text-[#9a978f]">{group.members} medlemmer</p>
+                          <p className="text-[11px] text-muted-foreground">{group.members} medlemmer</p>
                         </div>
                         <button
                           onClick={(e) => { e.stopPropagation(); setLeaveGroupId(group.id); }}
-                          className="text-[12px] font-semibold text-[#78766d] px-3 py-1.5 rounded-full border border-[#e5e3dc] hover:bg-[#f5f4f0] transition-colors"
+                          className="text-[12px] font-semibold text-muted-foreground px-3 py-1.5 rounded-full border border-border hover:bg-card transition-colors"
                         >
                           Forlad
                         </button>
@@ -808,7 +808,7 @@ export function FeedView() {
               {/* Foreslåede grupper */}
               {suggestedGroups.length > 0 && (
                 <>
-                  <p className="text-[12px] font-semibold text-[#9a978f] uppercase tracking-wider px-4 pt-4 pb-1.5">
+                  <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider px-4 pt-4 pb-1.5">
                     Foreslåede grupper
                   </p>
                   <div className="space-y-[1px]">
@@ -818,21 +818,21 @@ export function FeedView() {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.05 }}
-                        className="flex items-center gap-3 bg-white p-4"
+                        className="flex items-center gap-3 bg-card p-4"
                       >
                         {group.image ? (
                           <img src={group.image} alt="" className="w-10 h-10 rounded-lg object-cover shrink-0" />
                         ) : (
-                          <div className="w-10 h-10 rounded-lg bg-[#eceae2] flex items-center justify-center shrink-0">
-                            <Users className="h-5 w-5 text-[#78766d]" />
+                          <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center shrink-0">
+                            <Users className="h-5 w-5 text-muted-foreground" />
                           </div>
                         )}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <p className="text-[14px] font-semibold text-[#2f2f2d]">{group.name}</p>
-                            {group.type === 'closed' && <Lock className="h-3 w-3 text-[#9a978f]" />}
+                            <p className="text-[14px] font-semibold text-foreground">{group.name}</p>
+                            {group.type === 'closed' && <Lock className="h-3 w-3 text-muted-foreground" />}
                           </div>
-                          <p className="text-[11px] text-[#9a978f]">{group.members} medlemmer · {group.description}</p>
+                          <p className="text-[11px] text-muted-foreground">{group.members} medlemmer · {group.description}</p>
                         </div>
                         {group.requestStatus === 'pending' ? (
                           <button
@@ -841,7 +841,7 @@ export function FeedView() {
                                 ? { ...g, requestStatus: 'none' as const, pendingRequests: (g.pendingRequests || []).filter(id => id !== (currentUser?.id || 'self')) }
                                 : g
                             ))}
-                            className="flex items-center gap-1 text-[12px] font-semibold text-[#9a978f] px-3 py-1.5 rounded-full border border-[#e5e3dc] active:bg-[#fef2f2] active:text-[#ef4444] active:border-[#fecaca] transition-colors"
+                            className="flex items-center gap-1 text-[12px] font-semibold text-muted-foreground px-3 py-1.5 rounded-full border border-border active:bg-red-tint active:text-[#ef4444] active:border-[#fecaca] transition-colors"
                           >
                             Afventer...
                             <X className="h-3 w-3" />
@@ -874,7 +874,7 @@ export function FeedView() {
 
               <button
                 onClick={() => setShowGrupper(false)}
-                className="fixed right-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-[#2f2f2f] text-white shadow-lg hover:bg-[#1a1a1a] transition-colors"
+                className="fixed right-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-primary text-white shadow-lg hover:bg-primary transition-colors"
                 style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }}
                 aria-label="Tilbage"
               >
@@ -905,29 +905,29 @@ export function FeedView() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    className="bg-white p-4 space-y-2.5"
+                    className="bg-card p-4 space-y-2.5"
                   >
                     <div className="flex items-center gap-2.5">
                       <button onClick={() => { setViewProfileUserId(post.userId); setActiveTab('profile'); }}>
                         <Avatar className="h-8 w-8">
                           <AvatarImage src={post.avatar} />
-                          <AvatarFallback className="bg-[#eceae2] text-[#5f5d56] text-xs">{post.name[0]}</AvatarFallback>
+                          <AvatarFallback className="bg-secondary text-muted-foreground text-xs">{post.name[0]}</AvatarFallback>
                         </Avatar>
                       </button>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-baseline gap-1.5">
                           <button onClick={() => { setViewProfileUserId(post.userId); setActiveTab('profile'); }} className="text-left">
-                            <span className="text-[13px] font-semibold text-[#2f2f2d]">{post.name}</span>
+                            <span className="text-[13px] font-semibold text-foreground">{post.name}</span>
                           </button>
-                          <span className="text-[10px] text-[#b5b3ab]">·</span>
-                          <span className="text-[11px] text-[#9a978f]">{post.time}</span>
+                          <span className="text-[10px] text-muted-foreground">·</span>
+                          <span className="text-[11px] text-muted-foreground">{post.time}</span>
                         </div>
                       </div>
                       {/* Tre-prikker-menu */}
                       <div className="relative">
                         <button
                           onClick={() => setMenuPostId(menuPostId === post.id ? null : post.id)}
-                          className="p-1 text-[#9a978f] hover:text-[#5f5d56] transition-colors"
+                          className="p-1 text-muted-foreground hover:text-muted-foreground transition-colors"
                         >
                           <MoreHorizontal className="h-4 w-4" />
                         </button>
@@ -946,25 +946,25 @@ export function FeedView() {
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
                                 transition={{ duration: 0.12 }}
-                                className="absolute right-0 top-8 z-[71] w-44 rounded-xl bg-white border border-[#e5e3dc] shadow-lg overflow-hidden"
+                                className="absolute right-0 top-8 z-[71] w-44 rounded-xl bg-card border border-border shadow-lg overflow-hidden"
                               >
                                 {isOwnPost ? (
                                   <>
                                     <button
                                       onClick={() => setMenuPostId(null)}
-                                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-[13px] text-[#2f2f2d] hover:bg-[#f5f4f0] transition-colors"
+                                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-[13px] text-foreground hover:bg-card transition-colors"
                                     >
-                                      <Pencil className="h-3.5 w-3.5 text-[#78766d]" /> Rediger
+                                      <Pencil className="h-3.5 w-3.5 text-muted-foreground" /> Rediger
                                     </button>
                                     <button
                                       onClick={() => { navigator.clipboard.writeText(`coparenting://post/${post.id}`); setMenuPostId(null); }}
-                                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-[13px] text-[#2f2f2d] hover:bg-[#f5f4f0] transition-colors"
+                                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-[13px] text-foreground hover:bg-card transition-colors"
                                     >
-                                      <Link className="h-3.5 w-3.5 text-[#78766d]" /> Kopiér link
+                                      <Link className="h-3.5 w-3.5 text-muted-foreground" /> Kopiér link
                                     </button>
                                     <button
                                       onClick={() => { setForumPosts(prev => prev.filter(p => p.id !== post.id)); setMenuPostId(null); }}
-                                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-[13px] text-[#ef4444] hover:bg-[#f5f4f0] transition-colors"
+                                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-[13px] text-[#ef4444] hover:bg-card transition-colors"
                                     >
                                       <Trash2 className="h-3.5 w-3.5" /> Slet
                                     </button>
@@ -973,21 +973,21 @@ export function FeedView() {
                                   <>
                                     <button
                                       onClick={() => { setMenuPostId(null); }}
-                                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-[13px] text-[#2f2f2d] hover:bg-[#f5f4f0] transition-colors"
+                                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-[13px] text-foreground hover:bg-card transition-colors"
                                     >
-                                      <Flag className="h-3.5 w-3.5 text-[#78766d]" /> Rapportér
+                                      <Flag className="h-3.5 w-3.5 text-muted-foreground" /> Rapportér
                                     </button>
                                     <button
                                       onClick={() => { setHiddenPostIds(prev => [...prev, post.id]); setMenuPostId(null); }}
-                                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-[13px] text-[#2f2f2d] hover:bg-[#f5f4f0] transition-colors"
+                                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-[13px] text-foreground hover:bg-card transition-colors"
                                     >
-                                      <EyeOff className="h-3.5 w-3.5 text-[#78766d]" /> Skjul opslag
+                                      <EyeOff className="h-3.5 w-3.5 text-muted-foreground" /> Skjul opslag
                                     </button>
                                     <button
                                       onClick={() => { navigator.clipboard.writeText(`coparenting://post/${post.id}`); setMenuPostId(null); }}
-                                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-[13px] text-[#2f2f2d] hover:bg-[#f5f4f0] transition-colors"
+                                      className="w-full flex items-center gap-2.5 px-4 py-2.5 text-left text-[13px] text-foreground hover:bg-card transition-colors"
                                     >
-                                      <Link className="h-3.5 w-3.5 text-[#78766d]" /> Kopiér link
+                                      <Link className="h-3.5 w-3.5 text-muted-foreground" /> Kopiér link
                                     </button>
                                   </>
                                 )}
@@ -997,12 +997,12 @@ export function FeedView() {
                         </AnimatePresence>
                       </div>
                     </div>
-                    <p className="text-[14px] text-[#3a3935] leading-relaxed">{post.text}</p>
+                    <p className="text-[14px] text-foreground leading-relaxed">{post.text}</p>
                     {post.image && (
                       post.image.startsWith('data:') ? (
                         <img src={post.image} alt="" className="w-full h-40 rounded-lg object-cover" />
                       ) : (
-                        <div className="w-full h-40 rounded-lg bg-[#f2f1ed] flex items-center justify-center text-5xl">
+                        <div className="w-full h-40 rounded-lg bg-background flex items-center justify-center text-5xl">
                           {post.image}
                         </div>
                       )
@@ -1010,14 +1010,14 @@ export function FeedView() {
                     <div className="flex items-center gap-3 pt-0.5">
                       <button
                         onClick={() => toggleLike(post.id)}
-                        className={cn("flex items-center gap-1.5 text-[12px] font-medium transition-colors", post.liked ? "text-[#ef4444]" : "text-[#6b6960]")}
+                        className={cn("flex items-center gap-1.5 text-[12px] font-medium transition-colors", post.liked ? "text-[#ef4444]" : "text-muted-foreground")}
                       >
                         <Heart className={cn("h-4 w-4 transition-colors", post.liked && "fill-current")} strokeWidth={2} />
                         {post.likes}
                       </button>
                       <button
                         onClick={() => { setCommentPostId(post.id); setCommentText(''); }}
-                        className="flex items-center gap-1.5 text-[12px] font-medium text-[#6b6960]"
+                        className="flex items-center gap-1.5 text-[12px] font-medium text-muted-foreground"
                       >
                         <MessageCircle className="h-4 w-4" strokeWidth={2} /> {post.comments}
                       </button>
@@ -1043,13 +1043,13 @@ export function FeedView() {
               >
                 <button
                   onClick={() => setShowGrupper(true)}
-                  className="flex h-11 items-center gap-1.5 rounded-full bg-[#2f2f2f] px-4 text-white shadow-lg text-[13px] font-semibold hover:bg-[#1a1a1a] transition-colors"
+                  className="flex h-11 items-center gap-1.5 rounded-full bg-primary px-4 text-white shadow-lg text-[13px] font-semibold hover:bg-primary transition-colors"
                 >
                   <Users className="h-4 w-4" /> Grupper
                 </button>
                 <button
                   onClick={() => setFeedTab('nyheder')}
-                  className="flex h-11 w-11 items-center justify-center rounded-full bg-[#2f2f2f] text-white shadow-lg hover:bg-[#1a1a1a] transition-colors"
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-white shadow-lg hover:bg-primary transition-colors"
                   aria-label="Tilbage"
                 >
                   <ChevronLeft className="h-5 w-5" />
@@ -1069,14 +1069,14 @@ export function FeedView() {
                     transition={{ type: 'spring', stiffness: 400, damping: 35 }}
                     drag="y" dragConstraints={{ top: 0 }} dragElastic={0.1}
                     onDragEnd={(_, info) => { if (info.offset.y > 100) setShowNewPost(false); }}
-                    className="fixed inset-x-0 bottom-0 z-[81] rounded-t-2xl bg-white"
+                    className="fixed inset-x-0 bottom-0 z-[81] rounded-t-2xl bg-card"
                     style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
                   >
-                    <div className="flex justify-center pt-3 pb-1"><div className="h-1 w-10 rounded-full bg-[#d0cec5]" /></div>
+                    <div className="flex justify-center pt-3 pb-1"><div className="h-1 w-10 rounded-full bg-muted" /></div>
                     <div className="px-4 pb-4 space-y-3">
                       <div className="flex items-center justify-between">
-                        <button onClick={() => setShowNewPost(false)} className="text-[13px] text-[#78766d]">Annuller</button>
-                        <p className="text-[15px] font-semibold text-[#2f2f2d]">Nyt opslag</p>
+                        <button onClick={() => setShowNewPost(false)} className="text-[13px] text-muted-foreground">Annuller</button>
+                        <p className="text-[15px] font-semibold text-foreground">Nyt opslag</p>
                         <button onClick={handleCreatePost} disabled={!newPostText.trim()} className="flex items-center gap-1 text-[13px] font-semibold text-[#f58a2d] disabled:opacity-40">
                           <Send className="h-3.5 w-3.5" /> Opret
                         </button>
@@ -1084,7 +1084,7 @@ export function FeedView() {
                       <textarea
                         value={newPostText} onChange={(e) => setNewPostText(e.target.value)}
                         placeholder="Hvad vil du dele?"
-                        className="w-full h-28 rounded-xl border border-[#e5e3dc] bg-[#f9f9f7] p-3 text-[14px] text-[#2f2f2d] placeholder:text-[#c5c3ba] resize-none focus:outline-none focus:ring-1 focus:ring-[#f58a2d]"
+                        className="w-full h-28 rounded-xl border border-border bg-card p-3 text-[14px] text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-1 focus:ring-ring"
                       />
                       {newPostImage && (
                         <div className="relative">
@@ -1092,7 +1092,7 @@ export function FeedView() {
                           <button onClick={() => setNewPostImage(null)} className="absolute top-2 right-2 h-6 w-6 rounded-full bg-black/50 flex items-center justify-center text-white"><X className="h-3.5 w-3.5" /></button>
                         </div>
                       )}
-                      <button onClick={() => postImageRef.current?.click()} className="flex items-center gap-2 text-[13px] text-[#78766d] hover:text-[#5f5d56] transition-colors">
+                      <button onClick={() => postImageRef.current?.click()} className="flex items-center gap-2 text-[13px] text-muted-foreground hover:text-muted-foreground transition-colors">
                         <ImagePlus className="h-5 w-5" /> Tilføj billede
                       </button>
                       <input ref={postImageRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleImageSelect(e, setNewPostImage)} />
@@ -1115,14 +1115,14 @@ export function FeedView() {
                     transition={{ type: 'spring', stiffness: 400, damping: 35 }}
                     drag="y" dragConstraints={{ top: 0 }} dragElastic={0.1}
                     onDragEnd={(_, info) => { if (info.offset.y > 100) setCommentPostId(null); }}
-                    className="fixed inset-x-0 bottom-0 z-[81] rounded-t-2xl bg-white max-h-[70vh] flex flex-col"
+                    className="fixed inset-x-0 bottom-0 z-[81] rounded-t-2xl bg-card max-h-[70vh] flex flex-col"
                     style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
                   >
-                    <div className="flex justify-center pt-3 pb-1 shrink-0"><div className="h-1 w-10 rounded-full bg-[#d0cec5]" /></div>
+                    <div className="flex justify-center pt-3 pb-1 shrink-0"><div className="h-1 w-10 rounded-full bg-muted" /></div>
                     <div className="px-4 pb-2 shrink-0">
                       <div className="flex items-center justify-between">
-                        <button onClick={() => setCommentPostId(null)} className="text-[13px] text-[#78766d]">Luk</button>
-                        <p className="text-[15px] font-semibold text-[#2f2f2d]">Kommentarer</p>
+                        <button onClick={() => setCommentPostId(null)} className="text-[13px] text-muted-foreground">Luk</button>
+                        <p className="text-[15px] font-semibold text-foreground">Kommentarer</p>
                         <div className="w-8" />
                       </div>
                     </div>
@@ -1130,19 +1130,19 @@ export function FeedView() {
                     {/* Kommentar-liste */}
                     <div className="flex-1 overflow-y-auto px-4 space-y-3 pb-3">
                       {commentPost.commentsList.length === 0 ? (
-                        <p className="text-center text-[13px] text-[#9a978f] py-8">Ingen kommentarer endnu</p>
+                        <p className="text-center text-[13px] text-muted-foreground py-8">Ingen kommentarer endnu</p>
                       ) : (
                         commentPost.commentsList.map(c => (
                           <div key={c.id} className="flex gap-2.5">
-                            <div className="w-7 h-7 rounded-full bg-[#eceae2] flex items-center justify-center shrink-0">
-                              <span className="text-[10px] font-semibold text-[#5f5d56]">{c.name[0]}</span>
+                            <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center shrink-0">
+                              <span className="text-[10px] font-semibold text-muted-foreground">{c.name[0]}</span>
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-baseline gap-2">
-                                <span className="text-[12px] font-semibold text-[#2f2f2d]">{c.name}</span>
-                                <span className="text-[10px] text-[#9a978f]">{c.time}</span>
+                                <span className="text-[12px] font-semibold text-foreground">{c.name}</span>
+                                <span className="text-[10px] text-muted-foreground">{c.time}</span>
                               </div>
-                              <p className="text-[13px] text-[#3a3935] leading-snug">{c.text}</p>
+                              <p className="text-[13px] text-foreground leading-snug">{c.text}</p>
                             </div>
                           </div>
                         ))
@@ -1150,12 +1150,12 @@ export function FeedView() {
                     </div>
 
                     {/* Skriv kommentar */}
-                    <div className="shrink-0 border-t border-[#e5e3dc] px-4 py-3 flex items-center gap-2">
+                    <div className="shrink-0 border-t border-border px-4 py-3 flex items-center gap-2">
                       <input
                         value={commentText}
                         onChange={(e) => setCommentText(e.target.value)}
                         placeholder="Skriv en kommentar..."
-                        className="flex-1 rounded-full border border-[#e5e3dc] bg-[#f9f9f7] px-3 py-2 text-[13px] text-[#2f2f2d] placeholder:text-[#c5c3ba] focus:outline-none focus:ring-1 focus:ring-[#f58a2d]"
+                        className="flex-1 rounded-full border border-border bg-card px-3 py-2 text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                         onKeyDown={(e) => { if (e.key === 'Enter') addComment(); }}
                       />
                       <button
@@ -1187,23 +1187,23 @@ export function FeedView() {
                 transition={{ type: 'spring', stiffness: 400, damping: 35 }}
                 drag="y" dragConstraints={{ top: 0 }} dragElastic={0.1}
                 onDragEnd={(_, info) => { if (info.offset.y > 100) setShowAddWish(false); }}
-                className="fixed inset-x-0 bottom-0 z-[81] rounded-t-2xl bg-white"
+                className="fixed inset-x-0 bottom-0 z-[81] rounded-t-2xl bg-card"
                 style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
               >
-                <div className="flex justify-center pt-3 pb-1"><div className="h-1 w-10 rounded-full bg-[#d0cec5]" /></div>
+                <div className="flex justify-center pt-3 pb-1"><div className="h-1 w-10 rounded-full bg-muted" /></div>
                 <div className="px-4 pb-4 space-y-3">
                   <div className="flex items-center justify-between">
-                    <button onClick={() => setShowAddWish(false)} className="text-[13px] text-[#78766d]">Annuller</button>
-                    <p className="text-[15px] font-semibold text-[#2f2f2d]">Tilføj ønske</p>
+                    <button onClick={() => setShowAddWish(false)} className="text-[13px] text-muted-foreground">Annuller</button>
+                    <p className="text-[15px] font-semibold text-foreground">Tilføj ønske</p>
                     <button onClick={handleAddWish} disabled={!newWishTitle.trim()} className="flex items-center gap-1 text-[13px] font-semibold text-[#f58a2d] disabled:opacity-40">
                       <Plus className="h-3.5 w-3.5" /> Tilføj
                     </button>
                   </div>
                   <input value={newWishTitle} onChange={(e) => setNewWishTitle(e.target.value)} placeholder="Produktnavn"
-                    className="w-full rounded-xl border border-[#e5e3dc] bg-[#f9f9f7] px-3 py-2.5 text-[14px] text-[#2f2f2d] placeholder:text-[#c5c3ba] focus:outline-none focus:ring-1 focus:ring-[#f58a2d]"
+                    className="w-full rounded-xl border border-border bg-card px-3 py-2.5 text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                   />
                   <input value={newWishPrice} onChange={(e) => setNewWishPrice(e.target.value)} placeholder="Pris (valgfrit)" type="number"
-                    className="w-full rounded-xl border border-[#e5e3dc] bg-[#f9f9f7] px-3 py-2.5 text-[14px] text-[#2f2f2d] placeholder:text-[#c5c3ba] focus:outline-none focus:ring-1 focus:ring-[#f58a2d]"
+                    className="w-full rounded-xl border border-border bg-card px-3 py-2.5 text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                   />
                 </div>
               </motion.div>

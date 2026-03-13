@@ -78,9 +78,9 @@ export function ProductCard({ product, mode, childId, listId, onAdded }: Product
   };
 
   return (
-    <div className="rounded-[8px] border border-[#e8e7e0] bg-white overflow-hidden">
+    <div className="rounded-[8px] border border-border bg-card overflow-hidden">
       {/* Image section */}
-      <div className="relative aspect-[4/3] bg-[#f5f4f0]">
+      <div className="relative aspect-[4/3] bg-card">
         {product.imageUrl ? (
           <img
             src={product.imageUrl}
@@ -89,7 +89,7 @@ export function ProductCard({ product, mode, childId, listId, onAdded }: Product
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
-            <Package className="h-10 w-10 text-[#c5c3bb]" />
+            <Package className="h-10 w-10 text-muted-foreground" />
           </div>
         )}
         {product.nutriscoreGrade && (
@@ -112,16 +112,16 @@ export function ProductCard({ product, mode, childId, listId, onAdded }: Product
 
       {/* Info section */}
       <div className="p-2.5">
-        <p className="text-sm font-semibold text-[#2f2f2d] line-clamp-2 leading-tight">
+        <p className="text-sm font-semibold text-foreground line-clamp-2 leading-tight">
           {product.name}
         </p>
         {(product.brand || product.quantity) && (
-          <p className="text-xs text-[#78766d] mt-0.5 line-clamp-1">
+          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
             {[product.brand, product.quantity].filter(Boolean).join(' · ')}
           </p>
         )}
         {product.price != null && product.price > 0 && (
-          <p className="text-sm font-bold text-[#2f2f2d] mt-1">
+          <p className="text-sm font-bold text-foreground mt-1">
             {formatCurrency(product.price)}
           </p>
         )}

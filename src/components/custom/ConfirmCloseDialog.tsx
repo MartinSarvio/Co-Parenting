@@ -36,15 +36,15 @@ export function ConfirmCloseDialog({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.92 }}
             transition={{ type: 'spring', duration: 0.3 }}
-            className="mx-6 w-full max-w-[300px] rounded-2xl bg-white p-5 shadow-xl"
+            className="mx-6 w-full max-w-[300px] rounded-2xl bg-card p-5 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-base font-semibold text-[#2f2f2d] text-center">{title}</h3>
-            <p className="mt-1 text-sm text-[#78766d] text-center">{description}</p>
+            <h3 className="text-base font-semibold text-foreground text-center">{title}</h3>
+            <p className="mt-1 text-sm text-muted-foreground text-center">{description}</p>
             <div className="mt-4 flex gap-2">
               <button
                 onClick={onCancel}
-                className="flex-1 rounded-xl border border-[#e8e7e0] bg-white py-2.5 text-sm font-medium text-[#2f2f2d] active:scale-[0.98] transition-all"
+                className="flex-1 rounded-xl border border-border bg-card py-2.5 text-sm font-medium text-foreground active:scale-[0.98] transition-all"
               >
                 {cancelLabel}
               </button>

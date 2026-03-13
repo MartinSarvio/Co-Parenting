@@ -116,14 +116,14 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
           className="w-full max-w-sm"
         >
           <div
-            className="bg-white/95 backdrop-blur-xl rounded-3xl px-6 py-8 shadow-[0_8px_40px_rgba(0,0,0,0.12)]"
+            className="bg-card/95 backdrop-blur-xl rounded-3xl px-6 py-8 shadow-[0_8px_40px_rgba(0,0,0,0.12)]"
           >
             {/* App branding */}
             <div className="text-center mb-7">
               <h1 className="text-[2.2rem] font-extrabold tracking-[-0.04em] bg-gradient-to-br from-[#f7a95c] via-[#f58a2d] to-[#e8773f] bg-clip-text text-transparent">
                 Huska
               </h1>
-              <p className="text-[0.85rem] text-[#9a978f] mt-1">
+              <p className="text-[0.85rem] text-muted-foreground mt-1">
                 Husk alt det vigtige i familien
               </p>
             </div>
@@ -132,13 +132,13 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
             <div className="space-y-2">
               {/* Email */}
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#b5b2a8] z-10" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-muted-foreground z-10" />
                 <Input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="din@email.dk"
-                  className="h-[50px] pl-11 text-[15px] bg-white/80 border-[#e5e3dc] rounded-[8px] placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
+                  className="h-[50px] pl-11 text-[15px] bg-card/80 border-border rounded-[8px] placeholder:text-muted-foreground focus-visible:border-[#f58a2d] focus-visible:ring-ring/20"
                   disabled={isLoading}
                   onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
                   autoCapitalize="none"
@@ -148,13 +148,13 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
 
               {/* Password */}
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-[#b5b2a8] z-10" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[18px] h-[18px] text-muted-foreground z-10" />
                 <Input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Adgangskode"
-                  className="h-[50px] pl-11 text-[15px] bg-white/80 border-[#e5e3dc] rounded-[8px] placeholder:text-[#c4c1b8] focus-visible:border-[#f58a2d] focus-visible:ring-[#f58a2d]/20"
+                  className="h-[50px] pl-11 text-[15px] bg-card/80 border-border rounded-[8px] placeholder:text-muted-foreground focus-visible:border-[#f58a2d] focus-visible:ring-ring/20"
                   disabled={isLoading}
                   onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
                 />
@@ -175,7 +175,7 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
                     className={`w-5 h-5 rounded-md border flex items-center justify-center transition-all duration-150 ${
                       rememberMe
                         ? 'bg-[#f58a2d] border-[#f58a2d]'
-                        : 'bg-white/80 border-[#d5d3cc]'
+                        : 'bg-card/80 border-border'
                     }`}
                   >
                     {rememberMe && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
@@ -214,7 +214,7 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
                 <button
                   onClick={onSwitchToRegister}
                   disabled={isLoading}
-                  className="text-[13px] text-[#9a978f]"
+                  className="text-[13px] text-muted-foreground"
                 >
                   Har du ikke en konto?{' '}
                   <span className="font-semibold text-[#f58a2d]">Opret konto</span>

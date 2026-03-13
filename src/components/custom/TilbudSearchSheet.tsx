@@ -89,7 +89,7 @@ export function TilbudSearchSheet({ open, onOpenChange, storeId, addedCatalogId,
 
           {/* Top sheet */}
           <motion.div
-            className="fixed inset-x-0 top-0 z-[81] mx-auto max-w-[430px] flex flex-col bg-[#f7f6f2] rounded-b-3xl shadow-[0_8px_40px_rgba(0,0,0,0.12)] max-h-[70vh]"
+            className="fixed inset-x-0 top-0 z-[81] mx-auto max-w-[430px] flex flex-col bg-background rounded-b-3xl shadow-[0_8px_40px_rgba(0,0,0,0.12)] max-h-[70vh]"
             style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
             initial={{ y: '-100%' }}
             animate={{ y: 0 }}
@@ -99,26 +99,26 @@ export function TilbudSearchSheet({ open, onOpenChange, storeId, addedCatalogId,
             {/* Header with search */}
             <div className="flex items-center gap-3 px-4 pt-3 pb-3 shrink-0">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9a978f]" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder={storeId ? `Søg i ${FLYERS.find(f => f.id === storeId)?.store || 'butik'}...` : 'Søg tilbud...'}
-                  className="w-full rounded-xl border border-[#e5e3dc] bg-white pl-9 pr-9 py-2.5 text-[14px] text-[#2f2f2d] placeholder:text-[#c5c3ba] focus:outline-none focus:ring-1 focus:ring-[#f58a2d]"
+                  className="w-full rounded-xl border border-border bg-card pl-9 pr-9 py-2.5 text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                   autoFocus
                 />
                 {query && (
                   <button
                     onClick={() => setQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-[#e5e3dc] flex items-center justify-center"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-muted flex items-center justify-center"
                   >
-                    <X className="h-3 w-3 text-[#78766d]" />
+                    <X className="h-3 w-3 text-muted-foreground" />
                   </button>
                 )}
               </div>
               <button
                 onClick={close}
-                className="text-[14px] font-semibold text-[#78766d]"
+                className="text-[14px] font-semibold text-muted-foreground"
               >
                 Luk
               </button>
@@ -127,11 +127,11 @@ export function TilbudSearchSheet({ open, onOpenChange, storeId, addedCatalogId,
             {/* Results */}
             <div className="flex-1 overflow-y-auto overscroll-contain px-4 pb-6 space-y-4">
               {query.length >= 2 && results.length === 0 && (
-                <p className="text-center text-[13px] text-[#9a978f] py-6">Ingen resultater for &ldquo;{query}&rdquo;</p>
+                <p className="text-center text-[13px] text-muted-foreground py-6">Ingen resultater for &ldquo;{query}&rdquo;</p>
               )}
 
               {query.length < 2 && (
-                <p className="text-center text-[13px] text-[#9a978f] py-6">Skriv mindst 2 tegn for at søge</p>
+                <p className="text-center text-[13px] text-muted-foreground py-6">Skriv mindst 2 tegn for at søge</p>
               )}
 
               {[...grouped.entries()].map(([sid, products]) => {
@@ -141,7 +141,7 @@ export function TilbudSearchSheet({ open, onOpenChange, storeId, addedCatalogId,
                     {!storeId && (
                       <div className="flex items-center gap-2 mb-2">
                         <StoreBadge storeId={sid} size="sm" />
-                        <span className="text-[13px] font-semibold text-[#2f2f2d]">{flyer?.store || sid}</span>
+                        <span className="text-[13px] font-semibold text-foreground">{flyer?.store || sid}</span>
                       </div>
                     )}
                     <div className="flex gap-2 overflow-x-auto snap-x pb-2 scrollbar-hide -mx-4 px-4">
@@ -162,7 +162,7 @@ export function TilbudSearchSheet({ open, onOpenChange, storeId, addedCatalogId,
 
             {/* Bottom handle */}
             <div className="flex justify-center pb-3 pt-1 shrink-0">
-              <div className="h-1 w-10 rounded-full bg-[#d8d7cf]" />
+              <div className="h-1 w-10 rounded-full bg-border" />
             </div>
           </motion.div>
         </>

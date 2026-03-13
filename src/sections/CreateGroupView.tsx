@@ -71,10 +71,10 @@ export function CreateGroupView() {
   return (
     <div className="-mx-3 sm:-mx-4">
       {/* Group image / cover */}
-      <div className="bg-white">
+      <div className="bg-card">
         <button
           onClick={() => imageRef.current?.click()}
-          className="w-full h-44 bg-[#eceae2] flex flex-col items-center justify-center gap-2 relative overflow-hidden"
+          className="w-full h-44 bg-secondary flex flex-col items-center justify-center gap-2 relative overflow-hidden"
         >
           {image ? (
             <>
@@ -85,8 +85,8 @@ export function CreateGroupView() {
             </>
           ) : (
             <>
-              <Camera className="h-7 w-7 text-[#9a978f]" />
-              <span className="text-[13px] text-[#9a978f] font-medium">Tilf&oslash;j gruppebillede</span>
+              <Camera className="h-7 w-7 text-muted-foreground" />
+              <span className="text-[13px] text-muted-foreground font-medium">Tilf&oslash;j gruppebillede</span>
             </>
           )}
         </button>
@@ -103,30 +103,30 @@ export function CreateGroupView() {
       </div>
 
       {/* Name + description */}
-      <div className="bg-white px-4 py-4 space-y-3 mt-[6px]">
+      <div className="bg-card px-4 py-4 space-y-3 mt-[6px]">
         <div>
-          <label className="text-[12px] font-semibold text-[#9a978f] uppercase tracking-wider">Gruppenavn *</label>
+          <label className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider">Gruppenavn *</label>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Navngiv din gruppe"
-            className="w-full mt-1 rounded-xl border border-[#e5e3dc] bg-[#f9f9f7] px-3 py-2.5 text-[14px] text-[#2f2f2d] placeholder:text-[#c5c3ba] focus:outline-none focus:ring-1 focus:ring-[#f58a2d]"
+            className="w-full mt-1 rounded-xl border border-border bg-card px-3 py-2.5 text-[14px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
           />
         </div>
         <div>
-          <label className="text-[12px] font-semibold text-[#9a978f] uppercase tracking-wider">Beskrivelse</label>
+          <label className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider">Beskrivelse</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Hvad handler gruppen om?"
-            className="w-full mt-1 h-20 rounded-xl border border-[#e5e3dc] bg-[#f9f9f7] px-3 py-2.5 text-[14px] text-[#2f2f2d] placeholder:text-[#c5c3ba] resize-none focus:outline-none focus:ring-1 focus:ring-[#f58a2d]"
+            className="w-full mt-1 h-20 rounded-xl border border-border bg-card px-3 py-2.5 text-[14px] text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-1 focus:ring-ring"
           />
         </div>
       </div>
 
       {/* Type selector */}
-      <div className="bg-white px-4 py-4 mt-[6px]">
-        <label className="text-[12px] font-semibold text-[#9a978f] uppercase tracking-wider">Gruppetype</label>
+      <div className="bg-card px-4 py-4 mt-[6px]">
+        <label className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider">Gruppetype</label>
         <div className="flex gap-2 mt-2">
           <button
             onClick={() => setType('open')}
@@ -134,7 +134,7 @@ export function CreateGroupView() {
               "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-[13px] font-semibold transition-colors",
               type === 'open'
                 ? "border-[#f58a2d] bg-[#f58a2d]/10 text-[#f58a2d]"
-                : "border-[#e5e3dc] bg-[#f9f9f7] text-[#78766d]"
+                : "border-border bg-card text-muted-foreground"
             )}
           >
             <Users className="h-4 w-4" /> &Aring;ben
@@ -145,7 +145,7 @@ export function CreateGroupView() {
               "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-[13px] font-semibold transition-colors",
               type === 'closed'
                 ? "border-[#f58a2d] bg-[#f58a2d]/10 text-[#f58a2d]"
-                : "border-[#e5e3dc] bg-[#f9f9f7] text-[#78766d]"
+                : "border-border bg-card text-muted-foreground"
             )}
           >
             <Lock className="h-4 w-4" /> Lukket
@@ -157,13 +157,13 @@ export function CreateGroupView() {
       <button
         id="create-group-settings"
         onClick={() => setShowSettings(!showSettings)}
-        className="w-full bg-white border-t border-[#e5e3dc] px-4 py-3.5 flex items-center justify-between mt-[6px]"
+        className="w-full bg-card border-t border-border px-4 py-3.5 flex items-center justify-between mt-[6px]"
       >
         <div className="flex items-center gap-2">
-          <Shield className="h-4 w-4 text-[#9a978f]" />
-          <span className="text-[13px] font-semibold text-[#5f5d56]">Avancerede indstillinger</span>
+          <Shield className="h-4 w-4 text-muted-foreground" />
+          <span className="text-[13px] font-semibold text-muted-foreground">Avancerede indstillinger</span>
         </div>
-        {showSettings ? <ChevronUp className="h-4 w-4 text-[#9a978f]" /> : <ChevronDown className="h-4 w-4 text-[#9a978f]" />}
+        {showSettings ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
       </button>
       <AnimatePresence>
         {showSettings && (
@@ -173,19 +173,19 @@ export function CreateGroupView() {
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="bg-white px-4 pb-4 space-y-3">
+            <div className="bg-card px-4 pb-4 space-y-3">
               {/* Rules */}
               <div>
-                <label className="text-[12px] font-semibold text-[#9a978f] uppercase tracking-wider">Grupperegler</label>
+                <label className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider">Grupperegler</label>
                 <textarea
                   value={rules}
                   onChange={(e) => setRules(e.target.value)}
                   placeholder="Definer regler for gruppen (valgfrit)"
-                  className="w-full mt-1 h-20 rounded-xl border border-[#e5e3dc] bg-[#f9f9f7] px-3 py-2.5 text-[14px] text-[#2f2f2d] placeholder:text-[#c5c3ba] resize-none focus:outline-none focus:ring-1 focus:ring-[#f58a2d]"
+                  className="w-full mt-1 h-20 rounded-xl border border-border bg-card px-3 py-2.5 text-[14px] text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-1 focus:ring-ring"
                 />
               </div>
 
-              <p className="text-[12px] text-[#9a978f]">
+              <p className="text-[12px] text-muted-foreground">
                 Andre brugere kan finde og tilmelde sig din gruppe efter oprettelse.
               </p>
             </div>

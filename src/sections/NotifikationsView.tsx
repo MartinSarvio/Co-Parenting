@@ -60,7 +60,7 @@ export function NotifikationsView() {
         animate={{ opacity: 1, y: 0 }}
         className="px-1"
       >
-        <h1 className="text-[1.7rem] font-semibold leading-tight tracking-[-0.02em] text-[#262623]">
+        <h1 className="text-[1.7rem] font-semibold leading-tight tracking-[-0.02em] text-foreground">
           Notifikationer
         </h1>
       </motion.div>
@@ -72,8 +72,8 @@ export function NotifikationsView() {
           transition={{ delay: 0.1 }}
           className="flex flex-col items-center py-16"
         >
-          <BellOff className="mb-3 h-10 w-10 text-[#c0beb6]" />
-          <p className="text-sm text-[#a09e96]">Ingen notifikationer endnu</p>
+          <BellOff className="mb-3 h-10 w-10 text-muted-foreground" />
+          <p className="text-sm text-muted-foreground">Ingen notifikationer endnu</p>
         </motion.div>
       ) : (
         <div className="space-y-1">
@@ -84,7 +84,7 @@ export function NotifikationsView() {
               transition={{ delay: 0.1 }}
               className="space-y-1"
             >
-              <p className="px-1 text-[13px] font-semibold uppercase tracking-wider text-[#9d9b93]">Nye</p>
+              <p className="px-1 text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">Nye</p>
               {unread.map((n, i) => {
                 const config = typeConfig[n.type] ?? fallbackConfig;
                 const Icon = config.icon;
@@ -95,16 +95,16 @@ export function NotifikationsView() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.05 * i }}
                     onClick={() => handleMarkRead(n.id)}
-                    className="flex w-full items-start gap-3 rounded-[8px] bg-[#fff8f0] p-3.5 text-left transition-colors active:bg-[#fff2e6]"
+                    className="flex w-full items-start gap-3 rounded-[8px] bg-orange-tint-light p-3.5 text-left transition-colors active:bg-orange-tint"
                   >
                     <Icon className="mt-0.5 h-5 w-5 shrink-0" style={{ color: config.color }} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-[13px] font-semibold text-[#2f2f2d]">{n.title}</span>
+                        <span className="text-[13px] font-semibold text-foreground">{n.title}</span>
                         <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#f58a2d]" />
                       </div>
-                      <p className="mt-0.5 text-[13px] leading-snug text-[#5f5d56]">{n.message}</p>
-                      <p className="mt-1 text-[11px] text-[#a09e96]">
+                      <p className="mt-0.5 text-[13px] leading-snug text-muted-foreground">{n.message}</p>
+                      <p className="mt-1 text-[11px] text-muted-foreground">
                         {formatDistanceToNow(parseISO(n.createdAt), { addSuffix: true, locale: da })}
                       </p>
                     </div>
@@ -121,7 +121,7 @@ export function NotifikationsView() {
               transition={{ delay: 0.2 }}
               className="space-y-1"
             >
-              <p className={cn("px-1 text-[13px] font-semibold uppercase tracking-wider text-[#9d9b93]", unread.length > 0 && "mt-4")}>
+              <p className={cn("px-1 text-[13px] font-semibold uppercase tracking-wider text-muted-foreground", unread.length > 0 && "mt-4")}>
                 Tidligere
               </p>
               {read.map((n, i) => {
@@ -135,11 +135,11 @@ export function NotifikationsView() {
                     transition={{ delay: 0.02 * i }}
                     className="flex w-full items-start gap-3 rounded-[8px] p-3.5"
                   >
-                    <Icon className="mt-0.5 h-5 w-5 shrink-0 text-[#b0ada4]" />
+                    <Icon className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
                     <div className="flex-1 min-w-0">
-                      <span className="text-[13px] font-medium text-[#5f5d56]">{n.title}</span>
-                      <p className="mt-0.5 text-[13px] leading-snug text-[#9d9b93]">{n.message}</p>
-                      <p className="mt-1 text-[11px] text-[#c0beb6]">
+                      <span className="text-[13px] font-medium text-muted-foreground">{n.title}</span>
+                      <p className="mt-0.5 text-[13px] leading-snug text-muted-foreground">{n.message}</p>
+                      <p className="mt-1 text-[11px] text-muted-foreground">
                         {formatDistanceToNow(parseISO(n.createdAt), { addSuffix: true, locale: da })}
                       </p>
                     </div>

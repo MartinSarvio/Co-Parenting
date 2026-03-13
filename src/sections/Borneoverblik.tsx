@@ -490,40 +490,40 @@ export function Borneoverblik() {
         <OverblikSidePanel />
         <div className="space-y-3">
           <div className="space-y-1.5">
-            <Label className="text-[12px] font-semibold text-[#78766d]">Titel</Label>
+            <Label className="text-[12px] font-semibold text-muted-foreground">Titel</Label>
             <Input
               value={newMilestone.title}
               onChange={(e) => setNewMilestone({...newMilestone, title: e.target.value})}
               placeholder="F.eks. Første skoledag"
-              className="rounded-[8px] border-[#e5e3dc] bg-white"
+              className="rounded-[8px] border-border bg-card"
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-[12px] font-semibold text-[#78766d]">Beskrivelse (valgfri)</Label>
+            <Label className="text-[12px] font-semibold text-muted-foreground">Beskrivelse (valgfri)</Label>
             <Textarea
               value={newMilestone.description}
               onChange={(e) => setNewMilestone({...newMilestone, description: e.target.value})}
               placeholder="Beskriv begivenheden..."
-              className="rounded-[8px] border-[#e5e3dc] bg-white min-h-[80px] resize-none"
+              className="rounded-[8px] border-border bg-card min-h-[80px] resize-none"
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-[12px] font-semibold text-[#78766d]">Dato</Label>
+            <Label className="text-[12px] font-semibold text-muted-foreground">Dato</Label>
             <Input
               type="date"
               value={newMilestone.date}
               onChange={(e) => setNewMilestone({...newMilestone, date: e.target.value})}
-              className="rounded-[8px] border-[#e5e3dc] bg-white"
+              className="rounded-[8px] border-border bg-card"
             />
           </div>
           <div className="space-y-1.5">
-            <Label className="text-[12px] font-semibold text-[#78766d]">Kategori</Label>
+            <Label className="text-[12px] font-semibold text-muted-foreground">Kategori</Label>
             <SelectSheet
               value={newMilestone.category}
               onValueChange={(v) => setNewMilestone({...newMilestone, category: v as Milestone['category']})}
               title="Kategori"
               options={milestoneCategories.map(cat => ({ value: cat.value, label: cat.label, icon: <cat.icon className="w-4 h-4" /> }))}
-              className="rounded-[8px] border-[#e5e3dc] bg-white"
+              className="rounded-[8px] border-border bg-card"
             />
           </div>
           <Button onClick={handleAddMilestone} className="w-full flex items-center justify-center gap-2 rounded-[8px] bg-[#f58a2d] text-white hover:bg-[#e07b1e]" disabled={!newMilestone.title || !newMilestone.date || isSaving}>
@@ -543,15 +543,15 @@ export function Borneoverblik() {
         <div className="flex items-center justify-between pt-2 pb-4">
           <div className="flex items-center gap-3">
             <button onClick={() => { setMilestoneFormMode(null); setEditingMilestone(null); }} className="transition-colors">
-              <ChevronLeft className="h-5 w-5 text-[#4a4945]" />
+              <ChevronLeft className="h-5 w-5 text-foreground" />
             </button>
-            <h2 className="text-lg font-semibold text-[#2f2f2d]">Rediger milepæl</h2>
+            <h2 className="text-lg font-semibold text-foreground">Rediger milepæl</h2>
           </div>
           <button onClick={handleDeleteMilestone} className="text-sm font-medium text-red-500 hover:text-red-600 transition-colors">
             Slet
           </button>
         </div>
-        <div className="space-y-2 rounded-2xl bg-white p-4 border border-[#e8e7e0]">
+        <div className="space-y-2 rounded-2xl bg-card p-4 border border-border">
           <div className="space-y-2">
             <Label>Titel</Label>
             <Input
@@ -600,8 +600,8 @@ export function Borneoverblik() {
       <div className="space-y-3 py-1">
         <OverblikSidePanel />
         <div className="text-center pt-2 pb-2">
-          <h1 className="text-2xl font-bold text-[#2f2f2d]">Milepæle & Begivenheder</h1>
-          <p className="text-sm text-[#75736b] mt-1">{currentChild.name}</p>
+          <h1 className="text-2xl font-bold text-foreground">Milepæle & Begivenheder</h1>
+          <p className="text-sm text-muted-foreground mt-1">{currentChild.name}</p>
         </div>
 
         <div className="space-y-2">
@@ -620,7 +620,7 @@ export function Borneoverblik() {
                 >
                   <button
                     type="button"
-                    className="w-full text-left rounded-[8px] border border-[#e8e7e0] bg-white px-4 py-3.5 transition-colors hover:bg-[#faf9f6]"
+                    className="w-full text-left rounded-[8px] border border-border bg-card px-4 py-3.5 transition-colors hover:bg-card"
                     onClick={() => {
                       setEditingMilestone(milestone);
                       setNewMilestone({
@@ -635,19 +635,19 @@ export function Borneoverblik() {
                     <div className="flex items-start gap-3">
                       <div className={cn(
                         "w-10 h-10 rounded-[8px] flex items-center justify-center flex-shrink-0",
-                        category?.color || 'bg-[#f2f1ed] text-[#7a786f]'
+                        category?.color || 'bg-background text-muted-foreground'
                       )}>
                         {category ? <category.icon className="w-5 h-5" /> : <Calendar className="w-5 h-5" />}
                       </div>
                       <div className="flex-1">
                         <div className="flex items-start justify-between">
                           <div>
-                            <p className="text-[14px] font-semibold text-[#2f2f2d]">{milestone.title}</p>
+                            <p className="text-[14px] font-semibold text-foreground">{milestone.title}</p>
                             {milestone.description && (
-                              <p className="text-[12px] text-[#9a978f] mt-0.5">{milestone.description}</p>
+                              <p className="text-[12px] text-muted-foreground mt-0.5">{milestone.description}</p>
                             )}
                           </div>
-                          <span className="text-[11px] text-[#9a978f] font-medium shrink-0 ml-2">
+                          <span className="text-[11px] text-muted-foreground font-medium shrink-0 ml-2">
                             {formatDate(milestone.date)}
                           </span>
                         </div>
@@ -656,7 +656,7 @@ export function Borneoverblik() {
                             <AvatarImage src={addedBy?.avatar} />
                             <AvatarFallback className="text-[8px]">{addedBy?.name[0]}</AvatarFallback>
                           </Avatar>
-                          <span className="text-[11px] text-[#9a978f]">
+                          <span className="text-[11px] text-muted-foreground">
                             Tilføjet af {addedBy?.name}
                           </span>
                         </div>
@@ -669,9 +669,9 @@ export function Borneoverblik() {
 
           {milestones.filter(m => m.childId === currentChild.id).length === 0 && (
             <div className="text-center py-8">
-              <Calendar className="w-12 h-12 text-[#d8d7cf] mx-auto mb-3" />
-              <p className="text-[#75736b]">Ingen milepæle endnu</p>
-              <p className="text-[13px] text-[#9a978f]">Tilføj vigtige begivenheder i dit barns liv</p>
+              <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+              <p className="text-muted-foreground">Ingen milepæle endnu</p>
+              <p className="text-[13px] text-muted-foreground">Tilføj vigtige begivenheder i dit barns liv</p>
             </div>
           )}
         </div>
@@ -690,13 +690,13 @@ export function Borneoverblik() {
       >
         <Avatar className="w-24 h-24 mx-auto mb-4 border-4 border-white shadow-xl">
           <AvatarImage src={currentChild.avatar || `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(currentChild.name)}`} />
-          <AvatarFallback className="text-3xl bg-[#eceae2] text-[#2f2f2f]">
+          <AvatarFallback className="text-3xl bg-secondary text-foreground">
             {currentChild.name[0]}
           </AvatarFallback>
         </Avatar>
-        <h1 className="text-2xl font-bold text-[#2f2f2d]">{currentChild.name}</h1>
-        <p className="text-[#75736b]">{getAge()} gammel</p>
-        <p className="text-[13px] text-[#9a978f]">Født {formatDate(currentChild.birthDate)}</p>
+        <h1 className="text-2xl font-bold text-foreground">{currentChild.name}</h1>
+        <p className="text-muted-foreground">{getAge()} gammel</p>
+        <p className="text-[13px] text-muted-foreground">Født {formatDate(currentChild.birthDate)}</p>
       </motion.div>
 
       {/* Parents */}
@@ -711,15 +711,15 @@ export function Borneoverblik() {
           <div className={cn(
             "flex items-center gap-2 rounded-full px-4 py-2",
             parent1.id === currentUser?.id
-              ? "border border-[#2f2f2f] bg-[#2f2f2f]"
-              : "border border-[#f3c59d] bg-[#fff2e6]"
+              ? "border border-primary bg-primary"
+              : "border border-orange-tint bg-orange-tint"
           )}>
             <Avatar className="w-8 h-8">
               <AvatarImage src={parent1.avatar} />
               <AvatarFallback className={cn(
                 "text-xs",
                 parent1.id === currentUser?.id
-                  ? "bg-[#4f4b45] text-white"
+                  ? "bg-primary text-white"
                   : "bg-[#f58a2d] text-white"
               )}>
                 {parent1.name[0]}
@@ -735,15 +735,15 @@ export function Borneoverblik() {
         <div className={cn(
           "flex items-center gap-2 rounded-full px-4 py-2",
           parent2 && parent2.id === currentUser?.id
-            ? "border border-[#2f2f2f] bg-[#2f2f2f]"
-            : "border border-[#f3c59d] bg-[#fff2e6]"
+            ? "border border-primary bg-primary"
+            : "border border-orange-tint bg-orange-tint"
         )}>
           <Avatar className="w-8 h-8">
             {parent2 && <AvatarImage src={parent2.avatar} />}
             <AvatarFallback className={cn(
               "text-xs",
               parent2 && parent2.id === currentUser?.id
-                ? "bg-[#4f4b45] text-white"
+                ? "bg-primary text-white"
                 : "bg-[#f58a2d] text-white"
             )}>
               {parent2Name[0]}
@@ -765,24 +765,24 @@ export function Borneoverblik() {
         >
           <button
             onClick={() => { setViewingStageIndex(stageInfo.currentIndex); setStageDetailOpen(true); }}
-            className="w-full rounded-[8px] border-2 border-[#e5e3dc] bg-white p-4 text-left transition-all hover:border-[#f3c59d] hover:shadow-[0_2px_12px_rgba(245,138,45,0.08)] active:scale-[0.98]"
+            className="w-full rounded-[8px] border-2 border-border bg-card p-4 text-left transition-all hover:border-orange-tint hover:shadow-[0_2px_12px_rgba(245,138,45,0.08)] active:scale-[0.98]"
           >
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="text-[12px] font-semibold uppercase tracking-wide text-[#78766d]">
+                  <span className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
                     {stageInfo.currentStage.type === 'tigerspring' ? 'Tigerspring' : 'Udviklingsfase'}
                   </span>
                   {stageInfo.currentStage.type === 'tigerspring' && (
-                    <span className="rounded-full bg-[#fff2e6] px-2 py-0.5 text-[10px] font-bold text-[#f58a2d]">
+                    <span className="rounded-full bg-orange-tint px-2 py-0.5 text-[10px] font-bold text-[#f58a2d]">
                       {stageInfo.currentStage.number}/10
                     </span>
                   )}
                 </div>
-                <p className="mt-1 text-lg font-bold text-[#2f2f2d] leading-snug">
+                <p className="mt-1 text-lg font-bold text-foreground leading-snug">
                   {stageInfo.currentStage.title}
                 </p>
-                <p className="mt-0.5 text-[12px] text-[#9a978f]">
+                <p className="mt-0.5 text-[12px] text-muted-foreground">
                   {stageInfo.currentStage.subtitle} · {stageInfo.ageWeeks} uger gammel
                 </p>
               </div>
@@ -810,13 +810,13 @@ export function Borneoverblik() {
                   className={cn(
                     "h-1 flex-1 rounded-full transition-colors",
                     i < stageInfo.currentIndex ? "bg-[#f58a2d]" :
-                    i === stageInfo.currentIndex ? "bg-[#2f2f2d]" :
-                    "bg-[#e8e7e0]"
+                    i === stageInfo.currentIndex ? "bg-primary" :
+                    "bg-muted"
                   )}
                 />
               ))}
             </div>
-            <p className="mt-2 text-[11px] text-[#b0ada4]">Tryk for at se detaljer →</p>
+            <p className="mt-2 text-[11px] text-muted-foreground">Tryk for at se detaljer →</p>
           </button>
         </motion.div>
       )}
@@ -837,17 +837,17 @@ export function Borneoverblik() {
                     <DialogHeader className="pr-8">
                       <div className="flex items-center gap-2">
                         {isCurrent && (
-                          <span className="rounded-full bg-[#fff2e6] px-2 py-0.5 text-[10px] font-bold text-[#f58a2d]">
+                          <span className="rounded-full bg-orange-tint px-2 py-0.5 text-[10px] font-bold text-[#f58a2d]">
                             Nuværende
                           </span>
                         )}
                         {stage.type === 'tigerspring' && (
-                          <span className="rounded-full bg-[#f2f1ed] px-2 py-0.5 text-[10px] font-bold text-[#75736b]">
+                          <span className="rounded-full bg-background px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
                             Tigerspring {stage.number}
                           </span>
                         )}
                         {stage.type === 'phase' && (
-                          <span className="rounded-full bg-[#f2f1ed] px-2 py-0.5 text-[10px] font-bold text-[#75736b]">
+                          <span className="rounded-full bg-background px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
                             Udviklingsfase
                           </span>
                         )}
@@ -859,14 +859,14 @@ export function Borneoverblik() {
                         })()}
                         <span className="text-[18px] leading-snug">{stage.title}</span>
                       </DialogTitle>
-                      <p className="text-[13px] text-[#9a978f]">{stage.subtitle}</p>
+                      <p className="text-[13px] text-muted-foreground">{stage.subtitle}</p>
                     </DialogHeader>
 
                     <div className="space-y-2 pt-2">
                       {/* Crisis Symptoms */}
-                      <div className="rounded-[8px] bg-[#fef3ee] p-3.5">
+                      <div className="rounded-[8px] bg-orange-tint p-3.5">
                         <div className="mb-2 flex items-center gap-2">
-                          <div className="flex h-6 w-6 items-center justify-center rounded-[8px] bg-[#fde0c8]">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-[8px] bg-orange-tint">
                             <Sparkles className="h-3.5 w-3.5 text-[#e8842a]" />
                           </div>
                           <span className="text-[13px] font-bold text-[#cc6f1f]">
@@ -884,9 +884,9 @@ export function Borneoverblik() {
                       </div>
 
                       {/* New Skills */}
-                      <div className="rounded-[8px] bg-[#f0f7f0] p-3.5">
+                      <div className="rounded-[8px] bg-green-tint p-3.5">
                         <div className="mb-2 flex items-center gap-2">
-                          <div className="flex h-6 w-6 items-center justify-center rounded-[8px] bg-[#d5ecd5]">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-[8px] bg-green-tint">
                             <Brain className="h-3.5 w-3.5 text-[#3d8b3d]" />
                           </div>
                           <span className="text-[13px] font-bold text-[#2d6e2d]">Nye færdigheder</span>
@@ -902,17 +902,17 @@ export function Borneoverblik() {
                       </div>
 
                       {/* Tips */}
-                      <div className="rounded-[8px] bg-[#f4f3ef] p-3.5">
+                      <div className="rounded-[8px] bg-card p-3.5">
                         <div className="mb-2 flex items-center gap-2">
-                          <div className="flex h-6 w-6 items-center justify-center rounded-[8px] bg-[#e5e3dc]">
-                            <Baby className="h-3.5 w-3.5 text-[#6b6960]" />
+                          <div className="flex h-6 w-6 items-center justify-center rounded-[8px] bg-muted">
+                            <Baby className="h-3.5 w-3.5 text-muted-foreground" />
                           </div>
-                          <span className="text-[13px] font-bold text-[#4a4840]">Tips til dig</span>
+                          <span className="text-[13px] font-bold text-foreground">Tips til dig</span>
                         </div>
                         <ul className="space-y-1.5">
                           {stage.tips.map((t, i) => (
-                            <li key={i} className="flex items-start gap-2 text-[13px] text-[#5a584f]">
-                              <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#9a978f]" />
+                            <li key={i} className="flex items-start gap-2 text-[13px] text-foreground">
+                              <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-muted-foreground" />
                               {t}
                             </li>
                           ))}
@@ -922,16 +922,16 @@ export function Borneoverblik() {
                       {/* External link */}
                       <button
                         onClick={() => window.open(stage.link, '_blank', 'noopener,noreferrer')}
-                        className="flex w-full items-center gap-3 rounded-[8px] border border-[#e5e3dc] bg-white p-3 transition-colors hover:bg-[#faf9f6]"
+                        className="flex w-full items-center gap-3 rounded-[8px] border border-border bg-card p-3 transition-colors hover:bg-card"
                       >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-[#fff2e6]">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-[8px] bg-orange-tint">
                           <ExternalLink className="h-4 w-4 text-[#f58a2d]" />
                         </div>
                         <div className="flex-1 text-left">
-                          <p className="text-[13px] font-semibold text-[#2f2f2d]">Læs mere</p>
-                          <p className="text-[11px] text-[#9a978f]">Sundhed.dk — offentlig vejledning</p>
+                          <p className="text-[13px] font-semibold text-foreground">Læs mere</p>
+                          <p className="text-[11px] text-muted-foreground">Sundhed.dk — offentlig vejledning</p>
                         </div>
-                        <ChevronRight className="h-4 w-4 text-[#cccbc3]" />
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
                       </button>
 
                       {/* Navigation between stages */}
@@ -942,15 +942,15 @@ export function Borneoverblik() {
                           className={cn(
                             "flex items-center gap-1 rounded-[8px] px-3 py-2 text-[13px] font-medium transition-colors",
                             isFirst
-                              ? "text-[#d8d7cf] cursor-not-allowed"
-                              : "text-[#75736b] hover:bg-[#f2f1ed]"
+                              ? "text-muted-foreground cursor-not-allowed"
+                              : "text-muted-foreground hover:bg-background"
                           )}
                         >
                           <ChevronLeft className="h-4 w-4" />
                           Forrige
                         </button>
 
-                        <span className="text-[12px] font-medium text-[#b0ada4]">
+                        <span className="text-[12px] font-medium text-muted-foreground">
                           {viewingStageIndex + 1} / {developmentStages.length}
                         </span>
 
@@ -960,8 +960,8 @@ export function Borneoverblik() {
                           className={cn(
                             "flex items-center gap-1 rounded-[8px] px-3 py-2 text-[13px] font-medium transition-colors",
                             isLast
-                              ? "text-[#d8d7cf] cursor-not-allowed"
-                              : "text-[#75736b] hover:bg-[#f2f1ed]"
+                              ? "text-muted-foreground cursor-not-allowed"
+                              : "text-muted-foreground hover:bg-background"
                           )}
                         >
                           Næste

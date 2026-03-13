@@ -281,24 +281,24 @@ export function AdminPanel() {
       onTouchStart={() => handleTouchStart(user)}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchEnd}
-      className="flex items-center gap-3 rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2.5 select-none"
+      className="flex items-center gap-3 rounded-[8px] border border-border bg-card px-3 py-2.5 select-none"
     >
       <Avatar className="h-9 w-9 shrink-0">
         <AvatarImage src={user.avatar ?? undefined} />
-        <AvatarFallback className="bg-[#ecebe5] text-sm text-[#4a4945]">
+        <AvatarFallback className="bg-secondary text-sm text-foreground">
           {user.name[0]}
         </AvatarFallback>
       </Avatar>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <p className="truncate text-[15px] font-medium text-[#2f2f2d]">{user.name}</p>
+          <p className="truncate text-[15px] font-medium text-foreground">{user.name}</p>
           {user.isAdmin && (
             <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100 text-[10px] px-1.5 py-0">
               Admin
             </Badge>
           )}
         </div>
-        <p className="truncate text-[13px] text-[#75736b]">
+        <p className="truncate text-[13px] text-muted-foreground">
           {generateUserId(user.id)} · {getRoleLabel(user.role)}
         </p>
       </div>
@@ -308,27 +308,27 @@ export function AdminPanel() {
   // ── SEARCH VIEW ──
   if (view === 'search') {
     return (
-      <div className="fixed inset-0 z-[60] bg-[#f2f1ed] flex flex-col">
-        <div className="safe-area-pt border-b border-[#d8d7cf] bg-[#f2f1ed]">
+      <div className="fixed inset-0 z-[60] bg-background flex flex-col">
+        <div className="safe-area-pt border-b border-border bg-background">
           <div className="flex items-center gap-3 px-4 pb-3 pt-2">
             <button
               onClick={() => setView('list')}
-              className="flex h-9 w-9 items-center justify-center text-[#30302d]"
+              className="flex h-9 w-9 items-center justify-center text-foreground"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
-            <h1 className="text-base font-semibold text-[#2f2f2d]">Søg brugere</h1>
+            <h1 className="text-base font-semibold text-foreground">Søg brugere</h1>
           </div>
         </div>
 
         <div className="px-4 py-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#b5b2a8]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Søg på navn eller User ID..."
-              className="pl-10 h-[44px] bg-white border-[#d8d7cf] rounded-[8px]"
+              className="pl-10 h-[44px] bg-card border-border rounded-[8px]"
               autoFocus
             />
           </div>
@@ -350,23 +350,23 @@ export function AdminPanel() {
   // ── CREATE VIEW (full-screen overlay) ──
   if (view === 'create') {
     return (
-      <div className="fixed inset-0 z-[60] bg-[#f2f1ed] flex flex-col">
-        <div className="safe-area-pt border-b border-[#d8d7cf] bg-[#f2f1ed]">
+      <div className="fixed inset-0 z-[60] bg-background flex flex-col">
+        <div className="safe-area-pt border-b border-border bg-background">
           <div className="flex items-center gap-3 px-4 pb-3 pt-2">
             <button
               onClick={() => setView('list')}
-              className="flex h-9 w-9 items-center justify-center text-[#30302d]"
+              className="flex h-9 w-9 items-center justify-center text-foreground"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
-            <h1 className="text-base font-semibold text-[#2f2f2d]">Opret ny bruger</h1>
+            <h1 className="text-base font-semibold text-foreground">Opret ny bruger</h1>
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 py-4">
-        <div className="space-y-3 rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] p-4">
+        <div className="space-y-3 rounded-[8px] border border-border bg-card p-4">
           <div className="space-y-1">
-            <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">
+            <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">
               Navn
             </Label>
             <Input
@@ -376,7 +376,7 @@ export function AdminPanel() {
             />
           </div>
           <div className="space-y-1">
-            <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">
+            <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">
               Email
             </Label>
             <Input
@@ -387,7 +387,7 @@ export function AdminPanel() {
             />
           </div>
           <div className="space-y-1">
-            <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">
+            <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">
               Rolle
             </Label>
             <SelectSheet
@@ -401,7 +401,7 @@ export function AdminPanel() {
               ]}
             />
           </div>
-          <div className="flex items-center gap-2 rounded-[8px] border border-[#d8d7cf] bg-white px-3 py-2">
+          <div className="flex items-center gap-2 rounded-[8px] border border-border bg-card px-3 py-2">
             <input
               type="checkbox"
               id="admin-check"
@@ -416,14 +416,14 @@ export function AdminPanel() {
           <div className="flex gap-2 pt-1">
             <Button
               variant="outline"
-              className="flex-1 rounded-[8px] border-[#d8d7cf]"
+              className="flex-1 rounded-[8px] border-border"
               onClick={() => setView('list')}
               disabled={isCreating}
             >
               Annuller
             </Button>
             <Button
-              className="flex-1 rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+              className="flex-1 rounded-[8px] bg-primary text-white hover:bg-primary"
               disabled={isCreating || !newUser.name || !newUser.email}
               onClick={handleCreateUser}
             >
@@ -448,24 +448,24 @@ export function AdminPanel() {
   // Send ny kode
   if (view === 'send-code' && selectedUser) {
     return (
-      <div className="fixed inset-0 z-[60] bg-[#f2f1ed] flex flex-col">
-        <div className="safe-area-pt border-b border-[#d8d7cf] bg-[#f2f1ed]">
+      <div className="fixed inset-0 z-[60] bg-background flex flex-col">
+        <div className="safe-area-pt border-b border-border bg-background">
           <div className="flex items-center gap-3 px-4 pb-3 pt-2">
-            <button onClick={() => setView('detail')} className="flex h-9 w-9 items-center justify-center text-[#30302d]">
+            <button onClick={() => setView('detail')} className="flex h-9 w-9 items-center justify-center text-foreground">
               <ChevronLeft className="h-5 w-5" />
             </button>
-            <h1 className="text-base font-semibold text-[#2f2f2d]">Send ny kode</h1>
+            <h1 className="text-base font-semibold text-foreground">Send ny kode</h1>
           </div>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-4">
-          <div className="rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] p-4 space-y-4">
-            <p className="text-sm text-[#75736b]">Send et nulstillingslink til brugerens email.</p>
-            <div className="rounded-[8px] bg-white border border-[#e8e7e2] px-3 py-2.5">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[#78766d]">Email</p>
-              <p className="text-sm text-[#2f2f2d]">{selectedUser.email}</p>
+          <div className="rounded-[8px] border border-border bg-card p-4 space-y-4">
+            <p className="text-sm text-muted-foreground">Send et nulstillingslink til brugerens email.</p>
+            <div className="rounded-[8px] bg-card border border-border px-3 py-2.5">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Email</p>
+              <p className="text-sm text-foreground">{selectedUser.email}</p>
             </div>
             <Button
-              className="w-full rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+              className="w-full rounded-[8px] bg-primary text-white hover:bg-primary"
               onClick={async () => {
                 try {
                   await resetPassword(selectedUser.email);
@@ -487,20 +487,20 @@ export function AdminPanel() {
   // Rabat
   if (view === 'discount' && selectedUser) {
     return (
-      <div className="fixed inset-0 z-[60] bg-[#f2f1ed] flex flex-col">
-        <div className="safe-area-pt border-b border-[#d8d7cf] bg-[#f2f1ed]">
+      <div className="fixed inset-0 z-[60] bg-background flex flex-col">
+        <div className="safe-area-pt border-b border-border bg-background">
           <div className="flex items-center gap-3 px-4 pb-3 pt-2">
-            <button onClick={() => setView('detail')} className="flex h-9 w-9 items-center justify-center text-[#30302d]">
+            <button onClick={() => setView('detail')} className="flex h-9 w-9 items-center justify-center text-foreground">
               <ChevronLeft className="h-5 w-5" />
             </button>
-            <h1 className="text-base font-semibold text-[#2f2f2d]">Rabat</h1>
+            <h1 className="text-base font-semibold text-foreground">Rabat</h1>
           </div>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-4">
-          <div className="rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] p-4 space-y-4">
-            <p className="text-sm text-[#75736b]">Giv rabat til {selectedUser.name}</p>
+          <div className="rounded-[8px] border border-border bg-card p-4 space-y-4">
+            <p className="text-sm text-muted-foreground">Giv rabat til {selectedUser.name}</p>
             <div className="space-y-1">
-              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Plan</Label>
+              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Plan</Label>
               <SelectSheet
                 value={upgradePlan}
                 onValueChange={setUpgradePlan}
@@ -512,7 +512,7 @@ export function AdminPanel() {
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Rabattype</Label>
+              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Rabattype</Label>
               <SelectSheet
                 value={discountType}
                 onValueChange={setDiscountType}
@@ -532,7 +532,7 @@ export function AdminPanel() {
               />
             </div>
             <Button
-              className="w-full rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+              className="w-full rounded-[8px] bg-primary text-white hover:bg-primary"
               onClick={async () => {
                 try {
                   const durationDays: Record<string, number> = {
@@ -575,20 +575,20 @@ export function AdminPanel() {
   // Opgrader Abonnement
   if (view === 'upgrade' && selectedUser) {
     return (
-      <div className="fixed inset-0 z-[60] bg-[#f2f1ed] flex flex-col">
-        <div className="safe-area-pt border-b border-[#d8d7cf] bg-[#f2f1ed]">
+      <div className="fixed inset-0 z-[60] bg-background flex flex-col">
+        <div className="safe-area-pt border-b border-border bg-background">
           <div className="flex items-center gap-3 px-4 pb-3 pt-2">
-            <button onClick={() => setView('detail')} className="flex h-9 w-9 items-center justify-center text-[#30302d]">
+            <button onClick={() => setView('detail')} className="flex h-9 w-9 items-center justify-center text-foreground">
               <ChevronLeft className="h-5 w-5" />
             </button>
-            <h1 className="text-base font-semibold text-[#2f2f2d]">Opgrader Abonnement</h1>
+            <h1 className="text-base font-semibold text-foreground">Opgrader Abonnement</h1>
           </div>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-4">
-          <div className="rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] p-4 space-y-4">
-            <p className="text-sm text-[#75736b]">Opgrader abonnement for {selectedUser.name}</p>
+          <div className="rounded-[8px] border border-border bg-card p-4 space-y-4">
+            <p className="text-sm text-muted-foreground">Opgrader abonnement for {selectedUser.name}</p>
             <div className="space-y-1">
-              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Plan</Label>
+              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Plan</Label>
               <SelectSheet
                 value={upgradePlan}
                 onValueChange={setUpgradePlan}
@@ -600,7 +600,7 @@ export function AdminPanel() {
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Interval</Label>
+              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Interval</Label>
               <SelectSheet
                 value={upgradeInterval}
                 onValueChange={setUpgradeInterval}
@@ -612,7 +612,7 @@ export function AdminPanel() {
               />
             </div>
             <Button
-              className="w-full rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+              className="w-full rounded-[8px] bg-primary text-white hover:bg-primary"
               onClick={async () => {
                 try {
                   const periodDays = upgradeInterval === 'annual' ? 365 : 30;
@@ -646,18 +646,18 @@ export function AdminPanel() {
   // Suspendere konto
   if (view === 'suspend' && selectedUser) {
     return (
-      <div className="fixed inset-0 z-[60] bg-[#f2f1ed] flex flex-col">
-        <div className="safe-area-pt border-b border-[#d8d7cf] bg-[#f2f1ed]">
+      <div className="fixed inset-0 z-[60] bg-background flex flex-col">
+        <div className="safe-area-pt border-b border-border bg-background">
           <div className="flex items-center gap-3 px-4 pb-3 pt-2">
-            <button onClick={() => setView('detail')} className="flex h-9 w-9 items-center justify-center text-[#30302d]">
+            <button onClick={() => setView('detail')} className="flex h-9 w-9 items-center justify-center text-foreground">
               <ChevronLeft className="h-5 w-5" />
             </button>
-            <h1 className="text-base font-semibold text-[#2f2f2d]">Suspendere konto</h1>
+            <h1 className="text-base font-semibold text-foreground">Suspendere konto</h1>
           </div>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-4">
-          <div className="rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] p-4 space-y-4">
-            <p className="text-sm text-[#75736b]">
+          <div className="rounded-[8px] border border-border bg-card p-4 space-y-4">
+            <p className="text-sm text-muted-foreground">
               Er du sikker på at du vil suspendere kontoen for <strong>{selectedUser.name}</strong>?
               Brugeren vil ikke kunne logge ind.
             </p>
@@ -689,22 +689,22 @@ export function AdminPanel() {
   // Link to konto sammen
   if (view === 'link-account' && selectedUser) {
     return (
-      <div className="fixed inset-0 z-[60] bg-[#f2f1ed] flex flex-col">
-        <div className="safe-area-pt border-b border-[#d8d7cf] bg-[#f2f1ed]">
+      <div className="fixed inset-0 z-[60] bg-background flex flex-col">
+        <div className="safe-area-pt border-b border-border bg-background">
           <div className="flex items-center gap-3 px-4 pb-3 pt-2">
-            <button onClick={() => { setView('detail'); setLinkEmail(''); }} className="flex h-9 w-9 items-center justify-center text-[#30302d]">
+            <button onClick={() => { setView('detail'); setLinkEmail(''); }} className="flex h-9 w-9 items-center justify-center text-foreground">
               <ChevronLeft className="h-5 w-5" />
             </button>
-            <h1 className="text-base font-semibold text-[#2f2f2d]">Link konti</h1>
+            <h1 className="text-base font-semibold text-foreground">Link konti</h1>
           </div>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-4">
-          <div className="rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] p-4 space-y-4">
-            <p className="text-sm text-[#75736b]">
+          <div className="rounded-[8px] border border-border bg-card p-4 space-y-4">
+            <p className="text-sm text-muted-foreground">
               Link {selectedUser.name}'s konto med en anden konto.
             </p>
             <div className="space-y-1">
-              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">
+              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                 Email på den anden konto
               </Label>
               <Input
@@ -715,7 +715,7 @@ export function AdminPanel() {
               />
             </div>
             <Button
-              className="w-full rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+              className="w-full rounded-[8px] bg-primary text-white hover:bg-primary"
               disabled={!linkEmail.trim()}
               onClick={() => {
                 toast.success(`Konti linket sammen`);
@@ -735,8 +735,8 @@ export function AdminPanel() {
   // ── DETAIL VIEW (full-screen overlay) ──
   if (view === 'detail' && selectedUser) {
     return (
-      <div className="fixed inset-0 z-[60] bg-[#f2f1ed] flex flex-col">
-        <div className="safe-area-pt border-b border-[#d8d7cf] bg-[#f2f1ed]">
+      <div className="fixed inset-0 z-[60] bg-background flex flex-col">
+        <div className="safe-area-pt border-b border-border bg-background">
           <div className="flex items-center gap-3 px-4 pb-3 pt-2">
             <button
               onClick={() => {
@@ -744,44 +744,44 @@ export function AdminPanel() {
                 setSelectedUser(null);
                 setShowActionMenu(false);
               }}
-              className="flex h-9 w-9 items-center justify-center text-[#30302d]"
+              className="flex h-9 w-9 items-center justify-center text-foreground"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
-            <h1 className="text-base font-semibold text-[#2f2f2d]">Brugerdetaljer</h1>
+            <h1 className="text-base font-semibold text-foreground">Brugerdetaljer</h1>
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto px-4 py-4">
-          <div className="rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] p-4 space-y-4">
+          <div className="rounded-[8px] border border-border bg-card p-4 space-y-4">
             <div className="relative flex items-center gap-4">
               <Avatar className="h-16 w-16 shrink-0">
                 <AvatarImage src={selectedUser.avatar ?? undefined} />
-                <AvatarFallback className="bg-[#ecebe5] text-lg text-[#4a4945]">
+                <AvatarFallback className="bg-secondary text-lg text-foreground">
                   {selectedUser.name[0]}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="text-lg font-semibold text-[#2f2f2d]">{selectedUser.name}</p>
+                  <p className="text-lg font-semibold text-foreground">{selectedUser.name}</p>
                   {selectedUser.isAdmin && (
                     <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100 text-[10px] px-1.5 py-0">
                       Admin
                     </Badge>
                   )}
                 </div>
-                <p className="text-sm text-[#75736b]">{selectedUser.email}</p>
+                <p className="text-sm text-muted-foreground">{selectedUser.email}</p>
               </div>
               <button
                 onClick={() => setShowActionMenu(!showActionMenu)}
-                className="flex h-9 w-9 shrink-0 items-center justify-center text-[#75736b] hover:text-[#2f2f2d] transition-colors"
+                className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
               >
                 <MoreVertical className="h-5 w-5" />
               </button>
 
               {/* 3-dot popup menu */}
               {showActionMenu && (
-                <div className="absolute right-0 top-full mt-1 z-10 w-56 rounded-lg border border-[#d8d7cf] bg-white shadow-lg overflow-hidden">
+                <div className="absolute right-0 top-full mt-1 z-10 w-56 rounded-lg border border-border bg-card shadow-lg overflow-hidden">
                   {[
                     { view: 'send-code' as AdminView, label: 'Send ny kode', icon: Mail },
                     { view: 'discount' as AdminView, label: 'Rabat', icon: Tag },
@@ -794,9 +794,9 @@ export function AdminPanel() {
                       <button
                         key={item.view}
                         onClick={() => { setView(item.view); setShowActionMenu(false); }}
-                        className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-[#3f3e3a] hover:bg-[#f2f1ec] transition-colors"
+                        className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm text-foreground hover:bg-background transition-colors"
                       >
-                        <Icon className="h-4 w-4 text-[#78766d]" />
+                        <Icon className="h-4 w-4 text-muted-foreground" />
                         {item.label}
                       </button>
                     );
@@ -805,26 +805,26 @@ export function AdminPanel() {
               )}
             </div>
 
-            <div className="space-y-2 border-t border-[#e8e7e2] pt-3">
+            <div className="space-y-2 border-t border-border pt-3">
               <div className="flex justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wide text-[#78766d]">User ID</span>
-                <span className="text-sm font-mono text-[#2f2f2d]">{generateUserId(selectedUser.id)}</span>
+                <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">User ID</span>
+                <span className="text-sm font-mono text-foreground">{generateUserId(selectedUser.id)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wide text-[#78766d]">Rolle</span>
-                <span className="text-sm text-[#2f2f2d]">{getRoleLabel(selectedUser.role)}</span>
+                <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Rolle</span>
+                <span className="text-sm text-foreground">{getRoleLabel(selectedUser.role)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wide text-[#78766d]">Oprettet</span>
-                <span className="text-sm text-[#2f2f2d]">{formatDate(selectedUser.createdAt)}</span>
+                <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Oprettet</span>
+                <span className="text-sm text-foreground">{formatDate(selectedUser.createdAt)}</span>
               </div>
             </div>
 
-            <div className="flex gap-2 border-t border-[#e8e7e2] pt-3">
+            <div className="flex gap-2 border-t border-border pt-3">
               {!selectedUser.isAdmin && (
                 <Button
                   variant="outline"
-                  className="flex-1 rounded-[8px] border-[#d8d7cf]"
+                  className="flex-1 rounded-[8px] border-border"
                   onClick={() => handleMakeAdmin(selectedUser.email, selectedUser.name)}
                 >
                   <ShieldCheck className="h-4 w-4 mr-1" />

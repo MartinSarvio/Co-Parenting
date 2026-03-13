@@ -37,9 +37,9 @@ function getStatusLabel(status: CaseStatus): string {
 
 function getStatusStyle(status: CaseStatus): string {
   switch (status) {
-    case 'active': return 'bg-[#e6f9ed] text-[#1a7a3a] border-transparent';
-    case 'closed': return 'bg-[#ecebe5] text-[#78766d] border-transparent';
-    case 'paused': return 'bg-[#fff2e6] text-[#bf6722] border-transparent';
+    case 'active': return 'bg-green-tint text-[#1a7a3a] border-transparent';
+    case 'closed': return 'bg-secondary text-muted-foreground border-transparent';
+    case 'paused': return 'bg-orange-tint text-[#bf6722] border-transparent';
   }
 }
 
@@ -150,28 +150,28 @@ export function ProfessionalDashboard() {
           <Button
             variant="ghost"
             onClick={() => setSelectedCase(null)}
-            className="text-[#2f2f2d] hover:bg-[#ecebe5] -ml-2"
+            className="text-foreground hover:bg-secondary -ml-2"
           >
             <ChevronLeft className="w-4 h-4 mr-1" />
             Tilbage til sagoversigt
           </Button>
 
           {/* Case Header */}
-          <Card className="bg-white border border-[#e8e7e0] rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <Card className="bg-card border border-border rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-3">
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <Badge className="bg-[#eef0ff] text-indigo-700 border border-[#c7ccf0] font-mono text-xs px-2.5 py-1">
+                    <Badge className="bg-blue-tint text-indigo-700 border border-[#c7ccf0] font-mono text-xs px-2.5 py-1">
                       <Hash className="w-3 h-3 mr-1" />
                       {caseData.caseNumber}
                     </Badge>
-                    <Badge variant="outline" className="text-[#78766d] border-[#e8e7e0] text-xs">
+                    <Badge variant="outline" className="text-muted-foreground border-border text-xs">
                       {caseData.departmentId}
                     </Badge>
                   </div>
-                  <h2 className="text-xl font-bold text-[#2f2f2d]">{caseData.familyName}</h2>
-                  <p className="text-sm text-[#78766d]">
+                  <h2 className="text-xl font-bold text-foreground">{caseData.familyName}</h2>
+                  <p className="text-sm text-muted-foreground">
                     Barn: {caseData.childName}, {caseData.childAge} ar
                   </p>
                 </div>
@@ -181,13 +181,13 @@ export function ProfessionalDashboard() {
               </div>
               <div className="flex flex-wrap gap-2 mt-3">
                 {caseData.parents.map((parent, i) => (
-                  <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#faf9f6] border border-[#e8e7e0]">
+                  <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card border border-border">
                     <Avatar className="w-6 h-6">
-                      <AvatarFallback className="text-xs bg-[#ecebe5] text-[#5f5d56]">
+                      <AvatarFallback className="text-xs bg-secondary text-muted-foreground">
                         {parent[0]}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-sm text-[#2f2f2d]">{parent}</span>
+                    <span className="text-sm text-foreground">{parent}</span>
                   </div>
                 ))}
               </div>
@@ -199,116 +199,116 @@ export function ProfessionalDashboard() {
             <motion.div whileTap={{ scale: 0.97 }}>
               <Button
                 variant="outline"
-                className="w-full h-auto py-5 flex flex-col items-center gap-2.5 bg-white border border-[#e8e7e0] rounded-[8px] hover:border-[#f3c59d] hover:bg-[#fff2e6] transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                className="w-full h-auto py-5 flex flex-col items-center gap-2.5 bg-card border border-border rounded-[8px] hover:border-orange-tint hover:bg-orange-tint transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
                 onClick={() => setActiveTab('meeting-minutes')}
               >
-                <div className="w-10 h-10 rounded-[8px] bg-[#ecebe5] flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-[#5f5d56]" />
+                <div className="w-10 h-10 rounded-[8px] bg-secondary flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-muted-foreground" />
                 </div>
-                <span className="text-sm font-medium text-[#2f2f2d]">Nyt referat</span>
+                <span className="text-sm font-medium text-foreground">Nyt referat</span>
               </Button>
             </motion.div>
             <motion.div whileTap={{ scale: 0.97 }}>
               <Button
                 variant="outline"
-                className="w-full h-auto py-5 flex flex-col items-center gap-2.5 bg-white border border-[#e8e7e0] rounded-[8px] hover:border-[#f3c59d] hover:bg-[#fff2e6] transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative"
+                className="w-full h-auto py-5 flex flex-col items-center gap-2.5 bg-card border border-border rounded-[8px] hover:border-orange-tint hover:bg-orange-tint transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative"
                 onClick={() => setActiveTab('kommunikation')}
               >
-                <div className="w-10 h-10 rounded-[8px] bg-[#ecebe5] flex items-center justify-center relative">
-                  <MessageCircle className="w-5 h-5 text-[#5f5d56]" />
+                <div className="w-10 h-10 rounded-[8px] bg-secondary flex items-center justify-center relative">
+                  <MessageCircle className="w-5 h-5 text-muted-foreground" />
                   {caseData.unreadMessages > 0 && (
                     <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-[#f58a2d] text-white text-[10px] font-bold flex items-center justify-center">
                       {caseData.unreadMessages}
                     </span>
                   )}
                 </div>
-                <span className="text-sm font-medium text-[#2f2f2d]">Send besked</span>
+                <span className="text-sm font-medium text-foreground">Send besked</span>
               </Button>
             </motion.div>
             <motion.div whileTap={{ scale: 0.97 }}>
               <Button
                 variant="outline"
-                className="w-full h-auto py-5 flex flex-col items-center gap-2.5 bg-white border border-[#e8e7e0] rounded-[8px] hover:border-[#f3c59d] hover:bg-[#fff2e6] transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                className="w-full h-auto py-5 flex flex-col items-center gap-2.5 bg-card border border-border rounded-[8px] hover:border-orange-tint hover:bg-orange-tint transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
                 onClick={() => setActiveTab('samvaer')}
               >
-                <div className="w-10 h-10 rounded-[8px] bg-[#ecebe5] flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-[#5f5d56]" />
+                <div className="w-10 h-10 rounded-[8px] bg-secondary flex items-center justify-center">
+                  <Calendar className="w-5 h-5 text-muted-foreground" />
                 </div>
-                <span className="text-sm font-medium text-[#2f2f2d]">Samværsplan</span>
+                <span className="text-sm font-medium text-foreground">Samværsplan</span>
               </Button>
             </motion.div>
             <motion.div whileTap={{ scale: 0.97 }}>
               <Button
                 variant="outline"
-                className="w-full h-auto py-5 flex flex-col items-center gap-2.5 bg-white border border-[#e8e7e0] rounded-[8px] hover:border-[#f3c59d] hover:bg-[#fff2e6] transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
+                className="w-full h-auto py-5 flex flex-col items-center gap-2.5 bg-card border border-border rounded-[8px] hover:border-orange-tint hover:bg-orange-tint transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)]"
                 onClick={() => setActiveTab('dokumenter')}
               >
-                <div className="w-10 h-10 rounded-[8px] bg-[#ecebe5] flex items-center justify-center">
-                  <Briefcase className="w-5 h-5 text-[#5f5d56]" />
+                <div className="w-10 h-10 rounded-[8px] bg-secondary flex items-center justify-center">
+                  <Briefcase className="w-5 h-5 text-muted-foreground" />
                 </div>
-                <span className="text-sm font-medium text-[#2f2f2d]">Dokumenter</span>
+                <span className="text-sm font-medium text-foreground">Dokumenter</span>
               </Button>
             </motion.div>
           </div>
 
           {/* Status Overview */}
-          <Card className="bg-white border border-[#e8e7e0] rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <Card className="bg-card border border-border rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
             <CardHeader className="pb-2 px-5 pt-5">
-              <CardTitle className="text-base font-semibold text-[#2f2f2d]">Statusoversigt</CardTitle>
+              <CardTitle className="text-base font-semibold text-foreground">Statusoversigt</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 px-5 pb-5">
-              <div className="flex items-center justify-between p-3 rounded-[8px] bg-[#faf9f6]">
+              <div className="flex items-center justify-between p-3 rounded-[8px] bg-card">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-[8px] bg-[#ecebe5] flex items-center justify-center">
-                    <Calendar className="w-5 h-5 text-[#5f5d56]" />
+                  <div className="w-10 h-10 rounded-[8px] bg-secondary flex items-center justify-center">
+                    <Calendar className="w-5 h-5 text-muted-foreground" />
                   </div>
                   <div>
-                    <p className="font-medium text-[#2f2f2d] text-sm">Samværsplan</p>
-                    <p className="text-xs text-[#78766d]">{custodyPlan?.pattern || 'Ikke oprettet'} ordning</p>
+                    <p className="font-medium text-foreground text-sm">Samværsplan</p>
+                    <p className="text-xs text-muted-foreground">{custodyPlan?.pattern || 'Ikke oprettet'} ordning</p>
                   </div>
                 </div>
                 <CheckCircle2 className="w-5 h-5 text-[#1a7a3a]" />
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-[8px] bg-[#faf9f6]">
+              <div className="flex items-center justify-between p-3 rounded-[8px] bg-card">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-[8px] bg-[#fff2e6] flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-[8px] bg-orange-tint flex items-center justify-center">
                     <Clock className="w-5 h-5 text-[#bf6722]" />
                   </div>
                   <div>
-                    <p className="font-medium text-[#2f2f2d] text-sm">Afventer godkendelse</p>
-                    <p className="text-xs text-[#78766d]">{pendingMinutes.length + caseData.pendingApprovals} element(er)</p>
+                    <p className="font-medium text-foreground text-sm">Afventer godkendelse</p>
+                    <p className="text-xs text-muted-foreground">{pendingMinutes.length + caseData.pendingApprovals} element(er)</p>
                   </div>
                 </div>
                 {(pendingMinutes.length + caseData.pendingApprovals) > 0 && (
-                  <Badge className="bg-[#fff2e6] text-[#bf6722] border-transparent text-xs">
+                  <Badge className="bg-orange-tint text-[#bf6722] border-transparent text-xs">
                     {pendingMinutes.length + caseData.pendingApprovals}
                   </Badge>
                 )}
               </div>
 
               {caseData.nextMeeting && (
-                <div className="flex items-center justify-between p-3 rounded-[8px] bg-[#faf9f6]">
+                <div className="flex items-center justify-between p-3 rounded-[8px] bg-card">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-[8px] bg-[#eef0ff] flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-[8px] bg-blue-tint flex items-center justify-center">
                       <Calendar className="w-5 h-5 text-indigo-600" />
                     </div>
                     <div>
-                      <p className="font-medium text-[#2f2f2d] text-sm">Næste mode</p>
-                      <p className="text-xs text-[#78766d]">{formatDate(caseData.nextMeeting)}</p>
+                      <p className="font-medium text-foreground text-sm">Næste mode</p>
+                      <p className="text-xs text-muted-foreground">{formatDate(caseData.nextMeeting)}</p>
                     </div>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-[#78766d]" />
+                  <ArrowRight className="w-4 h-4 text-muted-foreground" />
                 </div>
               )}
             </CardContent>
           </Card>
 
           {/* Risk Assessment */}
-          <Card className="bg-white border border-[#e8e7e0] rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <Card className="bg-card border border-border rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
             <CardHeader className="pb-2 px-5 pt-5">
-              <CardTitle className="text-base font-semibold text-[#2f2f2d] flex items-center gap-2">
-                <Shield className="w-4 h-4 text-[#5f5d56]" />
+              <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
+                <Shield className="w-4 h-4 text-muted-foreground" />
                 Risikovurdering
               </CardTitle>
             </CardHeader>
@@ -326,16 +326,16 @@ export function ProfessionalDashboard() {
                         Risiko: {getRiskLabel(caseData.riskLevel)}
                       </Badge>
                       {latestAssessment && (
-                        <span className="text-xs text-[#78766d]">
+                        <span className="text-xs text-muted-foreground">
                           Seneste: {formatDate(latestAssessment.assessmentDate)}
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-[#78766d] leading-relaxed">
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       {latestAssessment?.summary || caseData.notes}
                     </p>
                     {caseAssessments.length > 0 && (
-                      <p className="text-xs text-[#78766d] mt-2">
+                      <p className="text-xs text-muted-foreground mt-2">
                         {caseAssessments.length} vurdering(er) i alt
                       </p>
                     )}
@@ -346,9 +346,9 @@ export function ProfessionalDashboard() {
           </Card>
 
           {/* Timeline / Activity Log */}
-          <Card className="bg-white border border-[#e8e7e0] rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <Card className="bg-card border border-border rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
             <CardHeader className="pb-2 px-5 pt-5">
-              <CardTitle className="text-base font-semibold text-[#2f2f2d]">Seneste aktivitet</CardTitle>
+              <CardTitle className="text-base font-semibold text-foreground">Seneste aktivitet</CardTitle>
             </CardHeader>
             <CardContent className="px-5 pb-5">
               <div className="space-y-1">
@@ -356,19 +356,19 @@ export function ProfessionalDashboard() {
                 {caseMinutes.slice(0, 2).map((minutes) => (
                   <div
                     key={minutes.id}
-                    className="flex items-start gap-3 p-3 rounded-[8px] hover:bg-[#faf9f6] transition-colors"
+                    className="flex items-start gap-3 p-3 rounded-[8px] hover:bg-card transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-[8px] bg-[#eef0ff] flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <div className="w-8 h-8 rounded-[8px] bg-blue-tint flex items-center justify-center flex-shrink-0 mt-0.5">
                       <FileText className="w-4 h-4 text-indigo-600" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-[#2f2f2d] text-sm truncate">{minutes.title}</p>
-                      <p className="text-xs text-[#78766d]">{formatDate(minutes.date)}</p>
+                      <p className="font-medium text-foreground text-sm truncate">{minutes.title}</p>
+                      <p className="text-xs text-muted-foreground">{formatDate(minutes.date)}</p>
                     </div>
                     <Badge className={`text-[10px] flex-shrink-0 ${
                       minutes.status === 'approved'
-                        ? 'bg-[#e6f9ed] text-[#1a7a3a] border-transparent'
-                        : 'bg-[#fff2e6] text-[#bf6722] border-transparent'
+                        ? 'bg-green-tint text-[#1a7a3a] border-transparent'
+                        : 'bg-orange-tint text-[#bf6722] border-transparent'
                     }`}>
                       {minutes.status === 'approved' ? 'Godkendt' : 'Afventer'}
                     </Badge>
@@ -387,35 +387,35 @@ export function ProfessionalDashboard() {
                     return (
                       <div
                         key={activity.id}
-                        className="flex items-start gap-3 p-3 rounded-[8px] hover:bg-[#faf9f6] transition-colors cursor-pointer"
+                        className="flex items-start gap-3 p-3 rounded-[8px] hover:bg-card transition-colors cursor-pointer"
                         onClick={() => {
                           if (activity.relatedType === 'meeting_minutes') setActiveTab('meeting-minutes');
                           else if (activity.relatedType === 'message_thread') setActiveTab('kommunikation');
                         }}
                       >
-                        <div className="w-8 h-8 rounded-[8px] bg-[#ecebe5] flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <Icon className="w-4 h-4 text-[#5f5d56]" />
+                        <div className="w-8 h-8 rounded-[8px] bg-secondary flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Icon className="w-4 h-4 text-muted-foreground" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-[#2f2f2d] text-sm">{activity.title}</p>
-                          <p className="text-xs text-[#78766d]">{formatDate(activity.createdAt)}</p>
+                          <p className="font-medium text-foreground text-sm">{activity.title}</p>
+                          <p className="text-xs text-muted-foreground">{formatDate(activity.createdAt)}</p>
                         </div>
                       </div>
                     );
                   })}
 
                 {caseActivities.filter(a => a.caseId === selectedCase).length === 0 && caseMinutes.length === 0 && (
-                  <p className="text-center text-[#78766d] py-4 text-sm">Ingen aktivitet endnu</p>
+                  <p className="text-center text-muted-foreground py-4 text-sm">Ingen aktivitet endnu</p>
                 )}
               </div>
             </CardContent>
           </Card>
 
           {/* Internal Notes Section */}
-          <Card className="bg-white border border-[#e8e7e0] rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <Card className="bg-card border border-border rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
             <CardHeader className="pb-2 px-5 pt-5">
-              <CardTitle className="text-base font-semibold text-[#2f2f2d] flex items-center gap-2">
-                <StickyNote className="w-4 h-4 text-[#5f5d56]" />
+              <CardTitle className="text-base font-semibold text-foreground flex items-center gap-2">
+                <StickyNote className="w-4 h-4 text-muted-foreground" />
                 Interne noter
               </CardTitle>
             </CardHeader>
@@ -424,9 +424,9 @@ export function ProfessionalDashboard() {
               {notes.length > 0 && (
                 <div className="space-y-2">
                   {notes.map((note, i) => (
-                    <div key={i} className="p-3 rounded-[8px] bg-[#faf9f6] border border-[#e8e7e0]">
-                      <p className="text-sm text-[#2f2f2d] leading-relaxed">{note.text}</p>
-                      <p className="text-xs text-[#78766d] mt-1.5">{formatDate(note.date, 'dd. MMM yyyy, HH:mm')}</p>
+                    <div key={i} className="p-3 rounded-[8px] bg-card border border-border">
+                      <p className="text-sm text-foreground leading-relaxed">{note.text}</p>
+                      <p className="text-xs text-muted-foreground mt-1.5">{formatDate(note.date, 'dd. MMM yyyy, HH:mm')}</p>
                     </div>
                   ))}
                 </div>
@@ -438,12 +438,12 @@ export function ProfessionalDashboard() {
                   value={noteText}
                   onChange={(e) => setNoteText(e.target.value)}
                   placeholder="Skriv en intern note..."
-                  className="w-full min-h-[80px] p-3 rounded-[8px] border border-[#e8e7e0] bg-[#faf9f6] text-sm text-[#2f2f2d] placeholder:text-[#b0aea5] resize-none focus:outline-none focus:border-[#c7ccf0] focus:ring-1 focus:ring-[#c7ccf0] transition-colors"
+                  className="w-full min-h-[80px] p-3 rounded-[8px] border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:border-[#c7ccf0] focus:ring-1 focus:ring-[#c7ccf0] transition-colors"
                 />
                 <Button
                   onClick={() => handleAddNote(selectedCase)}
                   disabled={!noteText.trim()}
-                  className="bg-[#2f2f2f] text-white hover:bg-[#1a1a1a] rounded-[8px] text-sm h-9 px-4 disabled:opacity-40"
+                  className="bg-primary text-white hover:bg-primary rounded-[8px] text-sm h-9 px-4 disabled:opacity-40"
                 >
                   <Plus className="w-4 h-4 mr-1.5" />
                   Tilføj note
@@ -478,14 +478,14 @@ export function ProfessionalDashboard() {
         className="flex items-center justify-between px-1"
       >
         <div>
-          <h1 className="text-lg font-bold text-[#2f2f2d]">
+          <h1 className="text-lg font-bold text-foreground">
             {new Date().getHours() < 12 ? 'Godmorgen' : new Date().getHours() < 18 ? 'God eftermiddag' : 'God aften'}, {currentUser?.name?.split(' ')[0]}
           </h1>
-          <p className="text-xs text-[#78766d]">{currentUser?.organization}</p>
+          <p className="text-xs text-muted-foreground">{currentUser?.organization}</p>
         </div>
         <Avatar className="w-9 h-9 flex-shrink-0">
           <AvatarImage src={currentUser?.avatar} />
-          <AvatarFallback className="bg-[#eef0ff] text-indigo-700 text-sm font-medium">
+          <AvatarFallback className="bg-blue-tint text-indigo-700 text-sm font-medium">
             {currentUser?.name?.[0]}
           </AvatarFallback>
         </Avatar>
@@ -498,22 +498,22 @@ export function ProfessionalDashboard() {
         transition={{ delay: 0.1 }}
         className="grid grid-cols-3 gap-3"
       >
-        <Card className="bg-white border border-[#e8e7e0] rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)] cursor-pointer" onClick={() => { setProfessionalCaseFilter('active'); }}>
+        <Card className="bg-card border border-border rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)] cursor-pointer" onClick={() => { setProfessionalCaseFilter('active'); }}>
           <CardContent className="p-3 text-center">
-            <p className="text-2xl font-bold text-[#2f2f2d]">{activeCases.length}</p>
-            <p className="text-[11px] text-[#78766d] font-medium">Aktive sager</p>
+            <p className="text-2xl font-bold text-foreground">{activeCases.length}</p>
+            <p className="text-[11px] text-muted-foreground font-medium">Aktive sager</p>
           </CardContent>
         </Card>
-        <Card className="bg-white border border-[#e8e7e0] rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)] cursor-pointer" onClick={() => { setProfessionalCaseFilter('pending'); }}>
+        <Card className="bg-card border border-border rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)] cursor-pointer" onClick={() => { setProfessionalCaseFilter('pending'); }}>
           <CardContent className="p-3 text-center">
             <p className="text-2xl font-bold text-[#bf6722]">{pendingCount}</p>
-            <p className="text-[11px] text-[#78766d] font-medium">Afventende</p>
+            <p className="text-[11px] text-muted-foreground font-medium">Afventende</p>
           </CardContent>
         </Card>
-        <Card className="bg-white border border-[#e8e7e0] rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)] cursor-pointer" onClick={() => { setActiveTab('meeting-minutes'); }}>
+        <Card className="bg-card border border-border rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)] cursor-pointer" onClick={() => { setActiveTab('meeting-minutes'); }}>
           <CardContent className="p-3 text-center">
             <p className="text-2xl font-bold text-indigo-600">{totalMinutes}</p>
-            <p className="text-[11px] text-[#78766d] font-medium">Total referater</p>
+            <p className="text-[11px] text-muted-foreground font-medium">Total referater</p>
           </CardContent>
         </Card>
       </motion.div>
@@ -525,31 +525,31 @@ export function ProfessionalDashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.12 }}
         >
-          <Card className="bg-white border border-[#e8e7e0] rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+          <Card className="bg-card border border-border rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
             <CardHeader className="pb-2 px-4 pt-4">
-              <CardTitle className="text-sm font-semibold text-[#2f2f2d]">Dagens opgaver</CardTitle>
+              <CardTitle className="text-sm font-semibold text-foreground">Dagens opgaver</CardTitle>
             </CardHeader>
             <CardContent className="px-4 pb-4 space-y-1">
               {workflowItems.map((item, i) => (
                 <div
                   key={`${item.type}-${item.case.id}-${i}`}
                   onClick={() => setSelectedCase(item.case.id)}
-                  className="flex items-center gap-3 p-2.5 rounded-[8px] hover:bg-[#faf9f6] cursor-pointer transition-colors"
+                  className="flex items-center gap-3 p-2.5 rounded-[8px] hover:bg-card cursor-pointer transition-colors"
                 >
                   <div className={`w-8 h-8 rounded-[8px] flex items-center justify-center flex-shrink-0 ${
-                    item.type === 'meeting' ? 'bg-[#eef0ff]' :
-                    item.type === 'approval' ? 'bg-[#fff2e6]' :
-                    'bg-[#fff2e6]'
+                    item.type === 'meeting' ? 'bg-blue-tint' :
+                    item.type === 'approval' ? 'bg-orange-tint' :
+                    'bg-orange-tint'
                   }`}>
                     {item.type === 'meeting' && <Calendar className="w-4 h-4 text-indigo-600" />}
                     {item.type === 'approval' && <Clock className="w-4 h-4 text-[#bf6722]" />}
                     {item.type === 'message' && <MessageCircle className="w-4 h-4 text-[#f58a2d]" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#2f2f2d] truncate">{item.label}</p>
-                    <p className="text-xs text-[#78766d]">{item.detail}</p>
+                    <p className="text-sm font-medium text-foreground truncate">{item.label}</p>
+                    <p className="text-xs text-muted-foreground">{item.detail}</p>
                   </div>
-                  <ArrowRight className="w-3.5 h-3.5 text-[#b0aea5] flex-shrink-0" />
+                  <ArrowRight className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
                 </div>
               ))}
             </CardContent>
@@ -564,12 +564,12 @@ export function ProfessionalDashboard() {
         transition={{ delay: 0.15 }}
       >
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#78766d]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Søg sagsnummer, navn eller afdeling..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-white border-[#e8e7e0] rounded-[8px] text-sm text-[#2f2f2d] placeholder:text-[#b0aea5] focus:border-[#c7ccf0] focus:ring-[#c7ccf0] h-11"
+            className="pl-10 bg-card border-border rounded-[8px] text-sm text-foreground placeholder:text-muted-foreground focus:border-[#c7ccf0] focus:ring-[#c7ccf0] h-11"
           />
         </div>
       </motion.div>
@@ -577,7 +577,7 @@ export function ProfessionalDashboard() {
       {/* Filter badge */}
       {professionalCaseFilter !== 'all' && (
         <div className="flex items-center gap-2">
-          <Badge className="bg-[#eef0ff] text-indigo-700 border border-[#c7ccf0] text-xs flex items-center gap-1">
+          <Badge className="bg-blue-tint text-indigo-700 border border-[#c7ccf0] text-xs flex items-center gap-1">
             {professionalCaseFilter === 'active' ? 'Aktive sager' : 'Afventende godkendelse'}
             <button onClick={() => setProfessionalCaseFilter('all')} className="ml-1 hover:text-red-500">
               <X className="w-3 h-3" />
@@ -593,8 +593,8 @@ export function ProfessionalDashboard() {
         transition={{ delay: 0.2 }}
         className="flex items-center justify-between"
       >
-        <h2 className="font-semibold text-[#2f2f2d] text-sm">Mine sager</h2>
-        <span className="text-xs text-[#78766d]">{filteredCases.length} sag(er)</span>
+        <h2 className="font-semibold text-foreground text-sm">Mine sager</h2>
+        <span className="text-xs text-muted-foreground">{filteredCases.length} sag(er)</span>
       </motion.div>
 
       {/* Cases List */}
@@ -616,15 +616,15 @@ export function ProfessionalDashboard() {
               onClick={() => setSelectedCase(caseItem.id)}
               className="cursor-pointer"
             >
-              <Card className={`bg-white border border-[#e8e7e0] rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:border-[#f3c59d] hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all ${getCaseLeftBorder(caseItem.priority)}`}>
+              <Card className={`bg-card border border-border rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)] hover:border-orange-tint hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)] transition-all ${getCaseLeftBorder(caseItem.priority)}`}>
                 <CardContent className="p-4">
                   {/* Top row: case number + status */}
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <Badge className="bg-[#eef0ff] text-indigo-700 border border-[#c7ccf0] font-mono text-[11px] px-2 py-0.5">
+                      <Badge className="bg-blue-tint text-indigo-700 border border-[#c7ccf0] font-mono text-[11px] px-2 py-0.5">
                         {caseItem.caseNumber}
                       </Badge>
-                      <Badge variant="outline" className="text-[#78766d] border-[#e8e7e0] text-[10px] px-1.5 py-0.5">
+                      <Badge variant="outline" className="text-muted-foreground border-border text-[10px] px-1.5 py-0.5">
                         {caseItem.departmentId}
                       </Badge>
                     </div>
@@ -635,7 +635,7 @@ export function ProfessionalDashboard() {
                       {caseItem.priority !== 'normal' && (
                         <Badge className={`text-[10px] font-medium border-transparent ${
                           caseItem.priority === 'high'
-                            ? 'bg-[#fff2e6] text-[#bf6722]'
+                            ? 'bg-orange-tint text-[#bf6722]'
                             : 'bg-red-50 text-red-700'
                         }`}>
                           {getPriorityLabel(caseItem.priority)}
@@ -647,18 +647,18 @@ export function ProfessionalDashboard() {
                   {/* Family info */}
                   <div className="flex items-center justify-between mb-2">
                     <div>
-                      <h3 className="font-semibold text-[#2f2f2d] text-[15px]">{caseItem.familyName}</h3>
-                      <p className="text-sm text-[#78766d]">
+                      <h3 className="font-semibold text-foreground text-[15px]">{caseItem.familyName}</h3>
+                      <p className="text-sm text-muted-foreground">
                         {caseItem.childName}, {caseItem.childAge} ar
                       </p>
                     </div>
-                    <ArrowRight className="w-4 h-4 text-[#b0aea5]" />
+                    <ArrowRight className="w-4 h-4 text-muted-foreground" />
                   </div>
 
                   {/* Parents */}
                   <div className="flex flex-wrap gap-1.5 mb-3">
                     {caseItem.parents.map((parent, i) => (
-                      <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-[#faf9f6] border border-[#e8e7e0] text-[#5f5d56]">
+                      <span key={i} className="text-xs px-2 py-0.5 rounded-full bg-card border border-border text-muted-foreground">
                         {parent}
                       </span>
                     ))}
@@ -667,7 +667,7 @@ export function ProfessionalDashboard() {
                   {/* Bottom row: meta info */}
                   <div className="flex items-center gap-3 flex-wrap">
                     <span className={`text-[11px] flex items-center gap-1 ${
-                      daysSince > 14 ? 'text-[#bf6722]' : 'text-[#78766d]'
+                      daysSince > 14 ? 'text-[#bf6722]' : 'text-muted-foreground'
                     }`}>
                       <Clock className="w-3 h-3" />
                       {daysSince}d siden kontakt
@@ -699,11 +699,11 @@ export function ProfessionalDashboard() {
 
         {filteredCases.length === 0 && (
           <div className="text-center py-12">
-            <div className="w-14 h-14 rounded-[8px] bg-[#ecebe5] flex items-center justify-center mx-auto mb-3">
-              <Building2 className="w-7 h-7 text-[#78766d]" />
+            <div className="w-14 h-14 rounded-[8px] bg-secondary flex items-center justify-center mx-auto mb-3">
+              <Building2 className="w-7 h-7 text-muted-foreground" />
             </div>
-            <p className="text-[#2f2f2d] font-medium">Ingen sager fundet</p>
-            <p className="text-sm text-[#78766d] mt-1">Prøv at søge efter noget andet</p>
+            <p className="text-foreground font-medium">Ingen sager fundet</p>
+            <p className="text-sm text-muted-foreground mt-1">Prøv at søge efter noget andet</p>
           </div>
         )}
       </motion.div>

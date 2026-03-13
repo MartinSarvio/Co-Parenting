@@ -49,7 +49,7 @@ export function OverblikSidePanel() {
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-            className="fixed inset-y-0 inset-x-0 z-[9999] mx-auto w-full max-w-[430px] bg-white flex flex-col"
+            className="fixed inset-y-0 inset-x-0 z-[9999] mx-auto w-full max-w-[430px] bg-card flex flex-col"
             style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
             drag="x"
             dragConstraints={{ right: 0 }}
@@ -58,11 +58,11 @@ export function OverblikSidePanel() {
               if (info.offset.x < -80) setSideMenuOpen(false);
             }}
           >
-            <div className="flex items-center justify-between px-5 py-3 border-b border-[#eeedea]">
-              <h2 className="text-[17px] font-bold text-[#2f2f2d]">Overblik</h2>
+            <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+              <h2 className="text-[17px] font-bold text-foreground">Overblik</h2>
               <button
                 onClick={() => setSideMenuOpen(false)}
-                className="flex items-center justify-center text-[#5f5d56] hover:text-[#2f2f2d] transition-colors"
+                className="flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -80,14 +80,14 @@ export function OverblikSidePanel() {
                     }}
                     className={cn(
                       'flex w-full items-center gap-3.5 px-5 py-3.5 text-left transition-colors',
-                      isActive ? 'bg-transparent' : 'hover:bg-[#faf9f6]'
+                      isActive ? 'bg-transparent' : 'hover:bg-card'
                     )}
                   >
-                    <Icon className={cn('h-5 w-5 shrink-0', isActive ? 'text-[#f58a2d]' : 'text-[#7a786f]')} />
+                    <Icon className={cn('h-5 w-5 shrink-0', isActive ? 'text-[#f58a2d]' : 'text-muted-foreground')} />
                     <p
                       className={cn(
                         'flex-1 min-w-0 text-[15px] font-semibold',
-                        isActive ? 'text-[#2f2f2d]' : 'text-[#4a4945]'
+                        isActive ? 'text-foreground' : 'text-foreground'
                       )}
                     >
                       {item.label}

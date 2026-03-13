@@ -50,7 +50,7 @@ function DotIndicator({ count, active }: { count: number; active: number }) {
           key={i}
           className={cn(
             "h-1.5 rounded-full transition-all duration-200",
-            i === active ? "w-4 bg-[#f58a2d]" : "w-1.5 bg-[#d0cec5]"
+            i === active ? "w-4 bg-[#f58a2d]" : "w-1.5 bg-muted"
           )}
         />
       ))}
@@ -247,7 +247,7 @@ export function Dashboard() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-2 px-1"
       >
-        <h1 className="text-[2.05rem] font-semibold leading-[0.96] tracking-[-0.03em] text-[#262623]">
+        <h1 className="text-[2.05rem] font-semibold leading-[0.96] tracking-[-0.03em] text-foreground">
           {getGreeting()}, {currentUser?.name}
         </h1>
       </motion.div>
@@ -262,22 +262,22 @@ export function Dashboard() {
           <div className="flex gap-4">
             {/* Page 0: Family/person overview (all modes) */}
             <div className="min-w-0 flex-[0_0_100%]">
-              <Card className="overflow-hidden border border-[#d8d7d1] bg-[#faf8f3]">
+              <Card className="overflow-hidden border border-border bg-card">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-4">
-                    <Users className="h-7 w-7 shrink-0 text-[#2f2f2f]" />
+                    <Users className="h-7 w-7 shrink-0 text-foreground" />
                     <div className="flex-1 min-w-0">
                       <div className="flex -space-x-2">
                         {overviewMembers.map((m) => (
                           <Avatar key={m.id} className="h-10 w-10 border-2 border-white shadow-sm">
                             <AvatarImage src={m.avatar} />
-                            <AvatarFallback className="bg-[#eceae2] text-xs text-[#4e4d47]">
+                            <AvatarFallback className="bg-secondary text-xs text-foreground">
                               {m.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                             </AvatarFallback>
                           </Avatar>
                         ))}
                       </div>
-                      <p className="mt-1.5 text-[11px] text-[#a09e96]">
+                      <p className="mt-1.5 text-[11px] text-muted-foreground">
                         {overviewMembers.length} familiemedlemmer
                       </p>
                     </div>
@@ -293,20 +293,20 @@ export function Dashboard() {
                 const isChild = children.some(c => c.id === member.id);
                 return (
                   <div key={member.id} className="min-w-0 flex-[0_0_100%]">
-                    <Card className="overflow-hidden border border-[#d8d7d1] bg-[#faf8f3]">
+                    <Card className="overflow-hidden border border-border bg-card">
                       <CardContent className="p-4">
                         <div className="flex items-center gap-4">
                           <Avatar className="h-14 w-14 border-2 border-white shadow-md">
                             <AvatarImage src={member.avatar} />
-                            <AvatarFallback className="bg-[#eceae2] text-lg text-[#4e4d47]">
+                            <AvatarFallback className="bg-secondary text-lg text-foreground">
                               {member.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex-1 min-w-0">
-                            <p className="truncate text-2xl font-semibold tracking-[-0.02em] text-[#2f2f2d]">
+                            <p className="truncate text-2xl font-semibold tracking-[-0.02em] text-foreground">
                               {member.name}
                             </p>
-                            <p className="text-sm text-[#74726a]">
+                            <p className="text-sm text-muted-foreground">
                               {isChild ? 'Barn' : 'Forælder'}
                             </p>
                           </div>
@@ -329,20 +329,20 @@ export function Dashboard() {
                     <Card className={cn(
                       "overflow-hidden border transition-all duration-300",
                       childIsWithCurrentUser
-                        ? "border-[#d8d7d1] bg-[#faf8f3]"
-                        : "border-[#d8d7d1] bg-[#f7f6f2]"
+                        ? "border-border bg-card"
+                        : "border-border bg-background"
                     )}>
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
                             {childIsWithCurrentUser ? (
-                              <Home className="h-7 w-7 shrink-0 text-[#2f2f2f]" />
+                              <Home className="h-7 w-7 shrink-0 text-foreground" />
                             ) : (
-                              <User className="h-7 w-7 shrink-0 text-[#2f2f2f]" />
+                              <User className="h-7 w-7 shrink-0 text-foreground" />
                             )}
                             <div>
-                              <p className="mb-1 text-sm text-[#74726a]">{child.name} er hos</p>
-                              <p className="text-2xl font-semibold tracking-[-0.02em] text-[#2f2f2d]">
+                              <p className="mb-1 text-sm text-muted-foreground">{child.name} er hos</p>
+                              <p className="text-2xl font-semibold tracking-[-0.02em] text-foreground">
                                 {childIsWithCurrentUser ? 'Dig' : childParent?.name}
                               </p>
                               {nextHandover && (
@@ -357,7 +357,7 @@ export function Dashboard() {
                           </div>
                           <Avatar className="h-14 w-14 border-2 border-white shadow-md">
                             <AvatarImage src={child.avatar} />
-                            <AvatarFallback className="bg-[#eceae2] text-lg text-[#4e4d47]">
+                            <AvatarFallback className="bg-secondary text-lg text-foreground">
                               {child.name[0]}
                             </AvatarFallback>
                           </Avatar>
@@ -388,10 +388,10 @@ export function Dashboard() {
                     <button
                       key={id}
                       onClick={() => setActiveTab(tab)}
-                      className="flex flex-col items-center gap-2 rounded-[8px] border border-[#d8d7d1] bg-[#f8f7f3] py-3 transition-colors hover:bg-[#efeee9] active:scale-95"
+                      className="flex flex-col items-center gap-2 rounded-[8px] border border-border bg-card py-3 transition-colors hover:bg-secondary active:scale-95"
                     >
-                      <Icon className={cn('h-6 w-6', accent ? 'text-[#f58a2d]' : 'text-[#4f4d45]')} />
-                      <span className="text-[11px] font-semibold text-[#4a4945]">{label}</span>
+                      <Icon className={cn('h-6 w-6', accent ? 'text-[#f58a2d]' : 'text-foreground')} />
+                      <span className="text-[11px] font-semibold text-foreground">{label}</span>
                     </button>
                   ))}
                 </div>
@@ -412,10 +412,10 @@ export function Dashboard() {
           <div className="flex gap-4">
             {/* Slide 1: Dag */}
             <div className="min-w-0 flex-[0_0_100%]">
-              <Card className="min-h-[320px] border-[#d8d7d1] bg-[#f8f7f3]">
+              <Card className="min-h-[320px] border-border bg-card">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-[0.95rem] font-semibold tracking-[-0.01em] text-[#2f2f2d]">
+                    <CardTitle className="text-[0.95rem] font-semibold tracking-[-0.01em] text-foreground">
                       Dag
                     </CardTitle>
                     <button onClick={() => setActiveTab('kalender')}
@@ -427,31 +427,31 @@ export function Dashboard() {
                 <CardContent>
                   {todaysEvents.length === 0 ? (
                     <div className="py-6 text-center">
-                      <CalendarPlus className="h-8 w-8 text-[#b0ada4] mx-auto mb-2" />
-                      <p className="text-sm text-[#a09e96]">Ingen planer i dag</p>
+                      <CalendarPlus className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">Ingen planer i dag</p>
                     </div>
                   ) : (
                     <div className="space-y-2">
                       {todaysEvents.map((event) => (
                         <div
                           key={event.id}
-                          className="flex items-center gap-3 rounded-[8px] border border-[#deddd5] bg-white p-3"
+                          className="flex items-center gap-3 rounded-[8px] border border-border bg-card p-3"
                         >
                           <div className="flex w-[52px] shrink-0 flex-col items-center">
-                            <span className="text-sm font-semibold text-[#2f2f2d]">{formatTime(event.startDate)}</span>
-                            <span className="text-[11px] text-[#a09e96]">{formatTime(event.endDate)}</span>
+                            <span className="text-sm font-semibold text-foreground">{formatTime(event.startDate)}</span>
+                            <span className="text-[11px] text-muted-foreground">{formatTime(event.endDate)}</span>
                           </div>
-                          <div className="h-8 w-px bg-[#e8e7e0]" />
+                          <div className="h-8 w-px bg-muted" />
                           <div className="flex-1 min-w-0">
-                            <p className="truncate text-sm font-semibold text-[#2f2f2d]">{event.title}</p>
+                            <p className="truncate text-sm font-semibold text-foreground">{event.title}</p>
                             {event.location && (
-                              <div className="flex items-center gap-1 text-[11px] text-[#a09e96]">
+                              <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
                                 <MapPin className="h-3 w-3" />
                                 {event.location}
                               </div>
                             )}
                           </div>
-                          <Badge className="shrink-0 bg-[#eceae2] text-[11px] font-medium text-[#4f4d45] hover:bg-[#eceae2]">
+                          <Badge className="shrink-0 bg-secondary text-[11px] font-medium text-foreground hover:bg-secondary">
                             {event.type === 'school' ? 'Skole' :
                              event.type === 'activity' ? 'Aktivitet' :
                              event.type === 'handover' ? 'Aflevering' : 'Aftale'}
@@ -466,10 +466,10 @@ export function Dashboard() {
 
             {/* Slide 2: Uge */}
             <div className="min-w-0 flex-[0_0_100%]">
-              <Card className="min-h-[320px] border-[#d8d7d1] bg-[#f8f7f3]">
+              <Card className="min-h-[320px] border-border bg-card">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-[0.95rem] font-semibold tracking-[-0.01em] text-[#2f2f2d]">
+                    <CardTitle className="text-[0.95rem] font-semibold tracking-[-0.01em] text-foreground">
                       Uge
                     </CardTitle>
                     <button onClick={() => setActiveTab('kalender')}
@@ -487,18 +487,18 @@ export function Dashboard() {
                           key={day.toISOString()}
                           className={cn(
                             "flex flex-col items-center rounded-xl py-2 transition-colors",
-                            dayIsToday ? "bg-[#fff2e6]" : "bg-white"
+                            dayIsToday ? "bg-orange-tint" : "bg-card"
                           )}
                         >
                           <span className={cn(
                             "text-[10px] font-semibold",
-                            dayIsToday ? "text-[#f58a2d]" : "text-[#75736b]"
+                            dayIsToday ? "text-[#f58a2d]" : "text-muted-foreground"
                           )}>
                             {weekdayLabels[idx]}
                           </span>
                           <span className={cn(
                             "text-lg font-bold",
-                            dayIsToday ? "text-[#f58a2d]" : "text-[#2f2f2d]"
+                            dayIsToday ? "text-[#f58a2d]" : "text-foreground"
                           )}>
                             {format(day, 'd')}
                           </span>
@@ -520,10 +520,10 @@ export function Dashboard() {
 
             {/* Slide 3: Måned */}
             <div className="min-w-0 flex-[0_0_100%]">
-              <Card className="min-h-[320px] border-[#d8d7d1] bg-[#f8f7f3]">
+              <Card className="min-h-[320px] border-border bg-card">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-[0.95rem] font-semibold tracking-[-0.01em] text-[#2f2f2d]">
+                    <CardTitle className="text-[0.95rem] font-semibold tracking-[-0.01em] text-foreground">
                       Måned
                     </CardTitle>
                     <button onClick={() => setActiveTab('kalender')}
@@ -533,12 +533,12 @@ export function Dashboard() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="mb-2 text-center text-sm font-semibold text-[#2f2f2d] capitalize">
+                  <p className="mb-2 text-center text-sm font-semibold text-foreground capitalize">
                     {format(new Date(), 'MMMM yyyy', { locale: da })}
                   </p>
                   <div className="grid grid-cols-7 gap-px">
                     {weekdayLabels.map((d) => (
-                      <div key={d} className="py-1 text-center text-[9px] font-semibold text-[#75736b]">
+                      <div key={d} className="py-1 text-center text-[9px] font-semibold text-muted-foreground">
                         {d}
                       </div>
                     ))}
@@ -555,7 +555,7 @@ export function Dashboard() {
                         >
                           <div className={cn(
                             "flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-semibold",
-                            dayIsToday ? "bg-[#f58a2d] text-white" : "text-[#2f2f2d]"
+                            dayIsToday ? "bg-[#f58a2d] text-white" : "text-foreground"
                           )}>
                             {format(day, 'd')}
                           </div>
@@ -581,29 +581,29 @@ export function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <Card className="border-[#d8d7d1] bg-[#f8f7f3]">
+          <Card className="border-border bg-card">
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-[0.95rem] font-semibold tracking-[-0.01em] text-[#2f2f2d]">
+                <CardTitle className="text-[0.95rem] font-semibold tracking-[-0.01em] text-foreground">
                   Afleveringsstatus
                 </CardTitle>
                 <span className="text-sm font-semibold text-[#f58a2d]">{handoverProgress}%</span>
               </div>
             </CardHeader>
             <CardContent className="space-y-2 pt-0">
-              <Progress value={handoverProgress} className="h-1.5 bg-[#e8e7e0]" />
+              <Progress value={handoverProgress} className="h-1.5 bg-muted" />
               <div className="space-y-2">
                 {activeHandover.checklist.slice(0, 3).map((item) => (
                   <div key={item.id} className="flex items-center gap-2.5 text-sm">
                     <div className={cn(
                       'flex h-5 w-5 shrink-0 items-center justify-center rounded-full',
-                      item.completed ? 'bg-[#2f2f2f] text-white' : 'border-2 border-[#d0cfc7]'
+                      item.completed ? 'bg-primary text-white' : 'border-2 border-border'
                     )}>
                       {item.completed && <CheckCircle2 className="h-3 w-3" />}
                     </div>
                     <span className={cn(
                       'text-sm',
-                      item.completed ? 'text-[#a09e96] line-through' : 'text-[#2f2f2d]'
+                      item.completed ? 'text-muted-foreground line-through' : 'text-foreground'
                     )}>
                       {item.item}
                     </span>
@@ -612,7 +612,7 @@ export function Dashboard() {
               </div>
               <button
                 onClick={() => setActiveTab('handover')}
-                className="flex w-full items-center justify-center gap-1.5 rounded-[8px] border border-[#d8d7d1] bg-white py-2.5 text-sm font-medium text-[#2f2f2d] transition-colors hover:bg-[#f0efe9]"
+                className="flex w-full items-center justify-center gap-1.5 rounded-[8px] border border-border bg-card py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-card"
               >
                 Åbn aflevering
                 <ChevronRight className="h-4 w-4" />
@@ -628,10 +628,10 @@ export function Dashboard() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
       >
-        <Card className="border-[#d8d7d1] bg-[#f8f7f3]">
+        <Card className="border-border bg-card">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-[0.95rem] font-semibold tracking-[-0.01em] text-[#2f2f2d]">
+              <CardTitle className="text-[0.95rem] font-semibold tracking-[-0.01em] text-foreground">
                 Åbne opgaver
               </CardTitle>
               <button
@@ -645,21 +645,21 @@ export function Dashboard() {
           <CardContent className="pt-0">
             {pendingTasks.length === 0 ? (
               <div className="flex flex-col items-center py-5">
-                <CheckCircle2 className="mb-2 h-6 w-6 text-[#2f2f2f]" />
-                <p className="text-sm text-[#a09e96]">Alle opgaver er klaret</p>
+                <CheckCircle2 className="mb-2 h-6 w-6 text-foreground" />
+                <p className="text-sm text-muted-foreground">Alle opgaver er klaret</p>
               </div>
             ) : (
               <div className="space-y-2">
                 {pendingTasks.map((task) => (
                   <div
                     key={task.id}
-                    className="flex items-center gap-3 rounded-[8px] border border-[#deddd5] bg-white p-3"
+                    className="flex items-center gap-3 rounded-[8px] border border-border bg-card p-3"
                   >
-                    <div className="h-5 w-5 shrink-0 rounded-full border-2 border-[#d0cfc7]" />
+                    <div className="h-5 w-5 shrink-0 rounded-full border-2 border-border" />
                     <div className="flex-1 min-w-0">
-                      <p className="truncate text-sm font-semibold text-[#2f2f2d]">{task.title}</p>
+                      <p className="truncate text-sm font-semibold text-foreground">{task.title}</p>
                       {task.deadline && (
-                        <p className="text-[11px] text-[#a09e96]">
+                        <p className="text-[11px] text-muted-foreground">
                           {isToday(parseISO(task.deadline)) ? 'I dag' :
                            isTomorrow(parseISO(task.deadline)) ? 'I morgen' :
                            format(parseISO(task.deadline), 'dd. MMM', { locale: da })}

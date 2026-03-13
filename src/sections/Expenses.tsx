@@ -54,14 +54,14 @@ import { searchProducts } from '@/lib/openFoodFacts';
 import { ProductCard, type ProductCardData } from '@/components/custom/ProductCard';
 
 const expenseCategories = [
-  { value: 'institution', label: 'Institution', icon: Building2, color: 'bg-[#eceae2] text-[#2f2f2f]' },
-  { value: 'medical', label: 'Medicin/Sundhed', icon: Pill, color: 'bg-[#fff1e5] text-[#b96424]' },
-  { value: 'clothing', label: 'Tøj', icon: Shirt, color: 'bg-[#f3f2ec] text-[#5f5c53]' },
-  { value: 'activities', label: 'Aktiviteter', icon: GraduationCap, color: 'bg-[#fff2e6] text-[#c66f23]' },
-  { value: 'school', label: 'Skole', icon: GraduationCap, color: 'bg-[#eceae2] text-[#47443d]' },
-  { value: 'food', label: 'Mad', icon: UtensilsCrossed, color: 'bg-[#fff2e6] text-[#c66f23]' },
-  { value: 'transport', label: 'Transport', icon: Bus, color: 'bg-[#f3f2ec] text-[#5f5c53]' },
-  { value: 'other', label: 'Andet', icon: MoreHorizontal, color: 'bg-[#eceae2] text-[#4f4b43]' },
+  { value: 'institution', label: 'Institution', icon: Building2, color: 'bg-secondary text-foreground' },
+  { value: 'medical', label: 'Medicin/Sundhed', icon: Pill, color: 'bg-orange-tint text-[#b96424]' },
+  { value: 'clothing', label: 'Tøj', icon: Shirt, color: 'bg-card text-[#5f5c53]' },
+  { value: 'activities', label: 'Aktiviteter', icon: GraduationCap, color: 'bg-orange-tint text-[#c66f23]' },
+  { value: 'school', label: 'Skole', icon: GraduationCap, color: 'bg-secondary text-foreground' },
+  { value: 'food', label: 'Mad', icon: UtensilsCrossed, color: 'bg-orange-tint text-[#c66f23]' },
+  { value: 'transport', label: 'Transport', icon: Bus, color: 'bg-card text-[#5f5c53]' },
+  { value: 'other', label: 'Andet', icon: MoreHorizontal, color: 'bg-secondary text-foreground' },
 ] as const;
 
 const recurringIntervals = [
@@ -729,14 +729,14 @@ export function Expenses() {
     return (
       <div className="space-y-1.5 py-1">
         <ExpensesSidePanel />
-        <Card className="border-[#f3c59d] bg-[#fff2e6]">
+        <Card className="border-orange-tint bg-orange-tint">
           <CardContent className="space-y-2 p-4">
             <div className="flex items-start gap-3">
               <div className="rounded-[8px] bg-[#f58a2d] p-2 text-white">
                 <Lock className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-lg font-semibold text-[#2f2f2d]">Udgifter er en abonnementsfunktion</p>
+                <p className="text-lg font-semibold text-foreground">Udgifter er en abonnementsfunktion</p>
                 <p className="text-sm text-[#7a634b]">
                   Opgrader for at dele udgifter, oprette faste betalinger og sende/anmode penge direkte i appen.
                 </p>
@@ -780,7 +780,7 @@ export function Expenses() {
 
           {/* Parent rows — overlap bottom of orange */}
           <div className="space-y-2">
-            <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-4 shadow-sm">
+            <div className="rounded-[8px] border border-border bg-card p-4 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
@@ -788,25 +788,25 @@ export function Expenses() {
                     <AvatarFallback>{meUser?.name?.[0]}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="text-sm font-semibold text-[#2f2f2d]">{meUser?.name}</p>
-                    <p className="text-[11px] text-[#78766d]">Dig</p>
+                    <p className="text-sm font-semibold text-foreground">{meUser?.name}</p>
+                    <p className="text-[11px] text-muted-foreground">Dig</p>
                   </div>
                 </div>
-                <span className={cn('text-lg font-bold', meBalance > 0 ? 'text-green-600' : meBalance < 0 ? 'text-red-500' : 'text-[#75736b]')}>
+                <span className={cn('text-lg font-bold', meBalance > 0 ? 'text-green-600' : meBalance < 0 ? 'text-red-500' : 'text-muted-foreground')}>
                   {meBalance > 0 ? '+' : ''}{formatCurrency(meBalance)}
                 </span>
               </div>
             </div>
             {otherUser && (
-              <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-4 shadow-sm">
+              <div className="rounded-[8px] border border-border bg-card p-4 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <span className={cn('text-lg font-bold', otherBalance > 0 ? 'text-green-600' : otherBalance < 0 ? 'text-red-500' : 'text-[#75736b]')}>
+                  <span className={cn('text-lg font-bold', otherBalance > 0 ? 'text-green-600' : otherBalance < 0 ? 'text-red-500' : 'text-muted-foreground')}>
                     {otherBalance > 0 ? '+' : ''}{formatCurrency(otherBalance)}
                   </span>
                   <div className="flex items-center gap-3">
                     <div className="text-right">
-                      <p className="text-sm font-semibold text-[#2f2f2d]">{otherUser.name}</p>
-                      <p className="text-[11px] text-[#78766d]">Medforælder</p>
+                      <p className="text-sm font-semibold text-foreground">{otherUser.name}</p>
+                      <p className="text-[11px] text-muted-foreground">Medforælder</p>
                     </div>
                     <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
                       <AvatarImage src={otherUser.avatar} />
@@ -821,18 +821,18 @@ export function Expenses() {
           {/* Recent payments */}
           {transferHistory.length > 0 && (
             <div className="mt-4 space-y-2">
-              <p className="text-[0.95rem] font-semibold text-[#2f2f2d]">Seneste betalinger</p>
+              <p className="text-[0.95rem] font-semibold text-foreground">Seneste betalinger</p>
               {transferHistory.slice(0, 8).map((transfer) => {
                 const from = users.find(u => u.id === transfer.fromUserId);
                 const to = users.find(u => u.id === transfer.toUserId);
                 return (
-                  <div key={transfer.id} className="flex items-center justify-between rounded-[8px] border border-[#e8e7e0] bg-white px-3 py-2.5">
+                  <div key={transfer.id} className="flex items-center justify-between rounded-[8px] border border-border bg-card px-3 py-2.5">
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-[#2f2f2d] truncate">{from?.name} → {to?.name}</p>
-                      {transfer.note && <p className="text-xs text-[#78766d] truncate">{transfer.note}</p>}
+                      <p className="text-sm font-medium text-foreground truncate">{from?.name} → {to?.name}</p>
+                      {transfer.note && <p className="text-xs text-muted-foreground truncate">{transfer.note}</p>}
                     </div>
                     <div className="text-right shrink-0 ml-2">
-                      <p className="text-sm font-semibold text-[#2f2f2d]">{formatCurrency(transfer.amount)}</p>
+                      <p className="text-sm font-semibold text-foreground">{formatCurrency(transfer.amount)}</p>
                       <Badge variant="outline" className="text-[10px]">{transfer.status === 'completed' ? 'Betalt' : transfer.status === 'requested' ? 'Anmodet' : transfer.status}</Badge>
                     </div>
                   </div>
@@ -866,14 +866,14 @@ export function Expenses() {
             <p className="text-sm text-white/70 mt-1">Opret betalinger og anmodninger</p>
           </div>
 
-          <Card className="border-[#d8d7cf] bg-[#faf9f6]">
+          <Card className="border-border bg-card">
           <CardContent className="space-y-2 pt-4">
             {!canUsePayments && (
-              <p className="rounded-[8px] border border-[#f3c59d] bg-[#fff2e6] px-3 py-2 text-sm text-[#a7632c]">
+              <p className="rounded-[8px] border border-orange-tint bg-orange-tint px-3 py-2 text-sm text-[#a7632c]">
                 Denne funktion kræver Family Plus eller Enlig Plus.
               </p>
             )}
-            <p className="text-xs text-[#75736b]">
+            <p className="text-xs text-muted-foreground">
               Din primære konto: {myAccounts.find((account) => account.isPrimary)?.accountLabel || 'Ikke sat'}
             </p>
 
@@ -922,9 +922,9 @@ export function Expenses() {
                 {incomingRequests.map((transfer) => {
                   const sender = users.find((user) => user.id === transfer.fromUserId);
                   return (
-                    <div key={transfer.id} className="rounded-[8px] border border-[#dfddd6] bg-white p-3">
-                      <p className="text-sm font-medium text-[#2f2f2d]">{sender?.name || 'Ukendt'} anmoder om {formatCurrency(transfer.amount)}</p>
-                      <p className="text-xs text-[#75736b]">{transfer.note || 'Ingen note'}</p>
+                    <div key={transfer.id} className="rounded-[8px] border border-border bg-card p-3">
+                      <p className="text-sm font-medium text-foreground">{sender?.name || 'Ukendt'} anmoder om {formatCurrency(transfer.amount)}</p>
+                      <p className="text-xs text-muted-foreground">{transfer.note || 'Ingen note'}</p>
                       <div className="mt-2 flex gap-2">
                         <Button size="sm" variant="outline" onClick={() => respondToTransfer(transfer.id, 'declined')}>Afvis</Button>
                         <Button size="sm" onClick={() => respondToTransfer(transfer.id, 'completed')}>Bekræft betalt</Button>
@@ -939,7 +939,7 @@ export function Expenses() {
 
         {/* All transfers */}
         {transferHistory.length > 0 && (
-          <Card className="border-[#d8d7cf] bg-[#faf9f6]">
+          <Card className="border-border bg-card">
             <CardHeader className="pb-3">
               <CardTitle className="text-base">Betalingshistorik</CardTitle>
             </CardHeader>
@@ -948,13 +948,13 @@ export function Expenses() {
                 const from = users.find(u => u.id === transfer.fromUserId);
                 const to = users.find(u => u.id === transfer.toUserId);
                 return (
-                  <div key={transfer.id} className="flex items-center justify-between rounded-[8px] border border-[#e8e7e0] bg-white px-3 py-2.5">
+                  <div key={transfer.id} className="flex items-center justify-between rounded-[8px] border border-border bg-card px-3 py-2.5">
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-[#2f2f2d] truncate">{from?.name} → {to?.name}</p>
-                      {transfer.note && <p className="text-xs text-[#78766d] truncate">{transfer.note}</p>}
+                      <p className="text-sm font-medium text-foreground truncate">{from?.name} → {to?.name}</p>
+                      {transfer.note && <p className="text-xs text-muted-foreground truncate">{transfer.note}</p>}
                     </div>
                     <div className="text-right shrink-0 ml-2">
-                      <p className="text-sm font-semibold text-[#2f2f2d]">{formatCurrency(transfer.amount)}</p>
+                      <p className="text-sm font-semibold text-foreground">{formatCurrency(transfer.amount)}</p>
                       <Badge variant="outline" className="text-[10px]">{transfer.status === 'completed' ? 'Betalt' : transfer.status === 'requested' ? 'Anmodet' : transfer.status}</Badge>
                     </div>
                   </div>
@@ -975,8 +975,8 @@ export function Expenses() {
       <div className="relative">
         <ExpensesSidePanel />
         <div className="pt-4 space-y-4">
-          <div className="space-y-2 rounded-2xl bg-white p-4 border border-[#e8e7e0]">
-            <p className="text-sm font-medium text-[#78766d]">Kategori: {catLabel}</p>
+          <div className="space-y-2 rounded-2xl bg-card p-4 border border-border">
+            <p className="text-sm font-medium text-muted-foreground">Kategori: {catLabel}</p>
             <div className="space-y-2">
               <Label>Månedligt beløb (DKK)</Label>
               <Input type="number" value={budgetEditAmount} onChange={(e) => setBudgetEditAmount(e.target.value)} placeholder="0" />
@@ -1008,7 +1008,7 @@ export function Expenses() {
         <ExpensesSidePanel />
         {/* White background extending behind header/status bar */}
         <div
-          className="absolute inset-x-0 rounded-b-3xl bg-white border-b border-[#e5e3dc] -mx-3 sm:-mx-4"
+          className="absolute inset-x-0 rounded-b-3xl bg-card border-b border-border -mx-3 sm:-mx-4"
           style={{
             top: 'calc(-1 * (env(safe-area-inset-top, 0px) + 74px))',
             height: 'calc(env(safe-area-inset-top, 0px) + 74px + 180px)',
@@ -1017,23 +1017,23 @@ export function Expenses() {
 
         <div className="relative z-[1] space-y-3">
           <div className="text-center pt-1 pb-4">
-            <h1 className="text-2xl font-bold text-[#2f2f2d] mt-1">Budget</h1>
-            <p className="text-sm text-[#78766d] mt-1">{budgetPeriod === 'monthly' ? 'Månedligt overblik' : 'Årligt overblik'}</p>
+            <h1 className="text-2xl font-bold text-foreground mt-1">Budget</h1>
+            <p className="text-sm text-muted-foreground mt-1">{budgetPeriod === 'monthly' ? 'Månedligt overblik' : 'Årligt overblik'}</p>
           </div>
 
         {/* Summary */}
-        <Card className="border-[#d8d7cf] bg-[#f8f7f3]">
+        <Card className="border-border bg-card">
           <CardContent className="pt-4 space-y-1">
             <div className="flex justify-between text-sm">
-              <span className="text-[#78766d]">Budget total</span>
-              <span className="font-semibold text-[#2f2f2d]">{formatCurrency(totalBudget)}</span>
+              <span className="text-muted-foreground">Budget total</span>
+              <span className="font-semibold text-foreground">{formatCurrency(totalBudget)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-[#78766d]">Brugt</span>
-              <span className="font-semibold text-[#2f2f2d]">{formatCurrency(totalSpent)}</span>
+              <span className="text-muted-foreground">Brugt</span>
+              <span className="font-semibold text-foreground">{formatCurrency(totalSpent)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-[#78766d]">Resterende</span>
+              <span className="text-muted-foreground">Resterende</span>
               <span className={cn('font-semibold', totalBudget - totalSpent >= 0 ? 'text-green-600' : 'text-red-500')}>
                 {formatCurrency(totalBudget - totalSpent)}
               </span>
@@ -1053,30 +1053,30 @@ export function Expenses() {
             const progress = budgetAmount > 0 ? Math.min((spent / budgetAmount) * 100, 100) : 0;
 
             return (
-              <div key={cat.value} className="rounded-[8px] border border-[#e8e7e0] bg-white p-3">
+              <div key={cat.value} className="rounded-[8px] border border-border bg-card p-3">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <div className={cn('flex h-8 w-8 items-center justify-center rounded-xl', cat.color)}>
                       <CatIcon className="h-4 w-4" />
                     </div>
-                    <span className="text-sm font-semibold text-[#2f2f2d]">{cat.label}</span>
+                    <span className="text-sm font-semibold text-foreground">{cat.label}</span>
                   </div>
                   <button
                     onClick={() => { setBudgetEditCategory(cat.value); setBudgetEditAmount(String(goal?.monthlyAmount || 0)); setShowBudgetEdit(true); }}
-                    className="text-xs text-[#78766d] hover:text-[#2f2f2d] transition-colors"
+                    className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {budgetAmount > 0 ? formatCurrency(budgetAmount) : 'Sæt budget'}
                   </button>
                 </div>
                 {budgetAmount > 0 && (
                   <>
-                    <div className="h-2 w-full rounded-full bg-[#f0efe8] overflow-hidden">
+                    <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
                       <div
                         className={cn('h-full rounded-full transition-all', progress >= 90 ? 'bg-red-400' : progress >= 70 ? 'bg-yellow-400' : 'bg-green-400')}
                         style={{ width: `${progress}%` }}
                       />
                     </div>
-                    <div className="flex justify-between mt-1 text-[11px] text-[#78766d]">
+                    <div className="flex justify-between mt-1 text-[11px] text-muted-foreground">
                       <span>Brugt: {formatCurrency(spent)}</span>
                       <span>Rest: {formatCurrency(Math.max(budgetAmount - spent, 0))}</span>
                     </div>
@@ -1116,7 +1116,7 @@ export function Expenses() {
           }}
         />
         <div className="relative z-[1] pt-4">
-          <div className="space-y-3 rounded-2xl bg-white p-4 border border-[#e8e7e0]">
+          <div className="space-y-3 rounded-2xl bg-card p-4 border border-border">
             <div className="space-y-2">
               <Label>Link (valgfrit)</Label>
               <Input
@@ -1125,7 +1125,7 @@ export function Expenses() {
                 onBlur={(e) => fetchLinkPreview(e.target.value)}
                 placeholder="https://..."
               />
-              {isLinkLoading && <p className="text-xs text-[#78766d]">Henter produktinfo...</p>}
+              {isLinkLoading && <p className="text-xs text-muted-foreground">Henter produktinfo...</p>}
             </div>
             <div className="space-y-2">
               <Label>Titel</Label>
@@ -1258,19 +1258,19 @@ export function Expenses() {
 
         {/* Product search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9a978f]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             value={wishProductQuery}
             onChange={e => setWishProductQuery(e.target.value)}
             placeholder="Søg produkt..."
-            className="w-full rounded-[8px] border border-[#e5e3dc] bg-white py-3 pl-9 pr-3 text-[14px] text-[#2f2f2d] placeholder:text-[#9a978f] outline-none focus:border-[#c5c3bb]"
+            className="w-full rounded-[8px] border border-border bg-card py-3 pl-9 pr-3 text-[14px] text-foreground placeholder:text-muted-foreground outline-none focus:border-border"
           />
           {wishProductQuery && (
             <button
               onClick={() => { setWishProductQuery(''); setWishProductResults([]); }}
               className="absolute right-3 top-1/2 -translate-y-1/2"
             >
-              <X className="h-4 w-4 text-[#9a978f]" />
+              <X className="h-4 w-4 text-muted-foreground" />
             </button>
           )}
         </div>
@@ -1279,11 +1279,11 @@ export function Expenses() {
         {isWishSearching && (
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {[1, 2, 3].map(i => (
-              <div key={i} className="min-w-[155px] max-w-[155px] shrink-0 rounded-2xl border border-[#e8e7e0] bg-white overflow-hidden">
-                <div className="aspect-[4/3] bg-[#f0efe8] animate-pulse" />
+              <div key={i} className="min-w-[155px] max-w-[155px] shrink-0 rounded-2xl border border-border bg-card overflow-hidden">
+                <div className="aspect-[4/3] bg-muted animate-pulse" />
                 <div className="p-2.5 space-y-2">
-                  <div className="h-3 w-3/4 rounded bg-[#e8e7e0] animate-pulse" />
-                  <div className="h-3 w-1/2 rounded bg-[#e8e7e0] animate-pulse" />
+                  <div className="h-3 w-3/4 rounded bg-muted animate-pulse" />
+                  <div className="h-3 w-1/2 rounded bg-muted animate-pulse" />
                 </div>
               </div>
             ))}
@@ -1306,8 +1306,8 @@ export function Expenses() {
         {/* Wish list */}
         {filteredWishes.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Gift className="mx-auto mb-3 h-11 w-11 text-[#c5c3bb]" />
-            <p className="text-sm text-[#78766d]">Ingen ønsker endnu</p>
+            <Gift className="mx-auto mb-3 h-11 w-11 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">Ingen ønsker endnu</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3">
@@ -1315,21 +1315,21 @@ export function Expenses() {
               const child = children.find(c => c.id === wish.childId);
               const addedByUser = users.find(u => u.id === wish.addedBy);
               return (
-                <div key={wish.id} className={cn('rounded-2xl border border-[#e8e7e0] bg-white overflow-hidden', wish.status === 'bought' && 'opacity-60')}>
+                <div key={wish.id} className={cn('rounded-2xl border border-border bg-card overflow-hidden', wish.status === 'bought' && 'opacity-60')}>
                   {wish.imageUrl && (
-                    <div className="aspect-[4/3] w-full bg-[#f5f4f0]">
+                    <div className="aspect-[4/3] w-full bg-card">
                       <img src={wish.imageUrl} alt={wish.title} className="h-full w-full object-cover" />
                     </div>
                   )}
                   <div className="p-3">
-                    <p className={cn('text-sm font-semibold text-[#2f2f2d] line-clamp-2', wish.status === 'bought' && 'line-through')}>{wish.title}</p>
-                    {wish.description && <p className="text-xs text-[#78766d] mt-0.5 line-clamp-2">{wish.description}</p>}
+                    <p className={cn('text-sm font-semibold text-foreground line-clamp-2', wish.status === 'bought' && 'line-through')}>{wish.title}</p>
+                    {wish.description && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{wish.description}</p>}
                     <div className="flex items-center gap-1.5 mt-1">
-                      {wish.priceEstimate && <span className="text-sm font-bold text-[#2f2f2d]">{formatCurrency(wish.priceEstimate)}</span>}
+                      {wish.priceEstimate && <span className="text-sm font-bold text-foreground">{formatCurrency(wish.priceEstimate)}</span>}
                     </div>
                     {child && <Badge variant="outline" className="text-[10px] mt-1">{child.name}</Badge>}
-                    {addedByUser && <p className="text-[10px] text-[#a09e96] mt-0.5">Tilføjet af {addedByUser.name?.split(' ')[0]}</p>}
-                    <div className="flex items-center gap-0.5 mt-2 border-t border-[#e8e7e0] pt-2">
+                    {addedByUser && <p className="text-[10px] text-muted-foreground mt-0.5">Tilføjet af {addedByUser.name?.split(' ')[0]}</p>}
+                    <div className="flex items-center gap-0.5 mt-2 border-t border-border pt-2">
                       {wish.link && (
                         <Button variant="ghost" size="icon" className="h-7 w-7 text-[#1e88e5]" onClick={() => window.open(wish.link, '_blank')}>
                           <ArrowRightLeft className="h-3.5 w-3.5" />
@@ -1385,7 +1385,7 @@ export function Expenses() {
           }}
         />
         <div className="relative z-[1] pt-4">
-          <div className="space-y-2 rounded-2xl bg-white p-4 border border-[#e8e7e0]">
+          <div className="space-y-2 rounded-2xl bg-card p-4 border border-border">
             <div className="space-y-2">
               <Label>Hvad er der betalt for?</Label>
               <Input
@@ -1427,14 +1427,14 @@ export function Expenses() {
                     className={cn(
                       'flex items-center gap-2 rounded-[8px] border p-2.5 text-left transition-colors',
                       newExpense.category === category.value
-                        ? 'border-[#f3c59d] bg-[#fff2e6]'
-                        : 'border-[#d8d7cf] bg-[#faf9f6] hover:bg-[#f2f1ec]'
+                        ? 'border-orange-tint bg-orange-tint'
+                        : 'border-border bg-card hover:bg-background'
                     )}
                   >
                     <div className={cn('rounded-lg p-1.5', category.color)}>
                       <category.icon className="h-4 w-4" />
                     </div>
-                    <span className="text-sm font-medium text-[#35342f]">{category.label}</span>
+                    <span className="text-sm font-medium text-foreground">{category.label}</span>
                   </button>
                 ))}
               </div>
@@ -1471,10 +1471,10 @@ export function Expenses() {
             ) : null}
 
             {(splitMode === 'amount' || splitMode === 'percentage') ? (
-              <div className="space-y-2 rounded-[8px] border border-[#dfddd6] bg-[#faf9f6] p-3">
+              <div className="space-y-2 rounded-[8px] border border-border bg-card p-3">
                 {parentUsers.map((user) => (
                   <div key={user.id} className="grid grid-cols-[1fr_120px] items-center gap-2">
-                    <p className="text-sm text-[#47443d]">{user.name}</p>
+                    <p className="text-sm text-foreground">{user.name}</p>
                     <Input
                       type="number"
                       value={customShares[user.id] || ''}
@@ -1486,7 +1486,7 @@ export function Expenses() {
                     />
                   </div>
                 ))}
-                <p className="text-xs text-[#75736b]">
+                <p className="text-xs text-muted-foreground">
                   {splitMode === 'percentage'
                     ? 'Procenter skal tilsammen være 100.'
                     : 'Beløb skal tilsammen være lig totalbeløbet.'}
@@ -1515,14 +1515,14 @@ export function Expenses() {
                 placeholder="https://..."
               />
               {shouldAutoArchiveReceipts && (
-                <p className="text-xs text-[#75736b]">
+                <p className="text-xs text-muted-foreground">
                   Kvitteringer bliver automatisk gemt i dokumentation.
                 </p>
               )}
             </div>
 
-            <div className="grid grid-cols-1 gap-3 rounded-[8px] border border-[#dfddd6] bg-[#faf9f6] p-4">
-              <label className="flex min-h-[44px] items-center gap-3 text-base text-[#47443d]">
+            <div className="grid grid-cols-1 gap-3 rounded-[8px] border border-border bg-card p-4">
+              <label className="flex min-h-[44px] items-center gap-3 text-base text-foreground">
                 <Checkbox
                   className="h-5 w-5"
                   checked={newExpense.isUnexpected}
@@ -1531,7 +1531,7 @@ export function Expenses() {
                 Uventet udgift
               </label>
 
-              <label className="flex min-h-[44px] items-center gap-3 text-base text-[#47443d]">
+              <label className="flex min-h-[44px] items-center gap-3 text-base text-foreground">
                 <Checkbox
                   className="h-5 w-5"
                   checked={newExpense.isRecurring}
@@ -1611,7 +1611,7 @@ export function Expenses() {
           </p>
         </div>
 
-        <Button variant="outline" className="w-full border-[#d8d7cf] bg-white" onClick={() => setShowAddExpenseForm(true)}>
+        <Button variant="outline" className="w-full border-border bg-card" onClick={() => setShowAddExpenseForm(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Tilføj udgift
         </Button>
@@ -1623,7 +1623,7 @@ export function Expenses() {
         <button
           type="button"
           onClick={() => setPeriodYear(y => y - 1)}
-          className="flex h-9 w-9 shrink-0 items-center justify-center text-[#5f5d56] hover:text-[#2f2f2d] transition-colors"
+          className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
@@ -1633,8 +1633,8 @@ export function Expenses() {
           className={cn(
             'h-9 shrink-0 px-2.5 text-sm font-semibold transition-colors rounded-[8px]',
             periodMonth === null
-              ? 'text-[#b96424] bg-[#fff2e6]'
-              : 'text-[#4a4945] hover:text-[#2f2f2d]'
+              ? 'text-[#b96424] bg-orange-tint'
+              : 'text-foreground hover:text-foreground'
           )}
         >
           {periodYear}
@@ -1649,7 +1649,7 @@ export function Expenses() {
                 'shrink-0 rounded-[8px] px-2.5 py-1.5 text-sm font-medium transition-colors',
                 periodMonth === i
                   ? 'bg-[#f58a2d] text-white'
-                  : 'text-[#78766d] hover:bg-[#ecebe5]'
+                  : 'text-muted-foreground hover:bg-secondary'
               )}
             >
               {m}
@@ -1661,7 +1661,7 @@ export function Expenses() {
           onClick={() => setShowStats(!showStats)}
           className={cn(
             'flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] transition-colors',
-            showStats ? 'text-[#f58a2d]' : 'text-[#78766d] hover:text-[#2f2f2d]'
+            showStats ? 'text-[#f58a2d]' : 'text-muted-foreground hover:text-foreground'
           )}
         >
           <BarChart3 className="h-5 w-5" />
@@ -1669,7 +1669,7 @@ export function Expenses() {
         <button
           type="button"
           onClick={() => setPeriodYear(y => y + 1)}
-          className="flex h-9 w-9 shrink-0 items-center justify-center text-[#5f5d56] hover:text-[#2f2f2d] transition-colors"
+          className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
         >
           <ChevronRight className="h-5 w-5" />
         </button>
@@ -1677,10 +1677,10 @@ export function Expenses() {
 
       {/* Period total */}
       <div className="flex items-center justify-between px-1 py-1">
-        <span className="text-sm text-[#78766d]">
+        <span className="text-sm text-muted-foreground">
           {periodMonth !== null ? `${danishMonthsFull[periodMonth]} ${periodYear}` : `Hele ${periodYear}`}
         </span>
-        <span className="text-sm font-semibold text-[#2f2f2d]">
+        <span className="text-sm font-semibold text-foreground">
           {formatCurrency(filteredExpenses.reduce((s, e) => s + e.amount, 0))}
         </span>
       </div>
@@ -1693,14 +1693,14 @@ export function Expenses() {
           className="space-y-2"
         >
           {expenses.length === 0 ? (
-            <div className="py-10 text-center text-[#75736b]">
-              <Receipt className="mx-auto mb-3 h-10 w-10 text-[#c5c3bb]" />
+            <div className="py-10 text-center text-muted-foreground">
+              <Receipt className="mx-auto mb-3 h-10 w-10 text-muted-foreground" />
               Ingen udgifter at vise statistik for
             </div>
           ) : (
             <>
-              <div className="rounded-[8px] border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-                <p className="mb-3 text-[0.95rem] font-semibold tracking-[-0.01em] text-[#2f2f2d]">Månedlig udgift (6 mdr.)</p>
+              <div className="rounded-[8px] border border-border bg-card px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+                <p className="mb-3 text-[0.95rem] font-semibold tracking-[-0.01em] text-foreground">Månedlig udgift (6 mdr.)</p>
                 <ResponsiveContainer width="100%" height={180}>
                   <BarChart data={monthlyStats} margin={{ top: 4, right: 4, left: -16, bottom: 0 }}>
                     <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#78766d' }} axisLine={false} tickLine={false} />
@@ -1718,10 +1718,10 @@ export function Expenses() {
                 </ResponsiveContainer>
               </div>
 
-              <div className="rounded-[8px] border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-                <p className="mb-3 text-[0.95rem] font-semibold tracking-[-0.01em] text-[#2f2f2d]">Udgifter pr. kategori</p>
+              <div className="rounded-[8px] border border-border bg-card px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+                <p className="mb-3 text-[0.95rem] font-semibold tracking-[-0.01em] text-foreground">Udgifter pr. kategori</p>
                 {categoryStats.length === 0 ? (
-                  <p className="text-sm text-[#78766d]">Ingen kategoriserede udgifter</p>
+                  <p className="text-sm text-muted-foreground">Ingen kategoriserede udgifter</p>
                 ) : (
                   <div className="space-y-2.5">
                     {categoryStats.map(cat => {
@@ -1730,10 +1730,10 @@ export function Expenses() {
                       return (
                         <div key={cat.name}>
                           <div className="flex items-center justify-between text-[12px]">
-                            <span className="font-medium text-[#3f3e3a]">{cat.name}</span>
-                            <span className="font-semibold text-[#2f2f2d]">{cat.total.toFixed(0)} kr</span>
+                            <span className="font-medium text-foreground">{cat.name}</span>
+                            <span className="font-semibold text-foreground">{cat.total.toFixed(0)} kr</span>
                           </div>
-                          <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-[#ecebe5]">
+                          <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
                             <div className="h-full rounded-full bg-[#f58a2d] transition-all" style={{ width: `${pct}%` }} />
                           </div>
                         </div>
@@ -1743,8 +1743,8 @@ export function Expenses() {
                 )}
               </div>
 
-              <div className="rounded-[8px] border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-                <p className="mb-3 text-[0.95rem] font-semibold tracking-[-0.01em] text-[#2f2f2d]">Betalt pr. forælder</p>
+              <div className="rounded-[8px] border border-border bg-card px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+                <p className="mb-3 text-[0.95rem] font-semibold tracking-[-0.01em] text-foreground">Betalt pr. forælder</p>
                 <div className="space-y-2">
                   {parentUsers.map(u => {
                     const paid = expenses.filter(e => e.paidBy === u.id).reduce((s, e) => s + e.amount, 0);
@@ -1753,11 +1753,11 @@ export function Expenses() {
                     return (
                       <div key={u.id}>
                         <div className="flex items-center justify-between text-[12px]">
-                          <span className="font-medium text-[#3f3e3a]">{u.name}</span>
-                          <span className="font-semibold text-[#2f2f2d]">{paid.toFixed(0)} kr ({pct.toFixed(0)}%)</span>
+                          <span className="font-medium text-foreground">{u.name}</span>
+                          <span className="font-semibold text-foreground">{paid.toFixed(0)} kr ({pct.toFixed(0)}%)</span>
                         </div>
-                        <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-[#ecebe5]">
-                          <div className="h-full rounded-full bg-[#2f2f2f] transition-all" style={{ width: `${pct}%` }} />
+                        <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+                          <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} />
                         </div>
                       </div>
                     );
@@ -1779,8 +1779,8 @@ export function Expenses() {
         >
           <AnimatePresence>
             {filteredExpenses.length === 0 ? (
-              <div className="py-8 text-center text-[#75736b]">
-                <Receipt className="mx-auto mb-3 h-11 w-11 text-[#c5c3bb]" />
+              <div className="py-8 text-center text-muted-foreground">
+                <Receipt className="mx-auto mb-3 h-11 w-11 text-muted-foreground" />
                 Ingen udgifter i denne periode
               </div>
             ) : (
@@ -1803,22 +1803,22 @@ export function Expenses() {
                     >
                       <Card
                         className={cn(
-                          'border-[#d8d7cf] cursor-pointer transition-colors hover:border-[#c5c3bb]',
-                          expense.status === 'disputed' && 'border-[#e6b894] bg-[#fff6ef]'
+                          'border-border cursor-pointer transition-colors hover:border-border',
+                          expense.status === 'disputed' && 'border-[#e6b894] bg-orange-tint-light'
                         )}
                         onClick={() => setDetailExpenseId(expense.id)}
                       >
                         <CardContent className="p-4">
                           <div className="flex items-center gap-3">
-                            <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', category?.color || 'bg-[#eceae2] text-[#4f4b43]')}>
+                            <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', category?.color || 'bg-secondary text-foreground')}>
                               {category ? <category.icon className="h-5 w-5" /> : <Receipt className="h-5 w-5" />}
                             </div>
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center justify-between gap-2">
-                                <p className="truncate font-semibold text-[#2f2f2d]">{expense.title}</p>
-                                <p className="shrink-0 font-semibold text-[#2f2f2d]">{formatCurrency(expense.amount)}</p>
+                                <p className="truncate font-semibold text-foreground">{expense.title}</p>
+                                <p className="shrink-0 font-semibold text-foreground">{formatCurrency(expense.amount)}</p>
                               </div>
-                              <div className="flex items-center gap-2 text-xs text-[#78766d]">
+                              <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                 <span>{formatDate(expense.date)}</span>
                                 <span>·</span>
                                 <span>{paidByUser?.name}</span>
@@ -1831,18 +1831,18 @@ export function Expenses() {
                               </div>
                             </div>
                             {needsApproval && (
-                              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#fff2e6]">
+                              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-tint">
                                 <AlertCircle className="h-3.5 w-3.5 text-[#f58a2d]" />
                               </div>
                             )}
                             {expense.status === 'disputed' && (
-                              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#fff2e6]">
+                              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-tint">
                                 <TriangleAlert className="h-3.5 w-3.5 text-[#b96424]" />
                               </div>
                             )}
                             {expense.status === 'paid' && (
-                              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#eceae2]">
-                                <CheckCircle2 className="h-3.5 w-3.5 text-[#4f4b43]" />
+                              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-secondary">
+                                <CheckCircle2 className="h-3.5 w-3.5 text-foreground" />
                               </div>
                             )}
                           </div>
@@ -1862,7 +1862,7 @@ export function Expenses() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card className="border-[#d8d7cf]">
+          <Card className="border-border">
             <CardHeader className="pb-2">
               <CardTitle className="text-base">Seneste betalinger</CardTitle>
             </CardHeader>
@@ -1872,14 +1872,14 @@ export function Expenses() {
                 const toUser = users.find((user) => user.id === transfer.toUserId);
 
                 return (
-                  <div key={transfer.id} className="rounded-[8px] border border-[#e0ded7] bg-[#faf9f6] p-2.5">
+                  <div key={transfer.id} className="rounded-[8px] border border-border bg-card p-2.5">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="text-sm font-medium text-[#2f2f2d]">
+                      <p className="text-sm font-medium text-foreground">
                         {fromUser?.name} → {toUser?.name}
                       </p>
                       <Badge variant="outline">{formatCurrency(transfer.amount)}</Badge>
                     </div>
-                    <p className="mt-1 text-xs text-[#75736b]">
+                    <p className="mt-1 text-xs text-muted-foreground">
                       {transfer.status === 'requested' && 'Anmodet'}
                       {transfer.status === 'sent' && 'Sendt'}
                       {transfer.status === 'completed' && 'Gennemført'}
@@ -1887,7 +1887,7 @@ export function Expenses() {
                       {' · '}
                       {formatDate(transfer.createdAt)}
                     </p>
-                    {transfer.note && <p className="mt-0.5 text-xs text-[#75736b]">{transfer.note}</p>}
+                    {transfer.note && <p className="mt-0.5 text-xs text-muted-foreground">{transfer.note}</p>}
                   </div>
                 );
               })}
@@ -1906,7 +1906,7 @@ export function Expenses() {
         >
           <Button
             variant="outline"
-            className="flex-1 h-11 rounded-[8px] border-[#d8d7cf] bg-[#f8f7f3] text-sm font-medium text-[#4a4945] hover:bg-[#efeee9]"
+            className="flex-1 h-11 rounded-[8px] border-border bg-card text-sm font-medium text-foreground hover:bg-secondary"
             onClick={() => exportExpensesCSV(filteredExpenses, users)}
           >
             <Download className="mr-2 h-4 w-4" />
@@ -1914,7 +1914,7 @@ export function Expenses() {
           </Button>
           <Button
             variant="outline"
-            className="flex-1 h-11 rounded-[8px] border-[#d8d7cf] bg-[#f8f7f3] text-sm font-medium text-[#4a4945] hover:bg-[#efeee9]"
+            className="flex-1 h-11 rounded-[8px] border-border bg-card text-sm font-medium text-foreground hover:bg-secondary"
             onClick={() => printExpenses(filteredExpenses, users)}
           >
             <Printer className="mr-2 h-4 w-4" />
@@ -1925,7 +1925,7 @@ export function Expenses() {
 
       {/* Expense detail Sheet */}
       <Sheet open={!!detailExpense} onOpenChange={(open) => { if (!open) setDetailExpenseId(null); }}>
-        <SheetContent side="bottom" className="rounded-t-[28px] bg-[#faf9f6] max-h-[85vh] overflow-y-auto">
+        <SheetContent side="bottom" className="rounded-t-[28px] bg-card max-h-[85vh] overflow-y-auto">
           {detailExpense && (() => {
             const cat = expenseCategories.find(c => c.value === detailExpense.category);
             const paidBy = users.find(u => u.id === detailExpense.paidBy);
@@ -1936,17 +1936,17 @@ export function Expenses() {
             return (
               <>
                 <SheetHeader className="pb-2">
-                  <SheetTitle className="text-left text-lg font-bold text-[#2f2f2d]">{detailExpense.title}</SheetTitle>
+                  <SheetTitle className="text-left text-lg font-bold text-foreground">{detailExpense.title}</SheetTitle>
                 </SheetHeader>
                 <div className="space-y-2 px-4 pb-8">
                   {/* Amount + category header */}
                   <div className="flex items-center gap-3">
-                    <div className={cn('flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl', cat?.color || 'bg-[#eceae2] text-[#4f4b43]')}>
+                    <div className={cn('flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl', cat?.color || 'bg-secondary text-foreground')}>
                       {cat ? <cat.icon className="h-6 w-6" /> : <Receipt className="h-6 w-6" />}
                     </div>
                     <div className="flex-1">
-                      <p className="text-2xl font-bold text-[#2f2f2d]">{formatCurrency(detailExpense.amount)}</p>
-                      <div className="flex items-center gap-2 text-sm text-[#78766d]">
+                      <p className="text-2xl font-bold text-foreground">{formatCurrency(detailExpense.amount)}</p>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <span>{cat?.label || detailExpense.category}</span>
                         <span>·</span>
                         <span>{formatDate(detailExpense.date)}</span>
@@ -1955,9 +1955,9 @@ export function Expenses() {
                     <Badge
                       className={cn(
                         'shrink-0',
-                        detailExpense.status === 'pending' && 'bg-[#fff2e6] text-[#b96424]',
-                        detailExpense.status === 'paid' && 'bg-[#eceae2] text-[#4f4b43]',
-                        detailExpense.status === 'disputed' && 'bg-[#fff2e6] text-[#b55f22]'
+                        detailExpense.status === 'pending' && 'bg-orange-tint text-[#b96424]',
+                        detailExpense.status === 'paid' && 'bg-secondary text-foreground',
+                        detailExpense.status === 'disputed' && 'bg-orange-tint text-[#b55f22]'
                       )}
                     >
                       {detailExpense.status === 'pending' ? 'Afventer' : detailExpense.status === 'paid' ? 'Godkendt' : 'Anfægtet'}
@@ -1965,47 +1965,47 @@ export function Expenses() {
                   </div>
 
                   {detailExpense.description && (
-                    <p className="text-sm text-[#5f5d56]">{detailExpense.description}</p>
+                    <p className="text-sm text-muted-foreground">{detailExpense.description}</p>
                   )}
 
                   {/* Payment info */}
-                  <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-4 space-y-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-[#9b9a93]">Betalingsdetaljer</p>
+                  <div className="rounded-[8px] border border-border bg-card p-4 space-y-2">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Betalingsdetaljer</p>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-[#78766d]">Betalt af</span>
+                      <span className="text-sm text-muted-foreground">Betalt af</span>
                       <div className="flex items-center gap-2">
                         <Avatar className="h-6 w-6">
                           <AvatarImage src={paidBy?.avatar} />
                           <AvatarFallback className="text-[10px]">{paidBy?.name?.[0]}</AvatarFallback>
                         </Avatar>
-                        <span className="text-sm font-medium text-[#2f2f2d]">{paidBy?.name}</span>
+                        <span className="text-sm font-medium text-foreground">{paidBy?.name}</span>
                       </div>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-[#78766d]">Fordelingstype</span>
-                      <span className="text-sm font-medium text-[#2f2f2d]">
+                      <span className="text-sm text-muted-foreground">Fordelingstype</span>
+                      <span className="text-sm font-medium text-foreground">
                         {detailExpense.splitType === 'equal' ? 'Lige fordeling' : detailExpense.splitType === 'percentage' ? 'Procentvis' : 'Fast beløb'}
                       </span>
                     </div>
                     {detailExpense.isRecurring && (
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-[#78766d]">Gentagelse</span>
-                        <span className="text-sm font-medium text-[#2f2f2d]">
+                        <span className="text-sm text-muted-foreground">Gentagelse</span>
+                        <span className="text-sm font-medium text-foreground">
                           {detailExpense.recurringInterval === 'weekly' ? 'Ugentlig' : detailExpense.recurringInterval === 'monthly' ? 'Månedlig' : 'Årlig'}
                         </span>
                       </div>
                     )}
                     {detailExpense.isRecurring && detailExpense.nextDueDate && (
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-[#78766d]">Næste betaling</span>
-                        <span className="text-sm font-medium text-[#2f2f2d]">{formatDate(detailExpense.nextDueDate)}</span>
+                        <span className="text-sm text-muted-foreground">Næste betaling</span>
+                        <span className="text-sm font-medium text-foreground">{formatDate(detailExpense.nextDueDate)}</span>
                       </div>
                     )}
                   </div>
 
                   {/* Split breakdown */}
-                  <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-4 space-y-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-[#9b9a93]">Fordeling</p>
+                  <div className="rounded-[8px] border border-border bg-card p-4 space-y-2">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Fordeling</p>
                     {Object.entries(detailExpense.splitAmounts).map(([userId, amount]) => {
                       const user = users.find(u => u.id === userId);
                       const pct = detailExpense.amount > 0 ? ((amount / detailExpense.amount) * 100).toFixed(0) : '0';
@@ -2016,11 +2016,11 @@ export function Expenses() {
                               <AvatarImage src={user?.avatar} />
                               <AvatarFallback className="text-[10px]">{user?.name?.[0]}</AvatarFallback>
                             </Avatar>
-                            <span className="text-sm text-[#2f2f2d]">{user?.name}</span>
+                            <span className="text-sm text-foreground">{user?.name}</span>
                           </div>
                           <div className="text-right">
-                            <span className="text-sm font-semibold text-[#2f2f2d]">{formatCurrency(amount)}</span>
-                            <span className="ml-1.5 text-xs text-[#9b9a93]">({pct}%)</span>
+                            <span className="text-sm font-semibold text-foreground">{formatCurrency(amount)}</span>
+                            <span className="ml-1.5 text-xs text-muted-foreground">({pct}%)</span>
                           </div>
                         </div>
                       );
@@ -2029,18 +2029,18 @@ export function Expenses() {
 
                   {/* Linked transfer info */}
                   {linkedTransfer && (
-                    <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-4 space-y-2">
-                      <p className="text-xs font-semibold uppercase tracking-wide text-[#9b9a93]">Betalingsstatus</p>
+                    <div className="rounded-[8px] border border-border bg-card p-4 space-y-2">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Betalingsstatus</p>
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-[#78766d]">Status</span>
+                        <span className="text-sm text-muted-foreground">Status</span>
                         <Badge variant="outline">
                           {linkedTransfer.status === 'requested' ? 'Anmodet' : linkedTransfer.status === 'sent' ? 'Sendt' : linkedTransfer.status === 'completed' ? 'Gennemført' : 'Afvist'}
                         </Badge>
                       </div>
                       {linkedTransfer.completedAt && (
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-[#78766d]">Betalt</span>
-                          <span className="text-sm font-medium text-[#2f2f2d]">{formatDate(linkedTransfer.completedAt)}</span>
+                          <span className="text-sm text-muted-foreground">Betalt</span>
+                          <span className="text-sm font-medium text-foreground">{formatDate(linkedTransfer.completedAt)}</span>
                         </div>
                       )}
                     </div>
@@ -2051,7 +2051,7 @@ export function Expenses() {
                       href={detailExpense.receiptUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="block rounded-[8px] border border-[#e8e7e0] bg-white p-3 text-center text-sm font-medium text-[#b96424]"
+                      className="block rounded-[8px] border border-border bg-card p-3 text-center text-sm font-medium text-[#b96424]"
                     >
                       Åbn kvittering
                     </a>
@@ -2094,7 +2094,7 @@ export function Expenses() {
             <DialogTitle>Anfægt udgift</DialogTitle>
           </DialogHeader>
           <div className="space-y-2 pt-2">
-            <p className="text-sm text-[#75736b]">Beskriv hvorfor du anfægter denne udgift. Den anden forælder vil se din begrundelse.</p>
+            <p className="text-sm text-muted-foreground">Beskriv hvorfor du anfægter denne udgift. Den anden forælder vil se din begrundelse.</p>
             <div className="space-y-1.5">
               <Label htmlFor="dispute-reason">Begrundelse</Label>
               <Textarea
@@ -2124,7 +2124,7 @@ export function Expenses() {
             <DialogTitle>Løs tvist</DialogTitle>
           </DialogHeader>
           <div className="space-y-2 pt-2">
-            <p className="text-sm text-[#75736b]">Beskriv hvordan tvisten løses. Udgiften vil blive markeret som godkendt.</p>
+            <p className="text-sm text-muted-foreground">Beskriv hvordan tvisten løses. Udgiften vil blive markeret som godkendt.</p>
             <div className="space-y-1.5">
               <Label htmlFor="resolve-note">Løsning</Label>
               <Textarea

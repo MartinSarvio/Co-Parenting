@@ -106,12 +106,12 @@ export function SelectSheet({
         disabled={disabled}
         onClick={handleOpen}
         className={cn(
-          'flex w-full items-center justify-between gap-2 rounded-[8px] border border-[#d7d6ce] bg-[#f8f7f3] px-3 py-2 text-sm whitespace-nowrap shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] transition-[color,box-shadow,border-color] outline-none disabled:cursor-not-allowed disabled:opacity-50',
+          'flex w-full items-center justify-between gap-2 rounded-[8px] border border-border bg-card px-3 py-2 text-sm whitespace-nowrap shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] transition-[color,box-shadow,border-color] outline-none disabled:cursor-not-allowed disabled:opacity-50',
           size === 'default' ? 'h-11' : 'h-9',
           className,
         )}
       >
-        <span className={cn('truncate', !selectedOption && 'text-[#9a978f]')}>
+        <span className={cn('truncate', !selectedOption && 'text-muted-foreground')}>
           {selectedOption ? (
             <span className="flex items-center gap-2">
               {selectedOption.icon}
@@ -140,14 +140,14 @@ export function SelectSheet({
 
               {/* Floating card — anchored to trigger */}
               <motion.div
-                className="overflow-hidden rounded-xl bg-white border border-[#e5e3dc] shadow-xl"
+                className="overflow-hidden rounded-xl bg-card border border-border shadow-xl"
                 style={cardStyle}
                 initial={{ opacity: 0, y: openAbove ? -8 : 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: openAbove ? -8 : 8 }}
               >
                 {/* Title */}
-                <p className="px-4 pt-3.5 pb-2 text-[13px] font-semibold text-[#78766d]">
+                <p className="px-4 pt-3.5 pb-2 text-[13px] font-semibold text-muted-foreground">
                   {title}
                 </p>
 
@@ -162,8 +162,8 @@ export function SelectSheet({
                         className={cn(
                           'flex w-full items-center justify-between px-4 py-3 text-left transition-colors',
                           isSelected
-                            ? 'bg-[#faf9f6]'
-                            : 'hover:bg-[#faf9f6] active:bg-[#faf9f6]',
+                            ? 'bg-card'
+                            : 'hover:bg-card active:bg-card',
                         )}
                         onClick={() => {
                           onValueChange(option.value);
@@ -172,7 +172,7 @@ export function SelectSheet({
                       >
                         <span className="flex items-center gap-3">
                           {option.icon}
-                          <span className="text-[14px] font-semibold text-[#2f2f2d]">
+                          <span className="text-[14px] font-semibold text-foreground">
                             {option.label}
                           </span>
                         </span>

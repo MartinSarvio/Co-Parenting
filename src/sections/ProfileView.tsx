@@ -93,7 +93,7 @@ export function ProfileView() {
   if (!profile) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="text-[14px] text-[#9a978f]">Profil ikke fundet</p>
+        <p className="text-[14px] text-muted-foreground">Profil ikke fundet</p>
       </div>
     );
   }
@@ -101,43 +101,43 @@ export function ProfileView() {
   return (
     <div className="-mx-3 sm:-mx-4">
       {/* Profile header */}
-      <div className="bg-white px-4 py-8 flex flex-col items-center gap-3">
+      <div className="bg-card px-4 py-8 flex flex-col items-center gap-3">
         <Avatar className="h-20 w-20">
           <AvatarImage src={profile.avatar} />
-          <AvatarFallback className="bg-[#eceae2] text-[#5f5d56] text-2xl font-bold">
+          <AvatarFallback className="bg-secondary text-muted-foreground text-2xl font-bold">
             {profile.name[0]}
           </AvatarFallback>
         </Avatar>
-        <h2 className="text-[20px] font-bold text-[#2f2f2d]">{profile.name}</h2>
+        <h2 className="text-[20px] font-bold text-foreground">{profile.name}</h2>
         {profile.bio && (
-          <p className="text-[14px] text-[#5f5d56] text-center leading-relaxed max-w-[280px]">{profile.bio}</p>
+          <p className="text-[14px] text-muted-foreground text-center leading-relaxed max-w-[280px]">{profile.bio}</p>
         )}
       </div>
 
       {/* Contact info */}
-      <div className="mt-[6px] bg-white">
-        <p className="text-[12px] font-semibold text-[#9a978f] uppercase tracking-wider px-4 pt-3 pb-1.5">Kontaktinfo</p>
+      <div className="mt-[6px] bg-card">
+        <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider px-4 pt-3 pb-1.5">Kontaktinfo</p>
 
         {profile.showEmail && profile.email && (
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-[#f0efea]">
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
             <div className="w-8 h-8 rounded-full bg-[#f58a2d]/10 flex items-center justify-center shrink-0">
               <Mail className="h-4 w-4 text-[#f58a2d]" />
             </div>
             <div>
-              <p className="text-[11px] text-[#9a978f]">Email</p>
-              <p className="text-[14px] text-[#2f2f2d]">{profile.email}</p>
+              <p className="text-[11px] text-muted-foreground">Email</p>
+              <p className="text-[14px] text-foreground">{profile.email}</p>
             </div>
           </div>
         )}
 
         {profile.showPhone && profile.phone && (
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-[#f0efea]">
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
             <div className="w-8 h-8 rounded-full bg-[#f58a2d]/10 flex items-center justify-center shrink-0">
               <Phone className="h-4 w-4 text-[#f58a2d]" />
             </div>
             <div>
-              <p className="text-[11px] text-[#9a978f]">Telefon</p>
-              <p className="text-[14px] text-[#2f2f2d]">{profile.phone}</p>
+              <p className="text-[11px] text-muted-foreground">Telefon</p>
+              <p className="text-[14px] text-foreground">{profile.phone}</p>
             </div>
           </div>
         )}
@@ -148,14 +148,14 @@ export function ProfileView() {
               <MapPin className="h-4 w-4 text-[#f58a2d]" />
             </div>
             <div>
-              <p className="text-[11px] text-[#9a978f]">By</p>
-              <p className="text-[14px] text-[#2f2f2d]">{profile.city}</p>
+              <p className="text-[11px] text-muted-foreground">By</p>
+              <p className="text-[14px] text-foreground">{profile.city}</p>
             </div>
           </div>
         )}
 
         {!profile.showEmail && !profile.showPhone && !profile.showAddress && (
-          <p className="px-4 py-4 text-[13px] text-[#9a978f] text-center">
+          <p className="px-4 py-4 text-[13px] text-muted-foreground text-center">
             Denne bruger deler ikke kontaktoplysninger
           </p>
         )}
@@ -163,10 +163,10 @@ export function ProfileView() {
 
       {/* Edit profile button (own profile only) */}
       {isOwnProfile && (
-        <div className="mt-[6px] bg-white px-4 py-4">
+        <div className="mt-[6px] bg-card px-4 py-4">
           <button
             onClick={() => setActiveTab('settings')}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-[#e5e3dc] text-[14px] font-semibold text-[#5f5d56] hover:bg-[#f5f4f0] transition-colors"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-border text-[14px] font-semibold text-muted-foreground hover:bg-card transition-colors"
           >
             <Settings className="h-4 w-4" />
             Rediger profil

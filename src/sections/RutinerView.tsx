@@ -128,18 +128,18 @@ export function RutinerView() {
         <OverblikSidePanel />
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Rutiner</h1>
-            {child && <p className="text-[13px] text-[#78766d]">{child.name}</p>}
+            <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-foreground">Rutiner</h1>
+            {child && <p className="text-[13px] text-muted-foreground">{child.name}</p>}
           </div>
         </div>
-        <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-[#d0cec5] bg-[#faf9f6] py-16 text-center">
-          <ListChecks className="h-10 w-10 text-[#c8c6bc]" />
+        <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-border bg-card py-16 text-center">
+          <ListChecks className="h-10 w-10 text-muted-foreground" />
           <div>
-            <p className="text-sm font-semibold text-[#3f3e3a]">Ingen rutiner opsat endnu</p>
-            <p className="mt-1 text-[12px] text-[#78766d]">Opsæt morgen-, dags- og aftenrutiner for {child?.name ?? 'dit barn'}</p>
+            <p className="text-sm font-semibold text-foreground">Ingen rutiner opsat endnu</p>
+            <p className="mt-1 text-[12px] text-muted-foreground">Opsæt morgen-, dags- og aftenrutiner for {child?.name ?? 'dit barn'}</p>
           </div>
           <Button
-            className="mt-1 h-9 rounded-[4px] bg-[#2f2f2f] px-6 text-sm text-white hover:bg-[#1a1a1a]"
+            className="mt-1 h-9 rounded-[4px] bg-primary px-6 text-sm text-white hover:bg-primary"
             onClick={() => setSetupOpen(true)}
           >
             Opsæt rutiner
@@ -157,19 +157,19 @@ export function RutinerView() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Rutiner</h1>
-          {child && <p className="text-[13px] text-[#78766d]">{child.name}</p>}
+          <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-foreground">Rutiner</h1>
+          {child && <p className="text-[13px] text-muted-foreground">{child.name}</p>}
         </div>
         <div className="flex items-center gap-1">
           <button
             onClick={() => setNotifOpen(true)}
-            className="rounded-full p-2 text-[#78766d] hover:bg-[#f2f1ed] transition-colors"
+            className="rounded-full p-2 text-muted-foreground hover:bg-background transition-colors"
           >
             <Bell className="h-5 w-5" />
           </button>
           <button
             onClick={() => setSetupOpen(true)}
-            className="rounded-full p-2 text-[#78766d] hover:bg-[#f2f1ed] transition-colors"
+            className="rounded-full p-2 text-muted-foreground hover:bg-background transition-colors"
           >
             <Settings className="h-5 w-5" />
           </button>
@@ -177,30 +177,30 @@ export function RutinerView() {
       </div>
 
       {/* Date navigator */}
-      <div className="flex items-center justify-between rounded-[4px] border border-[#e8e7e0] bg-white px-3 py-2">
-        <button onClick={() => setSelectedDate(d => subDays(d, 1))} className="rounded-full p-1 hover:bg-[#f2f1ed]">
-          <ChevronLeft className="h-5 w-5 text-[#5f5d56]" />
+      <div className="flex items-center justify-between rounded-[4px] border border-border bg-card px-3 py-2">
+        <button onClick={() => setSelectedDate(d => subDays(d, 1))} className="rounded-full p-1 hover:bg-background">
+          <ChevronLeft className="h-5 w-5 text-muted-foreground" />
         </button>
         <button
           onClick={() => setSelectedDate(new Date())}
-          className="text-[14px] font-semibold text-[#2f2f2d]"
+          className="text-[14px] font-semibold text-foreground"
         >
           {isToday ? 'I dag' : format(selectedDate, 'EEEE d. MMM', { locale: da })}
         </button>
-        <button onClick={() => setSelectedDate(d => addDays(d, 1))} className="rounded-full p-1 hover:bg-[#f2f1ed]">
-          <ChevronRight className="h-5 w-5 text-[#5f5d56]" />
+        <button onClick={() => setSelectedDate(d => addDays(d, 1))} className="rounded-full p-1 hover:bg-background">
+          <ChevronRight className="h-5 w-5 text-muted-foreground" />
         </button>
       </div>
 
       {/* Progress bar */}
       <div className="flex items-center gap-3">
-        <div className="flex-1 h-2 rounded-full bg-[#ecebe5] overflow-hidden">
+        <div className="flex-1 h-2 rounded-full bg-secondary overflow-hidden">
           <div
             className="h-full rounded-full bg-[#4caf50] transition-all duration-300"
             style={{ width: totalItems > 0 ? `${(completedCount / totalItems) * 100}%` : '0%' }}
           />
         </div>
-        <span className="text-[12px] font-semibold text-[#78766d]">{completedCount}/{totalItems}</span>
+        <span className="text-[12px] font-semibold text-muted-foreground">{completedCount}/{totalItems}</span>
       </div>
 
       {/* Routine categories */}
@@ -213,7 +213,7 @@ export function RutinerView() {
         return (
           <div key={cat} className="space-y-1">
             <div className="flex items-center justify-between">
-              <h2 className="text-[13px] font-bold uppercase tracking-[0.05em] text-[#78766d]">
+              <h2 className="text-[13px] font-bold uppercase tracking-[0.05em] text-muted-foreground">
                 {CATEGORY_META[cat].emoji} {CATEGORY_META[cat].label}
               </h2>
               {allDone && (
@@ -229,8 +229,8 @@ export function RutinerView() {
                     className={cn(
                       'flex items-center gap-3 rounded-[4px] border px-4 py-3 transition-all',
                       done
-                        ? 'border-[#c8e6c9] bg-[#f1f8f1]'
-                        : 'border-[#e8e7e0] bg-white shadow-[0_1px_4px_rgba(0,0,0,0.03)]'
+                        ? 'border-[#c8e6c9] bg-green-tint'
+                        : 'border-border bg-card shadow-[0_1px_4px_rgba(0,0,0,0.03)]'
                     )}
                   >
                     <button
@@ -240,7 +240,7 @@ export function RutinerView() {
                       {done ? (
                         <CheckCircle2 className="h-6 w-6 text-[#4caf50]" />
                       ) : (
-                        <Circle className="h-6 w-6 text-[#c8c6bc]" />
+                        <Circle className="h-6 w-6 text-muted-foreground" />
                       )}
                     </button>
                     <button
@@ -251,13 +251,13 @@ export function RutinerView() {
                         <span className="text-[15px]">{item.emoji}</span>
                         <span className={cn(
                           'text-[14px] font-medium',
-                          done ? 'text-[#78766d] line-through' : 'text-[#2f2f2d]'
+                          done ? 'text-muted-foreground line-through' : 'text-foreground'
                         )}>
                           {item.label}
                         </span>
                       </div>
                       {log?.time && (
-                        <p className="mt-0.5 text-[11px] text-[#9b9a93]">
+                        <p className="mt-0.5 text-[11px] text-muted-foreground">
                           Kl. {log.time}
                           {log.note && ` — ${log.note}`}
                         </p>
@@ -274,7 +274,7 @@ export function RutinerView() {
       {/* Share button */}
       <Button
         variant="outline"
-        className="w-full rounded-[4px] border-[#d8d7cf] text-[13px] text-[#5f5d56]"
+        className="w-full rounded-[4px] border-border text-[13px] text-muted-foreground"
         onClick={handleShare}
       >
         <Share2 className="mr-2 h-4 w-4" />

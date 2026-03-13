@@ -122,24 +122,24 @@ export function NyhederAdminView() {
     <div className="space-y-3 pb-8">
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9a978f]" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Søg nyheder..."
-          className="pl-9 rounded-[10px] border-[#e8e6df] bg-white text-[13px] h-9"
+          className="pl-9 rounded-[10px] border-border bg-card text-[13px] h-9"
         />
       </div>
 
       {/* List */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-5 w-5 animate-spin text-[#9a978f]" />
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-[10px] bg-white border border-[#e8e6df] p-6 text-center">
-          <FileText className="h-8 w-8 text-[#c5c3bb] mx-auto mb-2" />
-          <p className="text-sm text-[#78766d]">
+        <div className="rounded-[10px] bg-card border border-border p-6 text-center">
+          <FileText className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground">
             {search ? 'Ingen nyheder matcher søgningen' : 'Ingen nyheder endnu'}
           </p>
         </div>
@@ -148,7 +148,7 @@ export function NyhederAdminView() {
           {filtered.map(article => (
             <div
               key={article.id}
-              className="flex items-center gap-3 rounded-[10px] bg-white border border-[#e8e6df] p-3"
+              className="flex items-center gap-3 rounded-[10px] bg-card border border-border p-3"
             >
               {/* Thumbnail */}
               {article.image ? (
@@ -158,19 +158,19 @@ export function NyhederAdminView() {
                   className="h-10 w-10 rounded-[6px] object-cover shrink-0"
                 />
               ) : (
-                <div className="h-10 w-10 rounded-[6px] bg-[#f0efe8] flex items-center justify-center shrink-0">
-                  <FileText className="h-4 w-4 text-[#9a978f]" />
+                <div className="h-10 w-10 rounded-[6px] bg-muted flex items-center justify-center shrink-0">
+                  <FileText className="h-4 w-4 text-muted-foreground" />
                 </div>
               )}
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-medium text-[#2f2f2d] line-clamp-1">{article.title}</p>
-                <p className="text-[11px] text-[#9a978f] mt-0.5">
+                <p className="text-[13px] font-medium text-foreground line-clamp-1">{article.title}</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
                   {article.source ?? 'Ingen kilde'}
                   {article.date ? ` · ${article.date}` : ''}
                   {article.is_demo && (
-                    <span className="ml-1 inline-flex items-center rounded-full bg-[#f0efe8] px-1.5 py-0.5 text-[10px] font-medium text-[#78766d]">
+                    <span className="ml-1 inline-flex items-center rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
                       Demo
                     </span>
                   )}
@@ -192,14 +192,14 @@ export function NyhederAdminView() {
                 )}
                 <button
                   onClick={() => setEditArticle(article)}
-                  className="p-1.5 text-[#9a978f] hover:text-[#2f2f2d] transition-colors"
+                  className="p-1.5 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <Pencil className="h-3.5 w-3.5" />
                 </button>
                 {!article.is_demo && (
                   <button
                     onClick={() => setDeleteTarget(article)}
-                    className="p-1.5 text-[#9a978f] hover:text-red-500 transition-colors"
+                    className="p-1.5 text-muted-foreground hover:text-red-500 transition-colors"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -216,13 +216,13 @@ export function NyhederAdminView() {
           <DialogHeader>
             <DialogTitle className="text-base">Slet nyhed?</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-[#78766d]">
+          <p className="text-sm text-muted-foreground">
             "{deleteTarget?.title}" slettes permanent.
           </p>
           <div className="flex gap-2 mt-2">
             <button
               onClick={() => setDeleteTarget(null)}
-              className="flex-1 rounded-xl border border-[#e8e7e0] bg-white py-2.5 text-sm font-medium text-[#2f2f2d]"
+              className="flex-1 rounded-xl border border-border bg-card py-2.5 text-sm font-medium text-foreground"
             >
               Annuller
             </button>
@@ -354,22 +354,22 @@ function NewsCreatePage({
   };
 
   return (
-    <div className="fixed inset-0 z-[60] bg-[#f7f6f2] flex flex-col">
+    <div className="fixed inset-0 z-[60] bg-background flex flex-col">
       {/* Header */}
-      <div className="safe-area-pt flex items-center justify-between px-2 pb-2.5 pt-2 border-b border-[#e8e6df]">
+      <div className="safe-area-pt flex items-center justify-between px-2 pb-2.5 pt-2 border-b border-border">
         <button
           onClick={tryClose}
-          className="flex h-9 w-9 items-center justify-center text-[#30302d]"
+          className="flex h-9 w-9 items-center justify-center text-foreground"
           aria-label="Tilbage"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
-        <h1 className="text-[15px] font-semibold text-[#2f2f2d]">
+        <h1 className="text-[15px] font-semibold text-foreground">
           {article ? 'Rediger nyhed' : 'Opret nyhed'}
         </h1>
         <button
           onClick={tryClose}
-          className="flex h-9 w-9 items-center justify-center text-[#30302d]"
+          className="flex h-9 w-9 items-center justify-center text-foreground"
           aria-label="Luk"
         >
           <XIcon className="h-5 w-5" />
@@ -385,7 +385,7 @@ function NewsCreatePage({
               onClick={() => setMode('scrape')}
               className={cn(
                 'flex-1 flex items-center justify-center gap-1.5 rounded-[8px] py-2 text-[13px] font-medium transition-all',
-                mode === 'scrape' ? 'bg-white text-[#2f2f2d] shadow-sm' : 'text-[#78766d]'
+                mode === 'scrape' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
               )}
             >
               <Globe className="h-3.5 w-3.5" />
@@ -395,7 +395,7 @@ function NewsCreatePage({
               onClick={() => setMode('manual')}
               className={cn(
                 'flex-1 flex items-center justify-center gap-1.5 rounded-[8px] py-2 text-[13px] font-medium transition-all',
-                mode === 'manual' ? 'bg-white text-[#2f2f2d] shadow-sm' : 'text-[#78766d]'
+                mode === 'manual' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
               )}
             >
               <FileText className="h-3.5 w-3.5" />
@@ -406,19 +406,19 @@ function NewsCreatePage({
 
         {/* Scrape input */}
         {mode === 'scrape' && !article && (
-          <div className="rounded-[10px] bg-white border border-[#e8e6df] p-3 space-y-2">
-            <Label className="text-[12px] font-semibold text-[#5f5d56]">Artikel-URL</Label>
+          <div className="rounded-[10px] bg-card border border-border p-3 space-y-2">
+            <Label className="text-[12px] font-semibold text-muted-foreground">Artikel-URL</Label>
             <div className="flex gap-2">
               <Input
                 value={scrapeUrl}
                 onChange={e => setScrapeUrl(e.target.value)}
                 placeholder="https://..."
-                className="flex-1 rounded-[8px] border-[#e8e6df] text-[13px] h-9"
+                className="flex-1 rounded-[8px] border-border text-[13px] h-9"
               />
               <button
                 onClick={handleScrape}
                 disabled={scraping}
-                className="shrink-0 rounded-[8px] bg-[#2f2f2d] px-3 h-9 text-[13px] font-medium text-white disabled:opacity-50 flex items-center gap-1.5"
+                className="shrink-0 rounded-[8px] bg-primary px-3 h-9 text-[13px] font-medium text-white disabled:opacity-50 flex items-center gap-1.5"
               >
                 {scraping ? (
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -429,32 +429,32 @@ function NewsCreatePage({
               </button>
             </div>
             {scraping && (
-              <p className="text-[11px] text-[#9a978f]">Henter artikel-data...</p>
+              <p className="text-[11px] text-muted-foreground">Henter artikel-data...</p>
             )}
           </div>
         )}
 
         {/* Form fields */}
         <div>
-          <Label className="text-[12px] font-semibold text-[#5f5d56]">Titel *</Label>
-          <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="Nyhedens titel" className="mt-1 rounded-[8px] border-[#e8e6df] text-[13px]" />
+          <Label className="text-[12px] font-semibold text-muted-foreground">Titel *</Label>
+          <Input value={title} onChange={e => setTitle(e.target.value)} placeholder="Nyhedens titel" className="mt-1 rounded-[8px] border-border text-[13px]" />
         </div>
 
         <div>
-          <Label className="text-[12px] font-semibold text-[#5f5d56]">Beskrivelse</Label>
-          <Textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Kort beskrivelse..." className="mt-1 rounded-[8px] border-[#e8e6df] text-[13px] min-h-[60px]" />
+          <Label className="text-[12px] font-semibold text-muted-foreground">Beskrivelse</Label>
+          <Textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Kort beskrivelse..." className="mt-1 rounded-[8px] border-border text-[13px] min-h-[60px]" />
         </div>
 
         <div>
-          <Label className="text-[12px] font-semibold text-[#5f5d56]">Fuld tekst</Label>
-          <Textarea value={fullText} onChange={e => setFullText(e.target.value)} placeholder="Artikelens fulde tekst..." className="mt-1 rounded-[8px] border-[#e8e6df] text-[13px] min-h-[120px]" />
+          <Label className="text-[12px] font-semibold text-muted-foreground">Fuld tekst</Label>
+          <Textarea value={fullText} onChange={e => setFullText(e.target.value)} placeholder="Artikelens fulde tekst..." className="mt-1 rounded-[8px] border-border text-[13px] min-h-[120px]" />
         </div>
 
         {/* Image preview */}
         {image && (
           <div className="relative">
-            <Label className="text-[12px] font-semibold text-[#5f5d56] mb-1 block">Billede</Label>
-            <img src={image} alt="" className="w-full h-40 object-cover rounded-[8px] border border-[#e8e6df]" />
+            <Label className="text-[12px] font-semibold text-muted-foreground mb-1 block">Billede</Label>
+            <img src={image} alt="" className="w-full h-40 object-cover rounded-[8px] border border-border" />
             <button
               onClick={() => setImage('')}
               className="absolute top-7 right-2 bg-black/50 rounded-full p-1"
@@ -465,24 +465,24 @@ function NewsCreatePage({
         )}
 
         <div>
-          <Label className="text-[12px] font-semibold text-[#5f5d56]">Billede-URL</Label>
-          <Input value={image} onChange={e => setImage(e.target.value)} placeholder="https://..." className="mt-1 rounded-[8px] border-[#e8e6df] text-[13px]" />
+          <Label className="text-[12px] font-semibold text-muted-foreground">Billede-URL</Label>
+          <Input value={image} onChange={e => setImage(e.target.value)} placeholder="https://..." className="mt-1 rounded-[8px] border-border text-[13px]" />
         </div>
 
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <Label className="text-[12px] font-semibold text-[#5f5d56]">Kilde</Label>
-            <Input value={source} onChange={e => setSource(e.target.value)} placeholder="F.eks. DR, TV2" className="mt-1 rounded-[8px] border-[#e8e6df] text-[13px]" />
+            <Label className="text-[12px] font-semibold text-muted-foreground">Kilde</Label>
+            <Input value={source} onChange={e => setSource(e.target.value)} placeholder="F.eks. DR, TV2" className="mt-1 rounded-[8px] border-border text-[13px]" />
           </div>
           <div>
-            <Label className="text-[12px] font-semibold text-[#5f5d56]">Dato</Label>
-            <Input value={date} onChange={e => setDate(e.target.value)} placeholder="F.eks. 1. mar 2026" className="mt-1 rounded-[8px] border-[#e8e6df] text-[13px]" />
+            <Label className="text-[12px] font-semibold text-muted-foreground">Dato</Label>
+            <Input value={date} onChange={e => setDate(e.target.value)} placeholder="F.eks. 1. mar 2026" className="mt-1 rounded-[8px] border-border text-[13px]" />
           </div>
         </div>
 
         <div>
-          <Label className="text-[12px] font-semibold text-[#5f5d56]">Link til artikel</Label>
-          <Input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://..." className="mt-1 rounded-[8px] border-[#e8e6df] text-[13px]" />
+          <Label className="text-[12px] font-semibold text-muted-foreground">Link til artikel</Label>
+          <Input value={url} onChange={e => setUrl(e.target.value)} placeholder="https://..." className="mt-1 rounded-[8px] border-border text-[13px]" />
           {url && (
             <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 mt-1 text-[11px] text-[#007AFF]">
               <ExternalLink className="h-2.5 w-2.5" /> Åbn link
@@ -490,18 +490,18 @@ function NewsCreatePage({
           )}
         </div>
 
-        <div className="flex items-center justify-between rounded-[10px] bg-white border border-[#e8e6df] px-3 py-2.5">
-          <span className="text-[13px] font-medium text-[#2f2f2d]">Publiceret</span>
+        <div className="flex items-center justify-between rounded-[10px] bg-card border border-border px-3 py-2.5">
+          <span className="text-[13px] font-medium text-foreground">Publiceret</span>
           <IOSSwitch checked={isPublished} onCheckedChange={setIsPublished} />
         </div>
       </div>
 
       {/* Save button */}
-      <div className="safe-area-pb border-t border-[#e8e6df] px-4 pt-3 pb-3">
+      <div className="safe-area-pb border-t border-border px-4 pt-3 pb-3">
         <button
           onClick={handleSave}
           disabled={saving || !title.trim()}
-          className="w-full rounded-xl bg-[#2f2f2d] py-3 text-[14px] font-semibold text-white disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full rounded-xl bg-primary py-3 text-[14px] font-semibold text-white disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {saving ? (
             <Loader2 className="h-4 w-4 animate-spin" />

@@ -63,7 +63,7 @@ export function HistorikView() {
         animate={{ opacity: 1, y: 0 }}
         className="px-1"
       >
-        <h1 className="text-[1.7rem] font-semibold leading-tight tracking-[-0.02em] text-[#262623]">
+        <h1 className="text-[1.7rem] font-semibold leading-tight tracking-[-0.02em] text-foreground">
           Historik
         </h1>
       </motion.div>
@@ -82,8 +82,8 @@ export function HistorikView() {
             className={cn(
               'shrink-0 rounded-full px-3 py-1.5 text-[12px] font-semibold transition-colors',
               categoryFilter === cat.value
-                ? 'bg-[#2f2f2d] text-white'
-                : 'bg-[#f2f1ed] text-[#5f5d56]'
+                ? 'bg-primary text-white'
+                : 'bg-background text-muted-foreground'
             )}
           >
             {cat.label}
@@ -98,8 +98,8 @@ export function HistorikView() {
           transition={{ delay: 0.1 }}
           className="flex flex-col items-center py-16"
         >
-          <CheckCircle2 className="mb-3 h-10 w-10 text-[#c0beb6]" />
-          <p className="text-sm text-[#a09e96]">Ingen fuldførte opgaver</p>
+          <CheckCircle2 className="mb-3 h-10 w-10 text-muted-foreground" />
+          <p className="text-sm text-muted-foreground">Ingen fuldførte opgaver</p>
         </motion.div>
       ) : (
         <div className="space-y-1">
@@ -117,19 +117,19 @@ export function HistorikView() {
                 <Icon className="mt-0.5 h-5 w-5 shrink-0" style={{ color: config.color }} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-[13px] font-semibold text-[#2f2f2d]">{task.title}</span>
-                    <span className="shrink-0 rounded-full bg-[#f2f1ed] px-2 py-0.5 text-[10px] font-medium text-[#7e7c74]">
+                    <span className="text-[13px] font-semibold text-foreground">{task.title}</span>
+                    <span className="shrink-0 rounded-full bg-background px-2 py-0.5 text-[10px] font-medium text-[#7e7c74]">
                       {config.label}
                     </span>
                   </div>
-                  <p className="mt-0.5 text-[12px] text-[#9d9b93]">
+                  <p className="mt-0.5 text-[12px] text-muted-foreground">
                     Fuldført af {getUserName(task.assignedTo)}
                     {task.completedAt && (
                       <> · {formatDistanceToNow(parseISO(task.completedAt), { addSuffix: true, locale: da })}</>
                     )}
                   </p>
                   {task.completedAt && (
-                    <p className="mt-0.5 text-[11px] text-[#c0beb6]">
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">
                       {format(parseISO(task.completedAt), 'd. MMMM yyyy', { locale: da })}
                     </p>
                   )}

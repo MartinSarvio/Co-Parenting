@@ -161,7 +161,7 @@ export function KoleskabView() {
     if (daysLeft < 0) return { label: 'Udløbet', color: 'text-red-600', bgColor: 'bg-red-50 border-red-200' };
     if (daysLeft === 0) return { label: 'Udløber i dag', color: 'text-red-500', bgColor: 'bg-red-50 border-red-200' };
     if (daysLeft <= 3) return { label: `${daysLeft}d tilbage`, color: 'text-amber-600', bgColor: 'bg-amber-50 border-amber-200' };
-    return { label: format(parseISO(expiresAt), 'd. MMM', { locale: da }), color: 'text-[#78766d]', bgColor: '' };
+    return { label: format(parseISO(expiresAt), 'd. MMM', { locale: da }), color: 'text-muted-foreground', bgColor: '' };
   }
 
   // Sort: expired first, then by expiry date, then by name
@@ -184,7 +184,7 @@ export function KoleskabView() {
         <button
           onClick={handleScan}
           disabled={scanLoading}
-          className="flex flex-1 items-center justify-center gap-2 rounded-[8px] bg-[#2f2f2d] py-3.5 text-[14px] font-bold text-white active:scale-[0.98] transition-transform disabled:opacity-50"
+          className="flex flex-1 items-center justify-center gap-2 rounded-[8px] bg-primary py-3.5 text-[14px] font-bold text-white active:scale-[0.98] transition-transform disabled:opacity-50"
         >
           {scanLoading ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -195,7 +195,7 @@ export function KoleskabView() {
         </button>
         <button
           onClick={() => { resetForm(); setAddDialogOpen(true); }}
-          className="flex items-center justify-center gap-2 rounded-[8px] border-2 border-[#e5e3dc] bg-white px-5 py-3.5 text-[14px] font-bold text-[#2f2f2d] active:scale-[0.98] transition-transform"
+          className="flex items-center justify-center gap-2 rounded-[8px] border-2 border-border bg-card px-5 py-3.5 text-[14px] font-bold text-foreground active:scale-[0.98] transition-transform"
         >
           <Plus className="h-4 w-4" />
           Tilføj
@@ -215,12 +215,12 @@ export function KoleskabView() {
       {/* Items list */}
       {sortedItems.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-[8px] bg-[#f2f1ed]">
-            <PackageSearch className="h-8 w-8 text-[#b0ada4]" />
+          <div className="flex h-16 w-16 items-center justify-center rounded-[8px] bg-background">
+            <PackageSearch className="h-8 w-8 text-muted-foreground" />
           </div>
           <div>
-            <p className="text-[15px] font-semibold text-[#2f2f2d]">Køleskabet er tomt</p>
-            <p className="text-[13px] text-[#9a978f] mt-1">Scan en stregkode eller tilføj varer manuelt</p>
+            <p className="text-[15px] font-semibold text-foreground">Køleskabet er tomt</p>
+            <p className="text-[13px] text-muted-foreground mt-1">Scan en stregkode eller tilføj varer manuelt</p>
           </div>
         </div>
       ) : (
@@ -239,14 +239,14 @@ export function KoleskabView() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, x: -100 }}
                 className={cn(
-                  'rounded-[8px] border bg-white p-4 transition-colors',
-                  expiryInfo?.bgColor || 'border-[#e5e3dc]'
+                  'rounded-[8px] border bg-card p-4 transition-colors',
+                  expiryInfo?.bgColor || 'border-border'
                 )}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <p className="text-[15px] font-semibold text-[#2f2f2d] truncate">{item.name}</p>
+                      <p className="text-[15px] font-semibold text-foreground truncate">{item.name}</p>
                       {fridgeNutriGrade && <NutriScoreBadge grade={fridgeNutriGrade} size="sm" />}
                     </div>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
@@ -256,7 +256,7 @@ export function KoleskabView() {
                         </span>
                       )}
                       {n && n.energyKcal != null && (
-                        <span className="text-[11px] text-[#9a978f]">
+                        <span className="text-[11px] text-muted-foreground">
                           {Math.round(n.energyKcal)} kcal · P {n.protein?.toFixed(1)}g · K {n.carbs?.toFixed(1)}g · F {n.fat?.toFixed(1)}g /100g
                         </span>
                       )}
@@ -270,12 +270,12 @@ export function KoleskabView() {
                       </div>
                     )}
                     {item.barcode && (
-                      <p className="text-[10px] text-[#b0ada4] mt-0.5">{item.barcode}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">{item.barcode}</p>
                     )}
                   </div>
                   <button
                     onClick={() => setMenuItem(item)}
-                    className="text-[#b0ada4] hover:text-[#2f2f2d] transition-colors active:scale-95 p-1 shrink-0"
+                    className="text-muted-foreground hover:text-foreground transition-colors active:scale-95 p-1 shrink-0"
                   >
                     <MoreVertical className="h-4 w-4" />
                   </button>
@@ -296,9 +296,9 @@ export function KoleskabView() {
           <div className="space-y-1 px-1 pb-2">
             <button
               onClick={() => { openEdit(menuItem); setMenuItem(null); }}
-              className="flex w-full items-center gap-3 rounded-xl px-4 py-3.5 text-[15px] text-[#2f2f2d] active:bg-[#f5f4f0] transition-colors"
+              className="flex w-full items-center gap-3 rounded-xl px-4 py-3.5 text-[15px] text-foreground active:bg-card transition-colors"
             >
-              <Pencil className="h-4 w-4 text-[#78766d]" />
+              <Pencil className="h-4 w-4 text-muted-foreground" />
               Rediger
             </button>
             <button
@@ -315,7 +315,7 @@ export function KoleskabView() {
               <XCircle className="h-4 w-4" />
               Smidt ud
             </button>
-            <div className="mx-3 my-1 border-t border-[#e5e3dc]" />
+            <div className="mx-3 my-1 border-t border-border" />
             <button
               onClick={() => { handleRemoveItem(menuItem); setMenuItem(null); }}
               className="flex w-full items-center gap-3 rounded-xl px-4 py-3.5 text-[15px] text-red-600 active:bg-red-50 transition-colors"
@@ -337,90 +337,90 @@ export function KoleskabView() {
               onClick={() => setAddDialogOpen(false)}
             />
             <motion.div
-              className="fixed bottom-0 left-0 right-0 z-[61] bg-white rounded-t-3xl shadow-2xl pb-[env(safe-area-inset-bottom,24px)] max-h-[90vh] flex flex-col"
+              className="fixed bottom-0 left-0 right-0 z-[61] bg-card rounded-t-3xl shadow-2xl pb-[env(safe-area-inset-bottom,24px)] max-h-[90vh] flex flex-col"
               initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
               transition={{ type: 'spring', stiffness: 400, damping: 40 }}
             >
               <div className="flex justify-center pt-3 pb-1">
-                <div className="h-1 w-10 rounded-full bg-[#d8d7cf]" />
+                <div className="h-1 w-10 rounded-full bg-border" />
               </div>
               <div className="px-4 pb-[220px] space-y-4 overflow-y-auto flex-1">
                 {/* Header */}
                 <div className="text-center pb-2">
-                  <h2 className="text-[18px] font-black text-[#2f2f2d]">Tilføj til køleskab</h2>
+                  <h2 className="text-[18px] font-black text-foreground">Tilføj til køleskab</h2>
                 </div>
 
                 {/* Name */}
                 <div>
-                  <label className="text-[12px] font-semibold text-[#78766d] mb-1 block">Navn *</label>
+                  <label className="text-[12px] font-semibold text-muted-foreground mb-1 block">Navn *</label>
                   <input
                     type="text"
                     value={formName}
                     onChange={e => setFormName(e.target.value)}
                     placeholder="fx Arla Letmælk"
                     autoFocus
-                    className="w-full rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d]"
+                    className="w-full rounded-[8px] border border-border bg-card px-3 py-3 text-[14px] text-foreground placeholder:text-muted-foreground outline-none focus:border-[#f58a2d]"
                   />
                 </div>
 
                 {/* Expiry date */}
                 <div>
-                  <label className="text-[12px] font-semibold text-[#78766d] mb-1 block">Sidste anvendelsesdato</label>
+                  <label className="text-[12px] font-semibold text-muted-foreground mb-1 block">Sidste anvendelsesdato</label>
                   <input
                     type="date"
                     value={formExpiry}
                     onChange={e => setFormExpiry(e.target.value)}
-                    className="w-full rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] px-3 py-3 text-[14px] text-[#2f2f2d] outline-none focus:border-[#f58a2d]"
+                    className="w-full rounded-[8px] border border-border bg-card px-3 py-3 text-[14px] text-foreground outline-none focus:border-[#f58a2d]"
                   />
                 </div>
 
                 {/* Manual nutrition entry (if no scan data) */}
                 {!formNutrition && (
                   <div className="space-y-2">
-                    <p className="text-[12px] font-semibold text-[#78766d]">Næringsindhold pr. 100g (valgfrit)</p>
+                    <p className="text-[12px] font-semibold text-muted-foreground">Næringsindhold pr. 100g (valgfrit)</p>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="text-[11px] text-[#9a978f] mb-0.5 block">Kalorier (kcal)</label>
+                        <label className="text-[11px] text-muted-foreground mb-0.5 block">Kalorier (kcal)</label>
                         <input
                           type="number"
                           inputMode="numeric"
                           value={manualKcal}
                           onChange={e => setManualKcal(e.target.value)}
                           placeholder="0"
-                          className="w-full rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] px-3 py-2.5 text-[13px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d]"
+                          className="w-full rounded-[8px] border border-border bg-card px-3 py-2.5 text-[13px] text-foreground placeholder:text-muted-foreground outline-none focus:border-[#f58a2d]"
                         />
                       </div>
                       <div>
-                        <label className="text-[11px] text-[#9a978f] mb-0.5 block">Protein (g)</label>
+                        <label className="text-[11px] text-muted-foreground mb-0.5 block">Protein (g)</label>
                         <input
                           type="number"
                           inputMode="decimal"
                           value={manualProtein}
                           onChange={e => setManualProtein(e.target.value)}
                           placeholder="0"
-                          className="w-full rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] px-3 py-2.5 text-[13px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d]"
+                          className="w-full rounded-[8px] border border-border bg-card px-3 py-2.5 text-[13px] text-foreground placeholder:text-muted-foreground outline-none focus:border-[#f58a2d]"
                         />
                       </div>
                       <div>
-                        <label className="text-[11px] text-[#9a978f] mb-0.5 block">Kulhydrater (g)</label>
+                        <label className="text-[11px] text-muted-foreground mb-0.5 block">Kulhydrater (g)</label>
                         <input
                           type="number"
                           inputMode="decimal"
                           value={manualCarbs}
                           onChange={e => setManualCarbs(e.target.value)}
                           placeholder="0"
-                          className="w-full rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] px-3 py-2.5 text-[13px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d]"
+                          className="w-full rounded-[8px] border border-border bg-card px-3 py-2.5 text-[13px] text-foreground placeholder:text-muted-foreground outline-none focus:border-[#f58a2d]"
                         />
                       </div>
                       <div>
-                        <label className="text-[11px] text-[#9a978f] mb-0.5 block">Fedt (g)</label>
+                        <label className="text-[11px] text-muted-foreground mb-0.5 block">Fedt (g)</label>
                         <input
                           type="number"
                           inputMode="decimal"
                           value={manualFat}
                           onChange={e => setManualFat(e.target.value)}
                           placeholder="0"
-                          className="w-full rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] px-3 py-2.5 text-[13px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d]"
+                          className="w-full rounded-[8px] border border-border bg-card px-3 py-2.5 text-[13px] text-foreground placeholder:text-muted-foreground outline-none focus:border-[#f58a2d]"
                         />
                       </div>
                     </div>
@@ -429,8 +429,8 @@ export function KoleskabView() {
 
                 {/* Nutrition preview (if from scan) */}
                 {formNutrition && formNutrition.energyKcal != null && (
-                  <div className="rounded-[8px] bg-[#f2f1ed] p-3">
-                    <p className="text-[12px] font-semibold text-[#78766d] mb-1">Næringsindhold pr. 100g</p>
+                  <div className="rounded-[8px] bg-background p-3">
+                    <p className="text-[12px] font-semibold text-muted-foreground mb-1">Næringsindhold pr. 100g</p>
                     <div className="grid grid-cols-4 gap-2">
                       {[
                         { label: 'Kcal', value: Math.round(formNutrition.energyKcal ?? 0), color: '#f58a2d' },
@@ -440,7 +440,7 @@ export function KoleskabView() {
                       ].map(n => (
                         <div key={n.label} className="text-center">
                           <p className="text-[14px] font-black" style={{ color: n.color }}>{n.value}</p>
-                          <p className="text-[10px] text-[#9a978f]">{n.label}</p>
+                          <p className="text-[10px] text-muted-foreground">{n.label}</p>
                         </div>
                       ))}
                     </div>
@@ -465,27 +465,27 @@ export function KoleskabView() {
       <BottomSheet open={!!editingItem} onOpenChange={(o) => { if (!o) setEditingItem(null); }} title="Rediger vare">
         <div className="space-y-4">
           <div>
-            <label className="text-[12px] font-semibold text-[#78766d] mb-1 block">Navn</label>
+            <label className="text-[12px] font-semibold text-muted-foreground mb-1 block">Navn</label>
             <input
               type="text"
               value={editName}
               onChange={e => setEditName(e.target.value)}
-              className="w-full rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] px-3 py-3 text-[14px] text-[#2f2f2d] outline-none focus:border-[#f58a2d]"
+              className="w-full rounded-[8px] border border-border bg-card px-3 py-3 text-[14px] text-foreground outline-none focus:border-[#f58a2d]"
             />
           </div>
           <div>
-            <label className="text-[12px] font-semibold text-[#78766d] mb-1 block">Sidste anvendelsesdato</label>
+            <label className="text-[12px] font-semibold text-muted-foreground mb-1 block">Sidste anvendelsesdato</label>
             <input
               type="date"
               value={editExpiry}
               onChange={e => setEditExpiry(e.target.value)}
-              className="w-full rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] px-3 py-3 text-[14px] text-[#2f2f2d] outline-none focus:border-[#f58a2d]"
+              className="w-full rounded-[8px] border border-border bg-card px-3 py-3 text-[14px] text-foreground outline-none focus:border-[#f58a2d]"
             />
           </div>
           <button
             onClick={handleSaveEdit}
             disabled={!editName.trim()}
-            className="w-full rounded-[8px] bg-[#2f2f2f] py-3.5 text-[15px] font-bold text-white active:scale-[0.98] transition-transform disabled:opacity-40"
+            className="w-full rounded-[8px] bg-primary py-3.5 text-[15px] font-bold text-white active:scale-[0.98] transition-transform disabled:opacity-40"
           >
             Gem ændringer
           </button>

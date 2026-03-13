@@ -35,7 +35,7 @@ export function ProductCropImage({
   const offsetY = -cropY * scaleY * 100;
 
   return (
-    <div className={cn('overflow-hidden rounded-[8px] bg-white', className)}>
+    <div className={cn('overflow-hidden rounded-[8px] bg-card', className)}>
       <img
         src={pageImageUrl}
         alt=""

@@ -104,7 +104,7 @@ export function TilbudStoreView({ storeId, addedCatalogId, inCartNames, onAddPro
           if (products.length === 0) return null;
           return (
             <div key={category}>
-              <p className="text-[13px] font-semibold text-[#2f2f2d] px-1 mb-2">{category}</p>
+              <p className="text-[13px] font-semibold text-foreground px-1 mb-2">{category}</p>
               <div className="flex gap-2 overflow-x-auto snap-x pt-3 pb-2 scrollbar-hide -mx-2 px-2">
                 {products.map((product) => (
                   <CatalogProductCard
@@ -124,7 +124,7 @@ export function TilbudStoreView({ storeId, addedCatalogId, inCartNames, onAddPro
       ) : (
         // Flat sorted list (no category grouping)
         <div>
-          <p className="text-[13px] font-semibold text-[#2f2f2d] px-1 mb-2">
+          <p className="text-[13px] font-semibold text-foreground px-1 mb-2">
             {filters.sortBy === 'budget' ? 'Billigst først' : filters.sortBy === 'kilopris' ? 'Laveste kilopris' : filters.sortBy === 'sundhed' ? 'Sundest først' : 'Størst rabat'}
           </p>
           <div className="flex gap-2 overflow-x-auto snap-x pt-3 pb-2 scrollbar-hide -mx-2 px-2">
@@ -144,7 +144,7 @@ export function TilbudStoreView({ storeId, addedCatalogId, inCartNames, onAddPro
       )}
 
       {filteredCatalog.length === 0 && (
-        <p className="text-[13px] text-[#9a978f] py-4 px-2 text-center">Ingen produkter matcher dine filtre</p>
+        <p className="text-[13px] text-muted-foreground py-4 px-2 text-center">Ingen produkter matcher dine filtre</p>
       )}
 
       <div className="h-16" />
@@ -160,7 +160,7 @@ export function TilbudStoreView({ storeId, addedCatalogId, inCartNames, onAddPro
             "flex h-11 w-11 items-center justify-center rounded-full shadow-lg transition-colors",
             hasActiveFilters(filters)
               ? "bg-[#f58a2d] text-white"
-              : "bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+              : "bg-primary text-white hover:bg-primary"
           )}
           aria-label="Filter"
         >
@@ -168,7 +168,7 @@ export function TilbudStoreView({ storeId, addedCatalogId, inCartNames, onAddPro
         </button>
         <button
           onClick={() => setShowSearch(true)}
-          className="flex h-11 w-11 items-center justify-center rounded-full bg-[#2f2f2f] text-white shadow-lg hover:bg-[#1a1a1a] transition-colors"
+          className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-white shadow-lg hover:bg-primary transition-colors"
           aria-label="Søg"
         >
           <Search className="h-4.5 w-4.5" />

@@ -61,10 +61,10 @@ export function RoutineNotificationSheet({ open, onOpenChange, childId, childNam
   return (
     <BottomSheet open={open} onOpenChange={onOpenChange} title="Rutine-påmindelser">
       <div className="space-y-3">
-        <div className="flex items-center justify-between rounded-[4px] border border-[#e8e7e0] bg-white px-4 py-3">
+        <div className="flex items-center justify-between rounded-[4px] border border-border bg-card px-4 py-3">
           <div className="flex items-center gap-2">
-            <Bell className="h-4 w-4 text-[#78766d]" />
-            <span className="text-[13px] font-medium text-[#2f2f2d]">Påmindelser for {childName}</span>
+            <Bell className="h-4 w-4 text-muted-foreground" />
+            <span className="text-[13px] font-medium text-foreground">Påmindelser for {childName}</span>
           </div>
           <Switch checked={enabled} onCheckedChange={setEnabled} />
         </div>
@@ -72,46 +72,46 @@ export function RoutineNotificationSheet({ open, onOpenChange, childId, childNam
         {enabled && (
           <div className="space-y-2">
             <div className="space-y-1">
-              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">
+              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                 ☀️ Morgenrutine
               </Label>
               <Input
                 type="time"
                 value={morgenTime}
                 onChange={e => setMorgenTime(e.target.value)}
-                className="rounded-[4px] border-[#d8d7cf] bg-white"
+                className="rounded-[4px] border-border bg-card"
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">
+              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                 🌤️ Dagsrutine
               </Label>
               <Input
                 type="time"
                 value={dagTime}
                 onChange={e => setDagTime(e.target.value)}
-                className="rounded-[4px] border-[#d8d7cf] bg-white"
+                className="rounded-[4px] border-border bg-card"
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">
+              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                 🌙 Aftenrutine
               </Label>
               <Input
                 type="time"
                 value={aftenTime}
                 onChange={e => setAftenTime(e.target.value)}
-                className="rounded-[4px] border-[#d8d7cf] bg-white"
+                className="rounded-[4px] border-border bg-card"
               />
             </div>
           </div>
         )}
 
         <div className="flex gap-2">
-          <Button variant="outline" className="flex-1 rounded-[4px] border-[#d8d7cf]" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" className="flex-1 rounded-[4px] border-border" onClick={() => onOpenChange(false)}>
             Annuller
           </Button>
-          <Button className="flex-1 rounded-[4px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]" onClick={handleSave}>
+          <Button className="flex-1 rounded-[4px] bg-primary text-white hover:bg-primary" onClick={handleSave}>
             Gem
           </Button>
         </div>

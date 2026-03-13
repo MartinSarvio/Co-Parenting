@@ -92,7 +92,7 @@ function TrendBadge({ current, previous, invertColors }: {
 }) {
   if (previous === 0 && current === 0) {
     return (
-      <span className="inline-flex items-center gap-0.5 text-[14px] font-semibold text-[#8E8E93]">
+      <span className="inline-flex items-center gap-0.5 text-[14px] font-semibold text-muted-foreground">
         <Minus className="h-3 w-3" /> 0%
       </span>
     );
@@ -116,7 +116,7 @@ function TrendBadge({ current, previous, invertColors }: {
 function SectionHeader({ title }: { title: string }) {
   return (
     <div className="mt-5 mb-2">
-      <h2 className="text-[14px] font-semibold uppercase tracking-[0.05em] text-[#9a978f]">{title}</h2>
+      <h2 className="text-[14px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">{title}</h2>
     </div>
   );
 }
@@ -125,11 +125,11 @@ function SectionHeader({ title }: { title: string }) {
 
 function EmptyState({ text }: { text: string }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-[8px] border border-dashed border-[#d0cec5] bg-[#faf9f6] py-12 text-center">
-      <BarChart3 className="h-10 w-10 text-[#c8c6bc]" />
+    <div className="flex flex-col items-center justify-center gap-3 rounded-[8px] border border-dashed border-border bg-card py-12 text-center">
+      <BarChart3 className="h-10 w-10 text-muted-foreground" />
       <div>
-        <p className="text-sm font-semibold text-[#3f3e3a]">Ingen data endnu</p>
-        <p className="mt-1 text-[14px] text-[#78766d]">{text}</p>
+        <p className="text-sm font-semibold text-foreground">Ingen data endnu</p>
+        <p className="mt-1 text-[14px] text-muted-foreground">{text}</p>
       </div>
     </div>
   );
@@ -442,24 +442,24 @@ export function AnalyseView() {
           onClick={() => setPeriodMode('week')}
           className={cn(
             'rounded-[8px] px-3.5 py-1.5 text-[14px] font-semibold transition-all',
-            periodMode === 'week' ? 'bg-[#2f2f2d] text-white' : 'bg-[#ecebe5] text-[#78766d]'
+            periodMode === 'week' ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground'
           )}
         >Uge</button>
         <button
           onClick={() => setPeriodMode('month')}
           className={cn(
             'rounded-[8px] px-3.5 py-1.5 text-[14px] font-semibold transition-all',
-            periodMode === 'month' ? 'bg-[#2f2f2d] text-white' : 'bg-[#ecebe5] text-[#78766d]'
+            periodMode === 'month' ? 'bg-primary text-white' : 'bg-secondary text-muted-foreground'
           )}
         >Måned</button>
       </div>
 
       <div className="flex items-center justify-between px-4 py-1">
-        <button onClick={() => setPeriodOffset(o => o - 1)} className="text-[#78766d] active:scale-95 transition-transform">
+        <button onClick={() => setPeriodOffset(o => o - 1)} className="text-muted-foreground active:scale-95 transition-transform">
           <ChevronLeft className="h-5 w-5" />
         </button>
-        <p className="text-[14px] font-semibold text-[#2f2f2d]">{period.label}</p>
-        <button onClick={() => setPeriodOffset(o => o + 1)} className="text-[#78766d] active:scale-95 transition-transform">
+        <p className="text-[14px] font-semibold text-foreground">{period.label}</p>
+        <button onClick={() => setPeriodOffset(o => o + 1)} className="text-muted-foreground active:scale-95 transition-transform">
           <ChevronRight className="h-5 w-5" />
         </button>
       </div>
@@ -468,14 +468,14 @@ export function AnalyseView() {
       {/* SECTION 1: SUNDHEDSSCORE                                  */}
       {/* ═══════════════════════════════════════════════════════════ */}
 
-      <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-5 mt-2">
+      <div className="rounded-[8px] border border-border bg-card p-5 mt-2">
         <div className="flex flex-col items-center">
-          <p className="text-[14px] font-semibold uppercase tracking-[0.05em] text-[#9a978f] mb-3">Sundhedsscore</p>
+          <p className="text-[14px] font-semibold uppercase tracking-[0.05em] text-muted-foreground mb-3">Sundhedsscore</p>
           <div className="relative">
             <ScoreRing value={scores.overall} color={scoreColor(scores.overall)} />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-[32px] font-black text-[#2f2f2d] leading-none">{scores.overall}</span>
-              <span className="text-[12px] font-semibold text-[#9a978f] mt-0.5">af 100</span>
+              <span className="text-[32px] font-black text-foreground leading-none">{scores.overall}</span>
+              <span className="text-[12px] font-semibold text-muted-foreground mt-0.5">af 100</span>
             </div>
           </div>
 
@@ -485,9 +485,9 @@ export function AnalyseView() {
               { label: 'Måltider', value: scores.meal },
               { label: 'Variation', value: scores.variety },
             ].map(s => (
-              <div key={s.label} className="flex flex-col items-center gap-0.5 rounded-[8px] bg-[#faf9f6] px-3 py-1.5">
+              <div key={s.label} className="flex flex-col items-center gap-0.5 rounded-[8px] bg-card px-3 py-1.5">
                 <span className="text-[14px] font-bold" style={{ color: scoreColor(s.value) }}>{s.value}</span>
-                <span className="text-[12px] text-[#78766d]">{s.label}</span>
+                <span className="text-[12px] text-muted-foreground">{s.label}</span>
               </div>
             ))}
           </div>
@@ -521,16 +521,16 @@ export function AnalyseView() {
               <p className={cn('text-[22px] font-black', wastePercent > 30 ? 'text-red-700' : 'text-emerald-700')}>{wastePercent}%</p>
               <p className={cn('text-[13px] font-semibold', wastePercent > 30 ? 'text-red-600' : 'text-emerald-600')}>Spild</p>
             </div>
-            <div className="rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] p-3 text-center">
+            <div className="rounded-[8px] border border-border bg-card p-3 text-center">
               <TrendBadge current={wastePercent} previous={prevWastePercent} invertColors />
-              <p className="text-[13px] text-[#78766d] mt-0.5">vs. forrige</p>
+              <p className="text-[13px] text-muted-foreground mt-0.5">vs. forrige</p>
             </div>
           </div>
 
           {/* Area chart */}
           {wasteOverTimeData.length > 0 && (
-            <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-3">
-              <p className="text-[13px] font-semibold text-[#9a978f] mb-2">Spild over tid</p>
+            <div className="rounded-[8px] border border-border bg-card p-3">
+              <p className="text-[13px] font-semibold text-muted-foreground mb-2">Spild over tid</p>
               <ResponsiveContainer width="100%" height={180}>
                 <AreaChart data={wasteOverTimeData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                   <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#78766d' }} axisLine={false} tickLine={false} />
@@ -545,8 +545,8 @@ export function AnalyseView() {
 
           {/* Pie chart: waste by category */}
           {wasteByCategoryData.length > 0 && (
-            <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-3">
-              <p className="text-[13px] font-semibold text-[#9a978f] mb-2">Mest spildte kategorier</p>
+            <div className="rounded-[8px] border border-border bg-card p-3">
+              <p className="text-[13px] font-semibold text-muted-foreground mb-2">Mest spildte kategorier</p>
               <div className="flex items-center gap-4">
                 <ResponsiveContainer width={160} height={160}>
                   <PieChart>
@@ -571,8 +571,8 @@ export function AnalyseView() {
                   {wasteByCategoryData.map(entry => (
                     <div key={entry.category} className="flex items-center gap-2">
                       <div className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: CATEGORY_COLORS[entry.category] }} />
-                      <span className="text-[13px] text-[#4a4945] flex-1 truncate">{entry.category}</span>
-                      <span className="text-[13px] font-semibold text-[#2f2f2d]">{entry.count}</span>
+                      <span className="text-[13px] text-foreground flex-1 truncate">{entry.category}</span>
+                      <span className="text-[13px] font-semibold text-foreground">{entry.count}</span>
                     </div>
                   ))}
                 </div>
@@ -593,8 +593,8 @@ export function AnalyseView() {
       ) : (
         <>
           {/* Consumption by category - horizontal bars */}
-          <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-3">
-            <p className="text-[13px] font-semibold text-[#9a978f] mb-2">Forbrug pr. kategori</p>
+          <div className="rounded-[8px] border border-border bg-card p-3">
+            <p className="text-[13px] font-semibold text-muted-foreground mb-2">Forbrug pr. kategori</p>
             <ResponsiveContainer width="100%" height={Math.max(120, usedByCategoryData.length * 36)}>
               <BarChart data={usedByCategoryData} layout="vertical" margin={{ top: 0, right: 8, left: 0, bottom: 0 }}>
                 <YAxis type="category" dataKey="category" tick={{ fontSize: 10, fill: '#4a4945' }} width={110} axisLine={false} tickLine={false} />
@@ -610,8 +610,8 @@ export function AnalyseView() {
           </div>
 
           {/* Meal plan adherence */}
-          <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-4">
-            <p className="text-[13px] font-semibold text-[#9a978f] mb-3">Madplan-overholdelse</p>
+          <div className="rounded-[8px] border border-border bg-card p-4">
+            <p className="text-[13px] font-semibold text-muted-foreground mb-3">Madplan-overholdelse</p>
             <div className="flex items-center gap-5">
               <div className="relative">
                 <ScoreRing
@@ -621,14 +621,14 @@ export function AnalyseView() {
                   color={uniqueMealDays >= totalDaysInPeriod * 0.7 ? '#34C759' : '#FFCC00'}
                 />
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-[18px] font-black text-[#2f2f2d] leading-none">{uniqueMealDays}</span>
-                  <span className="text-[9px] text-[#9a978f]">/{totalDaysInPeriod} dage</span>
+                  <span className="text-[18px] font-black text-foreground leading-none">{uniqueMealDays}</span>
+                  <span className="text-[9px] text-muted-foreground">/{totalDaysInPeriod} dage</span>
                 </div>
               </div>
               <div className="flex-1">
-                <p className="text-[13px] font-semibold text-[#2f2f2d]">{periodMealPlans.length} måltider planlagt</p>
-                <p className="text-[13px] text-[#78766d] mt-0.5">{uniqueMealDays} af {totalDaysInPeriod} dage har en madplan</p>
-                <div className="mt-2 h-2 w-full rounded-full overflow-hidden bg-[#ecebe5]">
+                <p className="text-[13px] font-semibold text-foreground">{periodMealPlans.length} måltider planlagt</p>
+                <p className="text-[13px] text-muted-foreground mt-0.5">{uniqueMealDays} af {totalDaysInPeriod} dage har en madplan</p>
+                <div className="mt-2 h-2 w-full rounded-full overflow-hidden bg-secondary">
                   <div
                     className="h-full rounded-full transition-all"
                     style={{
@@ -643,8 +643,8 @@ export function AnalyseView() {
 
           {/* Nutrition balance */}
           {nutritionTotals.total > 0 && (
-            <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-4">
-              <p className="text-[13px] font-semibold text-[#9a978f] mb-3">Ernæringsbalance (forbrugte varer)</p>
+            <div className="rounded-[8px] border border-border bg-card p-4">
+              <p className="text-[13px] font-semibold text-muted-foreground mb-3">Ernæringsbalance (forbrugte varer)</p>
               <div className="h-4 w-full rounded-full overflow-hidden flex">
                 <div className="h-full bg-[#3b82f6]" style={{ width: `${nutritionTotals.proteinPct}%` }} />
                 <div className="h-full bg-[#f59e0b]" style={{ width: `${nutritionTotals.carbsPct}%` }} />
@@ -653,15 +653,15 @@ export function AnalyseView() {
               <div className="flex justify-between mt-2">
                 <div className="flex items-center gap-1.5">
                   <div className="h-2 w-2 rounded-full bg-[#3b82f6]" />
-                  <span className="text-[12px] text-[#4a4945]">Protein {nutritionTotals.proteinPct}%</span>
+                  <span className="text-[12px] text-foreground">Protein {nutritionTotals.proteinPct}%</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="h-2 w-2 rounded-full bg-[#f59e0b]" />
-                  <span className="text-[12px] text-[#4a4945]">Kulhydrater {nutritionTotals.carbsPct}%</span>
+                  <span className="text-[12px] text-foreground">Kulhydrater {nutritionTotals.carbsPct}%</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <div className="h-2 w-2 rounded-full bg-[#ef4444]" />
-                  <span className="text-[12px] text-[#4a4945]">Fedt {nutritionTotals.fatPct}%</span>
+                  <span className="text-[12px] text-foreground">Fedt {nutritionTotals.fatPct}%</span>
                 </div>
               </div>
             </div>
@@ -669,9 +669,9 @@ export function AnalyseView() {
 
           {/* NutriScore distribution */}
           {nutriScoreDistribution && (
-            <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-4">
+            <div className="rounded-[8px] border border-border bg-card p-4">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-[13px] font-semibold text-[#9a978f]">NutriScore-fordeling</p>
+                <p className="text-[13px] font-semibold text-muted-foreground">NutriScore-fordeling</p>
                 <NutriScoreBadge grade={nutriScoreDistribution.avgGrade} size="sm" />
               </div>
               <div className="h-6 w-full rounded-full overflow-hidden flex">
@@ -687,11 +687,11 @@ export function AnalyseView() {
                 {nutriScoreDistribution.data.map(d => (
                   <div key={d.grade} className="flex items-center gap-1">
                     <div className="h-2 w-2 rounded-full" style={{ backgroundColor: d.color }} />
-                    <span className="text-[11px] text-[#4a4945]">{d.grade} ({d.pct}%)</span>
+                    <span className="text-[11px] text-foreground">{d.grade} ({d.pct}%)</span>
                   </div>
                 ))}
               </div>
-              <p className="text-[11px] text-[#9a978f] mt-2">{nutriScoreDistribution.matched} af {usedItems.length} varer med NutriScore-data</p>
+              <p className="text-[11px] text-muted-foreground mt-2">{nutriScoreDistribution.matched} af {usedItems.length} varer med NutriScore-data</p>
             </div>
           )}
         </>
@@ -709,20 +709,20 @@ export function AnalyseView() {
         <>
           {/* Big numbers */}
           <div className="grid grid-cols-2 gap-2">
-            <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-3 text-center">
-              <p className="text-[28px] font-black text-[#2f2f2d] leading-none">{totalFoodSpending.toLocaleString('da-DK')}</p>
-              <p className="text-[13px] text-[#78766d] mt-1">kr brugt på mad</p>
+            <div className="rounded-[8px] border border-border bg-card p-3 text-center">
+              <p className="text-[28px] font-black text-foreground leading-none">{totalFoodSpending.toLocaleString('da-DK')}</p>
+              <p className="text-[13px] text-muted-foreground mt-1">kr brugt på mad</p>
             </div>
-            <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-3 text-center">
+            <div className="rounded-[8px] border border-border bg-card p-3 text-center">
               <TrendBadge current={totalFoodSpending} previous={prevFoodSpending} invertColors />
-              <p className="text-[13px] text-[#78766d] mt-1">vs. forrige periode</p>
+              <p className="text-[13px] text-muted-foreground mt-1">vs. forrige periode</p>
             </div>
           </div>
 
           {/* Spending over time */}
           {spendingOverTimeData.length > 0 && (
-            <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-3">
-              <p className="text-[13px] font-semibold text-[#9a978f] mb-2">Forbrugstrend</p>
+            <div className="rounded-[8px] border border-border bg-card p-3">
+              <p className="text-[13px] font-semibold text-muted-foreground mb-2">Forbrugstrend</p>
               <ResponsiveContainer width="100%" height={150}>
                 <LineChart data={spendingOverTimeData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                   <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#78766d' }} axisLine={false} tickLine={false} />
@@ -739,13 +739,13 @@ export function AnalyseView() {
 
           {/* Budget status */}
           {foodBudget > 0 ? (
-            <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-4">
-              <p className="text-[13px] font-semibold text-[#9a978f] mb-2">Budgetstatus</p>
+            <div className="rounded-[8px] border border-border bg-card p-4">
+              <p className="text-[13px] font-semibold text-muted-foreground mb-2">Budgetstatus</p>
               <div className="flex items-end justify-between mb-2">
-                <span className="text-[15px] font-bold text-[#2f2f2d]">{totalFoodSpending.toLocaleString('da-DK')} kr</span>
-                <span className="text-[14px] text-[#78766d]">af {foodBudget.toLocaleString('da-DK')} kr</span>
+                <span className="text-[15px] font-bold text-foreground">{totalFoodSpending.toLocaleString('da-DK')} kr</span>
+                <span className="text-[14px] text-muted-foreground">af {foodBudget.toLocaleString('da-DK')} kr</span>
               </div>
-              <div className="h-3 w-full rounded-full overflow-hidden bg-[#ecebe5]">
+              <div className="h-3 w-full rounded-full overflow-hidden bg-secondary">
                 <div
                   className="h-full rounded-full transition-all"
                   style={{
@@ -761,9 +761,9 @@ export function AnalyseView() {
               )}
             </div>
           ) : (
-            <div className="rounded-[8px] border border-dashed border-[#d0cec5] bg-[#faf9f6] p-4 text-center">
-              <p className="text-[14px] text-[#78766d]">Intet madbudget sat endnu</p>
-              <p className="text-[13px] text-[#9a978f] mt-0.5">Tilføj et budget under Budget-fanen</p>
+            <div className="rounded-[8px] border border-dashed border-border bg-card p-4 text-center">
+              <p className="text-[14px] text-muted-foreground">Intet madbudget sat endnu</p>
+              <p className="text-[13px] text-muted-foreground mt-0.5">Tilføj et budget under Budget-fanen</p>
             </div>
           )}
         </>
@@ -782,15 +782,15 @@ export function AnalyseView() {
           <p className="text-[13px] text-emerald-500 mt-0.5">Hvis du halverer dit madspild</p>
         </div>
       ) : (
-        <div className="rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] p-4 text-center">
-          <p className="text-[13px] font-semibold text-[#3f3e3a]">Godt klaret!</p>
-          <p className="text-[13px] text-[#78766d] mt-0.5">Intet spild registreret i denne periode</p>
+        <div className="rounded-[8px] border border-border bg-card p-4 text-center">
+          <p className="text-[13px] font-semibold text-foreground">Godt klaret!</p>
+          <p className="text-[13px] text-muted-foreground mt-0.5">Intet spild registreret i denne periode</p>
         </div>
       )}
 
-      <div className="rounded-[8px] border border-dashed border-[#d0cec5] bg-[#faf9f6] p-4 text-center">
-        <p className="text-[14px] font-semibold text-[#78766d]">Tilbudsdata</p>
-        <p className="text-[13px] text-[#9a978f] mt-0.5">Kommende funktion — følg med</p>
+      <div className="rounded-[8px] border border-dashed border-border bg-card p-4 text-center">
+        <p className="text-[14px] font-semibold text-muted-foreground">Tilbudsdata</p>
+        <p className="text-[13px] text-muted-foreground mt-0.5">Kommende funktion — følg med</p>
       </div>
 
       {/* ═══════════════════════════════════════════════════════════ */}
@@ -801,13 +801,13 @@ export function AnalyseView() {
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-2">
-        <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-3 text-center">
-          <p className="text-[22px] font-black text-[#2f2f2d]">{fridgeItems.length}</p>
-          <p className="text-[13px] text-[#78766d]">Varer nu</p>
+        <div className="rounded-[8px] border border-border bg-card p-3 text-center">
+          <p className="text-[22px] font-black text-foreground">{fridgeItems.length}</p>
+          <p className="text-[13px] text-muted-foreground">Varer nu</p>
         </div>
-        <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-3 text-center">
-          <p className="text-[22px] font-black text-[#2f2f2d]">{avgShelfLife}</p>
-          <p className="text-[13px] text-[#78766d]">Gns. dage</p>
+        <div className="rounded-[8px] border border-border bg-card p-3 text-center">
+          <p className="text-[22px] font-black text-foreground">{avgShelfLife}</p>
+          <p className="text-[13px] text-muted-foreground">Gns. dage</p>
         </div>
         <div className={cn(
           'rounded-[8px] border p-3 text-center',
@@ -824,8 +824,8 @@ export function AnalyseView() {
 
       {/* Fridge activity stacked bar */}
       {fridgeActivityData.length > 0 && periodHistory.length > 0 && (
-        <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-3">
-          <p className="text-[13px] font-semibold text-[#9a978f] mb-2">Køleskabsaktivitet</p>
+        <div className="rounded-[8px] border border-border bg-card p-3">
+          <p className="text-[13px] font-semibold text-muted-foreground mb-2">Køleskabsaktivitet</p>
           <ResponsiveContainer width="100%" height={150}>
             <BarChart data={fridgeActivityData} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
               <XAxis dataKey="label" tick={{ fontSize: 10, fill: '#78766d' }} axisLine={false} tickLine={false} />
@@ -846,23 +846,23 @@ export function AnalyseView() {
 
       <div className="grid grid-cols-2 gap-2">
         {/* Shopping completion */}
-        <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-3 text-center">
-          <p className="text-[22px] font-black text-[#2f2f2d]">{shoppingCompletion.pct}%</p>
-          <p className="text-[13px] text-[#78766d]">Indkøbt</p>
-          <p className="text-[12px] text-[#9a978f]">{shoppingCompletion.purchased}/{shoppingCompletion.total} varer</p>
+        <div className="rounded-[8px] border border-border bg-card p-3 text-center">
+          <p className="text-[22px] font-black text-foreground">{shoppingCompletion.pct}%</p>
+          <p className="text-[13px] text-muted-foreground">Indkøbt</p>
+          <p className="text-[12px] text-muted-foreground">{shoppingCompletion.purchased}/{shoppingCompletion.total} varer</p>
         </div>
 
         {/* Meal plan week dots */}
-        <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-3">
-          <p className="text-[13px] text-[#78766d] mb-2 text-center">Ugens madplan</p>
+        <div className="rounded-[8px] border border-border bg-card p-3">
+          <p className="text-[13px] text-muted-foreground mb-2 text-center">Ugens madplan</p>
           <div className="flex justify-center gap-1.5">
             {mealPlanDots.map(d => (
               <div key={d.day} className="flex flex-col items-center gap-1">
                 <div className={cn(
                   'h-3 w-3 rounded-full',
-                  d.hasPlans ? 'bg-[#34C759]' : 'bg-[#e5e3dc]'
+                  d.hasPlans ? 'bg-[#34C759]' : 'bg-muted'
                 )} />
-                <span className="text-[8px] text-[#9a978f]">{d.day}</span>
+                <span className="text-[8px] text-muted-foreground">{d.day}</span>
               </div>
             ))}
           </div>

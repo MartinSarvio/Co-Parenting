@@ -73,7 +73,7 @@ export function ProductActionSheet({ open, onOpenChange, product, storeColor, on
         )}
 
         {product.unit && (
-          <p className="text-[13px] text-[#78766d] -mt-2">{product.unit}</p>
+          <p className="text-[13px] text-muted-foreground -mt-2">{product.unit}</p>
         )}
 
         {/* Price */}
@@ -82,7 +82,7 @@ export function ProductActionSheet({ open, onOpenChange, product, storeColor, on
             {formatDKK(product.price)}
           </span>
           {product.originalPrice && (
-            <span className="text-[15px] text-[#9a978f] line-through">
+            <span className="text-[15px] text-muted-foreground line-through">
               {formatDKK(product.originalPrice)}
             </span>
           )}
@@ -92,11 +92,11 @@ export function ProductActionSheet({ open, onOpenChange, product, storeColor, on
         </div>
 
         {up && (
-          <p className="text-[13px] text-[#78766d]">{up.formatted}</p>
+          <p className="text-[13px] text-muted-foreground">{up.formatted}</p>
         )}
 
         {saving > 0 && (
-          <div className="flex items-center gap-2 px-3 py-2 rounded-[8px] bg-[#fef3c7]">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-[8px] bg-yellow-tint">
             <span className="text-[13px] font-semibold text-[#92400e]">
               Du sparer {Number.isInteger(saving) ? saving : saving.toFixed(2).replace('.', ',')} kr
             </span>
@@ -106,8 +106,8 @@ export function ProductActionSheet({ open, onOpenChange, product, storeColor, on
         {/* Nutrition section */}
         {lookupLoading && (
           <div className="flex items-center gap-2 py-2">
-            <Loader2 className="h-4 w-4 animate-spin text-[#9a978f]" />
-            <span className="text-[12px] text-[#9a978f]">Henter næringsinfo...</span>
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+            <span className="text-[12px] text-muted-foreground">Henter næringsinfo...</span>
           </div>
         )}
 
@@ -122,16 +122,16 @@ export function ProductActionSheet({ open, onOpenChange, product, storeColor, on
 
         {/* Quantity stepper */}
         <div className="flex items-center justify-between px-1">
-          <span className="text-[14px] font-semibold text-[#2f2f2d]">Antal</span>
+          <span className="text-[14px] font-semibold text-foreground">Antal</span>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setQty(q => Math.max(1, q - 1))}
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f5f4f0] active:scale-95 transition-transform"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-card active:scale-95 transition-transform"
               disabled={qty <= 1}
             >
-              <Minus className="h-4 w-4 text-[#2f2f2d]" />
+              <Minus className="h-4 w-4 text-foreground" />
             </button>
-            <span className="text-[18px] font-bold text-[#2f2f2d] w-6 text-center">{qty}</span>
+            <span className="text-[18px] font-bold text-foreground w-6 text-center">{qty}</span>
             <button
               onClick={() => setQty(q => Math.min(20, q + 1))}
               className="flex h-8 w-8 items-center justify-center rounded-full active:scale-95 transition-transform"

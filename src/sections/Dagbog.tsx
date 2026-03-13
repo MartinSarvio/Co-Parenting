@@ -35,7 +35,7 @@ const qualityOptions: { value: Quality; label: string }[] = [
 function QualityPicker({ label, value, onChange }: { label: string; value: Quality; onChange: (v: Quality) => void }) {
   return (
     <div className="space-y-1.5">
-      <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">{label}</p>
+      <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">{label}</p>
       <div className="flex gap-2">
         {qualityOptions.map(opt => (
           <button
@@ -44,8 +44,8 @@ function QualityPicker({ label, value, onChange }: { label: string; value: Quali
             className={cn(
               'flex-1 rounded-[8px] py-2 text-sm font-medium transition-all',
               value === opt.value
-                ? 'bg-[#2f2f2f] text-white'
-                : 'bg-[#ecebe5] text-[#5f5d56] hover:bg-[#e0deda]'
+                ? 'bg-primary text-white'
+                : 'bg-secondary text-muted-foreground hover:bg-muted'
             )}
           >
             {opt.label}
@@ -118,14 +118,14 @@ export function Dagbog() {
       <OverblikSidePanel />
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Dagbog</h1>
+          <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-foreground">Dagbog</h1>
           {childForDiary && (
-            <p className="text-[13px] text-[#78766d]">{childForDiary.name}</p>
+            <p className="text-[13px] text-muted-foreground">{childForDiary.name}</p>
           )}
         </div>
         <Button
           onClick={() => setAddOpen(true)}
-          className="h-9 gap-1.5 rounded-[8px] bg-[#2f2f2f] px-4 text-sm text-white hover:bg-[#1a1a1a]"
+          className="h-9 gap-1.5 rounded-[8px] bg-primary px-4 text-sm text-white hover:bg-primary"
         >
           <Plus className="h-4 w-4" />
           Nyt notat
@@ -133,15 +133,15 @@ export function Dagbog() {
       </div>
 
       {entries.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-[#d0cec5] bg-[#faf9f6] py-16 text-center">
-          <BookOpen className="h-10 w-10 text-[#c8c6bc]" />
+        <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-border bg-card py-16 text-center">
+          <BookOpen className="h-10 w-10 text-muted-foreground" />
           <div>
-            <p className="text-sm font-semibold text-[#3f3e3a]">Ingen dagbogsnotater endnu</p>
-            <p className="mt-1 text-[12px] text-[#78766d]">Skriv et notat efter næste aflevering</p>
+            <p className="text-sm font-semibold text-foreground">Ingen dagbogsnotater endnu</p>
+            <p className="mt-1 text-[12px] text-muted-foreground">Skriv et notat efter næste aflevering</p>
           </div>
           <Button
             variant="outline"
-            className="mt-1 h-9 rounded-[8px] border-[#d0cec5] px-4 text-sm"
+            className="mt-1 h-9 rounded-[8px] border-border px-4 text-sm"
             onClick={() => setAddOpen(true)}
           >
             <Plus className="mr-1.5 h-4 w-4" /> Opret notat
@@ -153,13 +153,13 @@ export function Dagbog() {
             const moodInfo = getMoodInfo(entry.mood);
             const MoodIcon = moodInfo.icon;
             return (
-              <div key={entry.id} className="rounded-[8px] border border-[#e8e7e0] bg-white px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+              <div key={entry.id} className="rounded-[8px] border border-border bg-card px-4 py-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <MoodIcon className={cn('h-5 w-5', moodInfo.color)} />
                     <div>
-                      <p className="text-[13px] font-semibold text-[#2f2f2d]">{moodInfo.label}</p>
-                      <p className="text-[11px] text-[#78766d]">
+                      <p className="text-[13px] font-semibold text-foreground">{moodInfo.label}</p>
+                      <p className="text-[11px] text-muted-foreground">
                         {format(new Date(entry.date), "EEEE d. MMM, HH:mm", { locale: da })}
                       </p>
                     </div>
@@ -174,7 +174,7 @@ export function Dagbog() {
                   </div>
                 </div>
                 {entry.note && (
-                  <p className="mt-3 text-[13px] leading-relaxed text-[#4a4945]">{entry.note}</p>
+                  <p className="mt-3 text-[13px] leading-relaxed text-foreground">{entry.note}</p>
                 )}
               </div>
             );
@@ -197,7 +197,7 @@ export function Dagbog() {
         <div className="space-y-2">
           {/* Mood */}
           <div className="space-y-1.5">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Humør</p>
+            <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Humør</p>
             <div className="flex gap-2">
               {moodOptions.map(opt => {
                 const Icon = opt.icon;
@@ -208,8 +208,8 @@ export function Dagbog() {
                     className={cn(
                       'flex flex-1 flex-col items-center gap-1 rounded-[8px] py-2.5 transition-all',
                       mood === opt.value
-                        ? 'bg-[#2f2f2f] text-white'
-                        : 'bg-[#ecebe5] text-[#5f5d56] hover:bg-[#e0deda]'
+                        ? 'bg-primary text-white'
+                        : 'bg-secondary text-muted-foreground hover:bg-muted'
                     )}
                   >
                     <Icon className={cn('h-4 w-4', mood === opt.value ? 'text-white' : opt.color)} />
@@ -224,18 +224,18 @@ export function Dagbog() {
           <QualityPicker label="Appetit" value={appetite} onChange={setAppetite} />
 
           <div className="space-y-1.5">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Notat (valgfrit)</p>
+            <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Notat (valgfrit)</p>
             <Textarea
               placeholder="Skriv et notat om afleveringen..."
               value={note}
               onChange={e => setNote(e.target.value)}
               maxLength={2000}
-              className="min-h-[80px] resize-none rounded-[8px] border-[#d8d7cf] bg-white text-sm"
+              className="min-h-[80px] resize-none rounded-[8px] border-border bg-card text-sm"
             />
           </div>
 
           <div className="flex gap-2">
-            <Button variant="outline" className="flex-1 rounded-[8px] border-[#d8d7cf]" onClick={() => {
+            <Button variant="outline" className="flex-1 rounded-[8px] border-border" onClick={() => {
               if (note.trim() || mood !== 'neutral' || sleep !== 'okay' || appetite !== 'okay') {
                 setConfirmClose(true);
               } else {
@@ -244,7 +244,7 @@ export function Dagbog() {
             }}>
               Annuller
             </Button>
-            <Button className="flex-1 flex items-center justify-center gap-2 rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]" onClick={handleAdd} disabled={isSaving}>
+            <Button className="flex-1 flex items-center justify-center gap-2 rounded-[8px] bg-primary text-white hover:bg-primary" onClick={handleAdd} disabled={isSaving}>
               Gem notat
             </Button>
           </div>

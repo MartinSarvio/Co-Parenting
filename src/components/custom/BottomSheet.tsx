@@ -52,7 +52,7 @@ export function BottomSheet({ open, onOpenChange, title, children, compact }: Bo
 
           {/* Sheet */}
           <motion.div
-            className={`fixed inset-x-0 bottom-0 z-[81] mx-auto max-w-[430px] flex flex-col bg-[#f7f6f2] rounded-t-3xl shadow-[0_-8px_40px_rgba(0,0,0,0.12)] ${compact ? 'max-h-[70vh]' : 'max-h-[90vh]'}`}
+            className={`fixed inset-x-0 bottom-0 z-[81] mx-auto max-w-[430px] flex flex-col bg-background rounded-t-3xl shadow-[0_-8px_40px_rgba(0,0,0,0.12)] ${compact ? 'max-h-[70vh]' : 'max-h-[90vh]'}`}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
@@ -66,12 +66,12 @@ export function BottomSheet({ open, onOpenChange, title, children, compact }: Bo
           >
             {/* Drag handle */}
             <div className="flex justify-center pt-3 pb-1 shrink-0">
-              <div className="h-1 w-10 rounded-full bg-[#d8d7cf]" />
+              <div className="h-1 w-10 rounded-full bg-border" />
             </div>
 
             {/* Header */}
             <div className="flex items-center justify-center px-4 pb-3 shrink-0">
-              <h2 className="text-[17px] font-bold text-[#2f2f2d] truncate">
+              <h2 className="text-[17px] font-bold text-foreground truncate">
                 {title}
               </h2>
             </div>

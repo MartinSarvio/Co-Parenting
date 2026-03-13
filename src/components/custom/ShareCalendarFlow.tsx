@@ -112,19 +112,19 @@ export function ShareCalendarFlow({ open, onOpenChange }: ShareCalendarFlowProps
 
   return (
     <Sheet open={open} onOpenChange={handleClose}>
-      <SheetContent side="bottom" hideClose className="flex max-h-[85vh] flex-col rounded-t-[28px] border-[#d8d7d1] bg-[#f7f6f2] shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
-        <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-[#d0cec5] shrink-0" />
+      <SheetContent side="bottom" hideClose className="flex max-h-[85vh] flex-col rounded-t-[28px] border-border bg-background shadow-[0_-18px_40px_rgba(0,0,0,0.2)]">
+        <div aria-hidden="true" className="mx-auto mt-3 h-1.5 w-12 rounded-full bg-muted shrink-0" />
         <SheetHeader className="px-4 pb-2 shrink-0">
           <div className="flex items-center gap-3">
             {step === 2 && (
               <button
                 onClick={handleBack}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-[#5f5d56] hover:bg-[#ecebe6] transition-colors"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-secondary transition-colors"
               >
                 <ChevronLeft className="h-4 w-4" />
               </button>
             )}
-            <SheetTitle className="flex-1 text-center text-[1.05rem] text-[#2f2f2d]">
+            <SheetTitle className="flex-1 text-center text-[1.05rem] text-foreground">
               {step === 1 ? 'Del kalender' : 'Vælg kalendere'}
             </SheetTitle>
             {step === 2 && <div className="w-8" />}
@@ -135,7 +135,7 @@ export function ShareCalendarFlow({ open, onOpenChange }: ShareCalendarFlowProps
           {step === 1 ? (
             /* ── Step 1: Choose recipient ── */
             <div className="space-y-3 py-2">
-              <p className="text-[13px] text-[#75736b]">
+              <p className="text-[13px] text-muted-foreground">
                 Vælg hvem du vil dele din kalender med.
               </p>
               {otherParents.map((user) => {
@@ -144,7 +144,7 @@ export function ShareCalendarFlow({ open, onOpenChange }: ShareCalendarFlowProps
                   <button
                     key={user.id}
                     onClick={() => handleSelectUser(user.id)}
-                    className="flex w-full items-center gap-3 rounded-xl border border-[#e5e3dc] bg-white p-3 transition-colors hover:bg-[#faf9f6]"
+                    className="flex w-full items-center gap-3 rounded-xl border border-border bg-card p-3 transition-colors hover:bg-card"
                   >
                     <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
                       <AvatarImage src={user.avatar} />
@@ -156,18 +156,18 @@ export function ShareCalendarFlow({ open, onOpenChange }: ShareCalendarFlowProps
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 text-left">
-                      <p className="text-[14px] font-semibold text-[#2f2f2d]">{user.name}</p>
+                      <p className="text-[14px] font-semibold text-foreground">{user.name}</p>
                       {user.email && (
-                        <p className="text-[11px] text-[#a09e96]">{user.email}</p>
+                        <p className="text-[11px] text-muted-foreground">{user.email}</p>
                       )}
                     </div>
-                    <Share2 className="h-4 w-4 text-[#a09e96]" />
+                    <Share2 className="h-4 w-4 text-muted-foreground" />
                   </button>
                 );
               })}
               {otherParents.length === 0 && (
                 <div className="py-6 text-center">
-                  <p className="text-sm text-[#a09e96]">Ingen co-parents at dele med.</p>
+                  <p className="text-sm text-muted-foreground">Ingen co-parents at dele med.</p>
                 </div>
               )}
             </div>
@@ -175,56 +175,56 @@ export function ShareCalendarFlow({ open, onOpenChange }: ShareCalendarFlowProps
             /* ── Step 2: Choose calendars + permission levels ── */
             <div className="space-y-4 py-2">
               {selectedUser && (
-                <div className="flex items-center gap-3 rounded-xl border border-[#e5e3dc] bg-white p-3">
+                <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={selectedUser.avatar} />
                     <AvatarFallback className="text-xs">
                       {selectedUser.name[0]}
                     </AvatarFallback>
                   </Avatar>
-                  <p className="text-[13px] font-semibold text-[#2f2f2d]">
+                  <p className="text-[13px] font-semibold text-foreground">
                     Deler med {selectedUser.name}
                   </p>
                 </div>
               )}
 
               <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#75736b]">Kalendere</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Kalendere</p>
 
                 {/* Main calendar */}
-                <div className="flex items-center gap-3 rounded-xl border border-[#e5e3dc] bg-white p-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f2f1ed]">
-                    <Calendar className="h-4 w-4 text-[#5f5d56]" />
+                <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-background">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-semibold text-[#2f2f2d]">Hovedkalender</p>
+                    <p className="text-[13px] font-semibold text-foreground">Hovedkalender</p>
                   </div>
                   <SelectSheet
                     value={calendarPermissions.main || defaultLevel}
                     onValueChange={(v) => setCalendarPermissions((prev) => ({ ...prev, main: v as SharePermissionLevel }))}
                     title="Adgangsniveau"
                     options={Object.entries(PERMISSION_LABELS).map(([value, label]) => ({ value, label }))}
-                    className="h-8 w-[120px] rounded-lg border-[#e5e3dc] text-[11px]"
+                    className="h-8 w-[120px] rounded-lg border-border text-[11px]"
                     size="sm"
                   />
                 </div>
 
                 {/* External calendar sources */}
                 {calendarSources.map((source) => (
-                  <div key={source.id} className="flex items-center gap-3 rounded-xl border border-[#e5e3dc] bg-white p-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f2f1ed]">
-                      <Calendar className="h-4 w-4 text-[#5f5d56]" />
+                  <div key={source.id} className="flex items-center gap-3 rounded-xl border border-border bg-card p-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-background">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-semibold text-[#2f2f2d] truncate">{source.name}</p>
-                      <p className="text-[10px] text-[#a09e96]">{source.type}</p>
+                      <p className="text-[13px] font-semibold text-foreground truncate">{source.name}</p>
+                      <p className="text-[10px] text-muted-foreground">{source.type}</p>
                     </div>
                     <SelectSheet
                       value={calendarPermissions[source.id] || defaultLevel}
                       onValueChange={(v) => setCalendarPermissions((prev) => ({ ...prev, [source.id]: v as SharePermissionLevel }))}
                       title="Adgangsniveau"
                       options={Object.entries(PERMISSION_LABELS).map(([value, label]) => ({ value, label }))}
-                      className="h-8 w-[120px] rounded-lg border-[#e5e3dc] text-[11px]"
+                      className="h-8 w-[120px] rounded-lg border-border text-[11px]"
                       size="sm"
                     />
                   </div>

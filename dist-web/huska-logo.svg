@@ -1,0 +1,27 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="panel" x1="96" y1="96" x2="928" y2="928" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2F2B27"/>
+      <stop offset="1" stop-color="#221F1C"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="1024" fill="#F1EEE8"/>
+  <rect x="48" y="48" width="928" height="928" rx="236" fill="url(#panel)"/>
+
+  <g transform="translate(0 -38)">
+    <path
+      fill="#F1EEE8"
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M228 818V610C228 416.7 352.427 282 512 282C671.573 282 796 416.7 796 610V818H676V612C676 489.423 603.016 408 512 408C420.984 408 348 489.423 348 612V818H228Z"
+    />
+    <path
+      fill="#D3C4A7"
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="M380 818V644C380 516.269 437.307 440 512 440C586.693 440 644 516.269 644 644V818H556V648C556 591.086 535.627 560 512 560C488.373 560 468 591.086 468 648V818H380Z"
+    />
+    <rect x="486" y="584" width="48" height="228" rx="24" fill="#25211F"/>
+  </g>
+</svg>

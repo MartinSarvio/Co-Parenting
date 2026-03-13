@@ -58,25 +58,25 @@ function buildSearchValue(...parts: (string | undefined)[]): string {
 
 // All navigable sections with rich keywords
 const sectionItems: { id: string; label: string; tab: string; keywords: string; icon: React.ReactNode }[] = [
-  { id: 'nav-dashboard', label: 'Oversigt', tab: 'dashboard', keywords: 'oversigt dashboard hjem forside start', icon: <LayoutDashboard className="h-4 w-4 text-[#5f5d56]" /> },
-  { id: 'nav-samvaer', label: 'Samværsplan', tab: 'samversplan', keywords: 'samvær samværsplan samvaersplan custody plan skifteordning uge weekend hverdage', icon: <Repeat className="h-4 w-4 text-[#5f5d56]" /> },
+  { id: 'nav-dashboard', label: 'Oversigt', tab: 'dashboard', keywords: 'oversigt dashboard hjem forside start', icon: <LayoutDashboard className="h-4 w-4 text-muted-foreground" /> },
+  { id: 'nav-samvaer', label: 'Samværsplan', tab: 'samversplan', keywords: 'samvær samværsplan samvaersplan custody plan skifteordning uge weekend hverdage', icon: <Repeat className="h-4 w-4 text-muted-foreground" /> },
   { id: 'nav-kalender', label: 'Kalender', tab: 'kalender', keywords: 'kalender calendar begivenheder events aftale aftaler dato program', icon: <CalendarDays className="h-4 w-4 text-blue-500" /> },
-  { id: 'nav-handover', label: 'Aflevering', tab: 'handover', keywords: 'aflevering handover hente bringe pakkeliste checklist overlevering', icon: <UserCircle className="h-4 w-4 text-[#5f5d56]" /> },
+  { id: 'nav-handover', label: 'Aflevering', tab: 'handover', keywords: 'aflevering handover hente bringe pakkeliste checklist overlevering', icon: <UserCircle className="h-4 w-4 text-muted-foreground" /> },
   { id: 'nav-opgaver', label: 'Opgaver & Indkøb', tab: 'opgaver', keywords: 'opgaver tasks indkøb shopping todo gøremål liste indkobsliste', icon: <CheckSquare className="h-4 w-4 text-green-500" /> },
   { id: 'nav-madhjem', label: 'Mad & Hjem', tab: 'mad-hjem', keywords: 'mad hjem madplan rengøring opskrifter meal food cleaning køkken køleskab indkøbsliste rengoering', icon: <UtensilsCrossed className="h-4 w-4 text-[#bf6722]" /> },
   { id: 'nav-chat', label: 'Chat / Kommunikation', tab: 'kommunikation', keywords: 'chat kommunikation beskeder messages samtale sms besked tråd', icon: <MessageCircle className="h-4 w-4 text-teal-500" /> },
   { id: 'nav-expenses', label: 'Udgifter', tab: 'expenses', keywords: 'udgifter expenses økonomi penge betaling delt balance regning kvittering okonomi', icon: <Receipt className="h-4 w-4 text-orange-500" /> },
   { id: 'nav-children', label: 'Børn', tab: 'children', keywords: 'børn children barn institution skole børnehave vuggestue born', icon: <Baby className="h-4 w-4 text-[#bf6722]" /> },
-  { id: 'nav-overblik', label: 'Børneoverblik', tab: 'borneoverblik', keywords: 'børneoverblik overblik milestones dokumenter milepæle born borneoverblik', icon: <UserCircle className="h-4 w-4 text-[#5f5d56]" /> },
-  { id: 'nav-referater', label: 'Referater', tab: 'meeting-minutes', keywords: 'referater mødereferat meeting minutes notat møde mode modereferat', icon: <FileText className="h-4 w-4 text-[#5f5d56]" /> },
-  { id: 'nav-dokumenter', label: 'Dokumenter', tab: 'dokumenter', keywords: 'dokumenter documents blanketter familieretshuset officielle papirer filer', icon: <FolderOpen className="h-4 w-4 text-[#5f5d56]" /> },
-  { id: 'nav-fotoalbum', label: 'Fotoalbum', tab: 'fotoalbum', keywords: 'fotoalbum billeder photos fotos album foto', icon: <Camera className="h-4 w-4 text-[#5f5d56]" /> },
-  { id: 'nav-dagbog', label: 'Dagbog', tab: 'dagbog', keywords: 'dagbog diary journal noter bog notater', icon: <BookOpen className="h-4 w-4 text-[#5f5d56]" /> },
-  { id: 'nav-datoer', label: 'Vigtige datoer', tab: 'vigtige-datoer', keywords: 'vigtige datoer key dates fødselsdage jubilæum fodselsdage jubilaeum', icon: <CalendarHeart className="h-4 w-4 text-[#5f5d56]" /> },
-  { id: 'nav-beslutninger', label: 'Beslutningslog', tab: 'beslutningslog', keywords: 'beslutninger beslutningslog decisions log aftale aftaler', icon: <ClipboardList className="h-4 w-4 text-[#5f5d56]" /> },
-  { id: 'nav-aarskalender', label: 'Årskalender', tab: 'aarskalender', keywords: 'årskalender aarskalender year calendar oversigt helår helårs aar ars arskalender', icon: <CalendarRange className="h-4 w-4 text-[#5f5d56]" /> },
-  { id: 'nav-feed', label: 'Feed', tab: 'feed', keywords: 'feed nyheder tilbud forum rss news offers community opslag', icon: <Rss className="h-4 w-4 text-[#5f5d56]" /> },
-  { id: 'nav-settings', label: 'Indstillinger', tab: 'settings', keywords: 'indstillinger settings profil konto abonnement betaling familie', icon: <Settings className="h-4 w-4 text-[#5f5d56]" /> },
+  { id: 'nav-overblik', label: 'Børneoverblik', tab: 'borneoverblik', keywords: 'børneoverblik overblik milestones dokumenter milepæle born borneoverblik', icon: <UserCircle className="h-4 w-4 text-muted-foreground" /> },
+  { id: 'nav-referater', label: 'Referater', tab: 'meeting-minutes', keywords: 'referater mødereferat meeting minutes notat møde mode modereferat', icon: <FileText className="h-4 w-4 text-muted-foreground" /> },
+  { id: 'nav-dokumenter', label: 'Dokumenter', tab: 'dokumenter', keywords: 'dokumenter documents blanketter familieretshuset officielle papirer filer', icon: <FolderOpen className="h-4 w-4 text-muted-foreground" /> },
+  { id: 'nav-fotoalbum', label: 'Fotoalbum', tab: 'fotoalbum', keywords: 'fotoalbum billeder photos fotos album foto', icon: <Camera className="h-4 w-4 text-muted-foreground" /> },
+  { id: 'nav-dagbog', label: 'Dagbog', tab: 'dagbog', keywords: 'dagbog diary journal noter bog notater', icon: <BookOpen className="h-4 w-4 text-muted-foreground" /> },
+  { id: 'nav-datoer', label: 'Vigtige datoer', tab: 'vigtige-datoer', keywords: 'vigtige datoer key dates fødselsdage jubilæum fodselsdage jubilaeum', icon: <CalendarHeart className="h-4 w-4 text-muted-foreground" /> },
+  { id: 'nav-beslutninger', label: 'Beslutningslog', tab: 'beslutningslog', keywords: 'beslutninger beslutningslog decisions log aftale aftaler', icon: <ClipboardList className="h-4 w-4 text-muted-foreground" /> },
+  { id: 'nav-aarskalender', label: 'Årskalender', tab: 'aarskalender', keywords: 'årskalender aarskalender year calendar oversigt helår helårs aar ars arskalender', icon: <CalendarRange className="h-4 w-4 text-muted-foreground" /> },
+  { id: 'nav-feed', label: 'Feed', tab: 'feed', keywords: 'feed nyheder tilbud forum rss news offers community opslag', icon: <Rss className="h-4 w-4 text-muted-foreground" /> },
+  { id: 'nav-settings', label: 'Indstillinger', tab: 'settings', keywords: 'indstillinger settings profil konto abonnement betaling familie', icon: <Settings className="h-4 w-4 text-muted-foreground" /> },
   { id: 'nav-sager', label: 'Professionel oversigt', tab: 'cases', keywords: 'professionel sager cases sagsbehandler advokat myndigheder', icon: <Briefcase className="h-4 w-4 text-indigo-500" /> },
 ];
 
@@ -261,7 +261,7 @@ export function GlobalSearch({ variant = 'icon' }: { variant?: 'icon' | 'inline'
       {variant === 'inline' ? (
         <button
           onClick={() => setOpen(true)}
-          className="flex h-12 w-full items-center gap-3 rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] px-4 text-left text-[#78766d] transition-colors hover:bg-[#f2f1ec]"
+          className="flex h-12 w-full items-center gap-3 rounded-[8px] border border-border bg-card px-4 text-left text-muted-foreground transition-colors hover:bg-background"
           aria-label="Søg (⌘K)"
         >
           <Search className="h-4 w-4 shrink-0" />
@@ -270,7 +270,7 @@ export function GlobalSearch({ variant = 'icon' }: { variant?: 'icon' | 'inline'
       ) : (
         <button
           onClick={() => setOpen(true)}
-          className="flex h-10 w-10 items-center justify-center text-[#4a4944] transition-colors"
+          className="flex h-10 w-10 items-center justify-center text-foreground transition-colors"
           aria-label="Åbn global søgning (⌘K)"
           title="Søg (⌘K)"
         >
@@ -286,19 +286,19 @@ export function GlobalSearch({ variant = 'icon' }: { variant?: 'icon' | 'inline'
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className="fixed inset-0 z-[100] mx-auto max-w-[430px] bg-[#faf9f6] flex flex-col"
+              className="fixed inset-0 z-[100] mx-auto max-w-[430px] bg-card flex flex-col"
               style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
             >
               {/* Header */}
-              <div className="flex items-center gap-3 px-4 py-3 border-b border-[#e5e3dc]">
+              <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
                 <button
                   onClick={() => setOpen(false)}
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] text-[#5f5d56] hover:bg-[#eceae2] transition-colors"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] text-muted-foreground hover:bg-secondary transition-colors"
                 >
                   <ArrowLeft className="h-5 w-5" />
                 </button>
                 <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9a978f]" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <input
                     ref={inputRef}
                     autoFocus
@@ -307,7 +307,7 @@ export function GlobalSearch({ variant = 'icon' }: { variant?: 'icon' | 'inline'
                     inputMode="search"
                     enterKeyHint="search"
                     placeholder="Søg efter sektion, opgave, begivenhed…"
-                    className="w-full rounded-[8px] border border-[#d8d7cf] bg-white py-2.5 pl-10 pr-4 text-[15px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d] transition-colors"
+                    className="w-full rounded-[8px] border border-border bg-card py-2.5 pl-10 pr-4 text-[15px] text-foreground placeholder:text-muted-foreground outline-none focus:border-[#f58a2d] transition-colors"
                   />
                 </div>
               </div>
@@ -316,15 +316,15 @@ export function GlobalSearch({ variant = 'icon' }: { variant?: 'icon' | 'inline'
               <div className="flex-1 overflow-y-auto pb-[env(safe-area-inset-bottom,24px)]">
                 {totalResults === 0 && query.trim() ? (
                   <div className="flex flex-col items-center justify-center py-16 text-center">
-                    <Search className="h-8 w-8 text-[#d8d7cf] mb-3" />
-                    <p className="text-[15px] font-medium text-[#78766d]">Ingen resultater fundet</p>
-                    <p className="text-[13px] text-[#b0ada4] mt-1">Prøv et andet søgeord</p>
+                    <Search className="h-8 w-8 text-muted-foreground mb-3" />
+                    <p className="text-[15px] font-medium text-muted-foreground">Ingen resultater fundet</p>
+                    <p className="text-[13px] text-muted-foreground mt-1">Prøv et andet søgeord</p>
                   </div>
                 ) : (
                   filteredGroups.map((group) => (
                     <div key={group.label}>
-                      <div className="sticky top-0 bg-[#faf9f6] px-5 py-2 border-b border-[#eeedea]">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[#9a978f]">
+                      <div className="sticky top-0 bg-card px-5 py-2 border-b border-border">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
                           {group.label}
                         </p>
                       </div>
@@ -332,15 +332,15 @@ export function GlobalSearch({ variant = 'icon' }: { variant?: 'icon' | 'inline'
                         <button
                           key={result.id}
                           onClick={() => handleSelect(result.tab)}
-                          className="flex w-full items-center gap-3 px-5 py-3 text-left transition-colors hover:bg-[#f2f1ed] active:bg-[#eceae2]"
+                          className="flex w-full items-center gap-3 px-5 py-3 text-left transition-colors hover:bg-background active:bg-secondary"
                         >
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] bg-[#f2f1ed]">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] bg-background">
                             {result.icon}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-[14px] font-semibold text-[#2f2f2d] truncate">{result.title}</p>
+                            <p className="text-[14px] font-semibold text-foreground truncate">{result.title}</p>
                             {result.subtitle && (
-                              <p className="text-[12px] text-[#9a978f] truncate">{result.subtitle}</p>
+                              <p className="text-[12px] text-muted-foreground truncate">{result.subtitle}</p>
                             )}
                           </div>
                         </button>

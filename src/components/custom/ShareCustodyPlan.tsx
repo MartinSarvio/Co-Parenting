@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Share2, FileText, Link2, Check, Copy, Loader2, Trash2 } from 'lucide-react';
 import { exportCustodyPlanPDF } from '@/lib/export';
 import { supabase } from '@/lib/supabase';
-import type { CustodyPlan, Child, User } from '@/types';
+import type { CustodyPlan, Child } from '@/types';
 
 interface SharedLink {
   id: string;
@@ -95,7 +95,7 @@ export function ShareCustodyPlan({ plan, child }: ShareCustodyPlanProps) {
         variant="ghost"
         size="sm"
         onClick={handleOpen}
-        className="gap-1.5 text-[#75736b]"
+        className="gap-1.5 text-muted-foreground"
       >
         <Share2 className="h-4 w-4" />
         Del
@@ -103,21 +103,21 @@ export function ShareCustodyPlan({ plan, child }: ShareCustodyPlanProps) {
 
       <BottomSheet open={open} onOpenChange={setOpen} title="Del samværsplan" compact>
         <div className="space-y-4 pb-4">
-          <p className="text-sm text-[#75736b]">
+          <p className="text-sm text-muted-foreground">
             Del samværsplanen for {child.name} med familie eller andre.
           </p>
 
           {/* PDF option */}
           <button
             onClick={handlePDF}
-            className="flex w-full items-center gap-3 rounded-lg border border-[#e8e6df] p-3 text-left transition-colors hover:bg-[#f8f7f3]"
+            className="flex w-full items-center gap-3 rounded-lg border border-border p-3 text-left transition-colors hover:bg-card"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f0efe8]">
-              <FileText className="h-5 w-5 text-[#5f5d56]" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+              <FileText className="h-5 w-5 text-muted-foreground" />
             </div>
             <div>
-              <div className="text-sm font-semibold text-[#2f2f2d]">Download PDF</div>
-              <div className="text-xs text-[#75736b]">Åbner udskriftsdialog — gem som PDF</div>
+              <div className="text-sm font-semibold text-foreground">Download PDF</div>
+              <div className="text-xs text-muted-foreground">Åbner udskriftsdialog — gem som PDF</div>
             </div>
           </button>
 
@@ -125,37 +125,37 @@ export function ShareCustodyPlan({ plan, child }: ShareCustodyPlanProps) {
           <button
             onClick={handleCreateLink}
             disabled={creating}
-            className="flex w-full items-center gap-3 rounded-lg border border-[#e8e6df] p-3 text-left transition-colors hover:bg-[#f8f7f3] disabled:opacity-50"
+            className="flex w-full items-center gap-3 rounded-lg border border-border p-3 text-left transition-colors hover:bg-card disabled:opacity-50"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f0efe8]">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
               {creating ? (
-                <Loader2 className="h-5 w-5 animate-spin text-[#5f5d56]" />
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
               ) : (
-                <Link2 className="h-5 w-5 text-[#5f5d56]" />
+                <Link2 className="h-5 w-5 text-muted-foreground" />
               )}
             </div>
             <div>
-              <div className="text-sm font-semibold text-[#2f2f2d]">Opret delingslink</div>
-              <div className="text-xs text-[#75736b]">Gyldigt i 30 dage — kan deaktiveres</div>
+              <div className="text-sm font-semibold text-foreground">Opret delingslink</div>
+              <div className="text-xs text-muted-foreground">Gyldigt i 30 dage — kan deaktiveres</div>
             </div>
           </button>
 
           {/* Existing links */}
           {links.length > 0 && (
             <div className="space-y-2">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-[#9d9b93]">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Aktive links
               </h3>
               {links.map((link) => (
                 <div
                   key={link.id}
-                  className="flex items-center gap-2 rounded-lg border border-[#e8e6df] p-2"
+                  className="flex items-center gap-2 rounded-lg border border-border p-2"
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-xs font-mono text-[#5f5d56]">
+                    <div className="truncate text-xs font-mono text-muted-foreground">
                       huska.dk/del/samvaer/{link.token.slice(0, 8)}...
                     </div>
-                    <div className="text-[10px] text-[#9d9b93]">
+                    <div className="text-[10px] text-muted-foreground">
                       Udløber {new Date(link.expires_at).toLocaleDateString('da-DK')} · {link.view_count} visninger
                     </div>
                   </div>
@@ -182,7 +182,7 @@ export function ShareCustodyPlan({ plan, child }: ShareCustodyPlanProps) {
 
           {loadingLinks && (
             <div className="flex justify-center py-2">
-              <Loader2 className="h-5 w-5 animate-spin text-[#9d9b93]" />
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
           )}
         </div>

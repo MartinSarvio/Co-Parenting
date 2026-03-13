@@ -19,7 +19,7 @@ export function CatalogProductCard({ product, storeColor, isAdded, inCart, nutri
   const up = calculateUnitPrice(product.price, product.unit);
 
   return (
-    <div className="relative min-w-[150px] max-w-[150px] snap-start shrink-0 rounded-[8px] bg-white p-3 flex flex-col overflow-visible">
+    <div className="relative min-w-[150px] max-w-[150px] snap-start shrink-0 rounded-[8px] bg-card p-3 flex flex-col overflow-visible">
       {nutriscoreGrade && (
         <NutriScoreBadge grade={nutriscoreGrade} size="sm" className="absolute top-1 left-1 z-10" />
       )}
@@ -38,21 +38,21 @@ export function CatalogProductCard({ product, storeColor, isAdded, inCart, nutri
           className="w-full h-20 mb-1.5 -mt-1"
         />
       )}
-      <p className="text-[13px] font-semibold text-[#2f2f2d] leading-snug line-clamp-2">{product.name}</p>
+      <p className="text-[13px] font-semibold text-foreground leading-snug line-clamp-2">{product.name}</p>
       {product.unit && (
-        <p className="text-[10px] text-[#9a978f] mt-0.5">{product.unit}</p>
+        <p className="text-[10px] text-muted-foreground mt-0.5">{product.unit}</p>
       )}
       <div className="flex items-baseline gap-1.5 mt-auto pt-1.5">
-        <span className="text-[15px] font-bold text-[#2f2f2d]">{formatDKK(product.price)}</span>
+        <span className="text-[15px] font-bold text-foreground">{formatDKK(product.price)}</span>
         {product.originalPrice && (
-          <span className="text-[11px] text-[#9a978f] line-through">{formatDKK(product.originalPrice)}</span>
+          <span className="text-[11px] text-muted-foreground line-through">{formatDKK(product.originalPrice)}</span>
         )}
         <span className="text-[10px] font-bold text-white bg-[#ef4444] rounded-full px-1.5 py-0.5 ml-auto">
           {product.discount}
         </span>
       </div>
       {up && (
-        <p className="text-[10px] text-[#78766d] mt-0.5">{up.formatted}</p>
+        <p className="text-[10px] text-muted-foreground mt-0.5">{up.formatted}</p>
       )}
       <button
         onClick={() => onSelect(product)}

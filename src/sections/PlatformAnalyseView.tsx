@@ -33,10 +33,10 @@ import {
 
 function SectionCard({ title, children, className }: { title?: string; children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn('rounded-[16px] bg-white border border-[#e8e6df] shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden', className)}>
+    <div className={cn('rounded-[16px] bg-card border border-border shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden', className)}>
       {title && (
         <div className="px-4 pt-4 pb-2">
-          <p className="text-[14px] font-semibold text-[#2f2f2d]">{title}</p>
+          <p className="text-[14px] font-semibold text-foreground">{title}</p>
         </div>
       )}
       {children}
@@ -49,7 +49,7 @@ function SectionCard({ title, children, className }: { title?: string; children:
 function TrendBadge({ current, previous }: { current: number; previous: number }) {
   if (previous === 0 && current === 0) {
     return (
-      <span className="inline-flex items-center gap-0.5 rounded-full bg-[#8E8E93]/10 px-2 py-0.5 text-[11px] font-semibold text-[#8E8E93]">
+      <span className="inline-flex items-center gap-0.5 rounded-full bg-[#8E8E93]/10 px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
         <Minus className="h-3 w-3" /> 0%
       </span>
     );
@@ -59,7 +59,7 @@ function TrendBadge({ current, previous }: { current: number; previous: number }
   return (
     <span className={cn(
       'inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[11px] font-semibold',
-      isUp ? 'bg-[#34C759]/10 text-[#34C759]' : diff < 0 ? 'bg-[#FF3B30]/10 text-[#FF3B30]' : 'bg-[#8E8E93]/10 text-[#8E8E93]'
+      isUp ? 'bg-[#34C759]/10 text-[#34C759]' : diff < 0 ? 'bg-[#FF3B30]/10 text-[#FF3B30]' : 'bg-[#8E8E93]/10 text-muted-foreground'
     )}>
       {isUp ? <TrendingUp className="h-3 w-3" /> : diff < 0 ? <TrendingDown className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
       {isUp ? '+' : ''}{diff}%
@@ -72,8 +72,8 @@ function TrendBadge({ current, previous }: { current: number; previous: number }
 function EmptyChart({ text }: { text: string }) {
   return (
     <div className="flex flex-col items-center justify-center gap-2 py-8 text-center">
-      <BarChart3 className="h-7 w-7 text-[#d4d2cb]" />
-      <p className="text-[12px] text-[#9a978f]">{text}</p>
+      <BarChart3 className="h-7 w-7 text-muted-foreground" />
+      <p className="text-[12px] text-muted-foreground">{text}</p>
     </div>
   );
 }
@@ -83,9 +83,9 @@ function EmptyChart({ text }: { text: string }) {
 function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number }>; label?: string }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-[10px] border border-[#e8e6df] bg-white px-3 py-2 shadow-lg">
-      <p className="text-[12px] font-semibold text-[#2f2f2d]">{label}</p>
-      <p className="text-[11px] text-[#5f5d56]">{payload[0].value} events</p>
+    <div className="rounded-[10px] border border-border bg-card px-3 py-2 shadow-lg">
+      <p className="text-[12px] font-semibold text-foreground">{label}</p>
+      <p className="text-[11px] text-muted-foreground">{payload[0].value} events</p>
     </div>
   );
 }
@@ -95,9 +95,9 @@ function RevenueTooltip({ active, payload, label }: { active?: boolean; payload?
   const sub = payload.find(p => p.dataKey === 'count');
   const rev = payload.find(p => p.dataKey === 'revenue');
   return (
-    <div className="rounded-[10px] border border-[#e8e6df] bg-white px-3 py-2 shadow-lg">
-      <p className="text-[12px] font-semibold text-[#2f2f2d]">{label}</p>
-      {sub && <p className="text-[11px] text-[#5f5d56]">{sub.value} abonnenter</p>}
+    <div className="rounded-[10px] border border-border bg-card px-3 py-2 shadow-lg">
+      <p className="text-[12px] font-semibold text-foreground">{label}</p>
+      {sub && <p className="text-[11px] text-muted-foreground">{sub.value} abonnenter</p>}
       {rev && <p className="text-[11px] text-[#34C759] font-medium">{formatCurrency(rev.value)}</p>}
     </div>
   );
@@ -107,9 +107,9 @@ function DonutTooltip({ active, payload }: { active?: boolean; payload?: Array<{
   if (!active || !payload?.length) return null;
   const d = payload[0].payload;
   return (
-    <div className="rounded-[10px] border border-[#e8e6df] bg-white px-3 py-2 shadow-lg">
-      <p className="text-[12px] font-semibold text-[#2f2f2d]">{d.label}</p>
-      <p className="text-[11px] text-[#5f5d56]">{d.count} ({d.percentage}%)</p>
+    <div className="rounded-[10px] border border-border bg-card px-3 py-2 shadow-lg">
+      <p className="text-[12px] font-semibold text-foreground">{d.label}</p>
+      <p className="text-[11px] text-muted-foreground">{d.count} ({d.percentage}%)</p>
     </div>
   );
 }
@@ -182,48 +182,48 @@ export function PlatformAnalyseView() {
 
       {/* ── Indholdsstatistik (2x2 pastel kort) ─────────────────────────── */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-[16px] bg-[#fff6ef] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <div className="rounded-[16px] bg-orange-tint-light p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <div className="flex items-center justify-between mb-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#f58a2d]/20">
               <Newspaper className="h-5 w-5 text-[#f58a2d]" />
             </div>
             {stats && <TrendBadge current={stats.newsViews} previous={stats.newsViewsPrev} />}
           </div>
-          <p className="text-[28px] font-bold text-[#2f2f2d] leading-none tabular-nums">{stats?.newsViews ?? 0}</p>
-          <p className="text-[12px] text-[#7a786f] mt-1.5">Nyheds-visninger</p>
+          <p className="text-[28px] font-bold text-foreground leading-none tabular-nums">{stats?.newsViews ?? 0}</p>
+          <p className="text-[12px] text-muted-foreground mt-1.5">Nyheds-visninger</p>
         </div>
 
-        <div className="rounded-[16px] bg-[#eef9ee] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <div className="rounded-[16px] bg-green-tint p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <div className="flex items-center justify-between mb-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#34C759]/20">
               <ShoppingBag className="h-5 w-5 text-[#34C759]" />
             </div>
             {stats && <TrendBadge current={stats.productClicks} previous={stats.productClicksPrev} />}
           </div>
-          <p className="text-[28px] font-bold text-[#2f2f2d] leading-none tabular-nums">{stats?.productClicks ?? 0}</p>
-          <p className="text-[12px] text-[#7a786f] mt-1.5">Produkt-klik</p>
+          <p className="text-[28px] font-bold text-foreground leading-none tabular-nums">{stats?.productClicks ?? 0}</p>
+          <p className="text-[12px] text-muted-foreground mt-1.5">Produkt-klik</p>
         </div>
 
-        <div className="rounded-[16px] bg-[#f5effe] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <div className="rounded-[16px] bg-blue-tint p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <div className="flex items-center justify-between mb-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#AF52DE]/20">
               <Tag className="h-5 w-5 text-[#AF52DE]" />
             </div>
             {stats && <TrendBadge current={stats.offerViews} previous={stats.offerViewsPrev} />}
           </div>
-          <p className="text-[28px] font-bold text-[#2f2f2d] leading-none tabular-nums">{stats?.offerViews ?? 0}</p>
-          <p className="text-[12px] text-[#7a786f] mt-1.5">Sidevisninger</p>
+          <p className="text-[28px] font-bold text-foreground leading-none tabular-nums">{stats?.offerViews ?? 0}</p>
+          <p className="text-[12px] text-muted-foreground mt-1.5">Sidevisninger</p>
         </div>
 
-        <div className="rounded-[16px] bg-[#eaf6ff] p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <div className="rounded-[16px] bg-blue-tint p-4 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
           <div className="flex items-center justify-between mb-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#5AC8FA]/20">
               <MessageCircle className="h-5 w-5 text-[#5AC8FA]" />
             </div>
             {stats && <TrendBadge current={stats.forumPosts} previous={stats.forumPostsPrev} />}
           </div>
-          <p className="text-[28px] font-bold text-[#2f2f2d] leading-none tabular-nums">{stats?.forumPosts ?? 0}</p>
-          <p className="text-[12px] text-[#7a786f] mt-1.5">Forum-indlæg</p>
+          <p className="text-[28px] font-bold text-foreground leading-none tabular-nums">{stats?.forumPosts ?? 0}</p>
+          <p className="text-[12px] text-muted-foreground mt-1.5">Forum-indlæg</p>
         </div>
       </div>
 
@@ -255,17 +255,17 @@ export function PlatformAnalyseView() {
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                  <p className="text-[28px] font-bold text-[#2f2f2d] leading-none tabular-nums">{totalEvents.toLocaleString('da-DK')}</p>
-                  <p className="text-[11px] text-[#9a978f] mt-1">Total events</p>
+                  <p className="text-[28px] font-bold text-foreground leading-none tabular-nums">{totalEvents.toLocaleString('da-DK')}</p>
+                  <p className="text-[11px] text-muted-foreground mt-1">Total events</p>
                 </div>
               </div>
 
               <div className="w-full mt-3 space-y-0">
                 {eventBreakdown.map((entry) => (
-                  <div key={entry.eventType} className="flex items-center gap-3 py-2 border-b border-[#f2f1ed] last:border-b-0">
+                  <div key={entry.eventType} className="flex items-center gap-3 py-2 border-b border-border last:border-b-0">
                     <div className="h-3 w-3 rounded-full shrink-0" style={{ backgroundColor: entry.color }} />
-                    <span className="text-[13px] text-[#4a4945] flex-1">{entry.label}</span>
-                    <span className="text-[13px] font-semibold text-[#2f2f2d] tabular-nums">{entry.count.toLocaleString('da-DK')}</span>
+                    <span className="text-[13px] text-foreground flex-1">{entry.label}</span>
+                    <span className="text-[13px] font-semibold text-foreground tabular-nums">{entry.count.toLocaleString('da-DK')}</span>
                     <span className="text-[12px] font-medium tabular-nums w-11 text-right" style={{ color: entry.color }}>{entry.percentage}%</span>
                   </div>
                 ))}
@@ -280,40 +280,40 @@ export function PlatformAnalyseView() {
         <div className="px-4 pb-4">
           {/* 3 mini-kort */}
           <div className="grid grid-cols-3 gap-2 mb-4">
-            <div className="rounded-[12px] bg-[#eef9ee] p-3 text-center">
+            <div className="rounded-[12px] bg-green-tint p-3 text-center">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#34C759]/20 mx-auto mb-1.5">
                 <DollarSign className="h-4.5 w-4.5 text-[#34C759]" />
               </div>
-              <p className="text-[17px] font-bold text-[#2f2f2d] leading-none tabular-nums">
+              <p className="text-[17px] font-bold text-foreground leading-none tabular-nums">
                 {revenue ? formatCurrency(revenue.totalMRR) : '—'}
               </p>
-              <p className="text-[10px] text-[#9a978f] mt-1 uppercase tracking-wider font-medium">MRR</p>
+              <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider font-medium">MRR</p>
             </div>
 
-            <div className="rounded-[12px] bg-[#eaf6ff] p-3 text-center">
+            <div className="rounded-[12px] bg-blue-tint p-3 text-center">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#5AC8FA]/20 mx-auto mb-1.5">
                 <Users className="h-4.5 w-4.5 text-[#5AC8FA]" />
               </div>
-              <p className="text-[17px] font-bold text-[#2f2f2d] leading-none tabular-nums">
+              <p className="text-[17px] font-bold text-foreground leading-none tabular-nums">
                 {revenue?.activeSubscribers ?? 0}
               </p>
-              <p className="text-[10px] text-[#9a978f] mt-1 uppercase tracking-wider font-medium">Aktive</p>
+              <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider font-medium">Aktive</p>
             </div>
 
-            <div className="rounded-[12px] bg-[#fff3f0] p-3 text-center">
+            <div className="rounded-[12px] bg-red-tint p-3 text-center">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#FF3B30]/20 mx-auto mb-1.5">
                 <CreditCard className="h-4.5 w-4.5 text-[#FF3B30]" />
               </div>
-              <p className="text-[17px] font-bold text-[#2f2f2d] leading-none tabular-nums">
+              <p className="text-[17px] font-bold text-foreground leading-none tabular-nums">
                 {revenue?.cancellingCount ?? 0}
               </p>
-              <p className="text-[10px] text-[#9a978f] mt-1 uppercase tracking-wider font-medium">Opsiger</p>
+              <p className="text-[10px] text-muted-foreground mt-1 uppercase tracking-wider font-medium">Opsiger</p>
             </div>
           </div>
 
           {/* Abonnent-vækst chart */}
-          <div className="rounded-[12px] bg-[#faf9f6] p-3">
-            <p className="text-[12px] font-medium text-[#7a786f] mb-2">Abonnent-vækst (6 mdr.)</p>
+          <div className="rounded-[12px] bg-card p-3">
+            <p className="text-[12px] font-medium text-muted-foreground mb-2">Abonnent-vækst (6 mdr.)</p>
             {!revenue || revenue.subscribersByMonth.length === 0 ? (
               <EmptyChart text="Ingen abonnementsdata endnu" />
             ) : (
@@ -343,20 +343,20 @@ export function PlatformAnalyseView() {
           </div>
 
           {/* Plan breakdown */}
-          <div className="mt-3 rounded-[12px] bg-[#faf9f6] divide-y divide-[#e8e6df]">
+          <div className="mt-3 rounded-[12px] bg-card divide-y divide-border">
             <div className="flex items-center justify-between px-3 py-2.5">
               <div className="flex items-center gap-2">
                 <div className="h-2.5 w-2.5 rounded-full bg-[#f58a2d]" />
-                <span className="text-[13px] text-[#4a4945]">Family Plus</span>
+                <span className="text-[13px] text-foreground">Family Plus</span>
               </div>
-              <span className="text-[13px] font-semibold text-[#2f2f2d] tabular-nums">{revenue?.familyPlusCount ?? 0}</span>
+              <span className="text-[13px] font-semibold text-foreground tabular-nums">{revenue?.familyPlusCount ?? 0}</span>
             </div>
             <div className="flex items-center justify-between px-3 py-2.5">
               <div className="flex items-center gap-2">
                 <div className="h-2.5 w-2.5 rounded-full bg-[#AF52DE]" />
-                <span className="text-[13px] text-[#4a4945]">Single Parent Plus</span>
+                <span className="text-[13px] text-foreground">Single Parent Plus</span>
               </div>
-              <span className="text-[13px] font-semibold text-[#2f2f2d] tabular-nums">{revenue?.singleParentPlusCount ?? 0}</span>
+              <span className="text-[13px] font-semibold text-foreground tabular-nums">{revenue?.singleParentPlusCount ?? 0}</span>
             </div>
           </div>
         </div>
@@ -366,7 +366,7 @@ export function PlatformAnalyseView() {
       <SectionCard title="Aktivitet over tid">
         <div className="px-4 pb-4">
           {/* Tab bar */}
-          <div className="flex gap-1 mb-3 rounded-[10px] bg-[#f2f1ed] p-1">
+          <div className="flex gap-1 mb-3 rounded-[10px] bg-background p-1">
             {ACTIVITY_TABS.map((tab) => (
               <button
                 key={tab.key}
@@ -374,8 +374,8 @@ export function PlatformAnalyseView() {
                 className={cn(
                   'flex-1 py-1.5 rounded-[8px] text-[12px] font-medium transition-all',
                   activeTab === tab.key
-                    ? 'bg-white text-[#2f2f2d] shadow-sm'
-                    : 'text-[#9a978f]'
+                    ? 'bg-card text-foreground shadow-sm'
+                    : 'text-muted-foreground'
                 )}
               >
                 {tab.label}
@@ -424,24 +424,24 @@ export function PlatformAnalyseView() {
           <div className="px-2 pb-2">
             <table className="w-full text-left">
               <thead>
-                <tr className="border-b border-[#f2f1ed]">
-                  <th className="px-3 py-2 text-[11px] font-semibold text-[#9a978f]">#</th>
-                  <th className="px-3 py-2 text-[11px] font-semibold text-[#9a978f]">Produkt</th>
-                  <th className="px-3 py-2 text-[11px] font-semibold text-[#9a978f]">Score</th>
-                  <th className="px-3 py-2 text-[11px] font-semibold text-[#9a978f]">Butik</th>
-                  <th className="px-3 py-2 text-[11px] font-semibold text-[#9a978f] text-right">Klik</th>
+                <tr className="border-b border-border">
+                  <th className="px-3 py-2 text-[11px] font-semibold text-muted-foreground">#</th>
+                  <th className="px-3 py-2 text-[11px] font-semibold text-muted-foreground">Produkt</th>
+                  <th className="px-3 py-2 text-[11px] font-semibold text-muted-foreground">Score</th>
+                  <th className="px-3 py-2 text-[11px] font-semibold text-muted-foreground">Butik</th>
+                  <th className="px-3 py-2 text-[11px] font-semibold text-muted-foreground text-right">Klik</th>
                 </tr>
               </thead>
               <tbody>
                 {topClicks.map((row, i) => (
-                  <tr key={row.targetId} className={i % 2 === 0 ? 'bg-white' : 'bg-[#faf9f6]'}>
-                    <td className="px-3 py-2.5 text-[12px] font-semibold text-[#9a978f]">{i + 1}</td>
-                    <td className="px-3 py-2.5 text-[13px] text-[#2f2f2d]">{row.name}</td>
+                  <tr key={row.targetId} className={i % 2 === 0 ? 'bg-card' : 'bg-card'}>
+                    <td className="px-3 py-2.5 text-[12px] font-semibold text-muted-foreground">{i + 1}</td>
+                    <td className="px-3 py-2.5 text-[13px] text-foreground">{row.name}</td>
                     <td className="px-3 py-2.5">
-                      {(() => { const g = matchNutriScore(row.name, nutriMap); return g ? <NutriScoreBadge grade={g} size="sm" /> : <span className="text-[11px] text-[#c5c3bb]">—</span>; })()}
+                      {(() => { const g = matchNutriScore(row.name, nutriMap); return g ? <NutriScoreBadge grade={g} size="sm" /> : <span className="text-[11px] text-muted-foreground">—</span>; })()}
                     </td>
-                    <td className="px-3 py-2.5 text-[12px] text-[#7a786f]">{row.store}</td>
-                    <td className="px-3 py-2.5 text-[13px] font-semibold text-[#2f2f2d] text-right tabular-nums">{row.clicks}</td>
+                    <td className="px-3 py-2.5 text-[12px] text-muted-foreground">{row.store}</td>
+                    <td className="px-3 py-2.5 text-[13px] font-semibold text-foreground text-right tabular-nums">{row.clicks}</td>
                   </tr>
                 ))}
               </tbody>

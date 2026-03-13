@@ -26,7 +26,7 @@ const typeOptions: { value: DateType; label: string; color: string }[] = [
   { value: 'school', label: 'Skole', color: 'bg-amber-100 text-amber-700' },
   { value: 'appointment', label: 'Aftale', color: 'bg-purple-100 text-purple-700' },
   { value: 'anniversary', label: 'Mærkedag', color: 'bg-emerald-100 text-emerald-700' },
-  { value: 'other', label: 'Andet', color: 'bg-[#ecebe5] text-[#5f5d56]' },
+  { value: 'other', label: 'Andet', color: 'bg-secondary text-muted-foreground' },
 ];
 
 function typeInfo(type: DateType) {
@@ -114,10 +114,10 @@ export function VigtigeDatoer() {
     <div className="space-y-1.5 py-1">
       <OverblikSidePanel />
       <div className="flex items-center justify-between">
-        <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-[#2f2f2d]">Vigtige datoer</h1>
+        <h1 className="text-[1.35rem] font-bold tracking-[-0.02em] text-foreground">Vigtige datoer</h1>
         <Button
           onClick={() => setAddOpen(true)}
-          className="h-9 gap-1.5 rounded-[8px] bg-[#2f2f2f] px-4 text-sm text-white hover:bg-[#1a1a1a]"
+          className="h-9 gap-1.5 rounded-[8px] bg-primary px-4 text-sm text-white hover:bg-primary"
         >
           <Plus className="h-4 w-4" />
           Tilføj
@@ -125,15 +125,15 @@ export function VigtigeDatoer() {
       </div>
 
       {sortedDates.length === 0 ? (
-        <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-[#d0cec5] bg-[#faf9f6] py-16 text-center">
-          <CalendarHeart className="h-10 w-10 text-[#c8c6bc]" />
+        <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-border bg-card py-16 text-center">
+          <CalendarHeart className="h-10 w-10 text-muted-foreground" />
           <div>
-            <p className="text-sm font-semibold text-[#3f3e3a]">Ingen vigtige datoer endnu</p>
-            <p className="mt-1 text-[12px] text-[#78766d]">Tilføj fødselsdage, vaccinationer og mærkedage</p>
+            <p className="text-sm font-semibold text-foreground">Ingen vigtige datoer endnu</p>
+            <p className="mt-1 text-[12px] text-muted-foreground">Tilføj fødselsdage, vaccinationer og mærkedage</p>
           </div>
           <Button
             variant="outline"
-            className="mt-1 h-9 rounded-[8px] border-[#d0cec5] px-4 text-sm"
+            className="mt-1 h-9 rounded-[8px] border-border px-4 text-sm"
             onClick={() => setAddOpen(true)}
           >
             <Plus className="mr-1.5 h-4 w-4" /> Opret dato
@@ -155,8 +155,8 @@ export function VigtigeDatoer() {
                 className={cn(
                   'flex items-center gap-3 rounded-[8px] border px-4 py-3.5',
                   isToday
-                    ? 'border-[#f5bf8f] bg-[#fff8f0]'
-                    : 'border-[#e8e7e0] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)]'
+                    ? 'border-[#f5bf8f] bg-orange-tint-light'
+                    : 'border-border bg-card shadow-[0_2px_8px_rgba(0,0,0,0.04)]'
                 )}
               >
                 <div className="flex-1 min-w-0">
@@ -166,26 +166,26 @@ export function VigtigeDatoer() {
                       <Bell className="h-3.5 w-3.5 text-[#f58a2d]" />
                     )}
                   </div>
-                  <p className="mt-1 text-[14px] font-semibold text-[#2f2f2d]">{kd.title}</p>
+                  <p className="mt-1 text-[14px] font-semibold text-foreground">{kd.title}</p>
                   {child && (
-                    <p className="text-[11px] text-[#78766d]">{child.name}</p>
+                    <p className="text-[11px] text-muted-foreground">{child.name}</p>
                   )}
                   {kd.notes && (
-                    <p className="mt-0.5 text-[12px] text-[#78766d]">{kd.notes}</p>
+                    <p className="mt-0.5 text-[12px] text-muted-foreground">{kd.notes}</p>
                   )}
                 </div>
                 <div className="flex flex-col items-end gap-2">
                   <div className="text-right">
-                    <p className="text-[12px] font-medium text-[#4a4945]">
+                    <p className="text-[12px] font-medium text-foreground">
                       {format(next, 'd. MMM', { locale: da })}
                     </p>
-                    <p className={cn('text-[11px] font-semibold', isToday ? 'text-[#f58a2d]' : 'text-[#78766d]')}>
+                    <p className={cn('text-[11px] font-semibold', isToday ? 'text-[#f58a2d]' : 'text-muted-foreground')}>
                       {isToday ? 'I dag!' : days === 1 ? 'I morgen' : `Om ${days} dage`}
                     </p>
                   </div>
                   <button
                     onClick={() => { deleteKeyDate(kd.id); toast.success('Dato slettet'); }}
-                    className="rounded-full p-1 text-[#c8c6bc] hover:text-rose-500"
+                    className="rounded-full p-1 text-muted-foreground hover:text-rose-500"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -210,29 +210,29 @@ export function VigtigeDatoer() {
       }} title="Tilføj vigtig dato">
         <div className="space-y-2">
           <div className="space-y-1">
-            <Label htmlFor="kd-title" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Titel</Label>
+            <Label htmlFor="kd-title" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Titel</Label>
             <Input
               id="kd-title"
               value={title}
               onChange={e => setTitle(e.target.value)}
               placeholder="f.eks. Mias fødselsdag"
-              className="rounded-[8px] border-[#d8d7cf] bg-white"
+              className="rounded-[8px] border-border bg-card"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1">
-              <Label htmlFor="kd-type" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Type</Label>
+              <Label htmlFor="kd-type" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Type</Label>
               <SelectSheet
                 value={type}
                 onValueChange={v => setType(v as DateType)}
                 title="Type"
                 options={typeOptions.map(t => ({ value: t.value, label: t.label }))}
-                className="rounded-[8px] border-[#d8d7cf] bg-white"
+                className="rounded-[8px] border-border bg-card"
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="kd-recurrence" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Gentagelse</Label>
+              <Label htmlFor="kd-recurrence" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Gentagelse</Label>
               <SelectSheet
                 value={recurrence}
                 onValueChange={v => setRecurrence(v as Recurrence)}
@@ -241,38 +241,38 @@ export function VigtigeDatoer() {
                   { value: 'yearly', label: 'Hvert år' },
                   { value: 'once', label: 'Én gang' },
                 ]}
-                className="rounded-[8px] border-[#d8d7cf] bg-white"
+                className="rounded-[8px] border-border bg-card"
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <Label htmlFor="kd-date" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Dato</Label>
+            <Label htmlFor="kd-date" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Dato</Label>
             <Input
               id="kd-date"
               type="date"
               value={date}
               onChange={e => setDate(e.target.value)}
-              className="rounded-[8px] border-[#d8d7cf] bg-white"
+              className="rounded-[8px] border-border bg-card"
             />
           </div>
 
           {children.length > 0 && (
             <div className="space-y-1">
-              <Label htmlFor="kd-child" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Tilknyt barn (valgfrit)</Label>
+              <Label htmlFor="kd-child" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Tilknyt barn (valgfrit)</Label>
               <SelectSheet
                 value={childId}
                 onValueChange={setChildId}
                 title="Tilknyt barn"
                 placeholder="Ingen"
                 options={[{ value: 'none', label: 'Ingen' }, ...children.map(c => ({ value: c.id, label: c.name }))]}
-                className="rounded-[8px] border-[#d8d7cf] bg-white"
+                className="rounded-[8px] border-border bg-card"
               />
             </div>
           )}
 
           <div className="space-y-1">
-            <Label htmlFor="kd-reminder" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Påmind X dage før</Label>
+            <Label htmlFor="kd-reminder" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Påmind X dage før</Label>
             <Input
               id="kd-reminder"
               type="number"
@@ -283,23 +283,23 @@ export function VigtigeDatoer() {
                 const val = e.target.value === '' ? 0 : Math.min(30, Math.max(0, parseInt(e.target.value, 10)));
                 setReminderDays(String(val));
               }}
-              className="rounded-[8px] border-[#d8d7cf] bg-white"
+              className="rounded-[8px] border-border bg-card"
             />
           </div>
 
           <div className="space-y-1">
-            <Label htmlFor="kd-notes" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Noter (valgfrit)</Label>
+            <Label htmlFor="kd-notes" className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Noter (valgfrit)</Label>
             <Textarea
               id="kd-notes"
               value={notes}
               onChange={e => setNotes(e.target.value)}
               placeholder="f.eks. Husk at bestille kage"
-              className="min-h-[60px] resize-none rounded-[8px] border-[#d8d7cf] bg-white text-sm"
+              className="min-h-[60px] resize-none rounded-[8px] border-border bg-card text-sm"
             />
           </div>
 
           <div className="flex gap-2 pt-1">
-            <Button variant="outline" className="flex-1 rounded-[8px] border-[#d8d7cf]" onClick={() => {
+            <Button variant="outline" className="flex-1 rounded-[8px] border-border" onClick={() => {
               if (title.trim() || date || notes.trim()) {
                 setConfirmClose(true);
               } else {
@@ -309,7 +309,7 @@ export function VigtigeDatoer() {
               Annuller
             </Button>
             <Button
-              className="flex-1 flex items-center justify-center gap-2 rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+              className="flex-1 flex items-center justify-center gap-2 rounded-[8px] bg-primary text-white hover:bg-primary"
               onClick={handleAdd}
               disabled={!title.trim() || !date || isSaving}
             >

@@ -507,14 +507,14 @@ export function SettingsView() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', stiffness: 400, damping: 35 }}
-              className="fixed inset-y-0 left-0 z-[9999] w-full bg-white flex flex-col"
+              className="fixed inset-y-0 left-0 z-[9999] w-full bg-card flex flex-col"
               style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
             >
-              <div className="flex items-center justify-between px-5 py-3 border-b border-[#eeedea]">
-                <h2 className="text-[17px] font-bold text-[#2f2f2d]">Indstillinger</h2>
+              <div className="flex items-center justify-between px-5 py-3 border-b border-border">
+                <h2 className="text-[17px] font-bold text-foreground">Indstillinger</h2>
                 <button
                   onClick={() => setSideMenuOpen(false)}
-                  className="flex items-center justify-center text-[#5f5d56] hover:text-[#2f2f2d] transition-colors"
+                  className="flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <XIcon className="h-4 w-4" />
                 </button>
@@ -553,13 +553,13 @@ export function SettingsView() {
                       }}
                       className={cn(
                         'flex w-full items-center gap-3.5 px-5 py-3.5 text-left transition-colors',
-                        isActive ? 'bg-transparent' : 'hover:bg-[#faf9f6]'
+                        isActive ? 'bg-transparent' : 'hover:bg-card'
                       )}
                     >
-                      <Icon className={cn('h-5 w-5 shrink-0', isActive ? 'text-[#f58a2d]' : 'text-[#7a786f]')} />
+                      <Icon className={cn('h-5 w-5 shrink-0', isActive ? 'text-[#f58a2d]' : 'text-muted-foreground')} />
                       <p className={cn(
                         'flex-1 min-w-0 text-[15px] font-semibold',
-                        isActive ? 'text-[#2f2f2d]' : 'text-[#4a4945]'
+                        isActive ? 'text-foreground' : 'text-foreground'
                       )}>
                         {item.label}
                       </p>
@@ -586,9 +586,9 @@ export function SettingsView() {
                 onClick={() => setAvatarDialogOpen(true)}
                 className="group relative"
               >
-                <Avatar className="h-20 w-20 border-2 border-[#e8e7e0] shadow-sm">
+                <Avatar className="h-20 w-20 border-2 border-border shadow-sm">
                   <AvatarImage src={currentUser?.avatar} />
-                  <AvatarFallback className="bg-[#ecebe5] text-2xl font-semibold text-[#4a4945]">
+                  <AvatarFallback className="bg-secondary text-2xl font-semibold text-foreground">
                     {currentUser?.name?.[0] ?? '?'}
                   </AvatarFallback>
                 </Avatar>
@@ -606,22 +606,22 @@ export function SettingsView() {
 
           {/* Avatar picker dialog */}
           <Dialog open={avatarDialogOpen} onOpenChange={setAvatarDialogOpen}>
-            <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
+            <DialogContent className="max-w-sm rounded-3xl border-border bg-card">
               <DialogHeader>
-                <DialogTitle className="text-[1rem] text-[#2f2f2d]">Vælg profilbillede</DialogTitle>
+                <DialogTitle className="text-[1rem] text-foreground">Vælg profilbillede</DialogTitle>
               </DialogHeader>
               <div className="space-y-2">
                 {/* Upload own photo */}
                 <button
                   onClick={() => avatarFileRef.current?.click()}
-                  className="flex w-full items-center gap-3 rounded-[8px] border-2 border-dashed border-[#d8d7cf] bg-white px-4 py-3 text-left transition-colors hover:border-[#f58a2d] hover:bg-[#fff8f0]"
+                  className="flex w-full items-center gap-3 rounded-[8px] border-2 border-dashed border-border bg-card px-4 py-3 text-left transition-colors hover:border-[#f58a2d] hover:bg-orange-tint-light"
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fff2e6]">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-tint">
                     <Upload className="h-5 w-5 text-[#f58a2d]" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Upload eget billede</p>
-                    <p className="text-[11px] text-[#78766d]">JPG eller PNG, maks 2 MB</p>
+                    <p className="text-sm font-semibold text-foreground">Upload eget billede</p>
+                    <p className="text-[11px] text-muted-foreground">JPG eller PNG, maks 2 MB</p>
                   </div>
                 </button>
                 <input
@@ -634,7 +634,7 @@ export function SettingsView() {
 
                 {/* Preset avatars */}
                 <div>
-                  <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Eller vælg en avatar</p>
+                  <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Eller vælg en avatar</p>
                   <div className="grid grid-cols-4 gap-3">
                     {AVATAR_PRESETS.map(seed => {
                       const url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}`;
@@ -646,15 +646,15 @@ export function SettingsView() {
                           className={cn(
                             "flex flex-col items-center gap-1 rounded-[8px] p-2 transition-all",
                             isSelected
-                              ? "bg-[#fff2e6] ring-2 ring-[#f58a2d]"
-                              : "hover:bg-[#f0efe8]"
+                              ? "bg-orange-tint ring-2 ring-ring"
+                              : "hover:bg-muted"
                           )}
                         >
                           <Avatar className="h-12 w-12">
                             <AvatarImage src={url} />
                             <AvatarFallback>{seed[0]}</AvatarFallback>
                           </Avatar>
-                          <span className="text-[10px] text-[#78766d]">{seed}</span>
+                          <span className="text-[10px] text-muted-foreground">{seed}</span>
                         </button>
                       );
                     })}
@@ -769,27 +769,27 @@ export function SettingsView() {
 
               {/* Profilsynlighed */}
               <div className="overflow-hidden">
-                <p className="text-[12px] font-semibold text-[#9a978f] uppercase tracking-wider px-4 pt-3 pb-1.5">Profilsynlighed</p>
-                <p className="text-[11px] text-[#9a978f] px-4 pb-2">Vælg hvad andre kan se på din profil i grupper</p>
-                <div className="flex items-center justify-between px-4 py-3 border-t border-[#f0efea]">
-                  <span className="text-[13px] text-[#2f2f2d]">Vis email</span>
+                <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider px-4 pt-3 pb-1.5">Profilsynlighed</p>
+                <p className="text-[11px] text-muted-foreground px-4 pb-2">Vælg hvad andre kan se på din profil i grupper</p>
+                <div className="flex items-center justify-between px-4 py-3 border-t border-border">
+                  <span className="text-[13px] text-foreground">Vis email</span>
                   <IOSSwitch checked={visibilityDraft.showEmail} onCheckedChange={(v) => setVisibilityDraft(prev => ({ ...prev, showEmail: v }))} />
                 </div>
-                <div className="flex items-center justify-between px-4 py-3 border-t border-[#f0efea]">
-                  <span className="text-[13px] text-[#2f2f2d]">Vis telefon</span>
+                <div className="flex items-center justify-between px-4 py-3 border-t border-border">
+                  <span className="text-[13px] text-foreground">Vis telefon</span>
                   <IOSSwitch checked={visibilityDraft.showPhone} onCheckedChange={(v) => setVisibilityDraft(prev => ({ ...prev, showPhone: v }))} />
                 </div>
-                <div className="flex items-center justify-between px-4 py-3 border-t border-[#f0efea]">
-                  <span className="text-[13px] text-[#2f2f2d]">Vis by</span>
+                <div className="flex items-center justify-between px-4 py-3 border-t border-border">
+                  <span className="text-[13px] text-foreground">Vis by</span>
                   <IOSSwitch checked={visibilityDraft.showAddress} onCheckedChange={(v) => setVisibilityDraft(prev => ({ ...prev, showAddress: v }))} />
                 </div>
-                <div className="px-4 py-3 border-t border-[#f0efea]">
-                  <label className="text-[13px] text-[#2f2f2d] block mb-1.5">Bio</label>
+                <div className="px-4 py-3 border-t border-border">
+                  <label className="text-[13px] text-foreground block mb-1.5">Bio</label>
                   <textarea
                     value={visibilityDraft.bio}
                     onChange={(e) => setVisibilityDraft(prev => ({ ...prev, bio: e.target.value }))}
                     placeholder="Kort beskrivelse af dig selv..."
-                    className="w-full h-16 rounded-lg border border-[#e5e3dc] bg-[#f9f9f7] px-3 py-2 text-[13px] text-[#2f2f2d] placeholder:text-[#c5c3ba] resize-none focus:outline-none focus:ring-1 focus:ring-[#f58a2d]"
+                    className="w-full h-16 rounded-lg border border-border bg-card px-3 py-2 text-[13px] text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-1 focus:ring-ring"
                   />
                 </div>
               </div>
@@ -801,16 +801,16 @@ export function SettingsView() {
 
               {/* Familiens allergener */}
               <div className="overflow-hidden">
-                <p className="text-[12px] font-semibold text-[#9a978f] uppercase tracking-wider px-4 pt-3 pb-1.5">Familiens allergener</p>
-                <p className="text-[11px] text-[#9a978f] px-4 pb-2">Tilføj allergener for at få advarsler på indkøbsliste og køleskab</p>
+                <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider px-4 pt-3 pb-1.5">Familiens allergener</p>
+                <p className="text-[11px] text-muted-foreground px-4 pb-2">Tilføj allergener for at få advarsler på indkøbsliste og køleskab</p>
 
                 {/* Current user */}
                 {currentUser && (
-                  <div className="border-t border-[#f0efea] px-4 py-3">
+                  <div className="border-t border-border px-4 py-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 min-w-0">
-                        <User className="h-4 w-4 text-[#9a978f] shrink-0" />
-                        <span className="text-[13px] font-medium text-[#2f2f2d] truncate">{currentUser.name}</span>
+                        <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <span className="text-[13px] font-medium text-foreground truncate">{currentUser.name}</span>
                       </div>
                       <button
                         onClick={() => setAllergenEditId(allergenEditId === currentUser.id ? null : currentUser.id)}
@@ -822,14 +822,14 @@ export function SettingsView() {
                     {currentUser.allergies?.length ? (
                       <div className="flex flex-wrap gap-1 mt-1.5">
                         {currentUser.allergies.map(a => (
-                          <span key={a} className="inline-flex items-center rounded-full bg-[#e8e7e0] px-2 py-0.5 text-[10px] font-semibold text-[#78766d]">{a}</span>
+                          <span key={a} className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">{a}</span>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-[11px] text-[#b0ada4] mt-1">Ingen allergener</p>
+                      <p className="text-[11px] text-muted-foreground mt-1">Ingen allergener</p>
                     )}
                     {allergenEditId === currentUser.id && (
-                      <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-[#f0efea]">
+                      <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-border">
                         {EU_ALLERGENS_DA.map(allergen => {
                           const active = currentUser.allergies?.includes(allergen);
                           return (
@@ -842,7 +842,7 @@ export function SettingsView() {
                               }}
                               className={cn(
                                 "rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors",
-                                active ? "bg-[#f58a2d] text-white" : "bg-[#f2f1ed] text-[#78766d]"
+                                active ? "bg-[#f58a2d] text-white" : "bg-background text-muted-foreground"
                               )}
                             >
                               {allergen}
@@ -856,11 +856,11 @@ export function SettingsView() {
 
                 {/* Children */}
                 {children.map(child => (
-                  <div key={child.id} className="border-t border-[#f0efea] px-4 py-3">
+                  <div key={child.id} className="border-t border-border px-4 py-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 min-w-0">
                         <Heart className="h-4 w-4 text-[#f58a2d] shrink-0" />
-                        <span className="text-[13px] font-medium text-[#2f2f2d] truncate">{child.name}</span>
+                        <span className="text-[13px] font-medium text-foreground truncate">{child.name}</span>
                       </div>
                       <button
                         onClick={() => setAllergenEditId(allergenEditId === child.id ? null : child.id)}
@@ -872,14 +872,14 @@ export function SettingsView() {
                     {child.allergies?.length ? (
                       <div className="flex flex-wrap gap-1 mt-1.5">
                         {child.allergies.map(a => (
-                          <span key={a} className="inline-flex items-center rounded-full bg-[#e8e7e0] px-2 py-0.5 text-[10px] font-semibold text-[#78766d]">{a}</span>
+                          <span key={a} className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">{a}</span>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-[11px] text-[#b0ada4] mt-1">Ingen allergener</p>
+                      <p className="text-[11px] text-muted-foreground mt-1">Ingen allergener</p>
                     )}
                     {allergenEditId === child.id && (
-                      <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-[#f0efea]">
+                      <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-border">
                         {EU_ALLERGENS_DA.map(allergen => {
                           const active = child.allergies?.includes(allergen);
                           return (
@@ -892,7 +892,7 @@ export function SettingsView() {
                               }}
                               className={cn(
                                 "rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors",
-                                active ? "bg-[#f58a2d] text-white" : "bg-[#f2f1ed] text-[#78766d]"
+                                active ? "bg-[#f58a2d] text-white" : "bg-background text-muted-foreground"
                               )}
                             >
                               {allergen}
@@ -908,7 +908,7 @@ export function SettingsView() {
 
           {/* ── Konto-handlinger ─────────────────────────── */}
           <div className="space-y-2 pt-2">
-            <p className="text-[12px] font-semibold text-[#9a978f] uppercase tracking-wide px-1">Konto</p>
+            <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1">Konto</p>
 
             <button
               onClick={async () => {
@@ -920,14 +920,14 @@ export function SettingsView() {
                   toast.error('Kunne ikke eksportere data');
                 }
               }}
-              className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#faf9f6]"
+              className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-card"
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-[#f2f1ed]">
-                <Save className="h-[18px] w-[18px] text-[#7a786f]" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-background">
+                <Save className="h-[18px] w-[18px] text-muted-foreground" />
               </div>
               <div>
-                <p className="text-[14px] font-semibold text-[#2f2f2d]">Eksporter mine data</p>
-                <p className="text-[11px] text-[#9a978f]">Download alle dine data som JSON (GDPR)</p>
+                <p className="text-[14px] font-semibold text-foreground">Eksporter mine data</p>
+                <p className="text-[11px] text-muted-foreground">Download alle dine data som JSON (GDPR)</p>
               </div>
             </button>
 
@@ -950,7 +950,7 @@ export function SettingsView() {
               </div>
               <div>
                 <p className="text-[14px] font-semibold text-red-600">Slet min konto</p>
-                <p className="text-[11px] text-[#9a978f]">Alle persondata anonymiseres permanent</p>
+                <p className="text-[11px] text-muted-foreground">Alle persondata anonymiseres permanent</p>
               </div>
             </button>
           </div>
@@ -961,18 +961,18 @@ export function SettingsView() {
           {/* Quick link to family type setting */}
           <button
             onClick={() => setActiveSettingsTab('familytype')}
-            className="flex w-full items-center justify-between rounded-[8px] border border-[#e5e3dc] bg-white px-4 py-3 text-left transition-colors hover:bg-[#faf9f6]"
+            className="flex w-full items-center justify-between rounded-[8px] border border-border bg-card px-4 py-3 text-left transition-colors hover:bg-card"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-[#f2f1ed]">
-                <Home className="h-[18px] w-[18px] text-[#7a786f]" />
+              <div className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-background">
+                <Home className="h-[18px] w-[18px] text-muted-foreground" />
               </div>
               <div>
-                <p className="text-[14px] font-semibold text-[#2f2f2d]">{familyModeLabels[currentMode]}</p>
-                <p className="text-[11px] text-[#9a978f]">Tryk for at ændre familietype</p>
+                <p className="text-[14px] font-semibold text-foreground">{familyModeLabels[currentMode]}</p>
+                <p className="text-[11px] text-muted-foreground">Tryk for at ændre familietype</p>
               </div>
             </div>
-            <ChevronRight className="h-4 w-4 text-[#b0ada4]" />
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </button>
 
           {/* Samboende / Co-parenting section */}
@@ -991,16 +991,16 @@ export function SettingsView() {
                 );
                 if (partnerUser) {
                   return (
-                    <div className="flex items-center gap-3 rounded-[8px] border border-[#e5e3dc] bg-white p-3">
+                    <div className="flex items-center gap-3 rounded-[8px] border border-border bg-card p-3">
                       <Avatar className="h-10 w-10 border border-white shadow-sm">
                         <AvatarImage src={partnerUser.avatar} />
-                        <AvatarFallback className="bg-[#ecebe5] text-[#4a4945] text-sm">
+                        <AvatarFallback className="bg-secondary text-foreground text-sm">
                           {partnerUser.name[0]}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[15px] font-medium text-[#2f2f2d]">{partnerUser.name}</p>
-                        <p className="text-[13px] text-[#75736b]">{partnerUser.email}</p>
+                        <p className="text-[15px] font-medium text-foreground">{partnerUser.name}</p>
+                        <p className="text-[13px] text-muted-foreground">{partnerUser.email}</p>
                       </div>
                       <Badge variant="outline" className="text-xs border-green-300 text-green-700 bg-green-50">
                         Tilknyttet
@@ -1010,14 +1010,14 @@ export function SettingsView() {
                 }
                 return (
                   <div className="space-y-2">
-                    <div className="rounded-[8px] border border-dashed border-[#d8d7cf] bg-[#f8f7f3] p-4 text-center">
-                      <Users className="h-8 w-8 text-[#b0ada4] mx-auto mb-2" />
-                      <p className="text-sm text-[#75736b]">
+                    <div className="rounded-[8px] border border-dashed border-border bg-card p-4 text-center">
+                      <Users className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                      <p className="text-sm text-muted-foreground">
                         {isTogetherMode
                           ? 'Ingen samboende tilknyttet endnu.'
                           : 'Ingen medforælder tilknyttet endnu.'}
                       </p>
-                      <p className="text-xs text-[#9a978f] mt-1">
+                      <p className="text-xs text-muted-foreground mt-1">
                         Inviter {isTogetherMode ? 'din samboende' : 'din medforælder'} til appen
                       </p>
                     </div>
@@ -1026,10 +1026,10 @@ export function SettingsView() {
                         value={partnerInviteEmail}
                         onChange={(e) => setPartnerInviteEmail(e.target.value)}
                         placeholder="Email på medforælder"
-                        className="flex-1 rounded-[8px] border-[#d8d7cf]"
+                        className="flex-1 rounded-[8px] border-border"
                       />
                       <Button
-                        className="rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+                        className="rounded-[8px] bg-primary text-white hover:bg-primary"
                         disabled={!partnerInviteEmail.trim() || !partnerInviteEmail.includes('@') || !household?.id}
                         onClick={async () => {
                           try {
@@ -1074,10 +1074,10 @@ export function SettingsView() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 pt-0">
-                <div className="flex items-center justify-between rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2">
+                <div className="flex items-center justify-between rounded-[8px] border border-border bg-card px-3 py-2">
                   <div>
                     <p className="text-sm font-medium">Dokumentationsarkiv</p>
-                    <p className="text-[13px] text-[#75736b]">Gem kvitteringer og beviser centralt</p>
+                    <p className="text-[13px] text-muted-foreground">Gem kvitteringer og beviser centralt</p>
                   </div>
                   <IOSSwitch
                     checked={Boolean(household?.singleParentSupport?.evidenceVaultEnabled)}
@@ -1085,10 +1085,10 @@ export function SettingsView() {
                     onCheckedChange={(value) => handleUpdateSingleParentSetting('evidenceVaultEnabled', value)}
                   />
                 </div>
-                <div className="flex items-center justify-between rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2">
+                <div className="flex items-center justify-between rounded-[8px] border border-border bg-card px-3 py-2">
                   <div>
                     <p className="text-sm font-medium">Auto-arkiver kvitteringer</p>
-                    <p className="text-[13px] text-[#75736b]">Udgiftskvitteringer samles automatisk</p>
+                    <p className="text-[13px] text-muted-foreground">Udgiftskvitteringer samles automatisk</p>
                   </div>
                   <IOSSwitch
                     checked={Boolean(household?.singleParentSupport?.autoArchiveReceipts)}
@@ -1097,7 +1097,7 @@ export function SettingsView() {
                   />
                 </div>
 
-                <div className="rounded-[8px] border border-[#d8d7cf] bg-[#f8f7f3] p-3">
+                <div className="rounded-[8px] border border-border bg-card p-3">
                   <p className="mb-2 text-sm font-medium">Inviter advokat</p>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <Input
@@ -1116,26 +1116,26 @@ export function SettingsView() {
                     Tilføj advokatadgang
                   </Button>
                   {!features.lawyerAccess && (
-                    <p className="text-xs text-[#9a978f] mt-1">Kræver Enlig Plus abonnement</p>
+                    <p className="text-xs text-muted-foreground mt-1">Kræver Enlig Plus abonnement</p>
                   )}
                 </div>
 
                 <div className="space-y-2">
                   {lawyerUsers.length === 0 ? (
-                    <p className="rounded-[8px] border border-dashed border-[#d8d7cf] bg-[#f8f7f3] p-3 text-sm text-[#75736b]">
+                    <p className="rounded-[8px] border border-dashed border-border bg-card p-3 text-sm text-muted-foreground">
                       Ingen advokater tilknyttet endnu.
                     </p>
                   ) : (
                     lawyerUsers.map((lawyer) => (
-                      <div key={lawyer.id} className="rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] p-3">
+                      <div key={lawyer.id} className="rounded-[8px] border border-border bg-card p-3">
                         <p className="font-medium">{lawyer.name}</p>
-                        <p className="text-[13px] text-[#75736b]">{lawyer.email}</p>
+                        <p className="text-[13px] text-muted-foreground">{lawyer.email}</p>
                       </div>
                     ))
                   )}
                 </div>
 
-                <div className="rounded-[8px] border border-[#d8d7cf] bg-[#f8f7f3] p-3">
+                <div className="rounded-[8px] border border-border bg-card p-3">
                   <p className="mb-2 text-sm font-medium">Upload vigtigt materiale</p>
                   <div className="space-y-2">
                     <Input
@@ -1162,10 +1162,10 @@ export function SettingsView() {
 
                 <div className="space-y-2">
                   {evidenceDocuments.slice(0, 5).map((doc) => (
-                    <div key={doc.id} className="flex items-center justify-between rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2">
+                    <div key={doc.id} className="flex items-center justify-between rounded-[8px] border border-border bg-card px-3 py-2">
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium">{doc.title}</p>
-                        <p className="truncate text-[13px] text-[#75736b]">{doc.url}</p>
+                        <p className="truncate text-[13px] text-muted-foreground">{doc.url}</p>
                       </div>
                       <Badge variant="outline">Dok</Badge>
                     </div>
@@ -1179,30 +1179,30 @@ export function SettingsView() {
         <TabsContent value="subscription" className="space-y-2">
           {isProfessionalView ? (
             /* Read-only licens-status for professionelle */
-            <Card className="border border-[#e8e7e0] rounded-[8px]">
+            <Card className="border border-border rounded-[8px]">
               <CardContent className="p-4 space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-[8px] bg-[#e6f9ed] flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-[8px] bg-green-tint flex items-center justify-center">
                     <BadgeCheck className="h-5 w-5 text-[#1a7a3a]" />
                   </div>
                   <div>
-                    <p className="font-medium text-[#2f2f2d]">Aktiv licens</p>
-                    <p className="text-xs text-[#78766d]">
+                    <p className="font-medium text-foreground">Aktiv licens</p>
+                    <p className="text-xs text-muted-foreground">
                       Administreres af din organisation
                     </p>
                   </div>
                 </div>
                 {currentUser?.organization && (
-                  <p className="text-sm text-[#5f5d56]">
+                  <p className="text-sm text-muted-foreground">
                     Organisation: {currentUser.organization}
                   </p>
                 )}
                 {currentUser?.municipality && (
-                  <p className="text-sm text-[#5f5d56]">
+                  <p className="text-sm text-muted-foreground">
                     Kommune: {currentUser.municipality}
                   </p>
                 )}
-                <p className="text-xs text-[#78766d]">
+                <p className="text-xs text-muted-foreground">
                   Kontakt din administrator for ændringer i abonnement.
                 </p>
               </CardContent>
@@ -1210,7 +1210,7 @@ export function SettingsView() {
           ) : (
           <>
           {/* Interval toggle */}
-          <div className="flex rounded-[8px] border-2 border-[#e0dfd8] bg-white p-1">
+          <div className="flex rounded-[8px] border-2 border-border bg-card p-1">
             {([
               { value: 'monthly' as BillingInterval, label: 'Månedlig' },
               { value: 'annual' as BillingInterval, label: 'Årlig (spar 17%)' },
@@ -1222,8 +1222,8 @@ export function SettingsView() {
                 className={cn(
                   'flex-1 rounded-[3px] py-2 text-[13px] font-semibold transition-all',
                   billingInterval === opt.value
-                    ? 'bg-[#2f2f2f] text-white shadow-sm'
-                    : 'text-[#78766d] hover:text-[#4a4945]'
+                    ? 'bg-primary text-white shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
                 )}
               >
                 {opt.label}
@@ -1302,8 +1302,8 @@ export function SettingsView() {
                 className={cn(
                   'relative w-full rounded-[8px] border-2 p-4 text-left transition-all',
                   isActive
-                    ? 'border-[#f58a2d] bg-[#fff8f0] shadow-[0_2px_12px_rgba(245,138,45,0.12)]'
-                    : 'border-[#e0dfd8] bg-white hover:border-[#cccbc3]',
+                    ? 'border-[#f58a2d] bg-orange-tint-light shadow-[0_2px_12px_rgba(245,138,45,0.12)]'
+                    : 'border-border bg-card hover:border-border',
                   checkoutLoading && 'opacity-60 pointer-events-none'
                 )}
               >
@@ -1315,14 +1315,14 @@ export function SettingsView() {
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2">
-                      <p className="text-lg font-bold text-[#2f2f2d]">{planCard.name}</p>
+                      <p className="text-lg font-bold text-foreground">{planCard.name}</p>
                       {isActive && <BadgeCheck className="h-5 w-5 text-[#f58a2d]" />}
                     </div>
-                    <p className="text-[13px] text-[#78766d]">{planCard.description}</p>
+                    <p className="text-[13px] text-muted-foreground">{planCard.description}</p>
                   </div>
                   <p className="text-right">
-                    <span className="text-lg font-bold text-[#2f2f2d]">{planCard.price.split('/')[0]}</span>
-                    <span className="text-[13px] text-[#9b9a93]">/{planCard.price.split('/')[1]}</span>
+                    <span className="text-lg font-bold text-foreground">{planCard.price.split('/')[0]}</span>
+                    <span className="text-[13px] text-muted-foreground">/{planCard.price.split('/')[1]}</span>
                   </p>
                 </div>
                 <div className="mt-3 grid grid-cols-1 gap-1">
@@ -1331,9 +1331,9 @@ export function SettingsView() {
                       {f.included ? (
                         <Check className="h-3.5 w-3.5 shrink-0 text-[#f58a2d]" />
                       ) : (
-                        <XIcon className="h-3.5 w-3.5 shrink-0 text-[#d0cec5]" />
+                        <XIcon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
                       )}
-                      <span className={cn('text-[13px]', f.included ? 'text-[#4a4945]' : 'text-[#b5b3ab]')}>
+                      <span className={cn('text-[13px]', f.included ? 'text-foreground' : 'text-muted-foreground')}>
                         {f.label}
                       </span>
                     </div>
@@ -1350,10 +1350,10 @@ export function SettingsView() {
 
           {/* "Skift plan" CTA for free users */}
           {plan === 'free' && (
-            <div className="rounded-[8px] border-2 border-dashed border-[#f3c59d] bg-[#fff8f0] p-5 text-center">
+            <div className="rounded-[8px] border-2 border-dashed border-orange-tint bg-orange-tint-light p-5 text-center">
               <Star className="h-8 w-8 text-[#f58a2d] mx-auto mb-2" />
-              <p className="text-base font-bold text-[#2f2f2d]">Opgrader din plan</p>
-              <p className="text-sm text-[#78766d] mt-1 mb-4">
+              <p className="text-base font-bold text-foreground">Opgrader din plan</p>
+              <p className="text-sm text-muted-foreground mt-1 mb-4">
                 Få adgang til flere børn, udgiftsmodul, indkøbsscanner og meget mere.
               </p>
               <Button
@@ -1374,13 +1374,13 @@ export function SettingsView() {
           {/* Administrer abonnement — only when user has real Stripe subscription */}
           {hasStripeCustomer && (
             <div className="p-5 text-center space-y-2">
-              <p className="text-sm font-semibold text-[#2f2f2d]">Administrer dit abonnement</p>
-              <p className="text-xs text-[#78766d]">
+              <p className="text-sm font-semibold text-foreground">Administrer dit abonnement</p>
+              <p className="text-xs text-muted-foreground">
                 Ændr betalingsmetode, se fakturaer eller annuller dit abonnement.
               </p>
               <Button
                 variant="outline"
-                className="rounded-[8px] border-[#d8d7cf] text-[13px]"
+                className="rounded-[8px] border-border text-[13px]"
                 onClick={handleManageSubscription}
               >
                 <CreditCard className="h-4 w-4 mr-2" />
@@ -1394,7 +1394,7 @@ export function SettingsView() {
 
         <TabsContent value="payments" className="space-y-0">
           <div className="px-1 pt-2 pb-4">
-            <p className="text-[13px] text-[#75736b]">
+            <p className="text-[13px] text-muted-foreground">
               Tilføj betalingsmetoder til udgiftsdeling mellem forældre.
             </p>
           </div>
@@ -1403,22 +1403,22 @@ export function SettingsView() {
           {myPaymentAccounts.length > 0 && (
             <div className="space-y-2 mb-4">
               {myPaymentAccounts.map((account) => (
-                <div key={account.id} className="flex items-center justify-between rounded-[8px] border-2 border-[#e5e3dc] bg-white px-4 py-3">
+                <div key={account.id} className="flex items-center justify-between rounded-[8px] border-2 border-border bg-card px-4 py-3">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] bg-[#f2f1ed]">
-                      <CreditCard className="h-4 w-4 text-[#7a786f]" />
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] bg-background">
+                      <CreditCard className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-[13px] font-semibold text-[#2f2f2d]">{account.accountLabel}</p>
-                      <p className="truncate text-[11px] text-[#9a978f]">{account.accountHandle}</p>
+                      <p className="truncate text-[13px] font-semibold text-foreground">{account.accountLabel}</p>
+                      <p className="truncate text-[11px] text-muted-foreground">{account.accountHandle}</p>
                     </div>
                   </div>
                   {account.isPrimary ? (
-                    <span className="shrink-0 rounded-[8px] bg-[#fff2e6] border border-[#f3c59d] px-2.5 py-1 text-[11px] font-semibold text-[#cc6f1f]">Primær</span>
+                    <span className="shrink-0 rounded-[8px] bg-orange-tint border border-orange-tint px-2.5 py-1 text-[11px] font-semibold text-[#cc6f1f]">Primær</span>
                   ) : (
                     <button
                       onClick={() => handleSetPrimaryPayment(account.id)}
-                      className="shrink-0 rounded-[8px] border-2 border-[#e5e3dc] px-2.5 py-1 text-[11px] font-semibold text-[#5f5d56] transition-all active:scale-[0.96]"
+                      className="shrink-0 rounded-[8px] border-2 border-border px-2.5 py-1 text-[11px] font-semibold text-muted-foreground transition-all active:scale-[0.96]"
                     >
                       Sæt primær
                     </button>
@@ -1429,8 +1429,8 @@ export function SettingsView() {
           )}
 
           {/* Tilføj ny konto */}
-          <div className="rounded-[8px] border-2 border-[#e5e3dc] bg-white p-4 space-y-3">
-            <p className="text-[13px] font-semibold text-[#2f2f2d]">Tilføj betalingskonto</p>
+          <div className="rounded-[8px] border-2 border-border bg-card p-4 space-y-3">
+            <p className="text-[13px] font-semibold text-foreground">Tilføj betalingskonto</p>
             <SelectSheet
               value={paymentDraft.provider}
               onValueChange={(value) => setPaymentDraft((prev) => ({ ...prev, provider: value }))}
@@ -1441,19 +1441,19 @@ export function SettingsView() {
                 { value: 'card', label: 'Kort' },
                 { value: 'other', label: 'Andet' },
               ]}
-              className="rounded-[8px] border-[#e5e3dc]"
+              className="rounded-[8px] border-border"
             />
             <Input
               value={paymentDraft.accountLabel}
               onChange={(e) => setPaymentDraft((prev) => ({ ...prev, accountLabel: e.target.value }))}
               placeholder="Kontonavn (fx 'Min MobilePay')"
-              className="rounded-[8px] border-[#e5e3dc]"
+              className="rounded-[8px] border-border"
             />
             <Input
               value={paymentDraft.accountHandle}
               onChange={(e) => setPaymentDraft((prev) => ({ ...prev, accountHandle: e.target.value }))}
               placeholder="Telefonnr. eller kontonummer"
-              className="rounded-[8px] border-[#e5e3dc]"
+              className="rounded-[8px] border-border"
             />
             <button
               onClick={handleAddPaymentAccount}
@@ -1461,8 +1461,8 @@ export function SettingsView() {
               className={cn(
                 "w-full rounded-[8px] py-2.5 text-[13px] font-semibold transition-all active:scale-[0.98]",
                 features.inAppPayments
-                  ? "bg-[#2f2f2f] text-white"
-                  : "bg-[#e5e3dc] text-[#9a978f]"
+                  ? "bg-primary text-white"
+                  : "bg-muted text-muted-foreground"
               )}
             >
               Tilføj konto
@@ -1475,24 +1475,24 @@ export function SettingsView() {
           </div>
 
           {myPaymentAccounts.length === 0 && (
-            <div className="mt-3 rounded-[8px] border-2 border-dashed border-[#e5e3dc] bg-[#faf9f6] p-4 text-center">
-              <CreditCard className="mx-auto h-6 w-6 text-[#d8d7cf] mb-1.5" />
-              <p className="text-[12px] text-[#9a978f]">Ingen betalingskonti tilføjet endnu</p>
+            <div className="mt-3 rounded-[8px] border-2 border-dashed border-border bg-card p-4 text-center">
+              <CreditCard className="mx-auto h-6 w-6 text-muted-foreground mb-1.5" />
+              <p className="text-[12px] text-muted-foreground">Ingen betalingskonti tilføjet endnu</p>
             </div>
           )}
 
           {/* Abonnementsmodel info */}
-          <div className="mt-4 rounded-[8px] border-2 border-[#e5e3dc] bg-white px-4 py-3">
+          <div className="mt-4 rounded-[8px] border-2 border-border bg-card px-4 py-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[13px] font-semibold text-[#2f2f2d]">Abonnementsmodel</p>
-                <p className="text-[11px] text-[#9a978f] mt-0.5">
+                <p className="text-[13px] font-semibold text-foreground">Abonnementsmodel</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
                   {isTogetherMode
                     ? 'Samboende: abonnement deles automatisk'
                     : 'Skilt/co-parenting: separat abonnement pr. bruger'}
                 </p>
               </div>
-              <span className="shrink-0 rounded-[8px] bg-[#f2f1ed] px-2.5 py-1 text-[11px] font-semibold text-[#5f5d56]">
+              <span className="shrink-0 rounded-[8px] bg-background px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
                 {isTogetherMode ? 'Delt' : 'Separat'}
               </span>
             </div>
@@ -1525,7 +1525,7 @@ export function SettingsView() {
 
         <TabsContent value="members" className="space-y-2">
               {!features.familyMembers ? (
-                <div className="rounded-[8px] border border-[#f3c59d] bg-[#fff6ef] p-4 text-center">
+                <div className="rounded-[8px] border border-orange-tint bg-orange-tint-light p-4 text-center">
                   <p className="text-sm font-semibold text-[#b96424]">Opgrader til Family Plus</p>
                   <p className="mt-1 text-xs text-[#cc8a4f]">
                     Tilføj familiemedlemmer som teenagere, bedsteforældre og bonusforældre med Family Plus eller Enlig Plus.
@@ -1542,10 +1542,10 @@ export function SettingsView() {
                 <>
                   <div className="space-y-2">
                     {users.filter(u => u.familyMemberRole).map(member => (
-                      <div key={member.id} className="flex items-center justify-between rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2">
+                      <div key={member.id} className="flex items-center justify-between rounded-[8px] border border-border bg-card px-3 py-2">
                         <div className="min-w-0">
-                          <p className="truncate text-[15px] font-medium text-[#2f2f2d]">{member.name}</p>
-                          <p className="text-[13px] text-[#75736b]">
+                          <p className="truncate text-[15px] font-medium text-foreground">{member.name}</p>
+                          <p className="text-[13px] text-muted-foreground">
                             {member.familyMemberRole === 'teenager' ? 'Teenager' :
                              member.familyMemberRole === 'grandparent' ? 'Bedsteforælder' :
                              member.familyMemberRole === 'step_parent' ? 'Bonusforælder' : 'Øvrigt familiemedlem'}
@@ -1555,7 +1555,7 @@ export function SettingsView() {
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="text-[#c8c6bc] hover:text-rose-500"
+                          className="text-muted-foreground hover:text-rose-500"
                           onClick={() => {
                             removeFamilyMember(member.id);
                             toast.success('Familiemedlem fjernet');
@@ -1566,12 +1566,12 @@ export function SettingsView() {
                       </div>
                     ))}
                     {users.filter(u => u.familyMemberRole).length === 0 && (
-                      <p className="rounded-[8px] border border-dashed border-[#d8d7cf] bg-[#f8f7f3] p-3 text-sm text-[#75736b]">
+                      <p className="rounded-[8px] border border-dashed border-border bg-card p-3 text-sm text-muted-foreground">
                         Ingen ekstra familiemedlemmer endnu.
                       </p>
                     )}
                   </div>
-                  <p className="text-xs text-[#78766d]">
+                  <p className="text-xs text-muted-foreground">
                     Maks {features.maxFamilyMembers} familiemedlemmer med dit abonnement.
                   </p>
                   <Button
@@ -1593,7 +1593,7 @@ export function SettingsView() {
             <>
               {/* Push-notifikationer status */}
               <div className="px-1 pt-2 pb-3">
-                <p className="text-[13px] text-[#75736b]">
+                <p className="text-[13px] text-muted-foreground">
                   Modtag notifikationer om afleveringer, beskeder og opdateringer.
                 </p>
               </div>
@@ -1601,11 +1601,11 @@ export function SettingsView() {
               {notifPermission === 'granted' ? (
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center justify-between px-1 py-2">
-                    <p className="text-[15px] font-medium text-[#2f2f2d]">Push-notifikationer</p>
+                    <p className="text-[15px] font-medium text-foreground">Push-notifikationer</p>
                     <BadgeCheck className="h-4 w-4 text-green-600" />
                   </div>
                   <div className="space-y-1.5 px-1">
-                    <Label htmlFor="reminder-minutes" className="text-[13px] text-[#75736b]">Påmind mig (minutter før aflevering)</Label>
+                    <Label htmlFor="reminder-minutes" className="text-[13px] text-muted-foreground">Påmind mig (minutter før aflevering)</Label>
                     <SelectSheet
                       value={String(notificationPreferences.handoverReminderMinutes)}
                       onValueChange={(v) => updateNotificationPreferences({ handoverReminderMinutes: Number(v) })}
@@ -1616,7 +1616,7 @@ export function SettingsView() {
                         { value: '60', label: '1 time' },
                         { value: '120', label: '2 timer' },
                       ]}
-                      className="rounded-[8px] border-[#d8d7cf]"
+                      className="rounded-[8px] border-border"
                     />
                   </div>
                   <Button
@@ -1634,7 +1634,7 @@ export function SettingsView() {
               ) : notifPermission === 'denied' ? (
                 <Button
                   variant="outline"
-                  className="w-full rounded-[8px] mb-4 text-[#b96424] border-[#f3c59d]"
+                  className="w-full rounded-[8px] mb-4 text-[#b96424] border-orange-tint"
                   onClick={() => toast.error('Notifikationer er blokeret. Tillad dem i enhedens indstillinger.')}
                 >
                   <Bell className="mr-2 h-4 w-4" />
@@ -1659,8 +1659,8 @@ export function SettingsView() {
               )}
 
               {/* ─── Kategori-rækker ─── */}
-              <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2">Kategorier</p>
-              <div className="divide-y divide-[#e5e3dc]">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-2">Kategorier</p>
+              <div className="divide-y divide-border">
                 {[
                   { id: 'notif-samvaer', label: 'Samvær & Afleveringer' },
                   { id: 'notif-kalender', label: 'Kalender & Datoer' },
@@ -1674,10 +1674,10 @@ export function SettingsView() {
                   <button
                     key={cat.id}
                     onClick={() => setSettingsDetailView(cat.id)}
-                    className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-[#faf9f6]"
+                    className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
                   >
-                    <p className="text-[15px] font-medium text-[#2f2f2d]">{cat.label}</p>
-                    <ChevronRight className="h-4 w-4 text-[#b0ada4] shrink-0" />
+                    <p className="text-[15px] font-medium text-foreground">{cat.label}</p>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                   </button>
                 ))}
               </div>
@@ -1689,19 +1689,19 @@ export function SettingsView() {
 
               {settingsDetailView === 'notif-samvaer' && (
                 <div className="space-y-0">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2">Samvær & Afleveringer</p>
-                  <div className="divide-y divide-[#e5e3dc]">
+                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-2">Samvær & Afleveringer</p>
+                  <div className="divide-y divide-border">
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
-                        <p className="text-[15px] font-medium text-[#2f2f2d]">Afleveringspåmindelser</p>
-                        <p className="text-[13px] text-[#75736b]">Før hver aflevering</p>
+                        <p className="text-[15px] font-medium text-foreground">Afleveringspåmindelser</p>
+                        <p className="text-[13px] text-muted-foreground">Før hver aflevering</p>
                       </div>
                       <IOSSwitch checked={notificationPreferences.handoverReminders} onCheckedChange={(v) => updateNotificationPreferences({ handoverReminders: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
-                        <p className="text-[15px] font-medium text-[#2f2f2d]">Samværsændringer</p>
-                        <p className="text-[13px] text-[#75736b]">Bytteanmodninger & planændringer</p>
+                        <p className="text-[15px] font-medium text-foreground">Samværsændringer</p>
+                        <p className="text-[13px] text-muted-foreground">Bytteanmodninger & planændringer</p>
                       </div>
                       <IOSSwitch checked={notificationPreferences.scheduleChanges} onCheckedChange={(v) => updateNotificationPreferences({ scheduleChanges: v })} />
                     </div>
@@ -1711,19 +1711,19 @@ export function SettingsView() {
 
               {settingsDetailView === 'notif-kalender' && (
                 <div className="space-y-0">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2">Kalender & Datoer</p>
-                  <div className="divide-y divide-[#e5e3dc]">
+                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-2">Kalender & Datoer</p>
+                  <div className="divide-y divide-border">
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
-                        <p className="text-[15px] font-medium text-[#2f2f2d]">Kalenderbegivenheder</p>
-                        <p className="text-[13px] text-[#75736b]">Nye events & ændringer</p>
+                        <p className="text-[15px] font-medium text-foreground">Kalenderbegivenheder</p>
+                        <p className="text-[13px] text-muted-foreground">Nye events & ændringer</p>
                       </div>
                       <IOSSwitch checked={notificationPreferences.eventReminders} onCheckedChange={(v) => updateNotificationPreferences({ eventReminders: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
-                        <p className="text-[15px] font-medium text-[#2f2f2d]">Vigtige datoer</p>
-                        <p className="text-[13px] text-[#75736b]">Fødselsdage, vaccinationer, skole</p>
+                        <p className="text-[15px] font-medium text-foreground">Vigtige datoer</p>
+                        <p className="text-[13px] text-muted-foreground">Fødselsdage, vaccinationer, skole</p>
                       </div>
                       <IOSSwitch checked={notificationPreferences.importantDates} onCheckedChange={(v) => updateNotificationPreferences({ importantDates: v })} />
                     </div>
@@ -1733,19 +1733,19 @@ export function SettingsView() {
 
               {settingsDetailView === 'notif-opgaver' && (
                 <div className="space-y-0">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2">Opgaver</p>
-                  <div className="divide-y divide-[#e5e3dc]">
+                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-2">Opgaver</p>
+                  <div className="divide-y divide-border">
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
-                        <p className="text-[15px] font-medium text-[#2f2f2d]">Opgavetildeling</p>
-                        <p className="text-[13px] text-[#75736b]">Når du får en ny opgave</p>
+                        <p className="text-[15px] font-medium text-foreground">Opgavetildeling</p>
+                        <p className="text-[13px] text-muted-foreground">Når du får en ny opgave</p>
                       </div>
                       <IOSSwitch checked={notificationPreferences.taskAssigned} onCheckedChange={(v) => updateNotificationPreferences({ taskAssigned: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
-                        <p className="text-[15px] font-medium text-[#2f2f2d]">Deadlines</p>
-                        <p className="text-[13px] text-[#75736b]">Forfaldne & kommende opgaver</p>
+                        <p className="text-[15px] font-medium text-foreground">Deadlines</p>
+                        <p className="text-[13px] text-muted-foreground">Forfaldne & kommende opgaver</p>
                       </div>
                       <IOSSwitch checked={notificationPreferences.taskDeadline} onCheckedChange={(v) => updateNotificationPreferences({ taskDeadline: v })} />
                     </div>
@@ -1755,19 +1755,19 @@ export function SettingsView() {
 
               {settingsDetailView === 'notif-oekonomi' && (
                 <div className="space-y-0">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2">Økonomi</p>
-                  <div className="divide-y divide-[#e5e3dc]">
+                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-2">Økonomi</p>
+                  <div className="divide-y divide-border">
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
-                        <p className="text-[15px] font-medium text-[#2f2f2d]">Nye udgifter</p>
-                        <p className="text-[13px] text-[#75736b]">Afventer din godkendelse</p>
+                        <p className="text-[15px] font-medium text-foreground">Nye udgifter</p>
+                        <p className="text-[13px] text-muted-foreground">Afventer din godkendelse</p>
                       </div>
                       <IOSSwitch checked={notificationPreferences.expensePending} onCheckedChange={(v) => updateNotificationPreferences({ expensePending: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
-                        <p className="text-[15px] font-medium text-[#2f2f2d]">Udgiftsopdateringer</p>
-                        <p className="text-[13px] text-[#75736b]">Godkendt, afvist, anfægtet</p>
+                        <p className="text-[15px] font-medium text-foreground">Udgiftsopdateringer</p>
+                        <p className="text-[13px] text-muted-foreground">Godkendt, afvist, anfægtet</p>
                       </div>
                       <IOSSwitch checked={notificationPreferences.expenseUpdates} onCheckedChange={(v) => updateNotificationPreferences({ expenseUpdates: v })} />
                     </div>
@@ -1777,19 +1777,19 @@ export function SettingsView() {
 
               {settingsDetailView === 'notif-beskeder' && (
                 <div className="space-y-0">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2">Beskeder</p>
-                  <div className="divide-y divide-[#e5e3dc]">
+                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-2">Beskeder</p>
+                  <div className="divide-y divide-border">
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
-                        <p className="text-[15px] font-medium text-[#2f2f2d]">Nye beskeder</p>
-                        <p className="text-[13px] text-[#75736b]">Kommunikation & dagbog</p>
+                        <p className="text-[15px] font-medium text-foreground">Nye beskeder</p>
+                        <p className="text-[13px] text-muted-foreground">Kommunikation & dagbog</p>
                       </div>
                       <IOSSwitch checked={notificationPreferences.newMessages} onCheckedChange={(v) => updateNotificationPreferences({ newMessages: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
-                        <p className="text-[15px] font-medium text-[#2f2f2d]">Professionelle beskeder</p>
-                        <p className="text-[13px] text-[#75736b]">Fra fagpersoner</p>
+                        <p className="text-[15px] font-medium text-foreground">Professionelle beskeder</p>
+                        <p className="text-[13px] text-muted-foreground">Fra fagpersoner</p>
                       </div>
                       <IOSSwitch checked={notificationPreferences.professionalMessages} onCheckedChange={(v) => updateNotificationPreferences({ professionalMessages: v })} />
                     </div>
@@ -1799,26 +1799,26 @@ export function SettingsView() {
 
               {settingsDetailView === 'notif-hjem' && (
                 <div className="space-y-0">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2">Hjem & Mad</p>
-                  <div className="divide-y divide-[#e5e3dc]">
+                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-2">Hjem & Mad</p>
+                  <div className="divide-y divide-border">
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
-                        <p className="text-[15px] font-medium text-[#2f2f2d]">Madplan</p>
-                        <p className="text-[13px] text-[#75736b]">Daglig påmindelse om aftensmad</p>
+                        <p className="text-[15px] font-medium text-foreground">Madplan</p>
+                        <p className="text-[13px] text-muted-foreground">Daglig påmindelse om aftensmad</p>
                       </div>
                       <IOSSwitch checked={notificationPreferences.mealPlanReminder} onCheckedChange={(v) => updateNotificationPreferences({ mealPlanReminder: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
-                        <p className="text-[15px] font-medium text-[#2f2f2d]">Indkøb</p>
-                        <p className="text-[13px] text-[#75736b]">Ugentlig indkøbspåmindelse</p>
+                        <p className="text-[15px] font-medium text-foreground">Indkøb</p>
+                        <p className="text-[13px] text-muted-foreground">Ugentlig indkøbspåmindelse</p>
                       </div>
                       <IOSSwitch checked={notificationPreferences.shoppingReminder} onCheckedChange={(v) => updateNotificationPreferences({ shoppingReminder: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
-                        <p className="text-[15px] font-medium text-[#2f2f2d]">Rengøring</p>
-                        <p className="text-[13px] text-[#75736b]">Rengøringsopgave-påmindelser</p>
+                        <p className="text-[15px] font-medium text-foreground">Rengøring</p>
+                        <p className="text-[13px] text-muted-foreground">Rengøringsopgave-påmindelser</p>
                       </div>
                       <IOSSwitch checked={notificationPreferences.cleaningReminder} onCheckedChange={(v) => updateNotificationPreferences({ cleaningReminder: v })} />
                     </div>
@@ -1828,19 +1828,19 @@ export function SettingsView() {
 
               {settingsDetailView === 'notif-dokumenter' && (
                 <div className="space-y-0">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2">Dokumenter & Beslutninger</p>
-                  <div className="divide-y divide-[#e5e3dc]">
+                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-2">Dokumenter & Beslutninger</p>
+                  <div className="divide-y divide-border">
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
-                        <p className="text-[15px] font-medium text-[#2f2f2d]">Delte dokumenter</p>
-                        <p className="text-[13px] text-[#75736b]">Nye filer delt med dig</p>
+                        <p className="text-[15px] font-medium text-foreground">Delte dokumenter</p>
+                        <p className="text-[13px] text-muted-foreground">Nye filer delt med dig</p>
                       </div>
                       <IOSSwitch checked={notificationPreferences.documentShared} onCheckedChange={(v) => updateNotificationPreferences({ documentShared: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
-                        <p className="text-[15px] font-medium text-[#2f2f2d]">Beslutningsforslag</p>
-                        <p className="text-[13px] text-[#75736b]">Nye forslag der kræver svar</p>
+                        <p className="text-[15px] font-medium text-foreground">Beslutningsforslag</p>
+                        <p className="text-[13px] text-muted-foreground">Nye forslag der kræver svar</p>
                       </div>
                       <IOSSwitch checked={notificationPreferences.decisionProposed} onCheckedChange={(v) => updateNotificationPreferences({ decisionProposed: v })} />
                     </div>
@@ -1850,12 +1850,12 @@ export function SettingsView() {
 
               {settingsDetailView === 'notif-dagbog' && (
                 <div className="space-y-0">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d] px-1 pb-2">Dagbog & Trivsel</p>
-                  <div className="divide-y divide-[#e5e3dc]">
+                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-2">Dagbog & Trivsel</p>
+                  <div className="divide-y divide-border">
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
-                        <p className="text-[15px] font-medium text-[#2f2f2d]">Dagbogspåmindelse</p>
-                        <p className="text-[13px] text-[#75736b]">Daglig påmindelse om at logge</p>
+                        <p className="text-[15px] font-medium text-foreground">Dagbogspåmindelse</p>
+                        <p className="text-[13px] text-muted-foreground">Daglig påmindelse om at logge</p>
                       </div>
                       <IOSSwitch checked={notificationPreferences.diaryReminder} onCheckedChange={(v) => updateNotificationPreferences({ diaryReminder: v })} />
                     </div>
@@ -1869,7 +1869,7 @@ export function SettingsView() {
         {/* ─── Familietype (fra sidepanel) ─── */}
         <TabsContent value="familytype" className="space-y-0">
           <div className="px-1 pt-2 pb-4">
-            <p className="text-[13px] text-[#75736b]">
+            <p className="text-[13px] text-muted-foreground">
               Vælg den familietype der passer bedst til jeres situation.
             </p>
           </div>
@@ -1885,17 +1885,17 @@ export function SettingsView() {
                 key={option.value}
                 onClick={() => handleFamilyModeChange(option.value)}
                 className={cn(
-                  "flex w-full items-center gap-3.5 p-4 text-left transition-all active:scale-[0.98] border-b border-[#f2f1ed]",
-                  currentMode === option.value && "bg-[#fff8f0]"
+                  "flex w-full items-center gap-3.5 p-4 text-left transition-all active:scale-[0.98] border-b border-border",
+                  currentMode === option.value && "bg-orange-tint-light"
                 )}
               >
-                <option.Icon className={cn("h-6 w-6 shrink-0", currentMode === option.value ? "text-[#f58a2d]" : "text-[#4f4d45]")} />
+                <option.Icon className={cn("h-6 w-6 shrink-0", currentMode === option.value ? "text-[#f58a2d]" : "text-foreground")} />
                 <div className="flex-1 min-w-0">
                   <p className={cn(
                     "text-[14px] font-semibold",
-                    currentMode === option.value ? "text-[#b96424]" : "text-[#2f2f2d]"
+                    currentMode === option.value ? "text-[#b96424]" : "text-foreground"
                   )}>{option.label}</p>
-                  <p className="text-[11px] text-[#9a978f] mt-0.5">{option.desc}</p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">{option.desc}</p>
                 </div>
                 {currentMode === option.value && (
                   <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#f58a2d]">
@@ -1909,13 +1909,13 @@ export function SettingsView() {
 
         {/* ─── Feedback (fra sidepanel) ─── */}
         <TabsContent value="feedback" className="space-y-2">
-              <p className="text-sm text-[#75736b]">
+              <p className="text-sm text-muted-foreground">
                 Vi vil gerne høre din mening! Hjælp os med at forbedre appen.
               </p>
 
               {/* Star rating */}
               <div className="space-y-2">
-                <Label className="text-xs font-semibold uppercase tracking-[0.05em] text-[#78766d]">
+                <Label className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                   Hvor tilfreds er du?
                 </Label>
                 <div className="flex gap-1">
@@ -1931,7 +1931,7 @@ export function SettingsView() {
                           'h-8 w-8 transition-colors',
                           star <= feedbackDraft.rating
                             ? 'fill-[#f58a2d] text-[#f58a2d]'
-                            : 'text-[#d8d7cf]'
+                            : 'text-muted-foreground'
                         )}
                       />
                     </button>
@@ -1941,7 +1941,7 @@ export function SettingsView() {
 
               {/* Category */}
               <div className="space-y-2">
-                <Label className="text-xs font-semibold uppercase tracking-[0.05em] text-[#78766d]">
+                <Label className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                   Kategori
                 </Label>
                 <SelectSheet
@@ -1956,13 +1956,13 @@ export function SettingsView() {
                     { value: 'calendar', label: 'Kalender / Samvær' },
                     { value: 'expenses', label: 'Udgifter / Økonomi' },
                   ]}
-                  className="rounded-[8px] border-[#d8d7cf]"
+                  className="rounded-[8px] border-border"
                 />
               </div>
 
               {/* Message */}
               <div className="space-y-2">
-                <Label className="text-xs font-semibold uppercase tracking-[0.05em] text-[#78766d]">
+                <Label className="text-xs font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                   Din besked
                 </Label>
                 <Textarea
@@ -1970,12 +1970,12 @@ export function SettingsView() {
                   onChange={(e) => setFeedbackDraft(prev => ({ ...prev, message: e.target.value }))}
                   placeholder="Fortæl os hvad du synes, eller hvad vi kan forbedre..."
                   rows={5}
-                  className="rounded-[8px] border-[#d8d7cf]"
+                  className="rounded-[8px] border-border"
                 />
               </div>
 
               <Button
-                className="w-full rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+                className="w-full rounded-[8px] bg-primary text-white hover:bg-primary"
                 disabled={!feedbackDraft.message.trim() || feedbackDraft.rating === 0}
                 onClick={() => {
                   toast.success('Tak for din feedback! Vi sætter stor pris på det.');
@@ -1997,7 +1997,7 @@ export function SettingsView() {
                     <Shield className="h-4 w-4" />
                     Databeskyttelse & Privatliv
                   </CardTitle>
-                  <p className="text-xs text-[#78766d]">
+                  <p className="text-xs text-muted-foreground">
                     Hos Hverdag tager vi beskyttelsen af dine og dine børns persondata alvorligt. Herunder kan du læse om, hvordan vi indsamler, behandler og beskytter dine oplysninger i overensstemmelse med EU&apos;s persondataforordning (GDPR).
                   </p>
                 </CardHeader>
@@ -2005,80 +2005,80 @@ export function SettingsView() {
 
               {/* Kategori 1 */}
               <div className="space-y-1 px-1">
-                <p className="text-sm font-bold text-[#2f2f2d]">For at levere vores tjeneste til dig</p>
-                <p className="text-xs text-[#4a4945] leading-relaxed">
+                <p className="text-sm font-bold text-foreground">For at levere vores tjeneste til dig</p>
+                <p className="text-xs text-foreground leading-relaxed">
                   Vi indsamler og behandler persondata for at kunne levere Hverdag-appen til dig — herunder samværsplaner, kalender, kommunikation, opgavestyring og dokumenthåndtering.
                 </p>
                 <button onClick={() => setSettingsDetailView('tjeneste')} className="text-xs font-semibold text-[#2f82de] flex items-center gap-0.5 pt-0.5">
                   Læs mere <ChevronRight className="h-3 w-3" />
                 </button>
               </div>
-              <div className="border-t border-[#e5e3dc]" />
+              <div className="border-t border-border" />
 
               {/* Kategori 2 */}
               <div className="space-y-1 px-1">
-                <p className="text-sm font-bold text-[#2f2f2d]">For at beskytte dine børns data</p>
-                <p className="text-xs text-[#4a4945] leading-relaxed">
+                <p className="text-sm font-bold text-foreground">For at beskytte dine børns data</p>
+                <p className="text-xs text-foreground leading-relaxed">
                   Vi behandler børns data med særlig omhu og ekstra sikkerhedsforanstaltninger. Forældre giver samtykke på vegne af børn under 13 år, og børnedata deles aldrig med tredjeparter.
                 </p>
                 <button onClick={() => setSettingsDetailView('boernedata')} className="text-xs font-semibold text-[#2f82de] flex items-center gap-0.5 pt-0.5">
                   Læs mere <ChevronRight className="h-3 w-3" />
                 </button>
               </div>
-              <div className="border-t border-[#e5e3dc]" />
+              <div className="border-t border-border" />
 
               {/* Kategori 3 */}
               <div className="space-y-1 px-1">
-                <p className="text-sm font-bold text-[#2f2f2d]">For at holde dine data sikre</p>
-                <p className="text-xs text-[#4a4945] leading-relaxed">
+                <p className="text-sm font-bold text-foreground">For at holde dine data sikre</p>
+                <p className="text-xs text-foreground leading-relaxed">
                   Vi bruger kryptering, adgangskontrol og sikker cloud-lagring i EU for at beskytte dine personlige oplysninger, dokumenter og samværsplaner.
                 </p>
                 <button onClick={() => setSettingsDetailView('sikkerhed')} className="text-xs font-semibold text-[#2f82de] flex items-center gap-0.5 pt-0.5">
                   Læs mere <ChevronRight className="h-3 w-3" />
                 </button>
               </div>
-              <div className="border-t border-[#e5e3dc]" />
+              <div className="border-t border-border" />
 
               {/* Kategori 4 */}
               <div className="space-y-1 px-1">
-                <p className="text-sm font-bold text-[#2f2f2d]">For at kommunikere med dig</p>
-                <p className="text-xs text-[#4a4945] leading-relaxed">
+                <p className="text-sm font-bold text-foreground">For at kommunikere med dig</p>
+                <p className="text-xs text-foreground leading-relaxed">
                   Vi bruger dine kontaktoplysninger til at sende dig notifikationer om afleveringer, beskeder, opgaver og vigtige opdateringer i din husstand.
                 </p>
                 <button onClick={() => setSettingsDetailView('kommunikation')} className="text-xs font-semibold text-[#2f82de] flex items-center gap-0.5 pt-0.5">
                   Læs mere <ChevronRight className="h-3 w-3" />
                 </button>
               </div>
-              <div className="border-t border-[#e5e3dc]" />
+              <div className="border-t border-border" />
 
               {/* Kategori 5 */}
               <div className="space-y-1 px-1">
-                <p className="text-sm font-bold text-[#2f2f2d]">Dine rettigheder som bruger</p>
-                <p className="text-xs text-[#4a4945] leading-relaxed">
+                <p className="text-sm font-bold text-foreground">Dine rettigheder som bruger</p>
+                <p className="text-xs text-foreground leading-relaxed">
                   Du har ret til at se, rette, slette og eksportere dine data. Vi respekterer alle dine rettigheder under GDPR og gør det nemt for dig at udøve dem.
                 </p>
                 <button onClick={() => setSettingsDetailView('rettigheder')} className="text-xs font-semibold text-[#2f82de] flex items-center gap-0.5 pt-0.5">
                   Læs mere <ChevronRight className="h-3 w-3" />
                 </button>
               </div>
-              <div className="border-t border-[#e5e3dc]" />
+              <div className="border-t border-border" />
 
               {/* Kategori 6 */}
               <div className="space-y-1 px-1">
-                <p className="text-sm font-bold text-[#2f2f2d]">Hvem vi deler data med</p>
-                <p className="text-xs text-[#4a4945] leading-relaxed">
+                <p className="text-sm font-bold text-foreground">Hvem vi deler data med</p>
+                <p className="text-xs text-foreground leading-relaxed">
                   Vi bruger betroede databehandlere til at drive appen sikkert. Dine data deles aldrig med tredjeparter til markedsføring eller reklameformål.
                 </p>
                 <button onClick={() => setSettingsDetailView('databehandlere')} className="text-xs font-semibold text-[#2f82de] flex items-center gap-0.5 pt-0.5">
                   Læs mere <ChevronRight className="h-3 w-3" />
                 </button>
               </div>
-              <div className="border-t border-[#e5e3dc]" />
+              <div className="border-t border-border" />
 
               {/* Kategori 7 */}
               <div className="space-y-1 px-1">
-                <p className="text-sm font-bold text-[#2f2f2d]">Sådan sletter du dine data</p>
-                <p className="text-xs text-[#4a4945] leading-relaxed">
+                <p className="text-sm font-bold text-foreground">Sådan sletter du dine data</p>
+                <p className="text-xs text-foreground leading-relaxed">
                   Du kan til enhver tid slette din konto. Alle persondata anonymiseres permanent ved sletning, og vi informerer dig om hele processen.
                 </p>
                 <button onClick={() => setSettingsDetailView('sletning')} className="text-xs font-semibold text-[#2f82de] flex items-center gap-0.5 pt-0.5">
@@ -2086,8 +2086,8 @@ export function SettingsView() {
                 </button>
               </div>
 
-              <div className="border-t border-[#e5e3dc] mt-2" />
-              <p className="text-[10px] text-center text-[#9e9c95] pb-4 pt-2">
+              <div className="border-t border-border mt-2" />
+              <p className="text-[10px] text-center text-muted-foreground pb-4 pt-2">
                 Dataansvarlig: Hverdag ApS · support@hverdag.app<br />
                 Senest opdateret: Februar 2026 · Hverdag v1.0
               </p>
@@ -2096,11 +2096,11 @@ export function SettingsView() {
             <>
               {settingsDetailView === 'tjeneste' && (
                 <div className="space-y-4 px-1">
-                  <p className="text-base font-bold text-[#2f2f2d]">For at levere vores tjeneste til dig</p>
+                  <p className="text-base font-bold text-foreground">For at levere vores tjeneste til dig</p>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Hvilke data indsamler vi</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">For at levere Hverdag-appen indsamler vi følgende persondata:</p>
-                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Hvilke data indsamler vi</p>
+                    <p className="text-xs text-foreground leading-relaxed">For at levere Hverdag-appen indsamler vi følgende persondata:</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-foreground leading-relaxed">
                       <li><span className="font-semibold">Kontooplysninger:</span> Navn, email, telefonnummer, profilbillede, fødselsdato, adresse</li>
                       <li><span className="font-semibold">Familieforhold:</span> Husstandstype (samboende, co-parenting, bonusfamilie, enlig forsørger), familiemedlemmer og deres roller</li>
                       <li><span className="font-semibold">Børnedata:</span> Navn, fødselsdato, allergier, medicin, institutioner, forældretilknytning</li>
@@ -2114,8 +2114,8 @@ export function SettingsView() {
                     </ul>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Hvordan vi bruger dataene</p>
-                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Hvordan vi bruger dataene</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-foreground leading-relaxed">
                       <li>Samværsplaner beregnes lokalt på din enhed og synkroniseres krypteret til cloud</li>
                       <li>Kalenderdata bruges til at vise din families samlede overblik og sende påmindelser</li>
                       <li>Beskeder leveres til husstandsmedlemmer via krypterede kanaler</li>
@@ -2124,23 +2124,23 @@ export function SettingsView() {
                     </ul>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Behandlingsgrundlag</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">Vi behandler dine data på følgende juridiske grundlag i henhold til GDPR:</p>
-                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Behandlingsgrundlag</p>
+                    <p className="text-xs text-foreground leading-relaxed">Vi behandler dine data på følgende juridiske grundlag i henhold til GDPR:</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-foreground leading-relaxed">
                       <li><span className="font-semibold">Art. 6(1)(b) — Kontrakt:</span> Behandling er nødvendig for at levere den tjeneste, du har tilmeldt dig</li>
                       <li><span className="font-semibold">Art. 9(2)(a) — Eksplicit samtykke:</span> For følsomme data som sundhedsoplysninger og børns data</li>
                       <li><span className="font-semibold">Art. 6(1)(f) — Legitim interesse:</span> For at forbedre appens funktionalitet og sikkerhed</li>
                     </ul>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Opbevaringsperiode</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Opbevaringsperiode</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Dine data opbevares, så længe din konto er aktiv. Ved kontosletning anonymiseres alle persondata inden for 30 dage. Anonymiserede, aggregerede data (uden personhenførbarhed) kan opbevares til statistiske formål.
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Datalagring</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Datalagring</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Alle data lagres i en Supabase PostgreSQL-database hostet i EU-regionen (Frankfurt, Tyskland). Data forlader aldrig EU. Databasen er krypteret at-rest med AES-256 og in-transit med TLS 1.3.
                     </p>
                   </div>
@@ -2149,22 +2149,22 @@ export function SettingsView() {
 
               {settingsDetailView === 'boernedata' && (
                 <div className="space-y-4 px-1">
-                  <p className="text-base font-bold text-[#2f2f2d]">For at beskytte dine børns data</p>
+                  <p className="text-base font-bold text-foreground">For at beskytte dine børns data</p>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Særlig beskyttelse af børns data</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Særlig beskyttelse af børns data</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Hverdag behandler børns persondata med den højeste grad af omhu. Børns data er underlagt strengere beskyttelse end voksnes data i henhold til GDPR art. 8 og den danske databeskyttelseslov.
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Samtykke</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Samtykke</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Forældre eller værger giver samtykke på vegne af børn under 13 år. Begge forældre i en co-parenting-husstand har adgang til barnets data. Samtykket kan til enhver tid trækkes tilbage.
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Hvilke børnedata behandles</p>
-                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Hvilke børnedata behandles</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-foreground leading-relaxed">
                       <li><span className="font-semibold">Identifikation:</span> Navn, fødselsdato, profilbillede</li>
                       <li><span className="font-semibold">Sundhed:</span> Allergier, medicin, humør/søvn/appetit-logs</li>
                       <li><span className="font-semibold">Institution:</span> Vuggestue, børnehave eller skole</li>
@@ -2174,14 +2174,14 @@ export function SettingsView() {
                     </ul>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Hvem kan se børnedata</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Hvem kan se børnedata</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Kun husstandens voksne medlemmer kan se børnedata. Hverdag som virksomhed har ikke adgang til individuelle børns data. Børnedata deles aldrig med tredjeparter — hverken til markedsføring, forskning eller andre formål.
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Sletning af børnedata</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Sletning af børnedata</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Børnedata kan fjernes fra appen af enhver forælder med adgang. Ved kontosletning anonymiseres alle børnedata tilknyttet kontoen. Hvis begge forældre sletter deres konti, slettes alle børnedata permanent.
                     </p>
                   </div>
@@ -2190,10 +2190,10 @@ export function SettingsView() {
 
               {settingsDetailView === 'sikkerhed' && (
                 <div className="space-y-4 px-1">
-                  <p className="text-base font-bold text-[#2f2f2d]">For at holde dine data sikre</p>
+                  <p className="text-base font-bold text-foreground">For at holde dine data sikre</p>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Kryptering</p>
-                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Kryptering</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-foreground leading-relaxed">
                       <li>Adgangskoder krypteres med bcrypt (salt rounds 12) og gemmes aldrig i klartekst</li>
                       <li>Al kommunikation foregår via HTTPS med TLS 1.3-kryptering</li>
                       <li>Databasen er krypteret at-rest med AES-256</li>
@@ -2201,26 +2201,26 @@ export function SettingsView() {
                     </ul>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Adgangskontrol</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Adgangskontrol</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Hverdag bruger household-baseret adgangskontrol, hvilket betyder at kun godkendte husstandsmedlemmer kan se jeres data. Hvert dataobjekt er knyttet til en specifik husstand og kan ikke tilgås af andre brugere.
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Autentificering</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Autentificering</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Vi bruger Supabase Auth til sikker brugerautentificering med JWT-tokens. Sessions udløber automatisk, og tokens fornyes sikkert. Push notification tokens slettes automatisk ved kontosletning.
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Databrud</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Databrud</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Ved et sikkerhedsbrud følger vi GDPR art. 33 og 34: Vi notificerer Datatilsynet inden 72 timer og informerer berørte brugere direkte via email og/eller push-notifikation med information om bruddet, de berørte data og de tiltag vi har iværksat.
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Cookies & lokal lagring</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Cookies & lokal lagring</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Appen bruger localStorage til session-data (login-token og app-tilstand). Dette er teknisk nødvendigt for appens funktion. Vi bruger ingen tredjeparts-cookies og ingen tracking- eller reklame-cookies.
                     </p>
                   </div>
@@ -2229,16 +2229,16 @@ export function SettingsView() {
 
               {settingsDetailView === 'kommunikation' && (
                 <div className="space-y-4 px-1">
-                  <p className="text-base font-bold text-[#2f2f2d]">For at kommunikere med dig</p>
+                  <p className="text-base font-bold text-foreground">For at kommunikere med dig</p>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Push-notifikationer</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Push-notifikationer</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Vi sender push-notifikationer via Apple Push Notification Service (APNs) for at informere dig om vigtige hændelser. Du kan styre hvilke typer notifikationer du modtager under Indstillinger → Notifikationer. Dine device-tokens gemmes i vores database og slettes ved kontosletning.
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Hvilke notifikationer sender vi</p>
-                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Hvilke notifikationer sender vi</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-foreground leading-relaxed">
                       <li>Afleveringspåmindelser og samværsændringer</li>
                       <li>Nye beskeder fra husstandsmedlemmer</li>
                       <li>Opgavetildelinger og deadlines</li>
@@ -2249,14 +2249,14 @@ export function SettingsView() {
                     </ul>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Email-kommunikation</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Email-kommunikation</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Din email bruges til kontoverifikation, adgangskodegendannelse og vigtige kontorelaterede meddelelser. Vi sender ikke markedsføringsemails medmindre du eksplicit tilmelder dig.
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Dine kontaktpræferencer</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Dine kontaktpræferencer</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Du kan til enhver tid ændre dine notifikationsindstillinger i appen. Du kan slå individuelle kategorier til og fra, og du kan helt fravælge push-notifikationer i din enheds indstillinger.
                     </p>
                   </div>
@@ -2265,55 +2265,55 @@ export function SettingsView() {
 
               {settingsDetailView === 'rettigheder' && (
                 <div className="space-y-4 px-1">
-                  <p className="text-base font-bold text-[#2f2f2d]">Dine rettigheder som bruger</p>
-                  <p className="text-xs text-[#4a4945] leading-relaxed">
+                  <p className="text-base font-bold text-foreground">Dine rettigheder som bruger</p>
+                  <p className="text-xs text-foreground leading-relaxed">
                     Som bruger af Hverdag har du en række rettigheder i henhold til GDPR. Vi gør det nemt for dig at udøve disse rettigheder direkte i appen eller ved at kontakte os.
                   </p>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Ret til indsigt (art. 15)</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Ret til indsigt (art. 15)</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Du kan se alle dine persondata direkte i appen under din profil og i de forskellige sektioner. Du kan også anmode om en komplet oversigt over alle data vi har om dig ved at kontakte os.
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Ret til berigtigelse (art. 16)</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Ret til berigtigelse (art. 16)</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Du kan rette dine personoplysninger direkte under Indstillinger → Konto. Dette omfatter dit navn, email, telefonnummer, adresse og andre profiloplysninger.
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Ret til sletning (art. 17)</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Ret til sletning (art. 17)</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Du kan slette din konto under Indstillinger → Konto → Slet konto. Ved sletning anonymiseres alle dine persondata permanent. Se afsnittet &quot;Sådan sletter du dine data&quot; for detaljer.
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Ret til begrænsning af behandling (art. 18)</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Ret til begrænsning af behandling (art. 18)</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Du kan anmode om, at vi begrænser behandlingen af dine data i visse situationer, fx mens en indsigelse behandles. Kontakt os på support@hverdag.app.
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Ret til dataportabilitet (art. 20)</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Ret til dataportabilitet (art. 20)</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Du har ret til at modtage dine persondata i et struktureret, almindeligt anvendt og maskinlæsbart format (JSON). Kontakt os på support@hverdag.app for at anmode om dataeksport.
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Ret til indsigelse (art. 21)</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Ret til indsigelse (art. 21)</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Du kan gøre indsigelse mod behandling af dine data, der er baseret på legitim interesse. Vi stopper behandlingen, medmindre vi kan påvise tvingende legitime grunde.
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Klage til tilsynsmyndighed</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Klage til tilsynsmyndighed</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Du har ret til at klage til Datatilsynet, hvis du mener, at vi behandler dine persondata i strid med GDPR. Datatilsynet kan kontaktes på dt@datatilsynet.dk eller via datatilsynet.dk.
                     </p>
                   </div>
                   <div className="space-y-2 pt-1">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Kontakt</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Kontakt</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Dataansvarlig: Hverdag ApS<br />
                       Email: support@hverdag.app<br />
                       Vi bestræber os på at besvare alle henvendelser inden for 30 dage.
@@ -2324,13 +2324,13 @@ export function SettingsView() {
 
               {settingsDetailView === 'databehandlere' && (
                 <div className="space-y-4 px-1">
-                  <p className="text-base font-bold text-[#2f2f2d]">Hvem vi deler data med</p>
-                  <p className="text-xs text-[#4a4945] leading-relaxed">
+                  <p className="text-base font-bold text-foreground">Hvem vi deler data med</p>
+                  <p className="text-xs text-foreground leading-relaxed">
                     Vi deler aldrig dine persondata med tredjeparter til markedsføring, reklame eller andre kommercielle formål. Vi bruger kun betroede databehandlere, der er nødvendige for at drive appen.
                   </p>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Supabase — Database & Autentificering</p>
-                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Supabase — Database & Autentificering</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-foreground leading-relaxed">
                       <li>Lagrer alle appdata (brugerprofiler, samværsplaner, beskeder, dokumenter etc.)</li>
                       <li>Håndterer brugerautentificering og session-management</li>
                       <li>Hostet i EU-region (Frankfurt, Tyskland)</li>
@@ -2339,8 +2339,8 @@ export function SettingsView() {
                     </ul>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Stripe — Betalingshåndtering</p>
-                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Stripe — Betalingshåndtering</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-foreground leading-relaxed">
                       <li>Håndterer abonnementsbetalinger og fakturering</li>
                       <li>PCI DSS Level 1-compliant (højeste sikkerhedsniveau for betalingsdata)</li>
                       <li>Vi gemmer aldrig kreditkortoplysninger — Stripe håndterer det direkte</li>
@@ -2348,16 +2348,16 @@ export function SettingsView() {
                     </ul>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Apple Push Notification Service (APNs)</p>
-                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Apple Push Notification Service (APNs)</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-foreground leading-relaxed">
                       <li>Leverer push-notifikationer til din iPhone/iPad</li>
                       <li>Vi sender kun notifikationsindhold — Apple kan ikke læse beskederne</li>
                       <li>Device-tokens slettes ved kontosletning</li>
                     </ul>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Ingen andre databehandlere</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Ingen andre databehandlere</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Vi bruger ingen analytics-tjenester (Google Analytics, Mixpanel etc.), ingen reklame-netværk, ingen social media-trackers og ingen AI/ML-tjenester til at behandle dine data. Dine data forbliver inden for de ovennævnte tjenester.
                     </p>
                   </div>
@@ -2366,17 +2366,17 @@ export function SettingsView() {
 
               {settingsDetailView === 'sletning' && (
                 <div className="space-y-4 px-1">
-                  <p className="text-base font-bold text-[#2f2f2d]">Sådan sletter du dine data</p>
+                  <p className="text-base font-bold text-foreground">Sådan sletter du dine data</p>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Sletning af din konto</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Sletning af din konto</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Du kan slette din konto under Indstillinger → Konto → Slet konto. Sletningen er permanent og kan ikke fortrydes.
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Hvad sker der ved sletning</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">Ved kontosletning anonymiseres alle dine persondata:</p>
-                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Hvad sker der ved sletning</p>
+                    <p className="text-xs text-foreground leading-relaxed">Ved kontosletning anonymiseres alle dine persondata:</p>
+                    <ul className="list-disc list-inside space-y-1 ml-1 text-xs text-foreground leading-relaxed">
                       <li>Dit navn erstattes med &quot;Slettet bruger&quot;</li>
                       <li>Din email anonymiseres (fx slettet_a1b2c3@anon.hverdag.app)</li>
                       <li>Telefonnummer, adresse og andre kontaktoplysninger fjernes</li>
@@ -2387,28 +2387,28 @@ export function SettingsView() {
                     </ul>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Hvad bevares (anonymiseret)</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Hvad bevares (anonymiseret)</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       For at bevare husstandens historik anonymiseres visse data i stedet for at slettes fuldstændigt. Dette inkluderer delte udgifter, beslutningslog-indlæg og mødereferater, hvor dit navn erstattes med &quot;Slettet bruger&quot;. Disse data kan ikke føres tilbage til dig som person.
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Tidsramme</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Tidsramme</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Anonymiseringen sker inden for 30 dage efter anmodning om kontosletning. Betalingsdata hos Stripe bevares i overensstemmelse med Stripes egne opbevaringsregler og lovkrav om regnskabsopbevaring.
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-[#2f2f2d]">Sletning af specifikke data</p>
-                    <p className="text-xs text-[#4a4945] leading-relaxed">
+                    <p className="text-sm font-semibold text-foreground">Sletning af specifikke data</p>
+                    <p className="text-xs text-foreground leading-relaxed">
                       Du behøver ikke slette hele din konto for at fjerne data. Du kan slette individuelle elementer direkte i appen: børneprofiler, dokumenter, dagbogsindlæg, fotos, udgifter og beskeder kan alle fjernes enkeltvist.
                     </p>
                   </div>
                 </div>
               )}
 
-              <div className="border-t border-[#e5e3dc] mt-4" />
-              <p className="text-[10px] text-center text-[#9e9c95] pb-4 pt-2">
+              <div className="border-t border-border mt-4" />
+              <p className="text-[10px] text-center text-muted-foreground pb-4 pt-2">
                 Dataansvarlig: Hverdag ApS · support@hverdag.app<br />
                 Senest opdateret: Februar 2026 · Hverdag v1.0
               </p>
@@ -2420,7 +2420,7 @@ export function SettingsView() {
         <TabsContent value="appearance" className="space-y-2">
               {/* Dark mode toggle */}
               <div className="space-y-2">
-                <p className="text-[15px] font-medium text-[#2f2f2d] dark:text-slate-200">Farvetema</p>
+                <p className="text-[15px] font-medium text-foreground dark:text-slate-200">Farvetema</p>
                 <div className="flex gap-2">
                   {([
                     { value: 'light', label: 'Lys', Icon: Sun },
@@ -2435,7 +2435,7 @@ export function SettingsView() {
                       className={`flex flex-1 flex-col items-center gap-1 rounded-[8px] border py-2.5 px-2 text-xs font-medium transition-colors ${
                         theme === value
                           ? 'border-orange-400 bg-orange-50 text-orange-700 dark:border-orange-400 dark:bg-orange-950 dark:text-orange-300'
-                          : 'border-[#d8d7cf] bg-[#faf9f6] text-[#75736b] dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400'
+                          : 'border-border bg-card text-muted-foreground dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400'
                       }`}
                     >
                       <Icon className="h-4 w-4" />
@@ -2445,10 +2445,10 @@ export function SettingsView() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
+              <div className="flex items-center justify-between rounded-[8px] border border-border bg-card px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
                 <div>
-                  <p className="text-[15px] font-medium text-[#2f2f2d] dark:text-slate-200">Professionel visning</p>
-                  <p className="text-[13px] text-[#75736b] dark:text-slate-400">
+                  <p className="text-[15px] font-medium text-foreground dark:text-slate-200">Professionel visning</p>
+                  <p className="text-[13px] text-muted-foreground dark:text-slate-400">
                     {allowProfessionalTools ? 'Kan slås til/fra' : 'Kun tilgængelig for administratorer'}
                   </p>
                 </div>
@@ -2463,31 +2463,31 @@ export function SettingsView() {
 
       {/* Family Member Dialog */}
       <Dialog open={familyMemberOpen} onOpenChange={setFamilyMemberOpen}>
-        <DialogContent className="max-w-sm rounded-3xl border-[#d8d7cf] bg-[#faf9f6]">
+        <DialogContent className="max-w-sm rounded-3xl border-border bg-card">
           <DialogHeader>
-            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-[#2f2f2d]">Tilføj familiemedlem</DialogTitle>
+            <DialogTitle className="text-[1rem] tracking-[-0.01em] text-foreground">Tilføj familiemedlem</DialogTitle>
           </DialogHeader>
           <div className="space-y-2">
             <div className="space-y-1">
-              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Navn</Label>
+              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Navn</Label>
               <Input
                 value={familyMemberDraft.name}
                 onChange={e => setFamilyMemberDraft(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="Fulde navn"
-                className="rounded-[8px] border-[#d8d7cf] bg-white"
+                className="rounded-[8px] border-border bg-card"
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Email (valgfrit)</Label>
+              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Email (valgfrit)</Label>
               <Input
                 value={familyMemberDraft.email}
                 onChange={e => setFamilyMemberDraft(prev => ({ ...prev, email: e.target.value }))}
                 placeholder="email@eksempel.dk"
-                className="rounded-[8px] border-[#d8d7cf] bg-white"
+                className="rounded-[8px] border-border bg-card"
               />
             </div>
             <div className="space-y-1">
-              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Rolle</Label>
+              <Label className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Rolle</Label>
               <SelectSheet
                 value={familyMemberDraft.role}
                 onValueChange={(v) => setFamilyMemberDraft(prev => ({ ...prev, role: v as FamilyMemberRole }))}
@@ -2498,15 +2498,15 @@ export function SettingsView() {
                   { value: 'step_parent', label: 'Bonusforælder' },
                   { value: 'other_relative', label: 'Øvrigt familiemedlem' },
                 ]}
-                className="rounded-[8px] border-[#d8d7cf] bg-white"
+                className="rounded-[8px] border-border bg-card"
               />
             </div>
             <div className="flex gap-2 pt-1">
-              <Button variant="outline" className="flex-1 rounded-[8px] border-[#d8d7cf]" onClick={() => setFamilyMemberOpen(false)}>
+              <Button variant="outline" className="flex-1 rounded-[8px] border-border" onClick={() => setFamilyMemberOpen(false)}>
                 Annuller
               </Button>
               <Button
-                className="flex-1 rounded-[8px] bg-[#2f2f2f] text-white hover:bg-[#1a1a1a]"
+                className="flex-1 rounded-[8px] bg-primary text-white hover:bg-primary"
                 disabled={!familyMemberDraft.name.trim()}
                 onClick={() => {
                   const memberId = generateUserId();

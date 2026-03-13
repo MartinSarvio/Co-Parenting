@@ -1601,7 +1601,7 @@ export function MadOgHjem() {
         {scannedProduct && (
           <motion.div
             key="product-detail"
-            className="fixed inset-0 z-[55] bg-[#faf9f6] flex flex-col overflow-hidden"
+            className="fixed inset-0 z-[55] bg-card flex flex-col overflow-hidden"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -1612,14 +1612,14 @@ export function MadOgHjem() {
             onDragEnd={(_: unknown, info: { offset: { x: number } }) => { if (info.offset.x > 100) { setScannedProduct(null); setScannedBarcode(null); } }}
           >
             {/* Header */}
-            <div className="shrink-0 flex items-center justify-between px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-[#faf9f6]">
+            <div className="shrink-0 flex items-center justify-between px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-card">
               <button
                 onClick={() => { setScannedProduct(null); setScannedBarcode(null); }}
-                className="flex h-9 w-9 items-center justify-center text-[#2f2f2d] active:scale-[0.92] transition-transform"
+                className="flex h-9 w-9 items-center justify-center text-foreground active:scale-[0.92] transition-transform"
               >
                 <ArrowLeft className="h-[18px] w-[18px]" />
               </button>
-              <h1 className="text-[17px] font-bold text-[#2f2f2d]">Produktdetaljer</h1>
+              <h1 className="text-[17px] font-bold text-foreground">Produktdetaljer</h1>
               <div className="w-9" />
             </div>
 
@@ -1633,33 +1633,33 @@ export function MadOgHjem() {
                     <img
                       src={scannedProduct.imageUrl}
                       alt={scannedProduct.name}
-                      className="h-48 w-48 rounded-[8px] object-contain bg-white border border-[#e5e3dc]"
+                      className="h-48 w-48 rounded-[8px] object-contain bg-card border border-border"
                       onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
                   </div>
                 ) : (
                   <div className="flex justify-center">
-                    <div className="flex h-48 w-48 items-center justify-center rounded-[8px] bg-[#f2f1ed] border border-[#e5e3dc]">
-                      <Package className="h-16 w-16 text-[#b0ada4]" />
+                    <div className="flex h-48 w-48 items-center justify-center rounded-[8px] bg-background border border-border">
+                      <Package className="h-16 w-16 text-muted-foreground" />
                     </div>
                   </div>
                 )}
 
                 {/* Name + brand + quantity */}
                 <div className="text-center space-y-1">
-                  <h2 className="text-[20px] font-black text-[#2f2f2d] leading-tight">
+                  <h2 className="text-[20px] font-black text-foreground leading-tight">
                     {scannedProduct.name}
                   </h2>
                   {scannedProduct.brand && (
-                    <p className="text-[14px] text-[#78766d]">{scannedProduct.brand}</p>
+                    <p className="text-[14px] text-muted-foreground">{scannedProduct.brand}</p>
                   )}
                   {scannedProduct.quantity && (
-                    <p className="text-[13px] text-[#9a978f]">{scannedProduct.quantity}</p>
+                    <p className="text-[13px] text-muted-foreground">{scannedProduct.quantity}</p>
                   )}
                 </div>
 
                 {/* Nutrition per 100g label */}
-                <p className="text-[12px] font-semibold uppercase tracking-wide text-[#75736b]">
+                <p className="text-[12px] font-semibold uppercase tracking-wide text-muted-foreground">
                   Næringsindhold pr. 100g
                 </p>
 
@@ -1671,24 +1671,24 @@ export function MadOgHjem() {
                     { label: 'Kulh.', value: Math.round(scannedProduct.carbsPer100g * 10) / 10, unit: 'g', color: '#f59e0b' },
                     { label: 'Fedt', value: Math.round(scannedProduct.fatPer100g * 10) / 10, unit: 'g', color: '#ef4444' },
                   ].map(n => (
-                    <div key={n.label} className="rounded-[8px] bg-white border border-[#e5e3dc] p-2.5 text-center">
+                    <div key={n.label} className="rounded-[8px] bg-card border border-border p-2.5 text-center">
                       <p className="text-[16px] font-black leading-tight" style={{ color: n.color }}>{n.value}{n.unit}</p>
-                      <p className="text-[10px] text-[#9a978f] mt-0.5">{n.label}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">{n.label}</p>
                     </div>
                   ))}
                 </div>
 
                 {/* Additional nutrition (fiber, sugar, salt) */}
                 {(scannedProduct.fiberPer100g != null || scannedProduct.sugarPer100g != null || scannedProduct.saltPer100g != null) && (
-                  <div className="rounded-[8px] border border-[#e5e3dc] bg-white p-4 space-y-2.5">
+                  <div className="rounded-[8px] border border-border bg-card p-4 space-y-2.5">
                     {[
                       { label: 'Kostfibre', value: scannedProduct.fiberPer100g, unit: 'g' },
                       { label: 'Sukker', value: scannedProduct.sugarPer100g, unit: 'g' },
                       { label: 'Salt', value: scannedProduct.saltPer100g, unit: 'g' },
                     ].filter(n => n.value != null).map(n => (
                       <div key={n.label} className="flex items-center justify-between">
-                        <span className="text-[13px] text-[#78766d]">{n.label}</span>
-                        <span className="text-[13px] font-semibold text-[#2f2f2d]">
+                        <span className="text-[13px] text-muted-foreground">{n.label}</span>
+                        <span className="text-[13px] font-semibold text-foreground">
                           {Math.round(n.value! * 10) / 10}{n.unit}
                         </span>
                       </div>
@@ -1698,13 +1698,13 @@ export function MadOgHjem() {
 
                 {/* Barcode display */}
                 {scannedBarcode && (
-                  <p className="text-[11px] text-[#b0ada4] text-center">Stregkode: {scannedBarcode}</p>
+                  <p className="text-[11px] text-muted-foreground text-center">Stregkode: {scannedBarcode}</p>
                 )}
               </div>
             </div>
 
             {/* Fixed bottom button */}
-            <div className="shrink-0 px-4 pb-[env(safe-area-inset-bottom,24px)] pt-3 bg-[#faf9f6]">
+            <div className="shrink-0 px-4 pb-[env(safe-area-inset-bottom,24px)] pt-3 bg-card">
               <button
                 onClick={handleAddScannedToShopping}
                 className="w-full rounded-[8px] bg-[#f58a2d] py-4 text-[15px] font-bold text-white active:scale-[0.98] transition-transform"
@@ -1721,7 +1721,7 @@ export function MadOgHjem() {
         {isAddMealOpen && (
           <motion.div
             key="new-meal"
-            className="fixed inset-0 z-[55] bg-[#faf9f6] flex flex-col overflow-hidden"
+            className="fixed inset-0 z-[55] bg-card flex flex-col overflow-hidden"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -1736,16 +1736,16 @@ export function MadOgHjem() {
             }}
           >
             {/* Header */}
-            <div className="shrink-0 flex items-center justify-between px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-[#faf9f6]">
+            <div className="shrink-0 flex items-center justify-between px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-card">
               <button
                 onClick={() => {
                   if (newMeal.title.trim()) { setConfirmClose(true); } else { setIsAddMealOpen(false); resetMealForm(); }
                 }}
-                className="flex h-9 w-9 items-center justify-center text-[#2f2f2d] active:scale-[0.92] transition-transform"
+                className="flex h-9 w-9 items-center justify-center text-foreground active:scale-[0.92] transition-transform"
               >
                 <ArrowLeft className="h-[18px] w-[18px]" />
               </button>
-              <h1 className="text-[17px] font-bold text-[#2f2f2d]">Ny ret</h1>
+              <h1 className="text-[17px] font-bold text-foreground">Ny ret</h1>
               <div className="w-9" />
             </div>
 
@@ -1755,16 +1755,16 @@ export function MadOgHjem() {
                 {/* Date + Meal type */}
                 <div className="grid grid-cols-2 gap-3 overflow-hidden">
                   <div className="space-y-1.5 min-w-0 overflow-hidden">
-                    <label className="text-[12px] font-semibold text-[#78766d]">Dag</label>
+                    <label className="text-[12px] font-semibold text-muted-foreground">Dag</label>
                     <input
                       type="date"
                       value={newMeal.date}
                       onChange={(e) => setNewMeal((prev) => ({ ...prev, date: e.target.value }))}
-                      className="w-full min-w-0 max-w-full rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-3 text-[14px] text-[#2f2f2d] outline-none focus:border-[#f58a2d]"
+                      className="w-full min-w-0 max-w-full rounded-[8px] border border-border bg-card px-3 py-3 text-[14px] text-foreground outline-none focus:border-[#f58a2d]"
                     />
                   </div>
                   <div className="space-y-1.5 min-w-0 overflow-hidden">
-                    <label className="text-[12px] font-semibold text-[#78766d]">Måltid</label>
+                    <label className="text-[12px] font-semibold text-muted-foreground">Måltid</label>
                     <SelectSheet
                       value={newMeal.mealType}
                       onValueChange={(value) => setNewMeal((prev) => ({ ...prev, mealType: value }))}
@@ -1775,57 +1775,57 @@ export function MadOgHjem() {
                         { value: 'dinner', label: 'Aftensmad' },
                         { value: 'snack', label: 'Snack' },
                       ]}
-                      className="rounded-[8px] border border-[#e5e3dc] bg-white text-[#2f2f2d]"
+                      className="rounded-[8px] border border-border bg-card text-foreground"
                     />
                   </div>
                 </div>
 
                 {/* Dish title */}
                 <div className="space-y-1.5">
-                  <label className="text-[12px] font-semibold text-[#78766d]">Ret *</label>
+                  <label className="text-[12px] font-semibold text-muted-foreground">Ret *</label>
                   <input
                     type="text"
                     value={newMeal.title}
                     onChange={(e) => setNewMeal((prev) => ({ ...prev, title: e.target.value }))}
                     placeholder="Fx lasagne med salat"
                     autoFocus
-                    className="w-full rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d]"
+                    className="w-full rounded-[8px] border border-border bg-card px-3 py-3 text-[14px] text-foreground placeholder:text-muted-foreground outline-none focus:border-[#f58a2d]"
                   />
                 </div>
 
                 {/* Ingredients */}
                 <div className="space-y-1.5">
-                  <label className="text-[12px] font-semibold text-[#78766d]">Ingredienser (én pr. linje)</label>
+                  <label className="text-[12px] font-semibold text-muted-foreground">Ingredienser (én pr. linje)</label>
                   <textarea
                     value={newMeal.ingredientsText}
                     onChange={(e) => setNewMeal((prev) => ({ ...prev, ingredientsText: e.target.value }))}
                     rows={4}
                     placeholder={'500 g hakket oksekød\n1 løg\n2 dåser tomat'}
-                    className="w-full rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d] resize-none"
+                    className="w-full rounded-[8px] border border-border bg-card px-3 py-3 text-[14px] text-foreground placeholder:text-muted-foreground outline-none focus:border-[#f58a2d] resize-none"
                   />
                 </div>
 
                 {/* Instructions */}
                 <div className="space-y-1.5">
-                  <label className="text-[12px] font-semibold text-[#78766d]">Opskrift / fremgangsmåde</label>
+                  <label className="text-[12px] font-semibold text-muted-foreground">Opskrift / fremgangsmåde</label>
                   <textarea
                     value={newMeal.instructions}
                     onChange={(e) => setNewMeal((prev) => ({ ...prev, instructions: e.target.value }))}
                     rows={3}
                     placeholder="Skriv korte trin..."
-                    className="w-full rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d] resize-none"
+                    className="w-full rounded-[8px] border border-border bg-card px-3 py-3 text-[14px] text-foreground placeholder:text-muted-foreground outline-none focus:border-[#f58a2d] resize-none"
                   />
                 </div>
 
                 {/* Notes */}
                 <div className="space-y-1.5">
-                  <label className="text-[12px] font-semibold text-[#78766d]">Noter</label>
+                  <label className="text-[12px] font-semibold text-muted-foreground">Noter</label>
                   <input
                     type="text"
                     value={newMeal.notes}
                     onChange={(e) => setNewMeal((prev) => ({ ...prev, notes: e.target.value }))}
                     placeholder="Fx barnets favorit, kan fryses osv."
-                    className="w-full rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d]"
+                    className="w-full rounded-[8px] border border-border bg-card px-3 py-3 text-[14px] text-foreground placeholder:text-muted-foreground outline-none focus:border-[#f58a2d]"
                   />
                 </div>
 
@@ -1834,7 +1834,7 @@ export function MadOgHjem() {
                   <button
                     type="button"
                     onClick={fillMealFromSuggestion}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-[8px] border-2 border-[#e5e3dc] bg-white py-4 text-[14px] font-bold text-[#2f2f2d] active:scale-[0.98] transition-transform"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-[8px] border-2 border-border bg-card py-4 text-[14px] font-bold text-foreground active:scale-[0.98] transition-transform"
                   >
                     <RefreshCw className="h-4 w-4" />
                     Foreslå ret
@@ -1843,7 +1843,7 @@ export function MadOgHjem() {
                     type="button"
                     onClick={handleAddMeal}
                     disabled={!newMeal.title.trim() || isSaving}
-                    className="flex-1 flex items-center justify-center gap-2 rounded-[8px] bg-[#2f2f2f] py-4 text-[15px] font-bold text-white active:scale-[0.98] transition-transform disabled:opacity-40"
+                    className="flex-1 flex items-center justify-center gap-2 rounded-[8px] bg-primary py-4 text-[15px] font-bold text-white active:scale-[0.98] transition-transform disabled:opacity-40"
                   >
                     Gem ret
                   </button>
@@ -1974,7 +1974,7 @@ export function MadOgHjem() {
               return (
                 <motion.div
                   key="meal-guide"
-                  className="fixed inset-0 z-[55] bg-[#faf9f6] flex flex-col overflow-hidden"
+                  className="fixed inset-0 z-[55] bg-card flex flex-col overflow-hidden"
                   initial={{ x: '100%' }}
                   animate={{ x: 0 }}
                   exit={{ x: '100%' }}
@@ -1991,18 +1991,18 @@ export function MadOgHjem() {
                   }}
                 >
                   {/* Header */}
-                  <div className="shrink-0 flex items-center justify-between px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-[#faf9f6]">
+                  <div className="shrink-0 flex items-center justify-between px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-card">
                     <button
                       onClick={() => {
                         setSelectedMealGuideId(null);
                         setGuideCompletedSteps(new Set());
                         setMealGuideVideoPlaying(false);
                       }}
-                      className="flex h-9 w-9 items-center justify-center text-[#2f2f2d] active:scale-[0.92] transition-transform"
+                      className="flex h-9 w-9 items-center justify-center text-foreground active:scale-[0.92] transition-transform"
                     >
                       <ArrowLeft className="h-[18px] w-[18px]" />
                     </button>
-                    <h1 className="text-[17px] font-bold text-[#2f2f2d] truncate max-w-[260px]">
+                    <h1 className="text-[17px] font-bold text-foreground truncate max-w-[260px]">
                       {selectedMealGuide.title}
                     </h1>
                     <div className="w-9" />
@@ -2013,20 +2013,20 @@ export function MadOgHjem() {
                     <div className="px-4 pt-2 pb-8 max-w-[430px] mx-auto space-y-3">
                       {/* Badges + time estimate */}
                       <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant="outline" className="border-[#e8e7e0] bg-white text-[#4a4944]">
+                        <Badge variant="outline" className="border-border bg-card text-foreground">
                           {getMealTypeLabel(selectedMealGuide.mealType)}
                         </Badge>
-                        <Badge variant="secondary" className="bg-[#ecebe5] text-[#4a4944]">
+                        <Badge variant="secondary" className="bg-secondary text-foreground">
                           {format(parseISO(selectedMealGuide.date), 'EEEE d. MMMM', { locale: da })}
                         </Badge>
                         {totalDuration > 0 && (
-                          <Badge className="bg-[#fff2e6] text-[#a8662f]">
+                          <Badge className="bg-orange-tint text-[#a8662f]">
                             <Clock className="mr-1 h-3 w-3" />
                             ca. {totalDuration} min
                           </Badge>
                         )}
                         {selectedMealGuide.notes?.toLowerCase().includes('auto-plan') && (
-                          <Badge className="bg-[#e6f0ff] text-[#2563eb]">
+                          <Badge className="bg-blue-tint text-[#2563eb]">
                             <Sparkles className="mr-1 h-3 w-3" />
                             Auto-plan
                           </Badge>
@@ -2036,7 +2036,7 @@ export function MadOgHjem() {
                       {/* Video card — only shown if recipe has a video */}
                       {guideVideoUrl && (
                         mealGuideVideoPlaying ? (
-                          <div className="rounded-[8px] overflow-hidden border-2 border-[#e5e3dc] bg-black">
+                          <div className="rounded-[8px] overflow-hidden border-2 border-border bg-black">
                             <video
                               src={guideVideoUrl}
                               controls
@@ -2049,14 +2049,14 @@ export function MadOgHjem() {
                         ) : (
                           <button
                             onClick={() => setMealGuideVideoPlaying(true)}
-                            className="flex w-full items-center gap-3 rounded-[8px] border-2 border-[#e5e3dc] bg-[#2f2f2d] px-4 py-3.5 text-left transition-all active:scale-[0.98]"
+                            className="flex w-full items-center gap-3 rounded-[8px] border-2 border-border bg-primary px-4 py-3.5 text-left transition-all active:scale-[0.98]"
                           >
                             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f58a2d]">
                               <Play className="h-5 w-5 text-white ml-0.5" />
                             </div>
                             <div>
                               <p className="text-[14px] font-bold text-white">Se tilberedningsvideo</p>
-                              <p className="text-[11px] text-[#9a978f]">Trin-for-trin video</p>
+                              <p className="text-[11px] text-muted-foreground">Trin-for-trin video</p>
                             </div>
                           </button>
                         )
@@ -2064,11 +2064,11 @@ export function MadOgHjem() {
 
                       {/* Progress bar */}
                       <div className="space-y-1">
-                        <div className="flex items-center justify-between text-[11px] text-[#78766d]">
+                        <div className="flex items-center justify-between text-[11px] text-muted-foreground">
                           <span>Fremskridt</span>
                           <span>{completedCount} af {richSteps.length} trin · {progressPercent}%</span>
                         </div>
-                        <div className="h-2 w-full overflow-hidden rounded-full bg-[#ecebe5]">
+                        <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
                           <div
                             className="h-full rounded-full bg-[#f58a2d] transition-all duration-500 ease-out"
                             style={{ width: `${progressPercent}%` }}
@@ -2078,15 +2078,15 @@ export function MadOgHjem() {
 
                       {/* Ingredients card */}
                       {selectedMealGuide.recipe?.ingredients?.length ? (
-                        <div className="rounded-[8px] border border-[#e8e7e0] bg-white p-3">
-                          <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">
+                        <div className="rounded-[8px] border border-border bg-card p-3">
+                          <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                             Ingredienser ({selectedMealGuide.recipe.ingredients.length})
                           </p>
                           <div className="grid grid-cols-2 gap-x-4 gap-y-1">
                             {selectedMealGuide.recipe.ingredients.map((ingredient, index) => (
                               <div
                                 key={`${selectedMealGuide.id}-ingredient-${index}`}
-                                className="flex items-center gap-2 py-0.5 text-[12px] text-[#2f2f2d]"
+                                className="flex items-center gap-2 py-0.5 text-[12px] text-foreground"
                               >
                                 <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#f58a2d]" />
                                 {ingredient}
@@ -2098,7 +2098,7 @@ export function MadOgHjem() {
 
                       {/* Rich step-by-step guide */}
                       <div>
-                        <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">
+                        <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">
                           Trin-for-trin tilberedning
                         </p>
                         <div className="space-y-2">
@@ -2108,10 +2108,10 @@ export function MadOgHjem() {
                               <div
                                 key={`${selectedMealGuide.id}-rstep-${index}`}
                                 className={cn(
-                                  "rounded-[8px] border bg-white p-3.5 transition-all duration-300",
+                                  "rounded-[8px] border bg-card p-3.5 transition-all duration-300",
                                   isCompleted
                                     ? "border-green-200 bg-green-50/50 opacity-75"
-                                    : "border-[#e8e7e0]"
+                                    : "border-border"
                                 )}
                               >
                                 {/* Step header */}
@@ -2138,12 +2138,12 @@ export function MadOgHjem() {
                                     <div className="flex items-center gap-2">
                                       <p className={cn(
                                         "text-[13px] font-semibold",
-                                        isCompleted ? "text-green-700 line-through" : "text-[#2f2f2d]"
+                                        isCompleted ? "text-green-700 line-through" : "text-foreground"
                                       )}>
                                         {step.title}
                                       </p>
                                       {step.duration && (
-                                        <span className="inline-flex items-center gap-0.5 rounded-full bg-[#f0efe8] px-2 py-0.5 text-[10px] font-medium text-[#5f5d56]">
+                                        <span className="inline-flex items-center gap-0.5 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                                           <Timer className="h-2.5 w-2.5" />
                                           {step.duration} min
                                         </span>
@@ -2158,7 +2158,7 @@ export function MadOgHjem() {
 
                                     {/* Technique badge */}
                                     {step.technique && (
-                                      <span className="mt-1 inline-block rounded-md bg-[#f0efe8] px-1.5 py-0.5 text-[10px] text-[#67645c]">
+                                      <span className="mt-1 inline-block rounded-md bg-muted px-1.5 py-0.5 text-[10px] text-foreground">
                                         {step.technique}
                                       </span>
                                     )}
@@ -2166,7 +2166,7 @@ export function MadOgHjem() {
                                     {/* Step description */}
                                     <p className={cn(
                                       "mt-1.5 text-[12px] leading-relaxed",
-                                      isCompleted ? "text-green-600" : "text-[#4a4945]"
+                                      isCompleted ? "text-green-600" : "text-foreground"
                                     )}>
                                       {step.description}
                                     </p>
@@ -2177,7 +2177,7 @@ export function MadOgHjem() {
                                         {step.ingredients.map((ing, i) => (
                                           <span
                                             key={i}
-                                            className="rounded-full bg-[#fff8f0] px-2 py-0.5 text-[10px] font-medium text-[#a8662f]"
+                                            className="rounded-full bg-orange-tint-light px-2 py-0.5 text-[10px] font-medium text-[#a8662f]"
                                           >
                                             {ing}
                                           </span>
@@ -2187,7 +2187,7 @@ export function MadOgHjem() {
 
                                     {/* Helpful tip */}
                                     {step.tip && (
-                                      <div className="mt-2 flex items-start gap-1.5 rounded-[8px] bg-[#fdf8ef] px-2.5 py-2">
+                                      <div className="mt-2 flex items-start gap-1.5 rounded-[8px] bg-card px-2.5 py-2">
                                         <Lightbulb className="mt-0.5 h-3 w-3 shrink-0 text-[#e5a73b]" />
                                         <p className="text-[11px] leading-relaxed text-[#7a6b3e]">{step.tip}</p>
                                       </div>
@@ -2232,41 +2232,41 @@ export function MadOgHjem() {
               }}
             />
             <motion.div
-              className="fixed bottom-0 left-0 right-0 z-[61] bg-white rounded-t-3xl shadow-2xl pb-[env(safe-area-inset-bottom,24px)] max-h-[90vh] flex flex-col"
+              className="fixed bottom-0 left-0 right-0 z-[61] bg-card rounded-t-3xl shadow-2xl pb-[env(safe-area-inset-bottom,24px)] max-h-[90vh] flex flex-col"
               initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
               transition={{ type: 'spring', stiffness: 400, damping: 40 }}
             >
               <div className="flex justify-center pt-3 pb-1">
-                <div className="h-1 w-10 rounded-full bg-[#d8d7cf]" />
+                <div className="h-1 w-10 rounded-full bg-border" />
               </div>
               <div className="text-center pb-2">
-                <h2 className="text-[17px] font-bold text-[#2f2f2d]">Tilføj til indkøbsliste</h2>
+                <h2 className="text-[17px] font-bold text-foreground">Tilføj til indkøbsliste</h2>
               </div>
               <div className="px-4 pt-4 pb-[300px] space-y-4 flex-1 overflow-y-auto">
                 <div className="space-y-1.5">
-                  <label className="text-[12px] font-semibold text-[#78766d]">Vare *</label>
+                  <label className="text-[12px] font-semibold text-muted-foreground">Vare *</label>
                   <input
                     type="text"
                     value={newShopping.name}
                     onChange={(e) => setNewShopping((prev) => ({ ...prev, name: e.target.value }))}
                     placeholder="Fx gulerødder"
                     autoFocus
-                    className="w-full rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d]"
+                    className="w-full rounded-[8px] border border-border bg-card px-3 py-3 text-[14px] text-foreground placeholder:text-muted-foreground outline-none focus:border-[#f58a2d]"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <label className="text-[12px] font-semibold text-[#78766d]">Mængde</label>
+                    <label className="text-[12px] font-semibold text-muted-foreground">Mængde</label>
                     <input
                       type="text"
                       value={newShopping.quantity}
                       onChange={(e) => setNewShopping((prev) => ({ ...prev, quantity: e.target.value }))}
                       placeholder="Fx 1 kg"
-                      className="w-full rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d]"
+                      className="w-full rounded-[8px] border border-border bg-card px-3 py-3 text-[14px] text-foreground placeholder:text-muted-foreground outline-none focus:border-[#f58a2d]"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[12px] font-semibold text-[#78766d]">Prioritet</label>
+                    <label className="text-[12px] font-semibold text-muted-foreground">Prioritet</label>
                     <SelectSheet
                       value={newShopping.priority}
                       onValueChange={(value) => setNewShopping((prev) => ({ ...prev, priority: value }))}
@@ -2276,33 +2276,33 @@ export function MadOgHjem() {
                         { value: 'normal', label: 'Normal' },
                         { value: 'high', label: 'Høj' },
                       ]}
-                      className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] text-[#2f2f2d]"
+                      className="rounded-[8px] border-border bg-card text-foreground"
                     />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <label className="text-[12px] font-semibold text-[#78766d]">Kategori</label>
+                    <label className="text-[12px] font-semibold text-muted-foreground">Kategori</label>
                     <input
                       type="text"
                       value={newShopping.category}
                       onChange={(e) => setNewShopping((prev) => ({ ...prev, category: e.target.value }))}
                       placeholder="Fx Dagligvarer"
-                      className="w-full rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d]"
+                      className="w-full rounded-[8px] border border-border bg-card px-3 py-3 text-[14px] text-foreground placeholder:text-muted-foreground outline-none focus:border-[#f58a2d]"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-[12px] font-semibold text-[#78766d]">Dag</label>
+                    <label className="text-[12px] font-semibold text-muted-foreground">Dag</label>
                     <input
                       type="date"
                       value={newShopping.neededForDate}
                       onChange={(e) => setNewShopping((prev) => ({ ...prev, neededForDate: e.target.value }))}
-                      className="w-full rounded-[8px] border border-[#e5e3dc] bg-[#faf9f6] px-3 py-3 text-[14px] text-[#2f2f2d] outline-none focus:border-[#f58a2d]"
+                      className="w-full rounded-[8px] border border-border bg-card px-3 py-3 text-[14px] text-foreground outline-none focus:border-[#f58a2d]"
                     />
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-[12px] font-semibold text-[#78766d]">Knyt til ret</label>
+                  <label className="text-[12px] font-semibold text-muted-foreground">Knyt til ret</label>
                   <SelectSheet
                     value={newShopping.neededForMealId}
                     onValueChange={(value) => setNewShopping((prev) => ({ ...prev, neededForMealId: value }))}
@@ -2315,7 +2315,7 @@ export function MadOgHjem() {
                         label: `${format(parseISO(meal.date), 'd. MMM', { locale: da })} - ${meal.title}`,
                       })),
                     ]}
-                    className="rounded-[8px] border-[#e5e3dc] bg-[#faf9f6] text-[#2f2f2d]"
+                    className="rounded-[8px] border-border bg-card text-foreground"
                   />
                 </div>
                 <button
@@ -2337,12 +2337,12 @@ export function MadOgHjem() {
           {/* ── Shopping list selector ── */}
           {shoppingLists.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-10 gap-4 text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-[8px] bg-[#f2f1ed]">
-                <ShoppingCart className="h-8 w-8 text-[#b0ada4]" />
+              <div className="flex h-16 w-16 items-center justify-center rounded-[8px] bg-background">
+                <ShoppingCart className="h-8 w-8 text-muted-foreground" />
               </div>
               <div>
-                <p className="text-[15px] font-semibold text-[#2f2f2d]">Ingen indkøbsliste endnu</p>
-                <p className="text-[13px] text-[#9a978f] mt-1">Opret en indkøbsliste for at samle dine varer</p>
+                <p className="text-[15px] font-semibold text-foreground">Ingen indkøbsliste endnu</p>
+                <p className="text-[13px] text-muted-foreground mt-1">Opret en indkøbsliste for at samle dine varer</p>
               </div>
               <button
                 onClick={() => { setNewListName('Indkøbsliste'); setNewListDate(''); setCreateListOpen(true); }}
@@ -2357,7 +2357,7 @@ export function MadOgHjem() {
               {/* Create new list */}
               <button
                 onClick={() => { setNewListName('Indkøbsliste'); setNewListDate(''); setCreateListOpen(true); }}
-                className="flex w-full items-center justify-center gap-2 rounded-[8px] border-2 border-dashed border-[#d8d7cf] py-4 text-[14px] font-semibold text-[#9a978f] transition-all active:scale-[0.98] hover:border-[#f58a2d] hover:text-[#f58a2d]"
+                className="flex w-full items-center justify-center gap-2 rounded-[8px] border-2 border-dashed border-border py-4 text-[14px] font-semibold text-muted-foreground transition-all active:scale-[0.98] hover:border-[#f58a2d] hover:text-[#f58a2d]"
               >
                 <Plus className="h-4 w-4" /> Opret indkøbsliste
               </button>
@@ -2387,16 +2387,16 @@ export function MadOgHjem() {
                     >
                       <button
                         onClick={() => setActiveShoppingListId(list.id)}
-                        className="relative w-full rounded-[8px] border border-[#e5e3dc] bg-white px-4 py-4 text-left transition-all active:scale-[0.99]"
+                        className="relative w-full rounded-[8px] border border-border bg-card px-4 py-4 text-left transition-all active:scale-[0.99]"
                       >
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-[15px] font-bold text-[#2f2f2d]">{list.name}</p>
-                            <p className="text-[12px] text-[#9a978f] mt-0.5">{purchasedCount}/{totalCount} varer afkrydset</p>
+                            <p className="text-[15px] font-bold text-foreground">{list.name}</p>
+                            <p className="text-[12px] text-muted-foreground mt-0.5">{purchasedCount}/{totalCount} varer afkrydset</p>
                           </div>
-                          <span className="text-[14px] font-semibold text-[#9a978f]">{pct}%</span>
+                          <span className="text-[14px] font-semibold text-muted-foreground">{pct}%</span>
                         </div>
-                        <div className="mt-2.5 h-1.5 w-full rounded-full bg-[#f0efe8] overflow-hidden">
+                        <div className="mt-2.5 h-1.5 w-full rounded-full bg-muted overflow-hidden">
                           <div
                             className="h-full rounded-full bg-[#f58a2d] transition-all"
                             style={{ width: `${pct}%` }}
@@ -2413,7 +2413,7 @@ export function MadOgHjem() {
               {/* ── Back to list overview ── */}
               <button
                 onClick={() => { setShowAllLists(true); setActiveShoppingListId(null); }}
-                className="flex items-center gap-1.5 text-[13px] font-medium text-[#78766d] transition-colors active:text-[#2f2f2d]"
+                className="flex items-center gap-1.5 text-[13px] font-medium text-muted-foreground transition-colors active:text-foreground"
               >
                 <ArrowLeft className="h-3.5 w-3.5" />
                 Alle lister
@@ -2423,7 +2423,7 @@ export function MadOgHjem() {
           <button
             onClick={handleScanShopping}
             disabled={shopScanLoading}
-            className="flex w-full items-center justify-center gap-2 rounded-[8px] bg-[#2f2f2d] py-3.5 text-[14px] font-bold text-white active:scale-[0.98] transition-transform disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-[8px] bg-primary py-3.5 text-[14px] font-bold text-white active:scale-[0.98] transition-transform disabled:opacity-50"
           >
             {shopScanLoading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -2435,29 +2435,29 @@ export function MadOgHjem() {
 
           {/* ── Product search ── */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#9a978f]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               value={productQuery}
               onChange={e => setProductQuery(e.target.value)}
               placeholder="Søg produkter..."
-              className="w-full rounded-[8px] border border-[#e5e3dc] bg-white py-3 pl-9 pr-3 text-[14px] text-[#2f2f2d] placeholder:text-[#9a978f] outline-none focus:border-[#c5c3bb]"
+              className="w-full rounded-[8px] border border-border bg-card py-3 pl-9 pr-3 text-[14px] text-foreground placeholder:text-muted-foreground outline-none focus:border-border"
             />
             {productQuery && (
               <button
                 onClick={() => { setProductQuery(''); setProductResults([]); }}
                 className="absolute right-3 top-1/2 -translate-y-1/2"
               >
-                <X className="h-4 w-4 text-[#9a978f]" />
+                <X className="h-4 w-4 text-muted-foreground" />
               </button>
             )}
           </div>
 
           {/* Product search results */}
           {isProductSearching && (
-            <p className="text-[12px] text-[#9a978f] py-2">Søger produkter...</p>
+            <p className="text-[12px] text-muted-foreground py-2">Søger produkter...</p>
           )}
           {!isProductSearching && productResults.length > 0 && (
-            <div className="rounded-[8px] border border-[#e5e3dc] bg-white divide-y divide-[#f2f1ed]">
+            <div className="rounded-[8px] border border-border bg-card divide-y divide-border">
               {productResults.map(product => (
                 <button
                   key={product.id}
@@ -2473,15 +2473,15 @@ export function MadOgHjem() {
                     }).catch(() => {});
                     toast.success(`${product.name} tilføjet`);
                   }}
-                  className="w-full flex items-center justify-between px-3 py-3 text-left hover:bg-[#faf9f6] transition-colors active:bg-[#f2f1ed]"
+                  className="w-full flex items-center justify-between px-3 py-3 text-left hover:bg-card transition-colors active:bg-background"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="text-[13px] font-semibold text-[#2f2f2d] truncate">{product.name}</p>
-                      {product.brand && <span className="shrink-0 text-[10px] text-[#9a978f]">{product.brand}</span>}
+                      <p className="text-[13px] font-semibold text-foreground truncate">{product.name}</p>
+                      {product.brand && <span className="shrink-0 text-[10px] text-muted-foreground">{product.brand}</span>}
                     </div>
                     {product.nutritionPer100g && (
-                      <p className="text-[10px] text-[#9a978f] mt-0.5">
+                      <p className="text-[10px] text-muted-foreground mt-0.5">
                         {product.category ?? ''}{product.category ? ' · ' : ''}P {product.nutritionPer100g.protein?.toFixed(0) ?? '?'}g · K {product.nutritionPer100g.carbs?.toFixed(0) ?? '?'}g · F {product.nutritionPer100g.fat?.toFixed(0) ?? '?'}g per 100g
                       </p>
                     )}
@@ -2489,7 +2489,7 @@ export function MadOgHjem() {
                   {product.nutritionPer100g?.energyKcal != null && (
                     <div className="text-right ml-2 shrink-0">
                       <p className="text-[14px] font-black text-[#f58a2d]">{Math.round(product.nutritionPer100g.energyKcal)}</p>
-                      <p className="text-[9px] text-[#b0ada4]">kcal/100g</p>
+                      <p className="text-[9px] text-muted-foreground">kcal/100g</p>
                     </div>
                   )}
                 </button>
@@ -2499,17 +2499,17 @@ export function MadOgHjem() {
 
           {/* ── Count + bulk actions ── */}
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-[#2f2f2d]">
+            <p className="text-sm font-semibold text-foreground">
               {visiblePendingShopping.length} vare{visiblePendingShopping.length !== 1 ? 'r' : ''}
             </p>
             <div className="flex flex-wrap items-center gap-2">
               {visiblePendingShopping.length > 1 && (
-                <button onClick={markAllVisibleShoppingPurchased} className="rounded-full bg-[#2f2f2f] px-3 py-1.5 text-xs font-medium text-white transition-all hover:bg-[#1a1a1a]">
+                <button onClick={markAllVisibleShoppingPurchased} className="rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-white transition-all hover:bg-primary">
                   Afkryds alle
                 </button>
               )}
               {purchasedShopping.length > 0 && (
-                <button onClick={resetPurchasedShoppingItems} className="rounded-full border border-[#e5e3dc] px-3 py-1.5 text-xs font-medium text-[#75736b] transition-all hover:border-[#cccbc3]">
+                <button onClick={resetPurchasedShoppingItems} className="rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-all hover:border-border">
                   Nulstil købte
                 </button>
               )}
@@ -2518,16 +2518,16 @@ export function MadOgHjem() {
 
           {visiblePendingShopping.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-[8px] bg-[#f2f1ed]">
-                <ShoppingCart className="h-8 w-8 text-[#b0ada4]" />
+              <div className="flex h-16 w-16 items-center justify-center rounded-[8px] bg-background">
+                <ShoppingCart className="h-8 w-8 text-muted-foreground" />
               </div>
               <div>
-                <p className="text-[15px] font-semibold text-[#2f2f2d]">Ingen varer på listen</p>
-                <p className="text-[13px] text-[#9a978f] mt-1">Scan en stregkode eller tilføj varer manuelt</p>
+                <p className="text-[15px] font-semibold text-foreground">Ingen varer på listen</p>
+                <p className="text-[13px] text-muted-foreground mt-1">Scan en stregkode eller tilføj varer manuelt</p>
               </div>
             </div>
           ) : (
-            <div className="rounded border border-[#e5e3dc] bg-white overflow-hidden">
+            <div className="rounded border border-border bg-card overflow-hidden">
               {visiblePendingShopping.map((item) => {
                 const meal = item.neededForMealId ? mealPlans.find((m) => m.id === item.neededForMealId) : null;
                 const nutriGrade = matchNutriScore(item.name, nutriScoreMap);
@@ -2546,7 +2546,7 @@ export function MadOgHjem() {
                       onDragEnd={(_: unknown, info: { offset: { x: number } }) => {
                         if (info.offset.x < -80) apiDeleteShoppingItem(item.id).catch(() => {});
                       }}
-                      className="relative bg-white"
+                      className="relative bg-card"
                     >
                       <div className="p-3 flex items-start gap-2">
                         <Checkbox
@@ -2557,13 +2557,13 @@ export function MadOgHjem() {
                         <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setDetailItem(item)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter') setDetailItem(item); }}>
                           <div className="flex items-center gap-1.5">
                             <span className={cn(
-                              "text-[14px] font-semibold text-[#2f2f2d]",
-                              item.purchased && "line-through text-[#9b9a93]"
+                              "text-[14px] font-semibold text-foreground",
+                              item.purchased && "line-through text-muted-foreground"
                             )}>
                               {item.name}
                             </span>
                             {item.quantity && (
-                              <span className="text-[11px] text-[#78766d]">{item.quantity}</span>
+                              <span className="text-[11px] text-muted-foreground">{item.quantity}</span>
                             )}
                             {nutriGrade && <NutriScoreBadge grade={nutriGrade} size="sm" />}
                             {item.priority === 'high' && (
@@ -2579,7 +2579,7 @@ export function MadOgHjem() {
                             </div>
                           )}
                           {(item.category || meal) && (
-                            <p className="text-[11px] text-[#9a978f] mt-0.5">
+                            <p className="text-[11px] text-muted-foreground mt-0.5">
                               {item.category}{item.category && meal ? ' · ' : ''}{meal ? `Til: ${meal.title}` : ''}
                             </p>
                           )}
@@ -2599,7 +2599,7 @@ export function MadOgHjem() {
               </CardHeader>
               <CardContent className="space-y-2 pt-0">
                 {purchasedShopping.slice(0, 5).map((item) => (
-                  <div key={item.id} className="flex items-center justify-between rounded-[8px] border border-slate-200 bg-white px-3 py-2">
+                  <div key={item.id} className="flex items-center justify-between rounded-[8px] border border-slate-200 bg-card px-3 py-2">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="h-4 w-4 text-green-600" />
                       <div>
@@ -2667,8 +2667,8 @@ export function MadOgHjem() {
                   className={cn(
                     "shrink-0 rounded-[8px] border-2 px-4 py-2 text-[13px] font-semibold transition-all",
                     (member.id === currentUser?.id ? dagbogSelectedChild === null : dagbogSelectedChild === member.id)
-                      ? "border-[#f58a2d] bg-[#fff2e6] text-[#b96424]"
-                      : "border-[#e5e3dc] bg-white text-[#78766d]"
+                      ? "border-[#f58a2d] bg-orange-tint text-[#b96424]"
+                      : "border-border bg-card text-muted-foreground"
                   )}
                 >
                   {member.name}
@@ -2680,11 +2680,11 @@ export function MadOgHjem() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setDagbogDate(format(addDays(new Date(dagbogDate), -1), 'yyyy-MM-dd'))}
-                className="flex h-9 w-9 items-center justify-center rounded-[8px] border border-[#e5e3dc] bg-white text-[#78766d] transition-all active:scale-95"
+                className="flex h-9 w-9 items-center justify-center rounded-[8px] border border-border bg-card text-muted-foreground transition-all active:scale-95"
               >
                 ‹
               </button>
-              <div className="flex-1 rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-2 text-center text-[14px] font-semibold text-[#2f2f2d]">
+              <div className="flex-1 rounded-[8px] border border-border bg-card px-3 py-2 text-center text-[14px] font-semibold text-foreground">
                 {dagbogDate === format(new Date(), 'yyyy-MM-dd') ? 'I dag' :
                   dagbogDate === format(addDays(new Date(), -1), 'yyyy-MM-dd') ? 'I går' :
                   format(new Date(dagbogDate), 'd. MMMM', { locale: da })}
@@ -2692,38 +2692,38 @@ export function MadOgHjem() {
               <button
                 onClick={() => setDagbogDate(format(addDays(new Date(dagbogDate), 1), 'yyyy-MM-dd'))}
                 disabled={dagbogDate >= format(new Date(), 'yyyy-MM-dd')}
-                className="flex h-9 w-9 items-center justify-center rounded-[8px] border border-[#e5e3dc] bg-white text-[#78766d] transition-all active:scale-95 disabled:opacity-30"
+                className="flex h-9 w-9 items-center justify-center rounded-[8px] border border-border bg-card text-muted-foreground transition-all active:scale-95 disabled:opacity-30"
               >
                 ›
               </button>
             </div>
 
             {/* Kalorieoverigt — tryk for fuld kaloriedagbog */}
-            <button onClick={() => setKaloriedagbogOpen(true)} className="w-full text-left rounded-[8px] border border-[#e5e3dc] bg-white p-4 active:scale-[0.98] transition-transform">
+            <button onClick={() => setKaloriedagbogOpen(true)} className="w-full text-left rounded-[8px] border border-border bg-card p-4 active:scale-[0.98] transition-transform">
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <p className="text-[13px] text-[#78766d]">Kalorier i dag</p>
+                  <p className="text-[13px] text-muted-foreground">Kalorier i dag</p>
                   <div className="flex items-baseline gap-1.5 mt-0.5">
-                    <span className="text-[28px] font-bold text-[#2f2f2d]">{totalKcal}</span>
-                    <span className="text-[14px] text-[#78766d]">/ {dailyCalorieGoal} kcal</span>
+                    <span className="text-[28px] font-bold text-foreground">{totalKcal}</span>
+                    <span className="text-[14px] text-muted-foreground">/ {dailyCalorieGoal} kcal</span>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-[12px] text-[#78766d]">Tilbage</p>
+                  <p className="text-[12px] text-muted-foreground">Tilbage</p>
                   <p className={cn("text-[22px] font-bold mt-0.5", remainingKcal < 0 ? "text-red-500" : "text-[#34C759]")}>
                     {remainingKcal < 0 ? `+${Math.abs(remainingKcal)}` : remainingKcal}
                   </p>
                 </div>
               </div>
               {/* Progress bar */}
-              <div className="h-2.5 w-full rounded-full bg-[#f2f1ed] overflow-hidden">
+              <div className="h-2.5 w-full rounded-full bg-background overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-500"
                   style={{ width: `${progressPct}%`, backgroundColor: progressColor }}
                 />
               </div>
               <div className="flex justify-between mt-1.5">
-                <p className="text-[11px] text-[#9a978f]">{progressPct}% af dagsmål</p>
+                <p className="text-[11px] text-muted-foreground">{progressPct}% af dagsmål</p>
                 {progressPct >= 100 && (
                   <p className="text-[11px] font-semibold text-red-500">Dagsmål overskredet</p>
                 )}
@@ -2731,15 +2731,15 @@ export function MadOgHjem() {
 
               {/* Makronæringsstoffer */}
               {todayEntries.some(e => e.protein || e.carbs || e.fat) && (
-                <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-[#f2f1ed]">
+                <div className="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-border">
                   {[
                     { label: 'Protein', value: todayEntries.reduce((s, e) => s + (e.protein || 0), 0), unit: 'g', color: '#3b82f6' },
                     { label: 'Kulhydrat', value: todayEntries.reduce((s, e) => s + (e.carbs || 0), 0), unit: 'g', color: '#f59e0b' },
                     { label: 'Fedt', value: todayEntries.reduce((s, e) => s + (e.fat || 0), 0), unit: 'g', color: '#ef4444' },
                   ].map(macro => (
                     <div key={macro.label} className="text-center">
-                      <p className="text-[11px] text-[#78766d]">{macro.label}</p>
-                      <p className="text-[16px] font-bold mt-0.5" style={{ color: macro.color }}>{macro.value}<span className="text-[11px] font-normal text-[#9a978f]"> {macro.unit}</span></p>
+                      <p className="text-[11px] text-muted-foreground">{macro.label}</p>
+                      <p className="text-[16px] font-bold mt-0.5" style={{ color: macro.color }}>{macro.value}<span className="text-[11px] font-normal text-muted-foreground"> {macro.unit}</span></p>
                     </div>
                   ))}
                 </div>
@@ -2752,37 +2752,37 @@ export function MadOgHjem() {
                 const mealEntries = todayEntries.filter(e => e.meal === meal.key);
                 const mealKcal = mealEntries.reduce((s, e) => s + e.kcal, 0);
                 return (
-                  <div key={meal.key} className="rounded-[8px] border border-[#e5e3dc] bg-white overflow-hidden">
+                  <div key={meal.key} className="rounded-[8px] border border-border bg-card overflow-hidden">
                     <div className="flex items-center justify-between px-4 py-3">
                       <div className="flex items-center gap-2.5">
                         <span className="text-lg">{meal.emoji}</span>
                         <div>
-                          <p className="text-[14px] font-semibold text-[#2f2f2d]">{meal.label}</p>
+                          <p className="text-[14px] font-semibold text-foreground">{meal.label}</p>
                           {mealKcal > 0 && (
-                            <p className="text-[12px] text-[#78766d]">{mealKcal} kcal</p>
+                            <p className="text-[12px] text-muted-foreground">{mealKcal} kcal</p>
                           )}
                         </div>
                       </div>
                       <button
                         onClick={() => { setAddFoodMeal(meal.key); setIsAddFoodOpen(true); }}
-                        className="flex h-8 w-8 items-center justify-center text-[#78766d] transition-all active:scale-95"
+                        className="flex h-8 w-8 items-center justify-center text-muted-foreground transition-all active:scale-95"
                       >
                         <Plus className="h-4 w-4" />
                       </button>
                     </div>
                     {mealEntries.length > 0 && (
-                      <div className="border-t border-[#f2f1ed] divide-y divide-[#f2f1ed]">
+                      <div className="border-t border-border divide-y divide-border">
                         {mealEntries.map(entry => (
                           <div key={entry.id} className="flex items-center justify-between px-4 py-2.5">
                             <div>
-                              <p className="text-[13px] font-medium text-[#2f2f2d]">{entry.food}</p>
-                              {entry.time && <p className="text-[11px] text-[#9a978f]">{entry.time}</p>}
+                              <p className="text-[13px] font-medium text-foreground">{entry.food}</p>
+                              {entry.time && <p className="text-[11px] text-muted-foreground">{entry.time}</p>}
                             </div>
                             <div className="flex items-center gap-3">
-                              <span className="text-[13px] font-semibold text-[#2f2f2d]">{entry.kcal} kcal</span>
+                              <span className="text-[13px] font-semibold text-foreground">{entry.kcal} kcal</span>
                               <button
                                 onClick={() => setFoodLog(prev => prev.filter(e => e.id !== entry.id))}
-                                className="text-[#c0bdb4] hover:text-red-400 transition-colors"
+                                className="text-muted-foreground hover:text-red-400 transition-colors"
                               >
                                 <Trash2 className="h-3.5 w-3.5" />
                               </button>
@@ -2792,7 +2792,7 @@ export function MadOgHjem() {
                       </div>
                     )}
                     {mealEntries.length === 0 && (
-                      <p className="px-4 pb-3 text-[12px] text-[#b0ada4]">Ingen mad logget endnu</p>
+                      <p className="px-4 pb-3 text-[12px] text-muted-foreground">Ingen mad logget endnu</p>
                     )}
                   </div>
                 );
@@ -2901,16 +2901,16 @@ export function MadOgHjem() {
         <div className="space-y-3">
           {weekTemplates.map((template) => (
             <div key={template.id} className="flex items-center gap-3.5 py-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-[#f2f1ed]">
-                <CalendarDays className="h-5 w-5 text-[#7a786f]" />
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-background">
+                <CalendarDays className="h-5 w-5 text-muted-foreground" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[14px] font-semibold text-[#2f2f2d]">{template.name}</p>
-                <p className="text-[11px] text-[#9a978f] mt-0.5 line-clamp-1">{template.description}</p>
+                <p className="text-[14px] font-semibold text-foreground">{template.name}</p>
+                <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{template.description}</p>
               </div>
               <button
                 onClick={() => applyWeekTemplate(template.id)}
-                className="shrink-0 rounded-[8px] bg-[#2f2f2d] px-4 py-2 text-[12px] font-semibold text-white transition-all active:scale-[0.96]"
+                className="shrink-0 rounded-[8px] bg-primary px-4 py-2 text-[12px] font-semibold text-white transition-all active:scale-[0.96]"
               >
                 Brug
               </button>
@@ -2921,50 +2921,50 @@ export function MadOgHjem() {
 
       {activeTab === 'auto-plan' && (
         <div className="space-y-4">
-          <p className="text-[11px] text-[#9a978f]">Regelbaseret madplan-generator</p>
+          <p className="text-[11px] text-muted-foreground">Regelbaseret madplan-generator</p>
 
           <div className="space-y-1.5">
-            <p className="text-[12px] font-semibold text-[#5f5d56]">Favoritter (kommasepareret)</p>
+            <p className="text-[12px] font-semibold text-muted-foreground">Favoritter (kommasepareret)</p>
             <Input
               value={autoPlannerSettings.favoriteKeywords}
               onChange={(e) => setAutoPlannerSettings((prev) => ({ ...prev, favoriteKeywords: e.target.value }))}
               placeholder="fx pasta, frikadeller, kylling"
-              className="rounded-[8px] border-[#e5e3dc] bg-white text-[13px] placeholder:text-[#c5c4be]"
+              className="rounded-[8px] border-border bg-card text-[13px] placeholder:text-muted-foreground"
             />
           </div>
 
           <div className="space-y-1.5">
-            <p className="text-[12px] font-semibold text-[#5f5d56]">Undgå ingredienser (kommasepareret)</p>
+            <p className="text-[12px] font-semibold text-muted-foreground">Undgå ingredienser (kommasepareret)</p>
             <Input
               value={autoPlannerSettings.avoidIngredients}
               onChange={(e) => setAutoPlannerSettings((prev) => ({ ...prev, avoidIngredients: e.target.value }))}
               placeholder="fx nødder, svampe"
-              className="rounded-[8px] border-[#e5e3dc] bg-white text-[13px] placeholder:text-[#c5c4be]"
+              className="rounded-[8px] border-border bg-card text-[13px] placeholder:text-muted-foreground"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="flex items-center gap-3 rounded-[8px] bg-[#f2f1ed] px-3 py-2.5 text-[13px] text-[#2f2f2d]">
+            <label className="flex items-center gap-3 rounded-[8px] bg-background px-3 py-2.5 text-[13px] text-foreground">
               <Checkbox
                 checked={autoPlannerSettings.childFriendly}
                 onCheckedChange={(checked) => setAutoPlannerSettings((prev) => ({ ...prev, childFriendly: checked as boolean }))}
-                className="size-4 rounded-[8px] border-[#d8d7cf] data-[state=checked]:bg-[#2f2f2d] data-[state=checked]:border-[#2f2f2d]"
+                className="size-4 rounded-[8px] border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary"
               />
               Prioritér børnevenlige retter
             </label>
-            <label className="flex items-center gap-3 rounded-[8px] bg-[#f2f1ed] px-3 py-2.5 text-[13px] text-[#2f2f2d]">
+            <label className="flex items-center gap-3 rounded-[8px] bg-background px-3 py-2.5 text-[13px] text-foreground">
               <Checkbox
                 checked={autoPlannerSettings.replaceExisting}
                 onCheckedChange={(checked) => setAutoPlannerSettings((prev) => ({ ...prev, replaceExisting: checked as boolean }))}
-                className="size-4 rounded-[8px] border-[#d8d7cf] data-[state=checked]:bg-[#2f2f2d] data-[state=checked]:border-[#2f2f2d]"
+                className="size-4 rounded-[8px] border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary"
               />
               Erstat eksisterende middage i denne uge
             </label>
-            <label className="flex items-center gap-3 rounded-[8px] bg-[#f2f1ed] px-3 py-2.5 text-[13px] text-[#2f2f2d]">
+            <label className="flex items-center gap-3 rounded-[8px] bg-background px-3 py-2.5 text-[13px] text-foreground">
               <Checkbox
                 checked={autoPlannerSettings.useChildAllergies}
                 onCheckedChange={(checked) => setAutoPlannerSettings((prev) => ({ ...prev, useChildAllergies: checked as boolean }))}
-                className="size-4 rounded-[8px] border-[#d8d7cf] data-[state=checked]:bg-[#2f2f2d] data-[state=checked]:border-[#2f2f2d]"
+                className="size-4 rounded-[8px] border-border data-[state=checked]:bg-primary data-[state=checked]:border-primary"
               />
               Tag hensyn til barnets allergier
             </label>
@@ -2982,7 +2982,7 @@ export function MadOgHjem() {
             <RefreshCw className="h-4 w-4" />
             Generer ugeplan automatisk
           </button>
-          <p className="text-[11px] text-[#9a978f] text-center">
+          <p className="text-[11px] text-muted-foreground text-center">
             Planneren vælger 7 middage ud fra dine regler og opretter dem i madplanen.
           </p>
         </div>
@@ -2999,12 +2999,12 @@ export function MadOgHjem() {
             const Icon = item.icon;
             return (
               <div key={item.id} className="flex items-center gap-3.5 py-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-[#fff2e6]">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[8px] bg-orange-tint">
                   <Icon className="h-5 w-5 text-[#f58a2d]" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-semibold text-[#2f2f2d]">{item.title}</p>
-                  <p className="text-[11px] text-[#9a978f] leading-snug mt-0.5">{item.desc}</p>
+                  <p className="text-[14px] font-semibold text-foreground">{item.title}</p>
+                  <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">{item.desc}</p>
                 </div>
                 <button
                   onClick={() => applyIdea(item.id)}
@@ -3023,7 +3023,7 @@ export function MadOgHjem() {
         {isAddTemplateOpen && (
           <motion.div
             key="new-template"
-            className="fixed inset-0 z-[55] bg-[#faf9f6] flex flex-col overflow-hidden"
+            className="fixed inset-0 z-[55] bg-card flex flex-col overflow-hidden"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -3036,14 +3036,14 @@ export function MadOgHjem() {
             }}
           >
             {/* Header */}
-            <div className="shrink-0 flex items-center justify-between px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-[#faf9f6]">
+            <div className="shrink-0 flex items-center justify-between px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-card">
               <button
                 onClick={() => setIsAddTemplateOpen(false)}
-                className="flex h-9 w-9 items-center justify-center text-[#2f2f2d] active:scale-[0.92] transition-transform"
+                className="flex h-9 w-9 items-center justify-center text-foreground active:scale-[0.92] transition-transform"
               >
                 <ArrowLeft className="h-[18px] w-[18px]" />
               </button>
-              <h1 className="text-[17px] font-bold text-[#2f2f2d]">Ny uge-skabelon</h1>
+              <h1 className="text-[17px] font-bold text-foreground">Ny uge-skabelon</h1>
               <button
                 onClick={() => {
                   if (!newTemplateName.trim()) { toast.error('Angiv et navn til skabelonen'); return; }
@@ -3079,28 +3079,28 @@ export function MadOgHjem() {
             <div className="flex-1 overflow-y-auto">
               <div className="px-4 pt-4 pb-8 max-w-[430px] mx-auto space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-[12px] font-semibold text-[#78766d]">Navn *</label>
+                  <label className="text-[12px] font-semibold text-muted-foreground">Navn *</label>
                   <input
                     type="text"
                     value={newTemplateName}
                     onChange={(e) => setNewTemplateName(e.target.value)}
                     placeholder="Fx Hurtig familieuge"
                     autoFocus
-                    className="w-full rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d]"
+                    className="w-full rounded-[8px] border border-border bg-card px-3 py-3 text-[14px] text-foreground placeholder:text-muted-foreground outline-none focus:border-[#f58a2d]"
                   />
                 </div>
 
-                <p className="text-[12px] font-semibold text-[#78766d]">Aftensmad for hver dag</p>
+                <p className="text-[12px] font-semibold text-muted-foreground">Aftensmad for hver dag</p>
 
                 {['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag'].map((day, i) => (
                   <div key={day} className="space-y-1">
-                    <label className="text-[11px] font-medium text-[#9a978f]">{day}</label>
+                    <label className="text-[11px] font-medium text-muted-foreground">{day}</label>
                     <input
                       type="text"
                       value={newTemplateMeals[i] || ''}
                       onChange={(e) => setNewTemplateMeals((prev) => ({ ...prev, [i]: e.target.value }))}
                       placeholder="Fx pasta med kødsovs"
-                      className="w-full rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-2.5 text-[13px] text-[#2f2f2d] placeholder:text-[#c5c4be] outline-none focus:border-[#f58a2d]"
+                      className="w-full rounded-[8px] border border-border bg-card px-3 py-2.5 text-[13px] text-foreground placeholder:text-muted-foreground outline-none focus:border-[#f58a2d]"
                     />
                   </div>
                 ))}
@@ -3115,7 +3115,7 @@ export function MadOgHjem() {
         {isAddQuickSetupOpen && (
           <motion.div
             key="new-quick-setup"
-            className="fixed inset-0 z-[55] bg-[#faf9f6] flex flex-col overflow-hidden"
+            className="fixed inset-0 z-[55] bg-card flex flex-col overflow-hidden"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -3128,14 +3128,14 @@ export function MadOgHjem() {
             }}
           >
             {/* Header */}
-            <div className="shrink-0 flex items-center justify-between px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-[#faf9f6]">
+            <div className="shrink-0 flex items-center justify-between px-4 pt-[env(safe-area-inset-top,16px)] pb-3 bg-card">
               <button
                 onClick={() => setIsAddQuickSetupOpen(false)}
-                className="flex h-9 w-9 items-center justify-center text-[#2f2f2d] active:scale-[0.92] transition-transform"
+                className="flex h-9 w-9 items-center justify-center text-foreground active:scale-[0.92] transition-transform"
               >
                 <ArrowLeft className="h-[18px] w-[18px]" />
               </button>
-              <h1 className="text-[17px] font-bold text-[#2f2f2d]">Nyt hurtig valg</h1>
+              <h1 className="text-[17px] font-bold text-foreground">Nyt hurtig valg</h1>
               <button
                 onClick={() => {
                   if (!newQuickSetup.title.trim()) { toast.error('Angiv en titel'); return; }
@@ -3153,25 +3153,25 @@ export function MadOgHjem() {
             <div className="flex-1 overflow-y-auto">
               <div className="px-4 pt-4 pb-8 max-w-[430px] mx-auto space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-[12px] font-semibold text-[#78766d]">Titel *</label>
+                  <label className="text-[12px] font-semibold text-muted-foreground">Titel *</label>
                   <input
                     type="text"
                     value={newQuickSetup.title}
                     onChange={(e) => setNewQuickSetup((prev) => ({ ...prev, title: e.target.value }))}
                     placeholder="Fx Ugentlig check-in"
                     autoFocus
-                    className="w-full rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d]"
+                    className="w-full rounded-[8px] border border-border bg-card px-3 py-3 text-[14px] text-foreground placeholder:text-muted-foreground outline-none focus:border-[#f58a2d]"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[12px] font-semibold text-[#78766d]">Beskrivelse</label>
+                  <label className="text-[12px] font-semibold text-muted-foreground">Beskrivelse</label>
                   <textarea
                     value={newQuickSetup.description}
                     onChange={(e) => setNewQuickSetup((prev) => ({ ...prev, description: e.target.value }))}
                     placeholder="Beskriv hvad dette hurtige valg gør..."
                     rows={4}
-                    className="w-full rounded-[8px] border border-[#e5e3dc] bg-white px-3 py-3 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#f58a2d] resize-none"
+                    className="w-full rounded-[8px] border border-border bg-card px-3 py-3 text-[14px] text-foreground placeholder:text-muted-foreground outline-none focus:border-[#f58a2d] resize-none"
                   />
                 </div>
               </div>
@@ -3192,7 +3192,7 @@ export function MadOgHjem() {
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.15}
             onDragEnd={(_: unknown, info: { offset: { x: number } }) => { if (info.offset.x > 100) setRecipeBrowserOpen(false); }}
-            className="fixed inset-0 z-[60] bg-[#faf9f6] overflow-hidden flex flex-col"
+            className="fixed inset-0 z-[60] bg-card overflow-hidden flex flex-col"
             style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
           >
             {/* Header */}
@@ -3200,11 +3200,11 @@ export function MadOgHjem() {
               <div className="flex items-center gap-3 mb-4">
                 <button
                   onClick={() => setRecipeBrowserOpen(false)}
-                  className="flex h-9 w-9 items-center justify-center text-[#2f2f2d] transition-all active:scale-[0.92]"
+                  className="flex h-9 w-9 items-center justify-center text-foreground transition-all active:scale-[0.92]"
                 >
-                  <ArrowLeft className="h-[18px] w-[18px] text-[#2f2f2d]" />
+                  <ArrowLeft className="h-[18px] w-[18px] text-foreground" />
                 </button>
-                <h1 className="text-[20px] font-bold tracking-[-0.02em] text-[#2f2f2d]">Opskrifter</h1>
+                <h1 className="text-[20px] font-bold tracking-[-0.02em] text-foreground">Opskrifter</h1>
               </div>
 
               <motion.div
@@ -3214,12 +3214,12 @@ export function MadOgHjem() {
               >
                 {/* Search */}
                 <div className="relative mb-3">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#b0ada4]" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     value={recipeSearch}
                     onChange={e => setRecipeSearch(e.target.value)}
                     placeholder="Søg opskrift..."
-                    className="pl-9 rounded-[8px] border-[#e5e3dc] bg-white text-[14px]"
+                    className="pl-9 rounded-[8px] border-border bg-card text-[14px]"
                   />
                 </div>
 
@@ -3234,7 +3234,7 @@ export function MadOgHjem() {
                         onClick={() => setRecipeCategory(cat)}
                         className={cn(
                           "shrink-0 flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12px] font-semibold transition-all",
-                          isActive ? "bg-[#2f2f2f] text-white" : "bg-[#f2f1ed] text-[#5f5d56]"
+                          isActive ? "bg-primary text-white" : "bg-background text-muted-foreground"
                         )}
                       >
                         <CatIcon className="h-3.5 w-3.5" />
@@ -3261,22 +3261,22 @@ export function MadOgHjem() {
                   <button
                     key={recipe.id}
                     onClick={() => { setSelectedRecipe(recipe); setRecipeServings(recipe.servings); setNutritionUnit('portion'); setSelectedMembers(eligibleMembers.map(m => m.id)); setMealPlanDate(todayString); setActiveStepIndex(0); setVideoPlaying(false); const catMap: Record<string, MealType> = { 'Morgenmad': 'breakfast', 'Frokost': 'lunch', 'Aftensmad': 'dinner', 'Snacks': 'snack' }; setSelectedMealType(catMap[recipe.category] || 'dinner'); }}
-                    className="flex w-full items-center gap-3 rounded-[8px] border-2 border-[#e5e3dc] bg-white px-4 py-3.5 text-left transition-all active:scale-[0.98] hover:border-[#d8d7cf]"
+                    className="flex w-full items-center gap-3 rounded-[8px] border-2 border-border bg-card px-4 py-3.5 text-left transition-all active:scale-[0.98] hover:border-border"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <p className="text-[14px] font-semibold text-[#2f2f2d]">{recipe.name}</p>
+                        <p className="text-[14px] font-semibold text-foreground">{recipe.name}</p>
                         {recipe.childFriendly && (
-                          <span className="inline-flex items-center gap-0.5 rounded-[8px] bg-[#fff2e6] border border-[#f3c59d] px-1.5 py-0.5 text-[10px] font-semibold text-[#cc6f1f]">
+                          <span className="inline-flex items-center gap-0.5 rounded-[8px] bg-orange-tint border border-orange-tint px-1.5 py-0.5 text-[10px] font-semibold text-[#cc6f1f]">
                             <Baby className="h-3 w-3" /> Børnevenlig
                           </span>
                         )}
                         {recipe.isUserRecipe && (
-                          <span className="rounded-[8px] bg-[#e8f4fd] border border-[#b3d4f0] px-1.5 py-0.5 text-[10px] font-semibold text-[#4a90d9]">Din</span>
+                          <span className="rounded-[8px] bg-blue-tint border border-[#b3d4f0] px-1.5 py-0.5 text-[10px] font-semibold text-[#4a90d9]">Din</span>
                         )}
                       </div>
-                      <p className="mt-1 text-[12px] text-[#78766d] line-clamp-1">{recipe.description}</p>
-                      <div className="mt-1.5 flex items-center gap-2 text-[11px] text-[#9a978f]">
+                      <p className="mt-1 text-[12px] text-muted-foreground line-clamp-1">{recipe.description}</p>
+                      <div className="mt-1.5 flex items-center gap-2 text-[11px] text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <span className={cn("h-2 w-2 rounded-full", recipe.difficulty === 'easy' ? "bg-[#4caf50]" : recipe.difficulty === 'medium' ? "bg-[#f5a623]" : "bg-[#e53935]")} />
                           {recipe.difficulty === 'easy' ? 'Nem' : recipe.difficulty === 'medium' ? 'Medium' : 'Svær'}
@@ -3289,13 +3289,13 @@ export function MadOgHjem() {
                         <span>{recipe.nutrition.kcal} kcal</span>
                       </div>
                     </div>
-                    <ChevronRight className="h-5 w-5 text-[#c8c6bc] shrink-0" />
+                    <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0" />
                   </button>
                 ))}
                 {filteredRecipes.length === 0 && (
                   <div className="py-12 text-center">
-                    <BookOpen className="mx-auto h-8 w-8 text-[#d8d7cf] mb-2" />
-                    <p className="text-[13px] text-[#9a978f]">Ingen opskrifter fundet</p>
+                    <BookOpen className="mx-auto h-8 w-8 text-muted-foreground mb-2" />
+                    <p className="text-[13px] text-muted-foreground">Ingen opskrifter fundet</p>
                   </div>
                 )}
               </div>
@@ -3325,30 +3325,30 @@ export function MadOgHjem() {
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.15}
             onDragEnd={(_: unknown, info: { offset: { x: number } }) => { if (info.offset.x > 100) setCreateRecipeOpen(false); }}
-            className="fixed inset-0 z-[60] bg-[#faf9f6] overflow-hidden flex flex-col"
+            className="fixed inset-0 z-[60] bg-card overflow-hidden flex flex-col"
             style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
           >
             <div className="shrink-0 px-4 pt-3 pb-3 flex items-center gap-3">
               <button
                 onClick={() => setCreateRecipeOpen(false)}
-                className="flex h-9 w-9 items-center justify-center text-[#2f2f2d] transition-all active:scale-[0.92]"
+                className="flex h-9 w-9 items-center justify-center text-foreground transition-all active:scale-[0.92]"
               >
-                <ArrowLeft className="h-[18px] w-[18px] text-[#2f2f2d]" />
+                <ArrowLeft className="h-[18px] w-[18px] text-foreground" />
               </button>
-              <h1 className="text-[20px] font-bold tracking-[-0.02em] text-[#2f2f2d]">Opret ny opskrift</h1>
+              <h1 className="text-[20px] font-bold tracking-[-0.02em] text-foreground">Opret ny opskrift</h1>
             </div>
           <div className="flex-1 overflow-y-auto px-4 space-y-2 pb-8">
             {/* URL scrape field */}
             <div className="space-y-2">
-              <Label className="text-[12px] font-semibold text-[#78766d]">Hent fra hjemmeside</Label>
+              <Label className="text-[12px] font-semibold text-muted-foreground">Hent fra hjemmeside</Label>
               <div className="flex gap-2">
                 <div className="relative flex-1">
-                  <Globe className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#b0ada4]" />
+                  <Globe className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                   <Input
                     value={scrapeUrl}
                     onChange={e => setScrapeUrl(e.target.value)}
                     placeholder="Indsæt link til opskrift..."
-                    className="pl-8 rounded-[8px] border-[#d8d7cf] text-[13px]"
+                    className="pl-8 rounded-[8px] border-border text-[13px]"
                   />
                 </div>
                 <Button
@@ -3387,86 +3387,86 @@ export function MadOgHjem() {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-[12px] font-semibold text-[#78766d]">Navn</Label>
+              <Label className="text-[12px] font-semibold text-muted-foreground">Navn</Label>
               <Input
                 value={newRecipe.name}
                 onChange={e => setNewRecipe(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="Fx. Bedstemors kyllingesuppe"
-                className="rounded-[8px] border-[#d8d7cf]"
+                className="rounded-[8px] border-border"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[12px] font-semibold text-[#78766d]">Beskrivelse</Label>
+              <Label className="text-[12px] font-semibold text-muted-foreground">Beskrivelse</Label>
               <Input
                 value={newRecipe.description}
                 onChange={e => setNewRecipe(prev => ({ ...prev, description: e.target.value }))}
                 placeholder="Kort beskrivelse..."
-                className="rounded-[8px] border-[#d8d7cf]"
+                className="rounded-[8px] border-border"
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <Label className="text-[12px] font-semibold text-[#78766d]">Kategori</Label>
+                <Label className="text-[12px] font-semibold text-muted-foreground">Kategori</Label>
                 <button
                   type="button"
                   onClick={() => setRecipeCategorySheetOpen(true)}
-                  className="flex h-10 w-full items-center justify-between rounded-[8px] border border-[#d8d7cf] bg-white px-3 text-sm text-[#2f2f2d]"
+                  className="flex h-10 w-full items-center justify-between rounded-[8px] border border-border bg-card px-3 text-sm text-foreground"
                 >
                   {newRecipe.category}
-                  <ChevronDown className="h-4 w-4 text-[#78766d]" />
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
                 </button>
               </div>
               <div className="space-y-2">
-                <Label className="text-[12px] font-semibold text-[#78766d]">Sværhedsgrad</Label>
+                <Label className="text-[12px] font-semibold text-muted-foreground">Sværhedsgrad</Label>
                 <button
                   type="button"
                   onClick={() => setRecipeDifficultySheetOpen(true)}
-                  className="flex h-10 w-full items-center justify-between rounded-[8px] border border-[#d8d7cf] bg-white px-3 text-sm text-[#2f2f2d]"
+                  className="flex h-10 w-full items-center justify-between rounded-[8px] border border-border bg-card px-3 text-sm text-foreground"
                 >
                   {{ easy: 'Nem', medium: 'Medium', hard: 'Svær' }[newRecipe.difficulty]}
-                  <ChevronDown className="h-4 w-4 text-[#78766d]" />
+                  <ChevronDown className="h-4 w-4 text-muted-foreground" />
                 </button>
               </div>
             </div>
             <div className="grid grid-cols-3 gap-3">
               <div className="space-y-2">
-                <Label className="text-[12px] font-semibold text-[#78766d]">Portioner</Label>
-                <Input type="number" value={newRecipe.servings || ''} onChange={e => setNewRecipe(prev => ({ ...prev, servings: e.target.value === '' ? 0 : +e.target.value }))} className="rounded-[8px] border-[#d8d7cf]" />
+                <Label className="text-[12px] font-semibold text-muted-foreground">Portioner</Label>
+                <Input type="number" value={newRecipe.servings || ''} onChange={e => setNewRecipe(prev => ({ ...prev, servings: e.target.value === '' ? 0 : +e.target.value }))} className="rounded-[8px] border-border" />
               </div>
               <div className="space-y-2">
-                <Label className="text-[12px] font-semibold text-[#78766d]">Forberedelse</Label>
-                <Input type="number" value={newRecipe.prepTime || ''} onChange={e => setNewRecipe(prev => ({ ...prev, prepTime: e.target.value === '' ? 0 : +e.target.value }))} className="rounded-[8px] border-[#d8d7cf]" />
+                <Label className="text-[12px] font-semibold text-muted-foreground">Forberedelse</Label>
+                <Input type="number" value={newRecipe.prepTime || ''} onChange={e => setNewRecipe(prev => ({ ...prev, prepTime: e.target.value === '' ? 0 : +e.target.value }))} className="rounded-[8px] border-border" />
               </div>
               <div className="space-y-2">
-                <Label className="text-[12px] font-semibold text-[#78766d]">Tilberedning</Label>
-                <Input type="number" value={newRecipe.cookTime || ''} onChange={e => setNewRecipe(prev => ({ ...prev, cookTime: e.target.value === '' ? 0 : +e.target.value }))} className="rounded-[8px] border-[#d8d7cf]" />
+                <Label className="text-[12px] font-semibold text-muted-foreground">Tilberedning</Label>
+                <Input type="number" value={newRecipe.cookTime || ''} onChange={e => setNewRecipe(prev => ({ ...prev, cookTime: e.target.value === '' ? 0 : +e.target.value }))} className="rounded-[8px] border-border" />
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="text-[12px] font-semibold text-[#78766d]">Ingredienser (én per linje, fx "500 g hakket kød")</Label>
+              <Label className="text-[12px] font-semibold text-muted-foreground">Ingredienser (én per linje, fx "500 g hakket kød")</Label>
               <Textarea
                 value={newRecipe.ingredientsText}
                 onChange={e => setNewRecipe(prev => ({ ...prev, ingredientsText: e.target.value }))}
                 placeholder={"500 g hakket oksekød\n1 stk løg\n2 dl fløde\n..."}
                 rows={5}
-                className="rounded-[8px] border-[#d8d7cf]"
+                className="rounded-[8px] border-border"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[12px] font-semibold text-[#78766d]">Tilberedning trin for trin (ét trin per linje)</Label>
+              <Label className="text-[12px] font-semibold text-muted-foreground">Tilberedning trin for trin (ét trin per linje)</Label>
               <Textarea
                 value={newRecipe.stepsText}
                 onChange={e => setNewRecipe(prev => ({ ...prev, stepsText: e.target.value }))}
                 placeholder={"Hak løget fint og svits i olie.\nTilsæt hakket kød og brun det.\nTilsæt fløde og lad simre 20 min."}
                 rows={5}
-                className="rounded-[8px] border-[#d8d7cf]"
+                className="rounded-[8px] border-border"
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-[12px] font-semibold text-[#78766d]">Tags</Label>
-              <div className="flex flex-wrap gap-1.5 rounded-[8px] border border-[#d8d7cf] bg-white p-2 min-h-[42px] items-center">
+              <Label className="text-[12px] font-semibold text-muted-foreground">Tags</Label>
+              <div className="flex flex-wrap gap-1.5 rounded-[8px] border border-border bg-card p-2 min-h-[42px] items-center">
                 {newRecipe.tags.map((tag, i) => (
-                  <span key={i} className="inline-flex items-center justify-center gap-0.5 rounded-full bg-[#fff2e6] border border-[#f3c59d] px-2 py-0.5 text-[11px] font-medium text-[#cc6f1f] leading-none">
+                  <span key={i} className="inline-flex items-center justify-center gap-0.5 rounded-full bg-orange-tint border border-orange-tint px-2 py-0.5 text-[11px] font-medium text-[#cc6f1f] leading-none">
                     {tag}
                     <button type="button" onClick={() => setNewRecipe(prev => ({ ...prev, tags: prev.tags.filter((_, idx) => idx !== i) }))}>
                       <X className="h-2.5 w-2.5" />
@@ -3493,16 +3493,16 @@ export function MadOgHjem() {
                 />
               </div>
             </div>
-            <div className="flex items-center justify-between rounded-[8px] border border-[#e8e7e0] bg-white px-3 py-2.5">
-              <span className="text-[12px] font-semibold text-[#2f2f2d]">Børnevenlig</span>
+            <div className="flex items-center justify-between rounded-[8px] border border-border bg-card px-3 py-2.5">
+              <span className="text-[12px] font-semibold text-foreground">Børnevenlig</span>
               <Checkbox checked={newRecipe.childFriendly} onCheckedChange={(v) => setNewRecipe(prev => ({ ...prev, childFriendly: !!v }))} />
             </div>
-            <div className="flex items-center justify-between rounded-[8px] border border-[#e8e7e0] bg-white px-3 py-2.5">
+            <div className="flex items-center justify-between rounded-[8px] border border-border bg-card px-3 py-2.5">
               <div className="flex items-center gap-2">
                 <Share2 className="h-4 w-4 text-[#22c55e]" />
                 <div>
-                  <p className="text-[12px] font-semibold text-[#2f2f2d]">Del med familien</p>
-                  <p className="text-[10px] text-[#78766d]">Opskriften deles automatisk med alle i husstanden</p>
+                  <p className="text-[12px] font-semibold text-foreground">Del med familien</p>
+                  <p className="text-[10px] text-muted-foreground">Opskriften deles automatisk med alle i husstanden</p>
                 </div>
               </div>
               <Checkbox checked={newRecipe.shareWithFamily} onCheckedChange={(v) => setNewRecipe(prev => ({ ...prev, shareWithFamily: !!v }))} />
@@ -3565,7 +3565,7 @@ export function MadOgHjem() {
               onClick={() => { setNewRecipe(prev => ({ ...prev, category: cat })); setRecipeCategorySheetOpen(false); }}
               className={cn(
                 "w-full rounded-lg px-4 py-3 text-left text-[15px] font-medium transition-colors",
-                newRecipe.category === cat ? "bg-[#fff2e6] text-[#2f2f2d]" : "text-[#4a4945]"
+                newRecipe.category === cat ? "bg-orange-tint text-foreground" : "text-foreground"
               )}
             >
               {cat}
@@ -3583,7 +3583,7 @@ export function MadOgHjem() {
               onClick={() => { setNewRecipe(prev => ({ ...prev, difficulty: value })); setRecipeDifficultySheetOpen(false); }}
               className={cn(
                 "w-full rounded-lg px-4 py-3 text-left text-[15px] font-medium transition-colors",
-                newRecipe.difficulty === value ? "bg-[#fff2e6] text-[#2f2f2d]" : "text-[#4a4945]"
+                newRecipe.difficulty === value ? "bg-orange-tint text-foreground" : "text-foreground"
               )}
             >
               {label}
@@ -3604,23 +3604,23 @@ export function MadOgHjem() {
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.15}
             onDragEnd={(_: unknown, info: { offset: { x: number } }) => { if (info.offset.x > 100) setSelectedRecipe(null); }}
-            className="fixed inset-0 z-[60] bg-[#faf9f6] overflow-hidden flex flex-col"
+            className="fixed inset-0 z-[60] bg-card overflow-hidden flex flex-col"
             style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
           >
             {/* Header */}
             <div className="shrink-0 px-4 pt-3 pb-3 flex items-center gap-3">
               <button
                 onClick={() => setSelectedRecipe(null)}
-                className="flex h-9 w-9 items-center justify-center text-[#2f2f2d] transition-all active:scale-[0.92]"
+                className="flex h-9 w-9 items-center justify-center text-foreground transition-all active:scale-[0.92]"
               >
-                <ArrowLeft className="h-[18px] w-[18px] text-[#2f2f2d]" />
+                <ArrowLeft className="h-[18px] w-[18px] text-foreground" />
               </button>
-              <h1 className="flex-1 text-[20px] font-bold tracking-[-0.02em] text-[#2f2f2d] truncate">{selectedRecipe.name}</h1>
+              <h1 className="flex-1 text-[20px] font-bold tracking-[-0.02em] text-foreground truncate">{selectedRecipe.name}</h1>
               <button
                 onClick={() => setDatePickerOpen(true)}
-                className="flex items-center gap-1.5 rounded-full bg-[#f2f1ed] px-3 py-1.5 text-[12px] font-semibold text-[#2f2f2d] shrink-0"
+                className="flex items-center gap-1.5 rounded-full bg-background px-3 py-1.5 text-[12px] font-semibold text-foreground shrink-0"
               >
-                <Calendar className="h-3.5 w-3.5 text-[#78766d]" />
+                <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
                 {format(parseISO(mealPlanDate), 'd. MMM', { locale: da })}
               </button>
             </div>
@@ -3628,7 +3628,7 @@ export function MadOgHjem() {
             {/* Content */}
             <div className="flex-1 overflow-y-auto px-4 pb-8">
               <div className="space-y-2">
-                <p className="text-[13px] text-[#4a4945] leading-relaxed">{selectedRecipe.description}</p>
+                <p className="text-[13px] text-foreground leading-relaxed">{selectedRecipe.description}</p>
 
                 {/* Nutrition bar */}
                 <div className="grid grid-cols-4 gap-2">
@@ -3638,15 +3638,15 @@ export function MadOgHjem() {
                     { label: 'Kulhydrat', val: `${getNutritionValue(selectedRecipe.nutrition.carbs)}g`, color: 'bg-[#22c55e]' },
                     { label: 'Fedt', val: `${getNutritionValue(selectedRecipe.nutrition.fat)}g`, color: 'bg-[#ef4444]' },
                   ].map(n => (
-                    <div key={n.label} className="rounded-[8px] border-2 border-[#e5e3dc] bg-white p-3 text-center">
+                    <div key={n.label} className="rounded-[8px] border-2 border-border bg-card p-3 text-center">
                       <div className={cn("mx-auto mb-1.5 h-1.5 w-10 rounded-full", n.color)} />
-                      <p className="text-[14px] font-bold text-[#2f2f2d]">{n.val}</p>
-                      <p className="text-[10px] text-[#9a978f]">{n.label}</p>
+                      <p className="text-[14px] font-bold text-foreground">{n.val}</p>
+                      <p className="text-[10px] text-muted-foreground">{n.label}</p>
                     </div>
                   ))}
                 </div>
                 {/* Portionskontrol — to rækker */}
-                <div className="rounded-[8px] border-2 border-[#e5e3dc] bg-white">
+                <div className="rounded-[8px] border-2 border-border bg-card">
                   {/* Række 1: Portionsstørrelse */}
                   <button
                     onClick={() => {
@@ -3658,26 +3658,26 @@ export function MadOgHjem() {
                       else if (next === '100g') setRecipeServings(Math.round(basePortionWeight * (selectedRecipe?.servings ?? 4) / 100));
                       else if (next === '1g') setRecipeServings(Math.round(basePortionWeight * (selectedRecipe?.servings ?? 4)));
                     }}
-                    className="flex w-full items-center justify-between px-4 py-3 active:bg-[#fafaf8] transition-colors"
+                    className="flex w-full items-center justify-between px-4 py-3 active:bg-card transition-colors"
                   >
-                    <span className="text-[13px] font-medium text-[#2f2f2d]">Portionsstørrelse</span>
-                    <span className="flex items-center gap-1 text-[13px] font-semibold text-[#5f5d56]">
+                    <span className="text-[13px] font-medium text-foreground">Portionsstørrelse</span>
+                    <span className="flex items-center gap-1 text-[13px] font-semibold text-muted-foreground">
                       {nutritionUnit === 'portion' ? 'Per portion' : nutritionUnit === '100g' ? 'Per 100 g' : nutritionUnit === '1g' ? 'Per gram' : 'Hele retten'}
-                      <ChevronDown className="h-3.5 w-3.5 text-[#9a978f]" />
+                      <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
                     </span>
                   </button>
                   {/* Række 2: Antal */}
                   {nutritionUnit !== 'total' && (
                     <>
-                      <div className="border-t border-[#e5e3dc]" />
+                      <div className="border-t border-border" />
                       <div className="flex items-center justify-between px-4 py-2.5">
-                        <span className="text-[13px] font-medium text-[#2f2f2d]">
+                        <span className="text-[13px] font-medium text-foreground">
                           {nutritionUnit === 'portion' ? 'Antal portioner' : nutritionUnit === '100g' ? 'Antal (×100g)' : 'Gram'}
                         </span>
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => setRecipeServings(Math.max(1, recipeServings - (nutritionUnit === '1g' ? 50 : 1)))}
-                            className="flex h-7 w-7 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56] active:scale-[0.92]"
+                            className="flex h-7 w-7 items-center justify-center rounded-full bg-background text-muted-foreground active:scale-[0.92]"
                           >
                             <Minus className="h-3.5 w-3.5" />
                           </button>
@@ -3694,11 +3694,11 @@ export function MadOgHjem() {
                               const v = parseInt(servingsInput);
                               if (isNaN(v) || v < 1) setServingsInput(String(recipeServings));
                             }}
-                            className="w-10 text-center text-[14px] font-bold text-[#2f2f2d] bg-transparent outline-none border-none"
+                            className="w-10 text-center text-[14px] font-bold text-foreground bg-transparent outline-none border-none"
                           />
                           <button
                             onClick={() => setRecipeServings(recipeServings + (nutritionUnit === '1g' ? 50 : 1))}
-                            className="flex h-7 w-7 items-center justify-center rounded-full bg-[#f2f1ed] text-[#5f5d56] active:scale-[0.92]"
+                            className="flex h-7 w-7 items-center justify-center rounded-full bg-background text-muted-foreground active:scale-[0.92]"
                           >
                             <Plus className="h-3.5 w-3.5" />
                           </button>
@@ -3710,7 +3710,7 @@ export function MadOgHjem() {
 
                 {/* Måltidsvælger */}
                 <div>
-                  <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Måltid</p>
+                  <p className="mb-1.5 text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Måltid</p>
                   <div className="flex gap-2">
                     {(['breakfast', 'lunch', 'dinner', 'snack'] as MealType[]).map(mt => (
                       <button
@@ -3719,8 +3719,8 @@ export function MadOgHjem() {
                         className={cn(
                           "flex-1 rounded-[8px] py-2 text-[12px] font-semibold transition-all active:scale-[0.96]",
                           selectedMealType === mt
-                            ? "bg-[#2f2f2d] text-white"
-                            : "bg-[#f2f1ed] text-[#5f5d56]"
+                            ? "bg-primary text-white"
+                            : "bg-background text-muted-foreground"
                         )}
                       >
                         {getMealTypeLabel(mt)}
@@ -3732,7 +3732,7 @@ export function MadOgHjem() {
                 {/* Household member selection — moved above Ingredienser */}
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Hvem spiser med?</p>
+                    <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Hvem spiser med?</p>
                     <button
                       type="button"
                       onClick={() => setSelectedMembers(eligibleMembers.map(m => m.id))}
@@ -3741,9 +3741,9 @@ export function MadOgHjem() {
                       Vælg alle
                     </button>
                   </div>
-                  <div className="rounded-[8px] border-2 border-[#e5e3dc] bg-white p-2 space-y-0.5">
+                  <div className="rounded-[8px] border-2 border-border bg-card p-2 space-y-0.5">
                     {eligibleMembers.map(member => (
-                      <label key={member.id} className="flex items-center gap-2.5 rounded-[8px] px-2 py-1.5 text-[13px] hover:bg-[#faf9f6] transition-colors cursor-pointer">
+                      <label key={member.id} className="flex items-center gap-2.5 rounded-[8px] px-2 py-1.5 text-[13px] hover:bg-card transition-colors cursor-pointer">
                         <Checkbox
                           checked={selectedMembers.includes(member.id)}
                           onCheckedChange={(checked) => {
@@ -3753,13 +3753,13 @@ export function MadOgHjem() {
                           }}
                           className="h-4 w-4"
                         />
-                        <span className="text-[#2f2f2d]">{member.name}</span>
+                        <span className="text-foreground">{member.name}</span>
                         {member.kcalGoal ? (
-                          <span className="text-[10px] text-[#9a978f] ml-auto">{member.kcalGoal} kcal/dag</span>
+                          <span className="text-[10px] text-muted-foreground ml-auto">{member.kcalGoal} kcal/dag</span>
                         ) : member.canConfigure ? (
                           <span className="text-[10px] text-[#f5a623] ml-auto">Ikke konfigureret</span>
                         ) : (
-                          <span className="text-[10px] text-[#9a978f] ml-auto">Bed {member.name} konfigurere</span>
+                          <span className="text-[10px] text-muted-foreground ml-auto">Bed {member.name} konfigurere</span>
                         )}
                       </label>
                     ))}
@@ -3768,25 +3768,25 @@ export function MadOgHjem() {
 
                 {/* Portionsfordeling — visuelt per person */}
                 {portionCalculation.length > 0 && (
-                  <div className="rounded-[8px] border-2 border-[#e5e3dc] bg-white p-4">
-                    <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Portionsfordeling</p>
+                  <div className="rounded-[8px] border-2 border-border bg-card p-4">
+                    <p className="mb-3 text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Portionsfordeling</p>
                     <div className="space-y-0">
                       {portionCalculation.map((p, i) => (
-                        <div key={p.name} className={cn(i > 0 && "border-t border-[#e5e3dc] pt-3", i > 0 ? "mt-3" : "")}>
+                        <div key={p.name} className={cn(i > 0 && "border-t border-border pt-3", i > 0 ? "mt-3" : "")}>
                           <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-[13px] font-semibold text-[#2f2f2d]">{p.name}</span>
-                            <span className="text-[18px] font-bold text-[#2f2f2d]">{p.percent}%</span>
+                            <span className="text-[13px] font-semibold text-foreground">{p.name}</span>
+                            <span className="text-[18px] font-bold text-foreground">{p.percent}%</span>
                           </div>
-                          <div className="mb-2 h-2 w-full overflow-hidden rounded-full bg-[#f2f1ed]">
+                          <div className="mb-2 h-2 w-full overflow-hidden rounded-full bg-background">
                             <div
                               className="h-full rounded-full bg-[#f58a2d] transition-all"
                               style={{ width: `${p.percent}%` }}
                             />
                           </div>
-                          <div className="flex items-center gap-3 text-[12px] text-[#5f5d56]">
+                          <div className="flex items-center gap-3 text-[12px] text-muted-foreground">
                             <span className="font-semibold">{p.kcal} kcal</span>
                             <span>{p.protein}g protein</span>
-                            <span className="text-[#9a978f]">{p.carbs}g kulhydrat · {p.fat}g fedt</span>
+                            <span className="text-muted-foreground">{p.carbs}g kulhydrat · {p.fat}g fedt</span>
                           </div>
                         </div>
                       ))}
@@ -3796,15 +3796,15 @@ export function MadOgHjem() {
 
                 {/* Ingredients */}
                 <div>
-                  <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Ingredienser</p>
-                  <div className="rounded-[8px] border-2 border-[#e5e3dc] bg-white p-4 space-y-2">
+                  <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Ingredienser</p>
+                  <div className="rounded-[8px] border-2 border-border bg-card p-4 space-y-2">
                     {selectedRecipe.ingredients.map((ing, i) => {
                       const scale = equivalentServings / selectedRecipe.servings;
                       const amount = Math.round(ing.amount * scale * 10) / 10;
                       return (
                         <div key={i} className="flex justify-between text-[13px]">
-                          <span className="text-[#2f2f2d]">{ing.name}</span>
-                          <span className="text-[#9a978f] font-medium">{amount} {ing.unit}</span>
+                          <span className="text-foreground">{ing.name}</span>
+                          <span className="text-muted-foreground font-medium">{amount} {ing.unit}</span>
                         </div>
                       );
                     })}
@@ -3813,14 +3813,14 @@ export function MadOgHjem() {
 
                 {/* Steps + Video */}
                 <div>
-                  <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#78766d]">Tilberedning</p>
+                  <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Tilberedning</p>
 
                   {/* Video card — only shown if recipe has a video */}
                   {(() => {
                     const videoUrl = getRecipeVideoUrl(selectedRecipe.id);
                     if (!videoUrl) return null;
                     return videoPlaying ? (
-                      <div className="mb-3 rounded-[8px] overflow-hidden border-2 border-[#e5e3dc] bg-black">
+                      <div className="mb-3 rounded-[8px] overflow-hidden border-2 border-border bg-black">
                         <video
                           src={videoUrl}
                           controls
@@ -3833,21 +3833,21 @@ export function MadOgHjem() {
                     ) : (
                       <button
                         onClick={() => setVideoPlaying(true)}
-                        className="mb-3 flex w-full items-center gap-3 rounded-[8px] border-2 border-[#e5e3dc] bg-[#2f2f2d] px-4 py-3.5 text-left transition-all active:scale-[0.98]"
+                        className="mb-3 flex w-full items-center gap-3 rounded-[8px] border-2 border-border bg-primary px-4 py-3.5 text-left transition-all active:scale-[0.98]"
                       >
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f58a2d]">
                           <Play className="h-5 w-5 text-white ml-0.5" />
                         </div>
                         <div>
                           <p className="text-[14px] font-bold text-white">Se tilberedningsvideo</p>
-                          <p className="text-[11px] text-[#9a978f]">Trin-for-trin video</p>
+                          <p className="text-[11px] text-muted-foreground">Trin-for-trin video</p>
                         </div>
                       </button>
                     );
                   })()}
 
                   {/* Swipeable step carousel */}
-                  <div className="relative overflow-hidden rounded-[8px] border-2 border-[#e5e3dc] bg-white">
+                  <div className="relative overflow-hidden rounded-[8px] border-2 border-border bg-card">
                     <div
                       className="flex transition-transform duration-300 ease-out"
                       style={{ transform: `translateX(-${activeStepIndex * 100}%)` }}
@@ -3859,9 +3859,9 @@ export function MadOgHjem() {
                               {step.step}
                             </span>
                             <div className="pt-0.5">
-                              <p className="text-[13px] text-[#2f2f2d] leading-relaxed">{step.description}</p>
+                              <p className="text-[13px] text-foreground leading-relaxed">{step.description}</p>
                               {step.duration && (
-                                <p className="mt-1 text-[11px] text-[#9a978f] flex items-center gap-1">
+                                <p className="mt-1 text-[11px] text-muted-foreground flex items-center gap-1">
                                   <Timer className="h-3 w-3" /> {step.duration} min
                                 </p>
                               )}
@@ -3897,7 +3897,7 @@ export function MadOgHjem() {
                             onClick={() => setActiveStepIndex(i)}
                             className={cn(
                               "h-2 w-2 rounded-full transition-all",
-                              i === activeStepIndex ? "bg-[#f58a2d] w-4" : "bg-[#d8d7cf]"
+                              i === activeStepIndex ? "bg-[#f58a2d] w-4" : "bg-border"
                             )}
                           />
                         ))}
@@ -3969,7 +3969,7 @@ export function MadOgHjem() {
                 onClick={() => { setMealPlanDate(dateStr); setDatePickerOpen(false); }}
                 className={cn(
                   "w-full rounded-lg px-4 py-3 text-left text-[15px] font-medium transition-colors capitalize",
-                  isSelected ? "bg-[#fff2e6] text-[#2f2f2d]" : "text-[#4a4945]"
+                  isSelected ? "bg-orange-tint text-foreground" : "text-foreground"
                 )}
               >
                 {label}
@@ -3977,13 +3977,13 @@ export function MadOgHjem() {
             );
           })}
           <div className="pt-2">
-            <label className="flex items-center gap-2 px-4 py-2 text-[13px] text-[#78766d]">
+            <label className="flex items-center gap-2 px-4 py-2 text-[13px] text-muted-foreground">
               Anden dato:
               <input
                 type="date"
                 value={mealPlanDate}
                 onChange={e => { setMealPlanDate(e.target.value); setDatePickerOpen(false); }}
-                className="flex-1 rounded-[8px] border border-[#d8d7cf] bg-white px-2 py-1.5 text-[13px] text-[#2f2f2d]"
+                className="flex-1 rounded-[8px] border border-border bg-card px-2 py-1.5 text-[13px] text-foreground"
               />
             </label>
           </div>
@@ -4001,7 +4001,7 @@ export function MadOgHjem() {
       <AnimatePresence>
         {detailItem && (
           <motion.div
-            className="fixed inset-0 z-[60] bg-[#faf9f6] flex flex-col"
+            className="fixed inset-0 z-[60] bg-card flex flex-col"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -4009,13 +4009,13 @@ export function MadOgHjem() {
           >
             {/* Minimal header: back + title + close */}
             <div className="flex items-center justify-between px-4 pt-[env(safe-area-inset-top,12px)] pb-3">
-              <button onClick={() => setDetailItem(null)} className="p-1 -ml-1 text-[#2f2f2d] active:scale-95">
+              <button onClick={() => setDetailItem(null)} className="p-1 -ml-1 text-foreground active:scale-95">
                 <ArrowLeft className="h-5 w-5" />
               </button>
-              <p className="text-[16px] font-bold text-[#2f2f2d] truncate mx-4 text-center flex-1">
+              <p className="text-[16px] font-bold text-foreground truncate mx-4 text-center flex-1">
                 {detailItem.name}
               </p>
-              <button onClick={() => setDetailItem(null)} className="p-1 -mr-1 text-[#78766d] active:scale-95">
+              <button onClick={() => setDetailItem(null)} className="p-1 -mr-1 text-muted-foreground active:scale-95">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -4024,9 +4024,9 @@ export function MadOgHjem() {
             <div className="flex-1 overflow-y-auto px-4 pb-8">
               {/* Product info */}
               <div className="mt-4 text-center">
-                <p className="text-[20px] font-black text-[#2f2f2d]">{detailItem.name}</p>
+                <p className="text-[20px] font-black text-foreground">{detailItem.name}</p>
                 {detailItem.quantity && (
-                  <p className="text-[14px] text-[#78766d] mt-1">{detailItem.quantity}</p>
+                  <p className="text-[14px] text-muted-foreground mt-1">{detailItem.quantity}</p>
                 )}
                 {(() => {
                   const detailNutriGrade = matchNutriScore(detailItem.name, nutriScoreMap);
@@ -4037,7 +4037,7 @@ export function MadOgHjem() {
                   ) : null;
                 })()}
                 {detailItem.category && (
-                  <span className="inline-block mt-2 rounded-full bg-[#f2f1ed] px-3 py-1 text-[12px] font-medium text-[#5f5d56]">
+                  <span className="inline-block mt-2 rounded-full bg-background px-3 py-1 text-[12px] font-medium text-muted-foreground">
                     {detailItem.category}
                   </span>
                 )}
@@ -4059,11 +4059,11 @@ export function MadOgHjem() {
               {detailLoading ? (
                 <div className="mt-8 flex flex-col items-center gap-3 py-8">
                   <Loader2 className="h-8 w-8 text-[#f58a2d] animate-spin" />
-                  <p className="text-[13px] text-[#9a978f]">Henter næringsdata...</p>
+                  <p className="text-[13px] text-muted-foreground">Henter næringsdata...</p>
                 </div>
               ) : detailNutrition && detailNutrition.energyKcal != null ? (
                 <div className="mt-8">
-                  <p className="text-[14px] font-bold text-[#2f2f2d] text-center mb-4">Næringsindhold pr. 100g</p>
+                  <p className="text-[14px] font-bold text-foreground text-center mb-4">Næringsindhold pr. 100g</p>
 
                   {/* Macro grid */}
                   <div className="grid grid-cols-4 gap-3">
@@ -4073,21 +4073,21 @@ export function MadOgHjem() {
                       { label: 'Kulhydrater', value: `${(detailNutrition.carbs ?? 0).toFixed(1)}`, unit: 'g', color: '#f59e0b' },
                       { label: 'Fedt', value: `${(detailNutrition.fat ?? 0).toFixed(1)}`, unit: 'g', color: '#ef4444' },
                     ].map(macro => (
-                      <div key={macro.label} className="rounded-[12px] bg-white border border-[#e5e3dc] p-3 text-center">
+                      <div key={macro.label} className="rounded-[12px] bg-card border border-border p-3 text-center">
                         <p className="text-[22px] font-black" style={{ color: macro.color }}>{macro.value}</p>
-                        <p className="text-[10px] text-[#9a978f] mt-0.5">{macro.unit}</p>
-                        <p className="text-[11px] font-medium text-[#78766d] mt-1">{macro.label}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{macro.unit}</p>
+                        <p className="text-[11px] font-medium text-muted-foreground mt-1">{macro.label}</p>
                       </div>
                     ))}
                   </div>
                 </div>
               ) : (
                 <div className="mt-8 text-center py-8">
-                  <div className="flex h-14 w-14 mx-auto items-center justify-center rounded-[8px] bg-[#f2f1ed]">
-                    <UtensilsCrossed className="h-7 w-7 text-[#b0ada4]" />
+                  <div className="flex h-14 w-14 mx-auto items-center justify-center rounded-[8px] bg-background">
+                    <UtensilsCrossed className="h-7 w-7 text-muted-foreground" />
                   </div>
-                  <p className="text-[15px] font-semibold text-[#2f2f2d] mt-3">Ingen næringsdata tilgængelig</p>
-                  <p className="text-[13px] text-[#9a978f] mt-1">Scan stregkoden for at hente næringsdata</p>
+                  <p className="text-[15px] font-semibold text-foreground mt-3">Ingen næringsdata tilgængelig</p>
+                  <p className="text-[13px] text-muted-foreground mt-1">Scan stregkoden for at hente næringsdata</p>
                 </div>
               )}
             </div>
@@ -4103,18 +4103,18 @@ export function MadOgHjem() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className="fixed inset-0 z-[9999] flex flex-col bg-[#faf9f6]"
+            className="fixed inset-0 z-[9999] flex flex-col bg-card"
             style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[#e5e3dc] bg-white">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card">
               <button
                 onClick={() => { setCreateListOpen(false); setNewListName('Indkøbsliste'); setNewListDate(''); }}
-                className="flex items-center text-[#78766d] active:opacity-70"
+                className="flex items-center text-muted-foreground active:opacity-70"
               >
                 <X className="h-5 w-5" />
               </button>
-              <h2 className="text-[16px] font-bold text-[#2f2f2d]">Opret indkøbsliste</h2>
+              <h2 className="text-[16px] font-bold text-foreground">Opret indkøbsliste</h2>
               <button
                 onClick={async () => {
                   if (!newListName.trim()) return;
@@ -4137,22 +4137,22 @@ export function MadOgHjem() {
             {/* Content */}
             <div className="flex-1 px-4 pt-6 space-y-4">
               <div>
-                <label className="mb-1 block text-[13px] font-medium text-[#5f5d56]">Listenavn</label>
+                <label className="mb-1 block text-[13px] font-medium text-muted-foreground">Listenavn</label>
                 <input
                   value={newListName}
                   onChange={e => setNewListName(e.target.value)}
                   placeholder="Indkøbsliste"
-                  className="w-full rounded-[8px] border border-[#d8d7cf] bg-white px-3 py-2.5 text-[14px] text-[#2f2f2d] placeholder:text-[#b0ada4] outline-none focus:border-[#c5c3bb]"
+                  className="w-full rounded-[8px] border border-border bg-card px-3 py-2.5 text-[14px] text-foreground placeholder:text-muted-foreground outline-none focus:border-border"
                   autoFocus
                 />
               </div>
               <div>
-                <label className="mb-1 block text-[13px] font-medium text-[#5f5d56]">Dato for indkøb (valgfrit)</label>
+                <label className="mb-1 block text-[13px] font-medium text-muted-foreground">Dato for indkøb (valgfrit)</label>
                 <input
                   type="date"
                   value={newListDate}
                   onChange={e => setNewListDate(e.target.value)}
-                  className="w-full rounded-[8px] border border-[#d8d7cf] bg-white px-3 py-2.5 text-[14px] text-[#2f2f2d] outline-none focus:border-[#c5c3bb]"
+                  className="w-full rounded-[8px] border border-border bg-card px-3 py-2.5 text-[14px] text-foreground outline-none focus:border-border"
                 />
               </div>
             </div>
@@ -4168,18 +4168,18 @@ export function MadOgHjem() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className="fixed inset-0 z-[9999] flex flex-col bg-[#faf9f6]"
+            className="fixed inset-0 z-[9999] flex flex-col bg-card"
             style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[#e5e3dc] bg-white">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card">
               <button
                 onClick={() => { setShowAllLists(false); if (shoppingLists.length > 0) setActiveShoppingListId(shoppingLists[0].id); }}
-                className="flex items-center text-[#78766d] active:opacity-70"
+                className="flex items-center text-muted-foreground active:opacity-70"
               >
                 <ArrowLeft className="h-5 w-5" />
               </button>
-              <h2 className="text-[16px] font-bold text-[#2f2f2d]">Indkøbslister</h2>
+              <h2 className="text-[16px] font-bold text-foreground">Indkøbslister</h2>
               <button
                 onClick={() => { setNewListName('Indkøbsliste'); setNewListDate(''); setCreateListOpen(true); }}
                 className="text-[15px] font-bold text-[#f58a2d] active:opacity-70"
@@ -4191,11 +4191,11 @@ export function MadOgHjem() {
             <div className="flex-1 overflow-y-auto px-4 pt-4 space-y-3" style={{ paddingBottom: 'env(safe-area-inset-bottom, 24px)' }}>
               {shoppingLists.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 gap-4 text-center">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-[8px] bg-[#f2f1ed]">
-                    <ShoppingCart className="h-8 w-8 text-[#b0ada4]" />
+                  <div className="flex h-16 w-16 items-center justify-center rounded-[8px] bg-background">
+                    <ShoppingCart className="h-8 w-8 text-muted-foreground" />
                   </div>
-                  <p className="text-[15px] font-semibold text-[#2f2f2d]">Ingen indkøbslister</p>
-                  <p className="text-[13px] text-[#9a978f]">Tryk "Ny" for at oprette en liste</p>
+                  <p className="text-[15px] font-semibold text-foreground">Ingen indkøbslister</p>
+                  <p className="text-[13px] text-muted-foreground">Tryk "Ny" for at oprette en liste</p>
                 </div>
               ) : (
                 shoppingLists.map(list => {
@@ -4222,16 +4222,16 @@ export function MadOgHjem() {
                       >
                         <button
                           onClick={() => { setActiveShoppingListId(list.id); setShowAllLists(false); }}
-                          className="relative w-full rounded-[8px] border border-[#e5e3dc] bg-white px-4 py-4 text-left transition-all active:scale-[0.99]"
+                          className="relative w-full rounded-[8px] border border-border bg-card px-4 py-4 text-left transition-all active:scale-[0.99]"
                         >
                           <div className="flex items-center justify-between">
                             <div>
-                              <p className="text-[15px] font-bold text-[#2f2f2d]">{list.name}</p>
-                              <p className="text-[12px] text-[#9a978f] mt-0.5">{purchasedCount}/{totalCount} varer afkrydset</p>
+                              <p className="text-[15px] font-bold text-foreground">{list.name}</p>
+                              <p className="text-[12px] text-muted-foreground mt-0.5">{purchasedCount}/{totalCount} varer afkrydset</p>
                             </div>
-                            <span className="text-[14px] font-semibold text-[#9a978f]">{pct}%</span>
+                            <span className="text-[14px] font-semibold text-muted-foreground">{pct}%</span>
                           </div>
-                          <div className="mt-2.5 h-1.5 w-full rounded-full bg-[#f0efe8] overflow-hidden">
+                          <div className="mt-2.5 h-1.5 w-full rounded-full bg-muted overflow-hidden">
                             <div
                               className="h-full rounded-full bg-[#f58a2d] transition-all"
                               style={{ width: `${pct}%` }}

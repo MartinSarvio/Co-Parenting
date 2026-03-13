@@ -232,7 +232,7 @@ export function HandoverView() {
   // Full page: Tilføj til pakkeliste
   if (showAddForm && activeHandover) {
     return (
-      <div className="bg-[#f5f3ee]">
+      <div className="bg-card">
         <div className="space-y-3 px-4 pt-4">
           <Input
             className="h-11 rounded-full text-sm"
@@ -265,19 +265,19 @@ export function HandoverView() {
 
           {activeHandover.checklist.length > 0 && (
             <div className="pt-3">
-              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-[#9a978f]">På listen</p>
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">På listen</p>
               <div className="space-y-1.5">
                 {activeHandover.checklist.map((item) => (
                   <div
                     key={item.id}
-                    className="flex items-center gap-3 p-3 border-b border-[#f2f1ed]"
+                    className="flex items-center gap-3 p-3 border-b border-border"
                   >
                     <div className="w-6 h-6 rounded-full flex items-center justify-center bg-slate-200 text-slate-500">
                       {checklistIcons[item.item] || checklistIcons['default']}
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-[#2f2f2d]">{item.item}</p>
-                      <p className="text-xs text-[#9a978f]">{checklistCategoryLabels[item.category || 'other']}</p>
+                      <p className="text-sm font-medium text-foreground">{item.item}</p>
+                      <p className="text-xs text-muted-foreground">{checklistCategoryLabels[item.category || 'other']}</p>
                     </div>
                     <Button
                       type="button"
@@ -420,7 +420,7 @@ export function HandoverView() {
                 </div>
                 <Avatar className="w-10 h-10 border-2 border-white">
                   <AvatarImage src={currentChild?.avatar} />
-                  <AvatarFallback className="bg-[#fff2e6] text-[#bf6722]">
+                  <AvatarFallback className="bg-orange-tint text-[#bf6722]">
                     {currentChild?.name[0]}
                   </AvatarFallback>
                 </Avatar>
@@ -479,7 +479,7 @@ export function HandoverView() {
                   transition={{ delay: 0.3 + index * 0.05 }}
                   onClick={() => toggleChecklistItem(item.id)}
                   className={cn(
-                    "flex items-center gap-3 p-3 cursor-pointer transition-all border-b border-[#f2f1ed]",
+                    "flex items-center gap-3 p-3 cursor-pointer transition-all border-b border-border",
                     item.completed && "bg-green-50/50"
                   )}
                 >
@@ -632,7 +632,7 @@ export function HandoverView() {
                     .map(handover => (
                       <div 
                         key={handover.id}
-                        className="flex items-center gap-3 p-3 border-b border-[#f2f1ed]"
+                        className="flex items-center gap-3 p-3 border-b border-border"
                       >
                         <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
                           <CheckCircle2 className="w-5 h-5 text-green-600" />
