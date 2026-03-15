@@ -10,6 +10,7 @@ const AboutPage = lazy(() => import('./pages/AboutPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
 const WebLoginPage = lazy(() => import('./pages/WebLoginPage'));
+const PartnerPage = lazy(() => import('./pages/PartnerPage'));
 
 function LoadingFallback() {
   return (
@@ -34,6 +35,7 @@ export function WebApp() {
   const isContact = route === '#kontakt';
   const isTerms = route === '#vilkar';
   const isLogin = route === '#login';
+  const isPartner = route === '#partner';
   const hideChrome = isAdmin || isLogin;
 
   const renderPage = () => {
@@ -43,6 +45,7 @@ export function WebApp() {
     if (isAbout) return <AboutPage />;
     if (isContact) return <ContactPage />;
     if (isTerms) return <TermsPage />;
+    if (isPartner) return <PartnerPage />;
     return <LandingPage />;
   };
 

@@ -46,12 +46,6 @@ export function Navbar() {
               Log ind
             </a>
             <a
-              href="#admin"
-              className="text-xs text-[#b5b3ab] hover:text-[#78766d] transition-colors"
-            >
-              Admin
-            </a>
-            <a
               href="#funktioner"
               className="inline-flex items-center px-5 py-2.5 text-sm font-semibold text-white rounded-full hover:shadow-lg hover:shadow-[#f58a2d]/25 transition-shadow duration-200"
               style={{ background: 'linear-gradient(135deg, #f7a95c 0%, #f58a2d 50%, #e8773f 100%)' }}
@@ -88,13 +82,6 @@ export function Navbar() {
               className="block px-4 py-2.5 text-[15px] font-medium text-[#5f5d56] hover:text-[#2f2f2f] rounded-lg hover:bg-[#f2f1ed] transition-colors"
             >
               Log ind
-            </a>
-            <a
-              href="#admin"
-              onClick={() => setMobileOpen(false)}
-              className="block px-4 py-2 text-xs text-[#b5b3ab]"
-            >
-              Admin
             </a>
             <a
               href="#funktioner"

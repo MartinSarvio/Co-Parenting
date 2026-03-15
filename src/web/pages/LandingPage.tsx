@@ -587,21 +587,6 @@ const familyFeatures = [
   'Krypteret data & sikker opbevaring',
 ];
 
-const proFeatures = [
-  'Alt i Familie — gratis',
-  'Professionelt dashboard',
-  'Risikovurdering & referater',
-  'Sagsbehandler-overblik',
-  'Ubegrænsede sager',
-  'Dedikeret support & onboarding',
-];
-
-const kommunePlans = [
-  { size: 'Lille', borgere: '< 30.000', sager: '~50–150', pris: '60.000–80.000' },
-  { size: 'Mellem', borgere: '30–60.000', sager: '~150–400', pris: '80.000–120.000' },
-  { size: 'Stor', borgere: '> 60.000', sager: '400+', pris: '120.000–200.000' },
-];
-
 function PricingSection() {
   const { ref, visible } = useInView();
 
@@ -609,152 +594,57 @@ function PricingSection() {
     <section id="priser" className="py-24 relative" ref={ref}>
       <div className="absolute inset-0 bg-gradient-to-b from-[#f7f6f2] via-white to-[#f2f1ed] pointer-events-none" />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className={`text-center mb-16 ${visible ? 'animate-slideUp' : 'opacity-0'}`}>
+      <div className="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className={`text-center mb-12 ${visible ? 'animate-slideUp' : 'opacity-0'}`}>
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#10b981]/8 text-[#10b981] text-xs font-semibold mb-4">
-            <Sparkles size={13} /> Enkel prismodel
+            <Sparkles size={13} /> Ingen skjulte omkostninger
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-[800] text-[#2f2f2f] tracking-[-0.03em]">
-            Gratis for familier.
-            <span className="block" style={{ color: '#f58a2d' }}>Professionel adgang for kommuner.</span>
+            Helt gratis.
+            <span className="block" style={{ color: '#10b981' }}>For altid.</span>
           </h2>
-          <p className="mt-4 text-[#78766d] max-w-lg mx-auto text-[1.05rem] leading-relaxed">
-            Huska er gratis for alle familier. Kommuner og professionelle kan tilkøbe avancerede funktioner.
+          <p className="mt-4 text-[#78766d] max-w-md mx-auto text-[1.05rem] leading-relaxed">
+            Alle funktioner er gratis for familier. Ingen abonnement, ingen prøveperiode.
           </p>
         </div>
 
-        {/* Pricing cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-16">
-          {/* Familie — Gratis */}
-          <div
-            className={`relative p-8 rounded-3xl backdrop-blur-sm bg-white/70 border border-white/40 shadow-lg shadow-black/[0.03] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${visible ? 'animate-slideUp' : 'opacity-0'}`}
-            style={{ animationDelay: '100ms' }}
-          >
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: '#10b98115' }}>
-                <Heart size={24} style={{ color: '#10b981' }} />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-[#2f2f2f]">Familie</h3>
-                <p className="text-[12px] text-[#9a978f]">For alle familier</p>
-              </div>
-            </div>
-
-            <div className="mb-6">
-              <span className="text-4xl font-[800] text-[#2f2f2f]">Gratis</span>
-              <span className="text-[#9a978f] text-sm ml-2">— for altid</span>
-            </div>
-
-            <ul className="space-y-3 mb-8">
-              {familyFeatures.map((f) => (
-                <li key={f} className="flex items-center gap-3 text-[14px] text-[#5f5d56]">
-                  <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0" style={{ background: '#10b98115' }}>
-                    <Check size={12} style={{ color: '#10b981' }} />
-                  </div>
-                  {f}
-                </li>
-              ))}
-            </ul>
-
-            <a
-              href="https://apps.apple.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full text-center py-3.5 rounded-xl font-semibold text-[#10b981] bg-[#10b981]/8 hover:bg-[#10b981]/15 transition-colors duration-200"
-            >
-              Hent appen gratis
-            </a>
+        <div
+          className={`relative p-8 rounded-3xl backdrop-blur-sm bg-white/70 border border-[#10b981]/15 shadow-lg shadow-black/[0.03] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${visible ? 'animate-slideUp' : 'opacity-0'}`}
+          style={{ animationDelay: '100ms', borderTopWidth: '3px', borderTopColor: '#10b98140' }}
+        >
+          <div className="text-center mb-6">
+            <span className="text-5xl font-[800] text-[#2f2f2f]">Kr. 0</span>
+            <span className="text-[#9a978f] text-sm ml-2">/ måned</span>
           </div>
 
-          {/* Kommune / Professionel */}
-          <div
-            className={`relative p-8 rounded-3xl border overflow-hidden transition-all duration-300 hover:-translate-y-1 ${visible ? 'animate-slideUp' : 'opacity-0'}`}
-            style={{
-              background: 'linear-gradient(135deg, #fff7ed 0%, #fff0de 100%)',
-              borderColor: '#f58a2d30',
-              borderTopWidth: '3px',
-              borderTopColor: '#f58a2d60',
-              animationDelay: '200ms',
-              boxShadow: '0 8px 32px #f58a2d10',
-            }}
-          >
-            {/* Popular badge */}
-            <div className="absolute top-4 right-4">
-              <span className="px-2.5 py-1 rounded-full bg-[#f58a2d]/10 text-[#e8773f] text-[10px] font-bold uppercase tracking-wide flex items-center gap-1">
-                <Crown size={11} /> Anbefalet
-              </span>
-            </div>
-
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg" style={{ background: 'linear-gradient(135deg, #f7a95c, #e8773f)', boxShadow: '0 4px 16px #f58a2d30' }}>
-                <Building2 size={24} className="text-white" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-[#2f2f2f]">Kommune</h3>
-                <p className="text-[12px] text-[#9a978f]">For professionelle</p>
-              </div>
-            </div>
-
-            <div className="mb-6">
-              <span className="text-4xl font-[800] text-[#2f2f2f]">Kr. 299</span>
-              <span className="text-[#9a978f] text-sm ml-1">/md. pr. sagsbehandler</span>
-            </div>
-
-            <ul className="space-y-3 mb-8">
-              {proFeatures.map((f) => (
-                <li key={f} className="flex items-center gap-3 text-[14px] text-[#5f5d56]">
-                  <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0" style={{ background: '#f58a2d15' }}>
-                    <Check size={12} style={{ color: '#f58a2d' }} />
-                  </div>
-                  {f}
-                </li>
-              ))}
-            </ul>
-
-            <a
-              href="mailto:kontakt@huska.dk?subject=Kommune-licens"
-              className="block w-full text-center py-3.5 rounded-xl font-semibold text-white shadow-lg shadow-[#f58a2d]/25 hover:shadow-xl hover:shadow-[#f58a2d]/35 transition-all duration-200"
-              style={{ background: 'linear-gradient(135deg, #f7a95c 0%, #f58a2d 50%, #e8773f 100%)' }}
-            >
-              Kontakt os for tilbud
-            </a>
-          </div>
-        </div>
-
-        {/* Kommune-licens tabel */}
-        <div className={`max-w-3xl mx-auto ${visible ? 'animate-slideUp' : 'opacity-0'}`} style={{ animationDelay: '300ms' }}>
-          <div className="text-center mb-8">
-            <h3 className="text-xl font-bold text-[#2f2f2f]">Kommune-licens (fast årspris)</h3>
-            <p className="text-[14px] text-[#78766d] mt-1">Ubegrænsede sagsbehandlere og sager inkluderet. Familier bruger appen gratis.</p>
-          </div>
-
-          <div className="rounded-2xl backdrop-blur-xl bg-white/70 border border-white/40 shadow-lg shadow-black/[0.03] overflow-hidden">
-            <div className="grid grid-cols-4 text-[12px] font-bold text-[#78766d] uppercase tracking-wider px-6 py-3 border-b border-[#e8e6df]/50 bg-[#f9f8f5]/50">
-              <div>Størrelse</div>
-              <div>Borgere</div>
-              <div>Årlige sager</div>
-              <div>Årspris</div>
-            </div>
-            {kommunePlans.map((p, i) => (
-              <div
-                key={p.size}
-                className={`grid grid-cols-4 px-6 py-4 text-[14px] text-[#5f5d56] ${i < kommunePlans.length - 1 ? 'border-b border-[#e8e6df]/30' : ''} hover:bg-[#f58a2d]/3 transition-colors`}
-              >
-                <div className="font-semibold text-[#2f2f2f]">{p.size}</div>
-                <div>{p.borgere}</div>
-                <div>{p.sager}</div>
-                <div className="font-semibold text-[#f58a2d]">Kr. {p.pris}/år</div>
-              </div>
+          <ul className="space-y-3 mb-8">
+            {familyFeatures.map((f) => (
+              <li key={f} className="flex items-center gap-3 text-[15px] text-[#5f5d56]">
+                <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0" style={{ background: '#10b98115' }}>
+                  <Check size={12} style={{ color: '#10b981' }} />
+                </div>
+                {f}
+              </li>
             ))}
-          </div>
+          </ul>
 
-          <div className="mt-6 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#f58a2d]/8 text-[14px]">
-              <Sparkles size={14} className="text-[#f58a2d]" />
-              <span className="text-[#5f5d56]"><strong className="text-[#2f2f2f]">Pilot-tilbud:</strong> 3 måneders gratis prøveperiode for de første kommuner</span>
-            </div>
-          </div>
+          <a
+            href="https://apps.apple.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full text-center py-3.5 rounded-xl font-semibold text-white shadow-lg shadow-[#10b981]/25 hover:shadow-xl hover:shadow-[#10b981]/35 transition-all duration-200"
+            style={{ background: 'linear-gradient(135deg, #34d399, #10b981, #059669)' }}
+          >
+            Hent appen gratis
+          </a>
         </div>
+
+        <p className={`text-center text-[14px] text-[#9a978f] mt-6 ${visible ? 'animate-slideUp' : 'opacity-0'}`} style={{ animationDelay: '200ms' }}>
+          Er du kommune eller professionel?{' '}
+          <a href="#partner" className="text-[#f58a2d] hover:text-[#e8773f] font-medium transition-colors">
+            Se partnerprogrammet <ArrowRight size={13} className="inline" />
+          </a>
+        </p>
       </div>
     </section>
   );

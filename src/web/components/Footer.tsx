@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Heart, Send } from 'lucide-react';
+import { Heart, Send, Facebook, Instagram, Linkedin } from 'lucide-react';
 
 export function Footer() {
   const [email, setEmail] = useState('');
@@ -33,14 +33,20 @@ export function Footer() {
 
             {/* Social links */}
             <div className="flex gap-3 mt-5">
-              {['Facebook', 'Instagram', 'LinkedIn'].map((social) => (
+              {[
+                { icon: Facebook, label: 'Facebook', href: 'https://facebook.com' },
+                { icon: Instagram, label: 'Instagram', href: 'https://instagram.com' },
+                { icon: Linkedin, label: 'LinkedIn', href: 'https://linkedin.com' },
+              ].map((social) => (
                 <a
-                  key={social}
-                  href="#"
-                  className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all duration-200 text-[11px] font-bold"
-                  title={social}
+                  key={social.label}
+                  href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all duration-200"
+                  title={social.label}
                 >
-                  {social.charAt(0)}
+                  <social.icon size={16} />
                 </a>
               ))}
             </div>
@@ -65,6 +71,7 @@ export function Footer() {
               <li><a href="#privatlivspolitik" className="text-white/50 hover:text-white transition-colors">Privatlivspolitik</a></li>
               <li><a href="#kontakt" className="text-white/50 hover:text-white transition-colors">Kontakt</a></li>
               <li><a href="#vilkar" className="text-white/50 hover:text-white transition-colors">Vilkår og betingelser</a></li>
+              <li><a href="#partner" className="text-white/50 hover:text-white transition-colors">For kommuner & partnere</a></li>
             </ul>
           </div>
 
