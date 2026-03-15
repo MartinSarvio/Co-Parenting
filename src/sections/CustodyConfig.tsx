@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useAppStore } from '@/store';
+import { useApiActions } from '@/hooks/useApiActions';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -269,7 +270,8 @@ function ParentPicker({
 /* ── Main Component ── */
 
 export function CustodyConfig() {
-  const { custodyPlans, household, users, children, updateCustodyPlan, addCustodyPlan, currentUser, setSideMenuOpen } = useAppStore();
+  const { custodyPlans, household, users, children, currentUser, setSideMenuOpen } = useAppStore();
+  const { createCustodyPlan, updateCustodyPlan: apiUpdateCustodyPlan } = useApiActions();
   const custodyPlan = custodyPlans[0];
   const [activeTab, setActiveTab] = useState('general');
   const [isSaving, setIsSaving] = useState(false);
@@ -555,7 +557,7 @@ export function CustodyConfig() {
     updatedPlan.parent2Days = even.flatMap((pid, day) => pid === parent2Id ? [day] : []);
 
     if (custodyPlan) {
-      updateCustodyPlan(custodyPlan.id, updatedPlan);
+      await apiUpdateCustodyPlan(custodyPlan.id, updatedPlan);
       console.log('[CustodyConfig] UPDATED existing plan:', custodyPlan.id);
     } else {
       // Ingen custody plan fundet — opret ny
@@ -570,7 +572,7 @@ export function CustodyConfig() {
         parent2Days: [],
         ...updatedPlan,
       } as CustodyPlan;
-      addCustodyPlan(newPlan);
+      await createCustodyPlan(newPlan);
       console.log('[CustodyConfig] CREATED new plan:', newPlan.id);
     }
 
@@ -597,7 +599,7 @@ export function CustodyConfig() {
     setSpecialAlternate(false);
   };
 
-  const handleAddHoliday = () => {
+  const handleAddHoliday = async () => {
     if (!holidayName.trim() || !holidayStart || !holidayEnd) {
       toast.error('Udfyld venligst navn og datoer');
       return;
@@ -612,14 +614,14 @@ export function CustodyConfig() {
     };
     const holidays = [...(custodyPlan?.holidays || []), newHoliday];
     if (custodyPlan) {
-      updateCustodyPlan(custodyPlan.id, { holidays });
+      await apiUpdateCustodyPlan(custodyPlan.id, { holidays });
     }
     toast.success(`${holidayName} tilføjet`);
     resetHolidayForm();
     setAddFormType(null);
   };
 
-  const handleAddSpecialDay = () => {
+  const handleAddSpecialDay = async () => {
     if (!specialDescription.trim() || !specialDate) {
       toast.error('Udfyld venligst beskrivelse og dato');
       return;
@@ -634,7 +636,7 @@ export function CustodyConfig() {
     };
     const specialDays = [...(custodyPlan?.specialDays || []), newDay];
     if (custodyPlan) {
-      updateCustodyPlan(custodyPlan.id, { specialDays });
+      await apiUpdateCustodyPlan(custodyPlan.id, { specialDays });
     }
     toast.success(`${specialDescription} tilføjet`);
     resetSpecialForm();
@@ -660,7 +662,7 @@ export function CustodyConfig() {
     return { start: startDate, end: startDate };
   };
 
-  const handleAddSelectedHolidays = () => {
+  const handleAddSelectedHolidays = async () => {
     const entries = Object.entries(selectedHolidays);
     if (entries.length === 0) {
       toast.error('Vælg mindst én helligdag');
@@ -680,7 +682,7 @@ export function CustodyConfig() {
     });
     const holidays = [...(custodyPlan?.holidays || []), ...newHolidays];
     if (custodyPlan) {
-      updateCustodyPlan(custodyPlan.id, { holidays });
+      await apiUpdateCustodyPlan(custodyPlan.id, { holidays });
     }
     toast.success(`${newHolidays.length} helligdag${newHolidays.length > 1 ? 'e' : ''} tilføjet`);
     setSelectedHolidays({});

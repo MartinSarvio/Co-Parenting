@@ -62,7 +62,6 @@ interface AppStore {
   currentUser: User | null;
   isAuthenticated: boolean;
   isProfessionalView: boolean;
-  isFamilyMemberView: boolean;
   currentChildId: string | null;
   
   // Data
@@ -183,11 +182,14 @@ interface AppStore {
   tilbudAdminCreateOpen: boolean;
   nyhederAdminCreateOpen: boolean;
 
+  // Network state
+  isOnline: boolean;
+  setOnline: (online: boolean) => void;
+
   // Actions
   setCurrentUser: (user: User | null) => void;
   setAuthenticated: (value: boolean) => void;
   setProfessionalView: (value: boolean) => void;
-  setFamilyMemberView: (value: boolean) => void;
   setCurrentChildId: (id: string | null) => void;
   setActiveTab: (tab: string) => void;
   goBack: () => void;
@@ -426,10 +428,10 @@ interface AppStore {
     riskAssessments?: RiskAssessment[];
     departments?: ProfessionalDepartment[];
     caseActivities?: CaseActivity[];
-    photos?: FamilyPhoto[];
+    routineItems?: RoutineItem[];
+    routineLogs?: RoutineLog[];
     fridgeItems?: FridgeItem[];
-    wishItems?: WishItem[];
-    budgetGoals?: BudgetGoal[];
+    custodyPlans?: CustodyPlan[];
   }) => void;
 
   // Auth
@@ -447,7 +449,6 @@ export const useAppStore = create<AppStore>()(
       currentUser: null,
       isAuthenticated: false,
       isProfessionalView: false,
-      isFamilyMemberView: false,
       currentChildId: null,
       users: [],
       children: [],
@@ -576,14 +577,15 @@ export const useAppStore = create<AppStore>()(
       tilbudAdminCreateOpen: false,
       nyhederAdminCreateOpen: false,
 
+      // Network state
+      isOnline: true,
+      setOnline: (online) => set({ isOnline: online }),
+
       // Actions
       setCurrentUser: (user) => set({ currentUser: user }),
       setAuthenticated: (value) => set({ isAuthenticated: value }),
       setProfessionalView: (value) => set((state) => ({
-        isProfessionalView: state.currentUser?.isAdmin ? value : false
-      })),
-      setFamilyMemberView: (value) => set((state) => ({
-        isFamilyMemberView: state.currentUser?.isAdmin ? value : false
+        isProfessionalView: (state.currentUser?.isAdmin || state.currentUser?.role === 'professional') ? value : false
       })),
       setCurrentChildId: (id) => set({ currentChildId: id }),
       setActiveTab: (tab) => set((state) => ({
@@ -720,8 +722,8 @@ export const useAppStore = create<AppStore>()(
           ...household,
           subscription: normalizeSubscription(household)
         },
-        isProfessionalView: state.currentUser?.isAdmin ? state.isProfessionalView : false,
-        activeTab: !state.currentUser?.isAdmin && state.activeTab === 'cases' ? 'dashboard' : state.activeTab
+        isProfessionalView: (state.currentUser?.isAdmin || state.currentUser?.role === 'professional') ? state.isProfessionalView : false,
+        activeTab: !(state.currentUser?.isAdmin || state.currentUser?.role === 'professional') && state.activeTab === 'cases' ? 'dashboard' : state.activeTab
       })),
       addPaymentAccount: (account) => set((state) => ({
         paymentAccounts: [
@@ -1105,10 +1107,14 @@ export const useAppStore = create<AppStore>()(
         riskAssessments: data.riskAssessments ?? state.riskAssessments,
         departments: data.departments ?? state.departments,
         caseActivities: data.caseActivities ?? state.caseActivities,
-        photos: data.photos ?? state.photos,
+        routineItems: data.routineItems ?? state.routineItems,
+        routineLogs: data.routineLogs ?? state.routineLogs,
         fridgeItems: data.fridgeItems ?? state.fridgeItems,
-        wishItems: data.wishItems ?? state.wishItems,
+        custodyPlans: data.custodyPlans ?? state.custodyPlans,
         budgetGoals: data.budgetGoals ?? state.budgetGoals,
+        wishItems: data.wishItems ?? state.wishItems,
+        photos: data.photos ?? state.photos,
+        notificationPreferences: data.notificationPreferences ?? state.notificationPreferences,
         currentChildId: data.children !== undefined && data.children.length > 0
           ? (state.currentChildId && data.children.some(c => c.id === state.currentChildId)
               ? state.currentChildId

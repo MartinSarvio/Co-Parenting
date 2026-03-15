@@ -37,7 +37,7 @@ import type {
   DbRiskAssessment,
   DbCaseActivity,
 } from '@/lib/mappers';
-import type { CalendarEvent, Task, Expense, MealPlan, Child, DiaryEntry, KeyDate, DecisionLog, Milestone, ShoppingItem, ShoppingList, Recipe, ProfessionalCase, RiskAssessment, CaseActivity } from '@/types';
+import type { CalendarEvent, Task, Expense, MealPlan, Child, DiaryEntry, KeyDate, DecisionLog, Milestone, ShoppingItem, ShoppingList, Recipe, ProfessionalCase, RiskAssessment, CaseActivity, BudgetGoal, WishItem, FamilyPhoto, NotificationPreferences } from '@/types';
 import { shoppingItemId, shoppingListId, generateId, professionalCaseId, riskAssessmentId, caseActivityId, diaryEntryId, keyDateId, decisionId, milestoneId, documentId, eventId } from '@/lib/id';
 import { toast } from 'sonner';
 
@@ -55,15 +55,6 @@ function getHouseholdId(): string {
   return useAppStore.getState().household?.id || '';
 }
 
-/** Fire-and-forget Supabase sync — item er allerede gemt lokalt i store */
-function syncToSupabase(table: string, payload: Record<string, unknown>, errorMsg: string) {
-  supabase.from(table).insert(payload).then(({ error }) => {
-    if (error) {
-      console.error(`Supabase sync failed for ${table}:`, error);
-      toast.error(`${errorMsg} (lokal kopi gemt)`);
-    }
-  });
-}
 
 export function useApiActions() {
   const store = useAppStore();
@@ -71,7 +62,7 @@ export function useApiActions() {
   // ── Events ──────────────────────────────────────────────
 
   const createEvent = useCallback(
-    (data: Omit<CalendarEvent, 'id'>) => {
+    async (data: Omit<CalendarEvent, 'id'>) => {
       const userId = getCurrentUserId();
       if (!userId) { toast.error('Du skal være logget ind'); return null; }
       const event: CalendarEvent = {
@@ -88,19 +79,24 @@ export function useApiActions() {
         isRecurring: data.isRecurring || false,
       };
       store.addEvent(event);
-      syncToSupabase('calendar_events', {
-        id: event.id,
-        title: event.title,
-        description: event.description || null,
-        start_date: event.startDate,
-        end_date: event.endDate,
-        type: event.type,
-        child_id: event.childId || null,
-        created_by: userId,
-        location: event.location || null,
-        assigned_to: event.assignedTo || [],
-        is_recurring: event.isRecurring || false,
-      }, 'Kunne ikke synkronisere begivenhed');
+      try {
+        const { error } = await supabase.from('calendar_events').insert({
+          id: event.id,
+          title: event.title,
+          description: event.description || null,
+          start_date: event.startDate,
+          end_date: event.endDate,
+          type: event.type,
+          child_id: event.childId || null,
+          created_by: userId,
+          location: event.location || null,
+          assigned_to: event.assignedTo || [],
+          is_recurring: event.isRecurring || false,
+        });
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke gemme begivenhed');
+      }
       return event;
     },
     [store],
@@ -318,7 +314,7 @@ export function useApiActions() {
   // ── Documents ───────────────────────────────────────────
 
   const createDocument = useCallback(
-    (data: { title: string; type: string; url: string; sharedWith?: string[]; isOfficial?: boolean; validFrom?: string; validUntil?: string }) => {
+    async (data: { title: string; type: string; url: string; sharedWith?: string[]; isOfficial?: boolean; validFrom?: string; validUntil?: string }) => {
       const userId = getCurrentUserId();
       if (!userId) { toast.error('Du skal være logget ind'); return null; }
       const doc: import('@/types').Document = {
@@ -334,17 +330,22 @@ export function useApiActions() {
         validUntil: data.validUntil,
       };
       store.addDocument(doc);
-      syncToSupabase('documents', {
-        id: doc.id,
-        title: doc.title,
-        type: doc.type,
-        url: doc.url,
-        uploaded_by: userId,
-        shared_with: doc.sharedWith,
-        is_official: doc.isOfficial || false,
-        valid_from: doc.validFrom || null,
-        valid_until: doc.validUntil || null,
-      }, 'Kunne ikke synkronisere dokument');
+      try {
+        const { error } = await supabase.from('documents').insert({
+          id: doc.id,
+          title: doc.title,
+          type: doc.type,
+          url: doc.url,
+          uploaded_by: userId,
+          shared_with: doc.sharedWith,
+          is_official: doc.isOfficial || false,
+          valid_from: doc.validFrom || null,
+          valid_until: doc.validUntil || null,
+        });
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke gemme dokument');
+      }
       return doc;
     },
     [store],
@@ -559,7 +560,7 @@ export function useApiActions() {
   // ── Diary Entries ─────────────────────────────────────────
 
   const createDiaryEntry = useCallback(
-    (data: Omit<DiaryEntry, 'id' | 'createdAt' | 'writtenBy'>) => {
+    async (data: Omit<DiaryEntry, 'id' | 'createdAt' | 'writtenBy'>) => {
       const userId = getCurrentUserId();
       if (!userId) { toast.error('Du skal være logget ind'); return null; }
       const entry: DiaryEntry = {
@@ -575,16 +576,21 @@ export function useApiActions() {
         createdAt: new Date().toISOString(),
       };
       store.addDiaryEntry(entry);
-      syncToSupabase('diary_entries', {
-        id: entry.id,
-        child_id: entry.childId,
-        date: entry.date,
-        mood: entry.mood,
-        sleep: entry.sleep,
-        appetite: entry.appetite,
-        note: entry.note || null,
-        written_by: userId,
-      }, 'Kunne ikke synkronisere dagbogsindlæg');
+      try {
+        const { error } = await supabase.from('diary_entries').insert({
+          id: entry.id,
+          child_id: entry.childId,
+          date: entry.date,
+          mood: entry.mood,
+          sleep: entry.sleep,
+          appetite: entry.appetite,
+          note: entry.note || null,
+          written_by: userId,
+        });
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke gemme dagbogsindlæg');
+      }
       return entry;
     },
     [store],
@@ -626,7 +632,7 @@ export function useApiActions() {
   // ── Key Dates ───────────────────────────────────────────
 
   const createKeyDate = useCallback(
-    (data: Omit<KeyDate, 'id' | 'createdAt' | 'addedBy'>) => {
+    async (data: Omit<KeyDate, 'id' | 'createdAt' | 'addedBy'>) => {
       const userId = getCurrentUserId();
       if (!userId) { toast.error('Du skal være logget ind'); return null; }
       const kd: KeyDate = {
@@ -642,17 +648,22 @@ export function useApiActions() {
         createdAt: new Date().toISOString(),
       };
       store.addKeyDate(kd);
-      syncToSupabase('key_dates', {
-        id: kd.id,
-        child_id: kd.childId || null,
-        title: kd.title,
-        date: kd.date,
-        type: kd.type,
-        recurrence: kd.recurrence,
-        reminder_days_before: kd.reminderDaysBefore,
-        notes: kd.notes || null,
-        added_by: userId,
-      }, 'Kunne ikke synkronisere vigtig dato');
+      try {
+        const { error } = await supabase.from('key_dates').insert({
+          id: kd.id,
+          child_id: kd.childId || null,
+          title: kd.title,
+          date: kd.date,
+          type: kd.type,
+          recurrence: kd.recurrence,
+          reminder_days_before: kd.reminderDaysBefore,
+          notes: kd.notes || null,
+          added_by: userId,
+        });
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke gemme vigtig dato');
+      }
       return kd;
     },
     [store],
@@ -695,7 +706,7 @@ export function useApiActions() {
   // ── Decisions ───────────────────────────────────────────
 
   const createDecision = useCallback(
-    (data: Omit<DecisionLog, 'id' | 'createdAt' | 'proposedBy'>) => {
+    async (data: Omit<DecisionLog, 'id' | 'createdAt' | 'proposedBy'>) => {
       const userId = getCurrentUserId();
       if (!userId) { toast.error('Du skal være logget ind'); return null; }
       const decision: DecisionLog = {
@@ -715,21 +726,26 @@ export function useApiActions() {
         createdAt: new Date().toISOString(),
       };
       store.addDecision(decision);
-      syncToSupabase('decision_logs', {
-        id: decision.id,
-        child_id: decision.childId || null,
-        title: decision.title,
-        description: decision.description,
-        category: decision.category,
-        decided_at: decision.decidedAt,
-        proposed_by: userId,
-        approved_by: decision.approvedBy,
-        status: decision.status,
-        valid_from: decision.validFrom || null,
-        valid_until: decision.validUntil || null,
-        notes: decision.notes || null,
-        document_ids: decision.documentIds || null,
-      }, 'Kunne ikke synkronisere beslutning');
+      try {
+        const { error } = await supabase.from('decision_logs').insert({
+          id: decision.id,
+          child_id: decision.childId || null,
+          title: decision.title,
+          description: decision.description,
+          category: decision.category,
+          decided_at: decision.decidedAt,
+          proposed_by: userId,
+          approved_by: decision.approvedBy,
+          status: decision.status,
+          valid_from: decision.validFrom || null,
+          valid_until: decision.validUntil || null,
+          notes: decision.notes || null,
+          document_ids: decision.documentIds || null,
+        });
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke gemme beslutning');
+      }
       return decision;
     },
     [store],
@@ -771,7 +787,7 @@ export function useApiActions() {
   // ── Milestones ──────────────────────────────────────────
 
   const createMilestone = useCallback(
-    (data: Omit<Milestone, 'id'>) => {
+    async (data: Omit<Milestone, 'id'>) => {
       const userId = getCurrentUserId();
       if (!userId) { toast.error('Du skal være logget ind'); return null; }
       const milestone: Milestone = {
@@ -785,16 +801,21 @@ export function useApiActions() {
         photos: data.photos || [],
       };
       store.addMilestone(milestone);
-      syncToSupabase('milestones', {
-        id: milestone.id,
-        child_id: milestone.childId,
-        title: milestone.title,
-        description: milestone.description || null,
-        date: milestone.date,
-        category: milestone.category,
-        added_by: milestone.addedBy,
-        photos: milestone.photos || [],
-      }, 'Kunne ikke synkronisere milepæl');
+      try {
+        const { error } = await supabase.from('milestones').insert({
+          id: milestone.id,
+          child_id: milestone.childId,
+          title: milestone.title,
+          description: milestone.description || null,
+          date: milestone.date,
+          category: milestone.category,
+          added_by: milestone.addedBy,
+          photos: milestone.photos || [],
+        });
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke gemme milepæl');
+      }
       return milestone;
     },
     [store],
@@ -840,6 +861,142 @@ export function useApiActions() {
       } catch (err) {
         handleError(err, 'Kunne ikke slette milepæl');
         return false;
+      }
+    },
+    [store],
+  );
+
+  // ── Custody Plans ──────────────────────────────────────
+
+  const createCustodyPlan = useCallback(
+    async (plan: import('@/types').CustodyPlan) => {
+      store.addCustodyPlan(plan);
+      try {
+        const { error } = await supabase.from('custody_plans').insert({
+          id: plan.id,
+          household_id: getHouseholdId(),
+          child_id: plan.childId,
+          name: plan.name,
+          pattern: plan.pattern,
+          start_date: plan.startDate,
+          swap_day: plan.swapDay,
+          swap_time: plan.swapTime,
+          swap_location: plan.swapLocation || null,
+          parent1_weeks: plan.parent1Weeks ?? null,
+          parent2_weeks: plan.parent2Weeks ?? null,
+          parent1_days: plan.parent1Days,
+          parent2_days: plan.parent2Days,
+          weekly_schedule: plan.weeklySchedule || null,
+          custom_week_config: plan.customWeekConfig || null,
+          custom_schedule: plan.customSchedule || null,
+          supervised_config: plan.supervisedConfig || null,
+          holidays: plan.holidays || null,
+          special_days: plan.specialDays || null,
+          created_by: getCurrentUserId(),
+        });
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke gemme samværsplan');
+      }
+      return plan;
+    },
+    [store],
+  );
+
+  const updateCustodyPlan = useCallback(
+    async (id: string, data: Partial<import('@/types').CustodyPlan>) => {
+      store.updateCustodyPlan(id, data);
+      try {
+        const updateData: Record<string, unknown> = {};
+        if (data.name !== undefined) updateData.name = data.name;
+        if (data.pattern !== undefined) updateData.pattern = data.pattern;
+        if (data.startDate !== undefined) updateData.start_date = data.startDate;
+        if (data.swapDay !== undefined) updateData.swap_day = data.swapDay;
+        if (data.swapTime !== undefined) updateData.swap_time = data.swapTime;
+        if (data.swapLocation !== undefined) updateData.swap_location = data.swapLocation || null;
+        if (data.parent1Days !== undefined) updateData.parent1_days = data.parent1Days;
+        if (data.parent2Days !== undefined) updateData.parent2_days = data.parent2Days;
+        if (data.weeklySchedule !== undefined) updateData.weekly_schedule = data.weeklySchedule;
+        if (data.customWeekConfig !== undefined) updateData.custom_week_config = data.customWeekConfig;
+        if (data.customSchedule !== undefined) updateData.custom_schedule = data.customSchedule;
+        if (data.supervisedConfig !== undefined) updateData.supervised_config = data.supervisedConfig;
+        if (data.holidays !== undefined) updateData.holidays = data.holidays;
+        if (data.specialDays !== undefined) updateData.special_days = data.specialDays;
+        const { error } = await supabase.from('custody_plans').update(updateData).eq('id', id);
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke opdatere samværsplan');
+      }
+    },
+    [store],
+  );
+
+  // ── Fridge Items ──────────────────────────────────────
+
+  const createFridgeItem = useCallback(
+    async (item: import('@/types').FridgeItem) => {
+      store.addFridgeItem(item);
+      try {
+        const { error } = await supabase.from('fridge_items').insert({
+          id: item.id,
+          household_id: getHouseholdId(),
+          name: item.name,
+          barcode: item.barcode || null,
+          added_at: item.addedAt,
+          added_by: item.addedBy,
+          expires_at: item.expiresAt || null,
+          nutrition_per_100g: item.nutritionPer100g || null,
+          allergens: item.allergens || null,
+        });
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke gemme køleskabsvare');
+      }
+      return item;
+    },
+    [store],
+  );
+
+  const deleteFridgeItem = useCallback(
+    async (id: string) => {
+      store.removeFridgeItem(id);
+      try {
+        const { error } = await supabase.from('fridge_items').delete().eq('id', id);
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke slette køleskabsvare');
+      }
+    },
+    [store],
+  );
+
+  const updateFridgeItem = useCallback(
+    async (id: string, data: Partial<import('@/types').FridgeItem>) => {
+      store.updateFridgeItem(id, data);
+      try {
+        const updateData: Record<string, unknown> = {};
+        if (data.name !== undefined) updateData.name = data.name;
+        if (data.barcode !== undefined) updateData.barcode = data.barcode || null;
+        if (data.expiresAt !== undefined) updateData.expires_at = data.expiresAt || null;
+        if (data.nutritionPer100g !== undefined) updateData.nutrition_per_100g = data.nutritionPer100g || null;
+        if (data.allergens !== undefined) updateData.allergens = data.allergens || null;
+        const { error } = await supabase.from('fridge_items').update(updateData).eq('id', id);
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke opdatere køleskabsvare');
+      }
+    },
+    [store],
+  );
+
+  const archiveFridgeItem = useCallback(
+    async (id: string, reason: 'used' | 'thrown_away') => {
+      store.archiveFridgeItem(id, reason);
+      try {
+        const { error } = await supabase.from('fridge_items').delete().eq('id', id);
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke arkivere køleskabsvare');
       }
     },
     [store],
@@ -1167,20 +1324,25 @@ export function useApiActions() {
   // ── Routines ──────────────────────────────────────────────
 
   const createRoutineItem = useCallback(
-    (data: import('@/types').RoutineItem) => {
+    async (data: import('@/types').RoutineItem) => {
       store.addRoutineItem(data);
-      syncToSupabase('routine_items', {
-        id: data.id,
-        child_id: data.childId,
-        category: data.category,
-        type: data.type,
-        label: data.label,
-        emoji: data.emoji,
-        'order': data.order,
-        meal_key: data.mealKey || null,
-        is_active: data.isActive,
-        created_by: data.createdBy,
-      }, 'Kunne ikke synkronisere rutine');
+      try {
+        const { error } = await supabase.from('routine_items').insert({
+          id: data.id,
+          child_id: data.childId,
+          category: data.category,
+          type: data.type,
+          label: data.label,
+          emoji: data.emoji,
+          'order': data.order,
+          meal_key: data.mealKey || null,
+          is_active: data.isActive,
+          created_by: data.createdBy,
+        });
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke gemme rutine');
+      }
       return data;
     },
     [store],
@@ -1197,20 +1359,25 @@ export function useApiActions() {
   );
 
   const createRoutineLog = useCallback(
-    (data: import('@/types').RoutineLog) => {
+    async (data: import('@/types').RoutineLog) => {
       store.addRoutineLog(data);
-      syncToSupabase('routine_logs', {
-        id: data.id,
-        routine_item_id: data.routineItemId,
-        child_id: data.childId,
-        date: data.date,
-        completed: data.completed,
-        completed_at: data.completedAt || null,
-        completed_by: data.completedBy || null,
-        time: data.time || null,
-        note: data.note || null,
-        linked_food_log_id: data.linkedFoodLogId || null,
-      }, 'Kunne ikke synkronisere rutine-log');
+      try {
+        const { error } = await supabase.from('routine_logs').insert({
+          id: data.id,
+          routine_item_id: data.routineItemId,
+          child_id: data.childId,
+          date: data.date,
+          completed: data.completed,
+          completed_at: data.completedAt || null,
+          completed_by: data.completedBy || null,
+          time: data.time || null,
+          note: data.note || null,
+          linked_food_log_id: data.linkedFoodLogId || null,
+        });
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke gemme rutine-log');
+      }
       return data;
     },
     [store],
@@ -1232,75 +1399,33 @@ export function useApiActions() {
     [store],
   );
 
-  // ── Photos ──────────────────────────────────────────────
+  // ── Budget Goals ─────────────────────────────────────────
 
-  const createPhoto = useCallback(
-    (data: import('@/types').FamilyPhoto) => {
-      store.addPhoto(data);
-      syncToSupabase('family_photos', {
-        id: data.id,
-        child_id: data.childId,
-        url: data.url,
-        caption: data.caption || null,
-        taken_at: data.takenAt,
-        added_by: data.addedBy,
-        added_at: data.addedAt,
-        household_id: getHouseholdId(),
-      }, 'Kunne ikke synkronisere foto');
-      return data;
-    },
-    [store],
-  );
+  const saveBudgetGoals = useCallback(
+    async (goals: BudgetGoal[]) => {
+      const householdId = getHouseholdId();
+      const userId = getCurrentUserId();
+      if (!householdId || !userId) return;
 
-  const deletePhoto = useCallback(
-    (id: string) => {
-      store.deletePhoto(id);
-      supabase.from('family_photos').delete().eq('id', id).then(({ error }) => {
-        if (error) console.error('Supabase sync failed for family_photos delete:', error);
-      });
-    },
-    [store],
-  );
+      store.setBudgetGoals(goals);
 
-  // ── Fridge ──────────────────────────────────────────────
-
-  const createFridgeItem = useCallback(
-    (data: import('@/types').FridgeItem) => {
-      store.addFridgeItem(data);
-      syncToSupabase('fridge_items', {
-        id: data.id,
-        name: data.name,
-        barcode: data.barcode || null,
-        added_at: data.addedAt,
-        added_by: data.addedBy,
-        expires_at: data.expiresAt || null,
-        nutrition_per_100g: data.nutritionPer100g || null,
-        household_id: getHouseholdId(),
-      }, 'Kunne ikke synkronisere køleskabsvare');
-      return data;
-    },
-    [store],
-  );
-
-  const updateFridgeItem = useCallback(
-    (id: string, updates: Partial<Pick<import('@/types').FridgeItem, 'name' | 'expiresAt'>>) => {
-      store.updateFridgeItem(id, updates);
-      const updateData: Record<string, unknown> = {};
-      if (updates.name !== undefined) updateData.name = updates.name;
-      if (updates.expiresAt !== undefined) updateData.expires_at = updates.expiresAt;
-      supabase.from('fridge_items').update(updateData).eq('id', id).then(({ error }) => {
-        if (error) console.error('Supabase sync failed for fridge_items update:', error);
-      });
-    },
-    [store],
-  );
-
-  const deleteFridgeItem = useCallback(
-    (id: string) => {
-      store.removeFridgeItem(id);
-      supabase.from('fridge_items').delete().eq('id', id).then(({ error }) => {
-        if (error) console.error('Supabase sync failed for fridge_items delete:', error);
-      });
+      try {
+        // Delete existing then insert fresh
+        await supabase.from('budget_goals').delete().eq('household_id', householdId);
+        if (goals.length > 0) {
+          await supabase.from('budget_goals').insert(
+            goals.map(g => ({
+              id: `bg_${householdId}_${g.category}`,
+              household_id: householdId,
+              category: g.category,
+              monthly_amount: g.monthlyAmount,
+              created_by: userId,
+            }))
+          );
+        }
+      } catch (err) {
+        console.error('Failed to sync budget goals:', err);
+      }
     },
     [store],
   );
@@ -1308,75 +1433,111 @@ export function useApiActions() {
   // ── Wish Items ──────────────────────────────────────────
 
   const createWishItem = useCallback(
-    (data: import('@/types').WishItem) => {
-      store.addWishItem(data);
-      syncToSupabase('wish_items', {
-        id: data.id,
-        title: data.title,
-        price_estimate: data.priceEstimate || null,
-        link: data.link || null,
-        image_url: data.imageUrl || null,
-        description: data.description || null,
-        child_id: data.childId,
-        added_by: data.addedBy,
-        status: data.status,
-        bought_by: data.boughtBy || null,
-        created_at: data.createdAt,
-        household_id: getHouseholdId(),
-      }, 'Kunne ikke synkronisere ønske');
-      return data;
+    async (data: Omit<WishItem, 'id' | 'createdAt'>) => {
+      const householdId = getHouseholdId();
+      if (!householdId) { toast.error('Ingen husstand'); return null; }
+      const item: WishItem = { ...data, id: `wish_${Date.now()}`, createdAt: new Date().toISOString() };
+      store.addWishItem(item);
+      const { error } = await supabase.from('wish_items').insert({
+        id: item.id, household_id: householdId, title: item.title,
+        price_estimate: item.priceEstimate, link: item.link, image_url: item.imageUrl,
+        description: item.description, child_id: item.childId, added_by: item.addedBy,
+        status: item.status, bought_by: item.boughtBy, created_at: item.createdAt,
+      });
+      if (error) { console.error('Supabase wish_items insert failed:', error); toast.error('Kunne ikke gemme ønske'); }
+      return item;
     },
     [store],
   );
 
   const updateWishItem = useCallback(
-    (id: string, updates: Partial<import('@/types').WishItem>) => {
+    async (id: string, updates: Partial<WishItem>) => {
       store.updateWishItem(id, updates);
-      const updateData: Record<string, unknown> = {};
-      if (updates.title !== undefined) updateData.title = updates.title;
-      if (updates.priceEstimate !== undefined) updateData.price_estimate = updates.priceEstimate;
-      if (updates.status !== undefined) updateData.status = updates.status;
-      if (updates.boughtBy !== undefined) updateData.bought_by = updates.boughtBy;
-      if (updates.link !== undefined) updateData.link = updates.link;
-      if (updates.description !== undefined) updateData.description = updates.description;
-      supabase.from('wish_items').update(updateData).eq('id', id).then(({ error }) => {
-        if (error) console.error('Supabase sync failed for wish_items update:', error);
-      });
+      const dbUpdates: Record<string, unknown> = {};
+      if (updates.title !== undefined) dbUpdates.title = updates.title;
+      if (updates.priceEstimate !== undefined) dbUpdates.price_estimate = updates.priceEstimate;
+      if (updates.link !== undefined) dbUpdates.link = updates.link;
+      if (updates.imageUrl !== undefined) dbUpdates.image_url = updates.imageUrl;
+      if (updates.description !== undefined) dbUpdates.description = updates.description;
+      if (updates.status !== undefined) dbUpdates.status = updates.status;
+      if (updates.boughtBy !== undefined) dbUpdates.bought_by = updates.boughtBy;
+      if (Object.keys(dbUpdates).length > 0) {
+        supabase.from('wish_items').update(dbUpdates).eq('id', id).then(({ error }) => {
+          if (error) console.error('Supabase wish_items update failed:', error);
+        });
+      }
     },
     [store],
   );
 
   const deleteWishItem = useCallback(
-    (id: string) => {
+    async (id: string) => {
       store.deleteWishItem(id);
       supabase.from('wish_items').delete().eq('id', id).then(({ error }) => {
-        if (error) console.error('Supabase sync failed for wish_items delete:', error);
+        if (error) console.error('Supabase wish_items delete failed:', error);
       });
     },
     [store],
   );
 
-  // ── Budget Goals ────────────────────────────────────────
+  // ── Photos ──────────────────────────────────────────────
 
-  const syncBudgetGoals = useCallback(
-    (goals: import('@/types').BudgetGoal[]) => {
-      store.setBudgetGoals(goals);
+  const createPhoto = useCallback(
+    async (data: Omit<FamilyPhoto, 'id' | 'addedAt'>) => {
       const householdId = getHouseholdId();
+      if (!householdId) return null;
+      const photo: FamilyPhoto = { ...data, id: `photo_${Date.now()}`, addedAt: new Date().toISOString() };
+      store.addPhoto(photo);
+      const { error } = await supabase.from('family_photos').insert({
+        id: photo.id, household_id: householdId, child_id: photo.childId,
+        url: photo.url, caption: photo.caption, taken_at: photo.takenAt,
+        added_by: photo.addedBy, added_at: photo.addedAt,
+      });
+      if (error) { console.error('Supabase family_photos insert failed:', error); }
+      return photo;
+    },
+    [store],
+  );
+
+  const deletePhoto = useCallback(
+    async (id: string) => {
+      store.deletePhoto(id);
+      supabase.from('family_photos').delete().eq('id', id).then(({ error }) => {
+        if (error) console.error('Supabase family_photos delete failed:', error);
+      });
+    },
+    [store],
+  );
+
+  // ── Notification Preferences ────────────────────────────
+
+  const saveNotificationPreferences = useCallback(
+    async (prefs: Partial<NotificationPreferences>) => {
       const userId = getCurrentUserId();
-      // Upsert all goals
-      supabase.from('budget_goals').delete().eq('household_id', householdId).then(() => {
-        if (goals.length > 0) {
-          supabase.from('budget_goals').insert(
-            goals.map(g => ({
-              household_id: householdId,
-              category: g.category,
-              monthly_amount: g.monthlyAmount,
-              created_by: userId,
-            }))
-          ).then(({ error }) => {
-            if (error) console.error('Supabase sync failed for budget_goals:', error);
-          });
-        }
+      if (!userId) return;
+      store.updateNotificationPreferences(prefs);
+      const fullPrefs = useAppStore.getState().notificationPreferences;
+      supabase.from('notification_preferences').upsert({
+        user_id: userId,
+        handover_reminders: fullPrefs.handoverReminders,
+        handover_reminder_minutes: fullPrefs.handoverReminderMinutes,
+        schedule_changes: fullPrefs.scheduleChanges,
+        event_reminders: fullPrefs.eventReminders,
+        important_dates: fullPrefs.importantDates,
+        task_assigned: fullPrefs.taskAssigned,
+        task_deadline: fullPrefs.taskDeadline,
+        expense_pending: fullPrefs.expensePending,
+        expense_updates: fullPrefs.expenseUpdates,
+        new_messages: fullPrefs.newMessages,
+        professional_messages: fullPrefs.professionalMessages,
+        meal_plan_reminder: fullPrefs.mealPlanReminder,
+        shopping_reminder: fullPrefs.shoppingReminder,
+        cleaning_reminder: fullPrefs.cleaningReminder,
+        document_shared: fullPrefs.documentShared,
+        decision_proposed: fullPrefs.decisionProposed,
+        diary_reminder: fullPrefs.diaryReminder,
+      }, { onConflict: 'user_id' }).then(({ error }) => {
+        if (error) console.error('Supabase notification_preferences upsert failed:', error);
       });
     },
     [store],
@@ -1427,6 +1588,14 @@ export function useApiActions() {
     createMilestone,
     updateMilestone,
     deleteMilestone,
+    // Custody Plans
+    createCustodyPlan,
+    updateCustodyPlan,
+    // Fridge Items
+    createFridgeItem,
+    deleteFridgeItem,
+    updateFridgeItem,
+    archiveFridgeItem,
     // Shopping Items
     createShoppingItem,
     updateShoppingItem,
@@ -1452,18 +1621,16 @@ export function useApiActions() {
     deleteRoutineItem,
     createRoutineLog,
     updateRoutineLog,
-    // Photos
-    createPhoto,
-    deletePhoto,
-    // Fridge
-    createFridgeItem,
-    updateFridgeItem,
-    deleteFridgeItem,
+    // Budget Goals
+    saveBudgetGoals,
     // Wish Items
     createWishItem,
     updateWishItem,
     deleteWishItem,
-    // Budget
-    syncBudgetGoals,
+    // Photos
+    createPhoto,
+    deletePhoto,
+    // Notification Preferences
+    saveNotificationPreferences,
   };
 }

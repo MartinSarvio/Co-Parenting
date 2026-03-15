@@ -166,7 +166,7 @@ export function BottomNav() {
   const isTogetherFamily = household?.familyMode === 'together';
   const isSingleParent = household?.familyMode === 'single_parent';
   const showHandoverNav = !isTogetherFamily && !isSingleParent;
-  const shouldShowProfessionalNav = isProfessionalView && currentUser?.isAdmin === true;
+  const shouldShowProfessionalNav = isProfessionalView && (currentUser?.isAdmin === true || currentUser?.role === 'professional');
 
   if (fullScreenOverlayOpen || kommunikationThreadId || activeTab === 'swap-request' || activeTab === 'kalender-week' || activeTab === 'group-detail' || activeTab === 'profile' || activeTab === 'create-group' || handoverAction === 'add-pakkeliste' || (activeTab === 'feed' && (feedTab === 'forum' || feedTab === 'tilbud')) || (activeTab === 'settings' && activeSettingsTab === 'info') || milestoneFormMode || meetingFormMode || docFormMode) return null;
 

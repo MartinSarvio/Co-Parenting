@@ -32,7 +32,7 @@ import { supabase } from '@/lib/supabase';
 import { formatRelativeTime } from '@/lib/utils';
 import { useApiActions } from '@/hooks/useApiActions';
 import { lookupProductByName, trackProductClick } from '@/lib/productLookup';
-import type { WishItem } from '@/types';
+
 import { TilbudMainPage } from '@/components/custom/TilbudMainPage';
 import { TilbudStoreView } from '@/components/custom/TilbudStoreView';
 import { UploadedBatchView } from '@/components/custom/UploadedBatchView';
@@ -79,6 +79,7 @@ interface ForumGroup {
 
 /* ─── Demo-data ─── */
 
+// TODO: Replace with Supabase news table
 export const DEMO_NEWS = [
   {
     id: '1',
@@ -207,7 +208,8 @@ const INITIAL_FORUM: ForumPost[] = [];
 const INITIAL_GROUPS: ForumGroup[] = [];
 
 export function FeedView() {
-  const { feedTab, setFeedTab, showGrupper, setShowGrupper, addWishItem, shoppingItems, children, currentUser, setViewGroupId, setViewGroupName, setViewProfileUserId, setActiveTab } = useAppStore();
+  const { feedTab, setFeedTab, showGrupper, setShowGrupper, shoppingItems, children, currentUser, setViewGroupId, setViewGroupName, setViewProfileUserId, setActiveTab } = useAppStore();
+  const { createWishItem } = useApiActions();
 
   // Forum state
   const [forumPosts, setForumPosts] = useState<ForumPost[]>(INITIAL_FORUM);
@@ -487,16 +489,13 @@ export function FeedView() {
 
   const handleAddWish = () => {
     if (!newWishTitle.trim()) return;
-    const item: WishItem = {
-      id: `wish-${Date.now()}`,
+    createWishItem({
       title: newWishTitle.trim(),
       priceEstimate: newWishPrice ? Number(newWishPrice) : undefined,
       childId: children[0]?.id || '',
       addedBy: currentUser?.id || '',
       status: 'wanted',
-      createdAt: new Date().toISOString(),
-    };
-    addWishItem(item);
+    });
     setNewWishTitle('');
     setNewWishPrice('');
     setShowAddWish(false);
@@ -558,16 +557,13 @@ export function FeedView() {
   };
 
   const handleAddCatalogToWishlist = (product: CatalogProduct) => {
-    const item: WishItem = {
-      id: `wish-${Date.now()}`,
+    createWishItem({
       title: `${product.name}${product.unit ? ` (${product.unit})` : ''}`,
       priceEstimate: product.price,
       childId: children[0]?.id || '',
       addedBy: currentUser?.id || '',
       status: 'wanted',
-      createdAt: new Date().toISOString(),
-    };
-    addWishItem(item);
+    });
     setAddedCatalogId(product.id);
     setTimeout(() => setAddedCatalogId(null), 1200);
     toast.success(`${product.name} tilføjet til ønskelisten`);
@@ -640,16 +636,13 @@ export function FeedView() {
   };
 
   const handleAddGiftToWishlist = (offer: Offer) => {
-    const item: WishItem = {
-      id: `wish-${Date.now()}`,
+    createWishItem({
       title: offer.title,
       priceEstimate: offer.price,
       childId: children[0]?.id || '',
       addedBy: currentUser?.id || '',
       status: 'wanted',
-      createdAt: new Date().toISOString(),
-    };
-    addWishItem(item);
+    });
     setAddedOfferId(offer.id);
     setTimeout(() => setAddedOfferId(null), 1200);
     toast.success(`${offer.title} tilføjet til ønskelisten`);

@@ -74,7 +74,7 @@ export function TopBar() {
 
   const unreadNotifications = notifications.filter(n => !n.read).length;
   const currentChild = children[0];
-  const allowProfessionalTools = currentUser?.isAdmin === true;
+  const allowProfessionalTools = currentUser?.isAdmin === true || currentUser?.role === 'professional';
   const analyseFamilyMembers = isAnalyse ? [
     { id: null as string | null, name: 'Alle' },
     ...(currentUser ? [{ id: currentUser.id, name: currentUser.name?.split(' ')[0] ?? 'Mig' }] : []),

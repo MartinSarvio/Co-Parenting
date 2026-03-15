@@ -70,10 +70,14 @@ import type {
   RiskAssessment,
   ProfessionalDepartment,
   CaseActivity,
-  FamilyPhoto,
+  RoutineItem,
+  RoutineLog,
   FridgeItem,
-  WishItem,
+  CustodyPlan,
   BudgetGoal,
+  WishItem,
+  FamilyPhoto,
+  NotificationPreferences,
 } from '@/types';
 
 export interface InitialData {
@@ -97,10 +101,14 @@ export interface InitialData {
   riskAssessments: RiskAssessment[];
   departments: ProfessionalDepartment[];
   caseActivities: CaseActivity[];
-  photos: FamilyPhoto[];
+  routineItems: RoutineItem[];
+  routineLogs: RoutineLog[];
   fridgeItems: FridgeItem[];
-  wishItems: WishItem[];
+  custodyPlans: CustodyPlan[];
   budgetGoals: BudgetGoal[];
+  wishItems: WishItem[];
+  photos: FamilyPhoto[];
+  notificationPreferences: NotificationPreferences | null;
 }
 
 /**
@@ -166,10 +174,14 @@ export async function loadInitialData(): Promise<InitialData> {
     riskAssessmentsResult,
     departmentsResult,
     caseActivitiesResult,
-    photosResult,
+    routineItemsResult,
+    routineLogsResult,
     fridgeItemsResult,
-    wishItemsResult,
+    custodyPlansResult,
     budgetGoalsResult,
+    wishItemsResult,
+    photosResult,
+    notifPrefsResult,
   ] = await Promise.all([
     supabase.from('children').select('*').then(r => r.data as DbChild[] | null, () => null),
     supabase.from('calendar_events').select('*').order('start_date', { ascending: false }).limit(MAX_EVENTS).then(r => (r.data || []) as DbCalendarEvent[], () => [] as DbCalendarEvent[]),
@@ -189,10 +201,14 @@ export async function loadInitialData(): Promise<InitialData> {
     supabase.from('risk_assessments').select('*').then(r => (r.data || []) as DbRiskAssessment[], () => [] as DbRiskAssessment[]),
     supabase.from('professional_departments').select('*').then(r => (r.data || []) as DbProfessionalDepartment[], () => [] as DbProfessionalDepartment[]),
     supabase.from('case_activity_log').select('*').order('created_at', { ascending: false }).limit(200).then(r => (r.data || []) as DbCaseActivity[], () => [] as DbCaseActivity[]),
-    supabase.from('family_photos').select('*').order('added_at', { ascending: false }).then(r => r.data || [], () => []),
-    supabase.from('fridge_items').select('*').then(r => r.data || [], () => []),
-    supabase.from('wish_items').select('*').then(r => r.data || [], () => []),
-    supabase.from('budget_goals').select('*').then(r => r.data || [], () => []),
+    supabase.from('routine_items').select('*').then(r => (r.data || []) as any[], () => [] as any[]),
+    supabase.from('routine_logs').select('*').then(r => (r.data || []) as any[], () => [] as any[]),
+    supabase.from('fridge_items').select('*').then(r => (r.data || []) as any[], () => [] as any[]),
+    supabase.from('custody_plans').select('*').then(r => (r.data || []) as any[], () => [] as any[]),
+    supabase.from('budget_goals').select('*').then(r => (r.data || []) as any[], () => [] as any[]),
+    supabase.from('wish_items').select('*').then(r => (r.data || []) as any[], () => [] as any[]),
+    supabase.from('family_photos').select('*').order('taken_at', { ascending: false }).limit(200).then(r => (r.data || []) as any[], () => [] as any[]),
+    supabase.from('notification_preferences').select('*').eq('user_id', userId).single().then(r => r.data as any | null, () => null),
   ]);
 
   return {
@@ -216,40 +232,105 @@ export async function loadInitialData(): Promise<InitialData> {
     riskAssessments: riskAssessmentsResult.map(mapRiskAssessment),
     departments: departmentsResult.map(mapProfessionalDepartment),
     caseActivities: caseActivitiesResult.map(mapCaseActivity),
-    photos: (photosResult as Record<string, unknown>[]).map((r): FamilyPhoto => ({
-      id: r.id as string,
-      childId: r.child_id as string,
-      url: r.url as string,
-      caption: r.caption as string | undefined,
-      takenAt: r.taken_at as string,
-      addedBy: r.added_by as string,
-      addedAt: r.added_at as string,
+    routineItems: routineItemsResult.map((r: any): RoutineItem => ({
+      id: r.id,
+      childId: r.child_id,
+      category: r.category,
+      type: r.type,
+      label: r.label,
+      emoji: r.emoji,
+      order: r.order,
+      mealKey: r.meal_key ?? undefined,
+      isActive: r.is_active ?? true,
+      createdBy: r.created_by,
+      createdAt: r.created_at ?? '',
     })),
-    fridgeItems: (fridgeItemsResult as Record<string, unknown>[]).map((r): FridgeItem => ({
-      id: r.id as string,
-      name: r.name as string,
-      barcode: r.barcode as string | undefined,
-      addedAt: r.added_at as string,
-      addedBy: r.added_by as string,
-      expiresAt: r.expires_at as string | undefined,
-      nutritionPer100g: r.nutrition_per_100g as FridgeItem['nutritionPer100g'],
+    routineLogs: routineLogsResult.map((r: any): RoutineLog => ({
+      id: r.id,
+      routineItemId: r.routine_item_id,
+      childId: r.child_id,
+      date: r.date,
+      completed: r.completed ?? false,
+      completedAt: r.completed_at ?? undefined,
+      completedBy: r.completed_by ?? undefined,
+      time: r.time ?? undefined,
+      note: r.note ?? undefined,
+      linkedFoodLogId: r.linked_food_log_id ?? undefined,
     })),
-    wishItems: (wishItemsResult as Record<string, unknown>[]).map((r): WishItem => ({
-      id: r.id as string,
-      title: r.title as string,
-      priceEstimate: r.price_estimate as number | undefined,
-      link: r.link as string | undefined,
-      imageUrl: r.image_url as string | undefined,
-      description: r.description as string | undefined,
-      childId: r.child_id as string,
-      addedBy: r.added_by as string,
-      status: r.status as 'wanted' | 'bought',
-      boughtBy: r.bought_by as string | undefined,
-      createdAt: r.created_at as string,
+    fridgeItems: fridgeItemsResult.map((r: any): FridgeItem => ({
+      id: r.id,
+      name: r.name,
+      barcode: r.barcode ?? undefined,
+      addedAt: r.added_at ?? '',
+      addedBy: r.added_by ?? '',
+      expiresAt: r.expires_at ?? undefined,
+      nutritionPer100g: r.nutrition_per_100g ?? undefined,
+      allergens: r.allergens ?? undefined,
     })),
-    budgetGoals: (budgetGoalsResult as Record<string, unknown>[]).map((r): BudgetGoal => ({
-      category: r.category as string,
-      monthlyAmount: r.monthly_amount as number,
+    custodyPlans: custodyPlansResult.map((r: any): CustodyPlan => ({
+      id: r.id,
+      childId: r.child_id,
+      name: r.name,
+      pattern: r.pattern,
+      startDate: r.start_date ?? '',
+      swapDay: r.swap_day ?? 0,
+      swapTime: r.swap_time ?? '18:00',
+      swapLocation: r.swap_location ?? undefined,
+      parent1Weeks: r.parent1_weeks ?? undefined,
+      parent2Weeks: r.parent2_weeks ?? undefined,
+      parent1Days: r.parent1_days ?? [],
+      parent2Days: r.parent2_days ?? [],
+      weeklySchedule: r.weekly_schedule ?? undefined,
+      customWeekConfig: r.custom_week_config ?? undefined,
+      customSchedule: r.custom_schedule ?? undefined,
+      supervisedConfig: r.supervised_config ?? undefined,
+      holidays: r.holidays ?? undefined,
+      specialDays: r.special_days ?? undefined,
     })),
+    budgetGoals: budgetGoalsResult.map((r: any): BudgetGoal => ({
+      category: r.category,
+      monthlyAmount: r.monthly_amount ?? 0,
+    })),
+    wishItems: wishItemsResult.map((r: any): WishItem => ({
+      id: r.id,
+      title: r.title,
+      priceEstimate: r.price_estimate ?? undefined,
+      link: r.link ?? undefined,
+      imageUrl: r.image_url ?? undefined,
+      description: r.description ?? undefined,
+      childId: r.child_id,
+      addedBy: r.added_by,
+      status: r.status ?? 'wanted',
+      boughtBy: r.bought_by ?? undefined,
+      createdAt: r.created_at ?? '',
+    })),
+    photos: photosResult.map((r: any): FamilyPhoto => ({
+      id: r.id,
+      childId: r.child_id,
+      url: r.url,
+      caption: r.caption ?? undefined,
+      takenAt: r.taken_at ?? '',
+      addedBy: r.added_by,
+      addedAt: r.added_at ?? '',
+    })),
+    notificationPreferences: notifPrefsResult ? {
+      handoverReminders: notifPrefsResult.handover_reminders ?? true,
+      handoverReminderMinutes: notifPrefsResult.handover_reminder_minutes ?? 30,
+      scheduleChanges: notifPrefsResult.schedule_changes ?? true,
+      eventReminders: notifPrefsResult.event_reminders ?? true,
+      importantDates: notifPrefsResult.important_dates ?? true,
+      taskAssigned: notifPrefsResult.task_assigned ?? true,
+      taskDeadline: notifPrefsResult.task_deadline ?? true,
+      expensePending: notifPrefsResult.expense_pending ?? true,
+      expenseUpdates: notifPrefsResult.expense_updates ?? true,
+      newMessages: notifPrefsResult.new_messages ?? true,
+      professionalMessages: notifPrefsResult.professional_messages ?? true,
+      mealPlanReminder: notifPrefsResult.meal_plan_reminder ?? true,
+      shoppingReminder: notifPrefsResult.shopping_reminder ?? true,
+      cleaningReminder: notifPrefsResult.cleaning_reminder ?? true,
+      documentShared: notifPrefsResult.document_shared ?? true,
+      decisionProposed: notifPrefsResult.decision_proposed ?? true,
+      diaryReminder: notifPrefsResult.diary_reminder ?? true,
+    } : null,
   };
 }

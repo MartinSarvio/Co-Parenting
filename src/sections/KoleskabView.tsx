@@ -17,6 +17,7 @@ import {
 import { cn } from '@/lib/utils';
 import { fetchFromOpenFoodFacts, startBarcodeScanner } from '@/lib/openFoodFacts';
 import { useAppStore } from '@/store';
+import { useApiActions } from '@/hooks/useApiActions';
 import { toast } from 'sonner';
 import { BottomSheet } from '@/components/custom/BottomSheet';
 import { NutriScoreBadge } from '@/components/custom/NutriScoreBadge';
@@ -26,7 +27,8 @@ import { matchFamilyAllergens } from '@/lib/allergenMatch';
 import type { FridgeItem } from '@/types';
 
 export function KoleskabView() {
-  const { currentUser, users, children, fridgeItems, addFridgeItem, removeFridgeItem, archiveFridgeItem, updateFridgeItem } = useAppStore();
+  const { currentUser, users, children, fridgeItems } = useAppStore();
+  const { createFridgeItem, deleteFridgeItem, updateFridgeItem: apiUpdateFridgeItem, archiveFridgeItem: apiArchiveFridgeItem } = useApiActions();
   const nutriScoreMap = useNutriScoreMap();
   const allergenMapData = useAllergenMap();
   const familyAllergenProfiles = useMemo(() => {
@@ -123,20 +125,20 @@ export function KoleskabView() {
       allergens: formAllergens,
     };
 
-    addFridgeItem(item);
+    createFridgeItem(item);
     toast.success(`${name} tilføjet til køleskabet`);
     setAddDialogOpen(false);
     resetForm();
   }
 
   function handleRemoveItem(item: FridgeItem) {
-    removeFridgeItem(item.id);
+    deleteFridgeItem(item.id);
     setMenuItem(null);
     toast('Fjernet fra køleskabet');
   }
 
   function handleArchive(item: FridgeItem, reason: 'used' | 'thrown_away') {
-    archiveFridgeItem(item.id, reason);
+    apiArchiveFridgeItem(item.id, reason);
     setMenuItem(null);
     toast.success(reason === 'used' ? `${item.name} markeret som brugt` : `${item.name} markeret som smidt ud`);
   }
@@ -150,7 +152,7 @@ export function KoleskabView() {
 
   function handleSaveEdit() {
     if (!editingItem || !editName.trim()) return;
-    updateFridgeItem(editingItem.id, { name: editName.trim(), expiresAt: editExpiry || undefined });
+    apiUpdateFridgeItem(editingItem.id, { name: editName.trim(), expiresAt: editExpiry || undefined });
     setEditingItem(null);
     toast.success('Vare opdateret');
   }

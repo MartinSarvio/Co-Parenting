@@ -112,13 +112,12 @@ export function SettingsView() {
     setSideMenuOpen,
     sideMenuContext,
     notificationPreferences,
-    updateNotificationPreferences,
     activeSettingsTab,
     setActiveSettingsTab,
     settingsDetailView,
     setSettingsDetailView,
   } = useAppStore();
-  const { createDocument } = useApiActions();
+  const { createDocument, saveNotificationPreferences } = useApiActions();
 
   const [isSaving, setIsSaving] = useState(false);
   const [profileDraft, setProfileDraft] = useState({
@@ -146,11 +145,7 @@ export function SettingsView() {
     accountLabel: '',
     accountHandle: ''
   });
-  const [lawyerDraft, setLawyerDraft] = useState({
-    name: '',
-    email: ''
-  });
-  const [evidenceDraft, setEvidenceDraft] = useState({
+const [evidenceDraft, setEvidenceDraft] = useState({
     title: '',
     url: '',
     description: ''
@@ -185,17 +180,13 @@ export function SettingsView() {
   const features = getPlanFeatures(household, currentUser?.isAdmin);
   const currentMode = household?.familyMode || 'co_parenting';
   const isTogetherMode = currentMode === 'together';
-  const allowProfessionalTools = currentUser?.isAdmin === true;
+  const allowProfessionalTools = currentUser?.isAdmin === true || currentUser?.role === 'professional';
 
   const myPaymentAccounts = useMemo(() => {
     if (!currentUser) return [];
     return paymentAccounts.filter((account) => account.userId === currentUser.id);
   }, [paymentAccounts, currentUser]);
 
-  const lawyerUsers = useMemo(() => {
-    const lawyerIds = household?.singleParentSupport?.lawyerIds || [];
-    return users.filter((user) => lawyerIds.includes(user.id));
-  }, [household, users]);
 
   const evidenceDocuments = useMemo(() => {
     return documents.filter((document) => (
@@ -419,46 +410,6 @@ export function SettingsView() {
     });
   };
 
-  const handleInviteLawyer = () => {
-    if (!household) return;
-    if (!features.lawyerAccess) {
-      toast.error('Advokatadgang kræver Enlig Plus abonnement');
-      return;
-    }
-    if (!lawyerDraft.name.trim() || !lawyerDraft.email.trim()) {
-      toast.error('Udfyld navn og email');
-      return;
-    }
-
-    const lawyerId = generateUserId();
-    addUser({
-      id: lawyerId,
-      name: lawyerDraft.name.trim(),
-      email: lawyerDraft.email.trim(),
-      role: 'professional',
-      professionalType: 'lawyer',
-      organization: 'Ekstern advokat',
-      color: 'neutral',
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(lawyerDraft.name.trim())}`
-    });
-
-    const support = household.singleParentSupport || {
-      evidenceVaultEnabled: true,
-      autoArchiveReceipts: true,
-      lawyerIds: []
-    };
-
-    setHousehold({
-      ...household,
-      singleParentSupport: {
-        ...support,
-        lawyerIds: [...support.lawyerIds, lawyerId]
-      }
-    });
-
-    setLawyerDraft({ name: '', email: '' });
-    toast.success('Advokat inviteret og fået adgang');
-  };
 
   const handleAddEvidence = () => {
     if (!currentUser || !household) return;
@@ -471,17 +422,11 @@ export function SettingsView() {
       return;
     }
 
-    const support = household.singleParentSupport || {
-      evidenceVaultEnabled: true,
-      autoArchiveReceipts: true,
-      lawyerIds: []
-    };
-
     createDocument({
       title: evidenceDraft.title.trim(),
       type: 'authority_document',
       url: evidenceDraft.url.trim(),
-      sharedWith: [currentUser.id, ...support.lawyerIds],
+      sharedWith: [currentUser.id],
       isOfficial: true,
     });
 
@@ -1100,41 +1045,10 @@ export function SettingsView() {
                 </div>
 
                 <div className="rounded-[8px] border border-border bg-card p-3">
-                  <p className="mb-2 text-sm font-medium">Inviter advokat</p>
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    <Input
-                      value={lawyerDraft.name}
-                      onChange={(e) => setLawyerDraft((prev) => ({ ...prev, name: e.target.value }))}
-                      placeholder="Navn"
-                    />
-                    <Input
-                      value={lawyerDraft.email}
-                      onChange={(e) => setLawyerDraft((prev) => ({ ...prev, email: e.target.value }))}
-                      placeholder="Email"
-                    />
-                  </div>
-                  <Button className="mt-2 w-full" variant="outline" onClick={handleInviteLawyer} disabled={!features.lawyerAccess}>
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    Tilføj advokatadgang
-                  </Button>
-                  {!features.lawyerAccess && (
-                    <p className="text-xs text-muted-foreground mt-1">Kræver Enlig Plus abonnement</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  {lawyerUsers.length === 0 ? (
-                    <p className="rounded-[8px] border border-dashed border-border bg-card p-3 text-sm text-muted-foreground">
-                      Ingen advokater tilknyttet endnu.
-                    </p>
-                  ) : (
-                    lawyerUsers.map((lawyer) => (
-                      <div key={lawyer.id} className="rounded-[8px] border border-border bg-card p-3">
-                        <p className="font-medium">{lawyer.name}</p>
-                        <p className="text-[13px] text-muted-foreground">{lawyer.email}</p>
-                      </div>
-                    ))
-                  )}
+                  <p className="mb-1 text-sm font-medium">Del med din advokat</p>
+                  <p className="text-[13px] text-muted-foreground">
+                    Eksportér dokumenter fra Dokumenter-sektionen og del dem sikkert med din advokat via email eller besked.
+                  </p>
                 </div>
 
                 <div className="rounded-[8px] border border-border bg-card p-3">
@@ -1585,8 +1499,10 @@ export function SettingsView() {
                     <UserPlus className="mr-2 h-4 w-4" />
                     Tilføj familiemedlem
                   </Button>
+
                 </>
               )}
+
         </TabsContent>
 
         {/* ─── Notifikationer (fra sidepanel) ─── */}
@@ -1610,7 +1526,7 @@ export function SettingsView() {
                     <Label htmlFor="reminder-minutes" className="text-[13px] text-muted-foreground">Påmind mig (minutter før aflevering)</Label>
                     <SelectSheet
                       value={String(notificationPreferences.handoverReminderMinutes)}
-                      onValueChange={(v) => updateNotificationPreferences({ handoverReminderMinutes: Number(v) })}
+                      onValueChange={(v) => saveNotificationPreferences({ handoverReminderMinutes: Number(v) })}
                       title="Påmindelsestid"
                       options={[
                         { value: '15', label: '15 minutter' },
@@ -1698,14 +1614,14 @@ export function SettingsView() {
                         <p className="text-[15px] font-medium text-foreground">Afleveringspåmindelser</p>
                         <p className="text-[13px] text-muted-foreground">Før hver aflevering</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.handoverReminders} onCheckedChange={(v) => updateNotificationPreferences({ handoverReminders: v })} />
+                      <IOSSwitch checked={notificationPreferences.handoverReminders} onCheckedChange={(v) => saveNotificationPreferences({ handoverReminders: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
                         <p className="text-[15px] font-medium text-foreground">Samværsændringer</p>
                         <p className="text-[13px] text-muted-foreground">Bytteanmodninger & planændringer</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.scheduleChanges} onCheckedChange={(v) => updateNotificationPreferences({ scheduleChanges: v })} />
+                      <IOSSwitch checked={notificationPreferences.scheduleChanges} onCheckedChange={(v) => saveNotificationPreferences({ scheduleChanges: v })} />
                     </div>
                   </div>
                 </div>
@@ -1720,14 +1636,14 @@ export function SettingsView() {
                         <p className="text-[15px] font-medium text-foreground">Kalenderbegivenheder</p>
                         <p className="text-[13px] text-muted-foreground">Nye events & ændringer</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.eventReminders} onCheckedChange={(v) => updateNotificationPreferences({ eventReminders: v })} />
+                      <IOSSwitch checked={notificationPreferences.eventReminders} onCheckedChange={(v) => saveNotificationPreferences({ eventReminders: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
                         <p className="text-[15px] font-medium text-foreground">Vigtige datoer</p>
                         <p className="text-[13px] text-muted-foreground">Fødselsdage, vaccinationer, skole</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.importantDates} onCheckedChange={(v) => updateNotificationPreferences({ importantDates: v })} />
+                      <IOSSwitch checked={notificationPreferences.importantDates} onCheckedChange={(v) => saveNotificationPreferences({ importantDates: v })} />
                     </div>
                   </div>
                 </div>
@@ -1742,14 +1658,14 @@ export function SettingsView() {
                         <p className="text-[15px] font-medium text-foreground">Opgavetildeling</p>
                         <p className="text-[13px] text-muted-foreground">Når du får en ny opgave</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.taskAssigned} onCheckedChange={(v) => updateNotificationPreferences({ taskAssigned: v })} />
+                      <IOSSwitch checked={notificationPreferences.taskAssigned} onCheckedChange={(v) => saveNotificationPreferences({ taskAssigned: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
                         <p className="text-[15px] font-medium text-foreground">Deadlines</p>
                         <p className="text-[13px] text-muted-foreground">Forfaldne & kommende opgaver</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.taskDeadline} onCheckedChange={(v) => updateNotificationPreferences({ taskDeadline: v })} />
+                      <IOSSwitch checked={notificationPreferences.taskDeadline} onCheckedChange={(v) => saveNotificationPreferences({ taskDeadline: v })} />
                     </div>
                   </div>
                 </div>
@@ -1764,14 +1680,14 @@ export function SettingsView() {
                         <p className="text-[15px] font-medium text-foreground">Nye udgifter</p>
                         <p className="text-[13px] text-muted-foreground">Afventer din godkendelse</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.expensePending} onCheckedChange={(v) => updateNotificationPreferences({ expensePending: v })} />
+                      <IOSSwitch checked={notificationPreferences.expensePending} onCheckedChange={(v) => saveNotificationPreferences({ expensePending: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
                         <p className="text-[15px] font-medium text-foreground">Udgiftsopdateringer</p>
                         <p className="text-[13px] text-muted-foreground">Godkendt, afvist, anfægtet</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.expenseUpdates} onCheckedChange={(v) => updateNotificationPreferences({ expenseUpdates: v })} />
+                      <IOSSwitch checked={notificationPreferences.expenseUpdates} onCheckedChange={(v) => saveNotificationPreferences({ expenseUpdates: v })} />
                     </div>
                   </div>
                 </div>
@@ -1786,14 +1702,14 @@ export function SettingsView() {
                         <p className="text-[15px] font-medium text-foreground">Nye beskeder</p>
                         <p className="text-[13px] text-muted-foreground">Kommunikation & dagbog</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.newMessages} onCheckedChange={(v) => updateNotificationPreferences({ newMessages: v })} />
+                      <IOSSwitch checked={notificationPreferences.newMessages} onCheckedChange={(v) => saveNotificationPreferences({ newMessages: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
                         <p className="text-[15px] font-medium text-foreground">Professionelle beskeder</p>
                         <p className="text-[13px] text-muted-foreground">Fra fagpersoner</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.professionalMessages} onCheckedChange={(v) => updateNotificationPreferences({ professionalMessages: v })} />
+                      <IOSSwitch checked={notificationPreferences.professionalMessages} onCheckedChange={(v) => saveNotificationPreferences({ professionalMessages: v })} />
                     </div>
                   </div>
                 </div>
@@ -1808,21 +1724,21 @@ export function SettingsView() {
                         <p className="text-[15px] font-medium text-foreground">Madplan</p>
                         <p className="text-[13px] text-muted-foreground">Daglig påmindelse om aftensmad</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.mealPlanReminder} onCheckedChange={(v) => updateNotificationPreferences({ mealPlanReminder: v })} />
+                      <IOSSwitch checked={notificationPreferences.mealPlanReminder} onCheckedChange={(v) => saveNotificationPreferences({ mealPlanReminder: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
                         <p className="text-[15px] font-medium text-foreground">Indkøb</p>
                         <p className="text-[13px] text-muted-foreground">Ugentlig indkøbspåmindelse</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.shoppingReminder} onCheckedChange={(v) => updateNotificationPreferences({ shoppingReminder: v })} />
+                      <IOSSwitch checked={notificationPreferences.shoppingReminder} onCheckedChange={(v) => saveNotificationPreferences({ shoppingReminder: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
                         <p className="text-[15px] font-medium text-foreground">Rengøring</p>
                         <p className="text-[13px] text-muted-foreground">Rengøringsopgave-påmindelser</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.cleaningReminder} onCheckedChange={(v) => updateNotificationPreferences({ cleaningReminder: v })} />
+                      <IOSSwitch checked={notificationPreferences.cleaningReminder} onCheckedChange={(v) => saveNotificationPreferences({ cleaningReminder: v })} />
                     </div>
                   </div>
                 </div>
@@ -1837,14 +1753,14 @@ export function SettingsView() {
                         <p className="text-[15px] font-medium text-foreground">Delte dokumenter</p>
                         <p className="text-[13px] text-muted-foreground">Nye filer delt med dig</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.documentShared} onCheckedChange={(v) => updateNotificationPreferences({ documentShared: v })} />
+                      <IOSSwitch checked={notificationPreferences.documentShared} onCheckedChange={(v) => saveNotificationPreferences({ documentShared: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
                         <p className="text-[15px] font-medium text-foreground">Beslutningsforslag</p>
                         <p className="text-[13px] text-muted-foreground">Nye forslag der kræver svar</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.decisionProposed} onCheckedChange={(v) => updateNotificationPreferences({ decisionProposed: v })} />
+                      <IOSSwitch checked={notificationPreferences.decisionProposed} onCheckedChange={(v) => saveNotificationPreferences({ decisionProposed: v })} />
                     </div>
                   </div>
                 </div>
@@ -1859,7 +1775,7 @@ export function SettingsView() {
                         <p className="text-[15px] font-medium text-foreground">Dagbogspåmindelse</p>
                         <p className="text-[13px] text-muted-foreground">Daglig påmindelse om at logge</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.diaryReminder} onCheckedChange={(v) => updateNotificationPreferences({ diaryReminder: v })} />
+                      <IOSSwitch checked={notificationPreferences.diaryReminder} onCheckedChange={(v) => saveNotificationPreferences({ diaryReminder: v })} />
                     </div>
                   </div>
                 </div>
@@ -2451,7 +2367,7 @@ export function SettingsView() {
                 <div>
                   <p className="text-[15px] font-medium text-foreground dark:text-slate-200">Professionel visning</p>
                   <p className="text-[13px] text-muted-foreground dark:text-slate-400">
-                    {allowProfessionalTools ? 'Kan slås til/fra' : 'Kun tilgængelig for administratorer'}
+                    {allowProfessionalTools ? 'Kan slås til/fra' : 'Kun tilgængelig for professionelle brugere og administratorer'}
                   </p>
                 </div>
                 <IOSSwitch
@@ -2553,6 +2469,9 @@ export function SettingsView() {
           </div>
         </DialogContent>
       </Dialog>
+
+
+
       <SavingOverlay open={isSaving} />
     </div>
   );

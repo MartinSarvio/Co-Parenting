@@ -9,6 +9,7 @@ const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
+const WebLoginPage = lazy(() => import('./pages/WebLoginPage'));
 
 function LoadingFallback() {
   return (
@@ -32,9 +33,11 @@ export function WebApp() {
   const isAbout = route === '#om';
   const isContact = route === '#kontakt';
   const isTerms = route === '#vilkar';
-  const hideChrome = isAdmin;
+  const isLogin = route === '#login';
+  const hideChrome = isAdmin || isLogin;
 
   const renderPage = () => {
+    if (isLogin) return <WebLoginPage />;
     if (isAdmin) return <AdminPage />;
     if (isPrivacy) return <PrivacyPage />;
     if (isAbout) return <AboutPage />;

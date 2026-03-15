@@ -1,109 +1,112 @@
-import { Instagram, Twitter, Linkedin } from 'lucide-react';
+import { useState } from 'react';
+import { Heart, Send } from 'lucide-react';
 
 export function Footer() {
-  const productLinks = [
-    { label: 'Samværsplan', href: '#funktioner' },
-    { label: 'Kalender', href: '#funktioner' },
-    { label: 'Kommunikation', href: '#funktioner' },
-    { label: 'Udgifter', href: '#funktioner' },
-    { label: 'Alle funktioner', href: '#funktioner' },
-  ];
+  const [email, setEmail] = useState('');
+  const [subscribed, setSubscribed] = useState(false);
 
-  const companyLinks = [
-    { label: 'Om os', href: '#om' },
-    { label: 'Kontakt', href: '#kontakt' },
-    { label: 'Privatlivspolitik', href: '#privatlivspolitik' },
-    { label: 'Vilkår og betingelser', href: '#' },
-  ];
+  const handleNewsletterSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email) {
+      setSubscribed(true);
+      setEmail('');
+    }
+  };
 
   return (
-    <footer className="bg-[#0f0f0f]">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-10">
-        {/* Main grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-8">
+    <footer className="relative bg-[#1a1a1a] text-white/80 overflow-hidden">
+      {/* Gradient top border */}
+      <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: 'linear-gradient(90deg, transparent, #f58a2d, #f7a95c, #f58a2d, transparent)' }} />
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
           {/* Brand */}
-          <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-3 mb-4">
-              <img src="/huska-logo.svg" alt="Huska" className="h-10 w-10 rounded-2xl" />
-              <span className="text-[18px] font-bold text-white tracking-tight">Huska</span>
+          <div>
+            <div className="flex items-center gap-2.5 mb-4">
+              <img src="/huska-logo.svg" alt="Huska" className="h-9 w-9 rounded-xl" />
+              <span className="text-lg font-bold text-white tracking-tight">Huska</span>
             </div>
-            <p className="text-[13px] text-white/35 max-w-[240px] leading-relaxed">
-              Koordinér hverdagen sammen. Én sandhedskilde for hele familien.
+            <p className="text-sm text-white/50 max-w-xs leading-relaxed">
+              Koordinér hverdagen sammen. Én sandhedskilde for hele familien
+              med overblik, struktur og mindre friktion.
             </p>
-            {/* Social icons */}
-            <div className="flex items-center gap-3 mt-5">
-              <a href="#" className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
-                <Instagram size={15} className="text-white/40" />
-              </a>
-              <a href="#" className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
-                <Twitter size={15} className="text-white/40" />
-              </a>
-              <a href="#" className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
-                <Linkedin size={15} className="text-white/40" />
-              </a>
+
+            {/* Social links */}
+            <div className="flex gap-3 mt-5">
+              {['Facebook', 'Instagram', 'LinkedIn'].map((social) => (
+                <a
+                  key={social}
+                  href="#"
+                  className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all duration-200 text-[11px] font-bold"
+                  title={social}
+                >
+                  {social.charAt(0)}
+                </a>
+              ))}
             </div>
           </div>
 
-          {/* Product */}
+          {/* Links */}
           <div>
-            <h3 className="text-[12px] font-semibold text-white/50 uppercase tracking-[0.15em] mb-4">Produkt</h3>
-            <ul className="space-y-2.5">
-              {productLinks.map((link) => (
-                <li key={link.label}>
-                  <a href={link.href} className="text-[13px] text-white/35 hover:text-white transition-colors">
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Company */}
-          <div>
-            <h3 className="text-[12px] font-semibold text-white/50 uppercase tracking-[0.15em] mb-4">Virksomhed</h3>
-            <ul className="space-y-2.5">
-              {companyLinks.map((link) => (
-                <li key={link.label}>
-                  <a href={link.href} className="text-[13px] text-white/35 hover:text-white transition-colors">
-                    {link.label}
-                  </a>
-                </li>
-              ))}
+            <h3 className="text-[13px] font-bold text-white/70 uppercase tracking-wider mb-4">Navigation</h3>
+            <ul className="space-y-2.5 text-sm">
+              <li><a href="#funktioner" className="text-white/50 hover:text-white transition-colors">Funktioner</a></li>
+              <li><a href="#hvordan" className="text-white/50 hover:text-white transition-colors">Sådan virker det</a></li>
+              <li><a href="#om" className="text-white/50 hover:text-white transition-colors">Om os</a></li>
+              <li><a href="#login" className="text-white/50 hover:text-white transition-colors">Log ind</a></li>
             </ul>
           </div>
 
           {/* Contact */}
           <div>
-            <h3 className="text-[12px] font-semibold text-white/50 uppercase tracking-[0.15em] mb-4">Kontakt</h3>
-            <ul className="space-y-2.5 text-[13px]">
-              <li>
-                <a href="mailto:kontakt@huska.dk" className="text-white/35 hover:text-white transition-colors">
-                  kontakt@huska.dk
-                </a>
-              </li>
-              <li className="text-white/25">Danmark</li>
+            <h3 className="text-[13px] font-bold text-white/70 uppercase tracking-wider mb-4">Info</h3>
+            <ul className="space-y-2.5 text-sm">
+              <li className="text-white/50">kontakt@huska.dk</li>
+              <li><a href="#privatlivspolitik" className="text-white/50 hover:text-white transition-colors">Privatlivspolitik</a></li>
+              <li><a href="#kontakt" className="text-white/50 hover:text-white transition-colors">Kontakt</a></li>
+              <li><a href="#vilkar" className="text-white/50 hover:text-white transition-colors">Vilkår og betingelser</a></li>
             </ul>
+          </div>
 
-            <div className="mt-6">
-              <a
-                href="https://apps.apple.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-4 py-2 text-[12px] font-semibold text-white/60 rounded-full border border-white/10 hover:border-white/25 hover:text-white transition-colors"
-              >
-                Hent appen
-              </a>
-            </div>
+          {/* Newsletter */}
+          <div>
+            <h3 className="text-[13px] font-bold text-white/70 uppercase tracking-wider mb-4">Nyhedsbrev</h3>
+            <p className="text-sm text-white/50 mb-4 leading-relaxed">
+              Få tips til familien og nyheder om Huska.
+            </p>
+            {subscribed ? (
+              <div className="flex items-center gap-2 text-sm text-[#10b981]">
+                <Heart size={14} className="fill-[#10b981]" />
+                Tak for din tilmelding!
+              </div>
+            ) : (
+              <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="din@email.dk"
+                  required
+                  className="flex-1 min-w-0 px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]/30 transition-all"
+                />
+                <button
+                  type="submit"
+                  className="px-3.5 py-2.5 rounded-xl text-white font-medium transition-all duration-200 hover:shadow-lg hover:shadow-[#f58a2d]/20 shrink-0"
+                  style={{ background: 'linear-gradient(135deg, #f7a95c, #e8773f)' }}
+                >
+                  <Send size={16} />
+                </button>
+              </form>
+            )}
           </div>
         </div>
 
-        {/* Bottom bar */}
-        <div className="mt-14 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-[12px] text-white/20">
-            &copy; {new Date().getFullYear()} Huska · Alle rettigheder forbeholdes
+        <div className="mt-12 pt-6 border-t border-white/8 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-[12px] text-white/30">
+            &copy; {new Date().getFullYear()} Huska. Alle rettigheder forbeholdes.
           </p>
-          <p className="text-[12px] text-white/20">
-            Lavet med omhu i Danmark 🇩🇰
+          <p className="text-[12px] text-white/30 flex items-center gap-1">
+            Lavet med <Heart size={11} className="text-[#f58a2d]/60 fill-[#f58a2d]/60" /> i Danmark
           </p>
         </div>
       </div>
