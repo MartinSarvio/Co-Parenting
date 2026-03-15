@@ -7,7 +7,7 @@
   min-height: 100%;
   display: flex;
   justify-content: center;
-  background-color: #fef8f0;
+  background-color: #f2f1ed;
 }
 
 .app-shell {
@@ -52,13 +52,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   overscroll-behavior-y: none;
   color: #2b2b28;
-}
-
-/* Main content scroll — ensures smooth scroll on iOS */
-main {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
 }
 
 /* Safe area for mobile devices */

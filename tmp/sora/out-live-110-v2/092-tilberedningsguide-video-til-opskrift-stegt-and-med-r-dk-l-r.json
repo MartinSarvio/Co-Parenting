@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624246,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a81975db208193bc8b3e0c50b929b5070b4d219f5b0136",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Stegt and med r\u00f8dk\u00e5l. Retbeskrivelse: Stegt andebryster med r\u00f8dk\u00e5l og brunede kartofler \u2013 julemad.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Andebryster, R\u00f8dk\u00e5l, Kartofler (sm\u00e5), Sm\u00f8r, Sukker, Salt, Peber. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Kryds andeskindet. Krydr med salt. Steg skindsiden ned ved middel varme 10 min. | Trin 2: Vend og steg 5 min mere. Hvil k\u00f8det i s\u00f8lvpapir. | Trin 3: Brunede kartofler: kog kartofler, steg i sm\u00f8r og sukker. | Trin 4: Varm r\u00f8dk\u00e5l. Server det hele sammen med sovs.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

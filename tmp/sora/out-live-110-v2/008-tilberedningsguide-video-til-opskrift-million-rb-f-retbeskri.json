@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624207,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8194f4f308191a44ffc07d91e497a0344e6b9f76dab9e",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Million\u00e6rb\u00f8f. Retbeskrivelse: Hakket oksek\u00f8d i cremet sovs med l\u00f8g og champignon.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Hakket oksek\u00f8d, L\u00f8g, Champignon, Madlavningsfl\u00f8de, Tomatpur\u00e9, Soja, Sm\u00f8r, Ris. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Hak l\u00f8g og sk\u00e6r champignon i skiver. | Trin 2: Brun oksek\u00f8det i sm\u00f8r. Tils\u00e6t l\u00f8g og champignon, svits 5 min. | Trin 3: Tils\u00e6t fl\u00f8de, tomatpur\u00e9 og soja. Lad simre 10 min. | Trin 4: Kog ris. Server million\u00e6rb\u00f8ffen over risene.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

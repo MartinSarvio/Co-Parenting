@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624231,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a81966f530819096015b9b5810eb15018413be8c4fa673",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Oksesteg med brun sovs. Retbeskrivelse: M\u00f8r oksesteg langtidstilberedt med rig brun sovs.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Oksesteg (culotte), L\u00f8g, Guler\u00f8dder, Oksefond, R\u00f8dvin, Sm\u00f8r, Timian, Laurb\u00e6rblad. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Brun stegen i sm\u00f8r p\u00e5 alle sider. Flyt til bradepande. | Trin 2: Svits l\u00f8g og guler\u00f8dder. Tils\u00e6t r\u00f8dvin og fond. H\u00e6ld over stegen. | Trin 3: Tils\u00e6t timian og laurb\u00e6r. Tilbered ved 150\u00b0C i 2-2,5 timer. | Trin 4: Lad stegen hvile. Si sovsen og j\u00e6vn. Server med kartofler.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

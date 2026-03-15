@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624225,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8196111e08198bda25a29fff9bf340fcdd42f1380b447",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: \u00d8llebr\u00f8d. Retbeskrivelse: Gammeldags dansk \u00f8llebr\u00f8d med fl\u00f8deskum.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Rugbr\u00f8d (gammelt), Hvidt\u00f8l, Vand, Sukker, Citron (saft), Piskefl\u00f8de. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Bryd rugbr\u00f8det i stykker. L\u00e6g i bl\u00f8d i \u00f8l og vand natten over. | Trin 2: Kog blandingen op under omr\u00f8ring i 15 min til den er j\u00e6vn. | Trin 3: Smag til med sukker og citronsaft. | Trin 4: Server varm med fl\u00f8deskum.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Morgenmad. B\u00f8rnevenlig: nej.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

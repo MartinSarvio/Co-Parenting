@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624250,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8197a3b248190964ad4d53e5e5f1c0c47291658e498c2",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: P\u00f8lsehorn. Retbeskrivelse: Hjemmebagte p\u00f8lsehorn med butterdej \u2013 b\u00f8rnenes yndlings-snack.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Butterdej, P\u00f8lser, \u00c6g, Sesamfr\u00f8, Sennep. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Rul butterdej ud og sk\u00e6r i trekanter. | Trin 2: Sm\u00f8r sennep p\u00e5 dejen. Rul en p\u00f8lse i hver trekant. | Trin 3: Pensle med pisket \u00e6g. Drys med sesamfr\u00f8. | Trin 4: Bag ved 200\u00b0C i 15-18 min til de er gyldne.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Snacks. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

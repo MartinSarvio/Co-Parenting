@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624211,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8195301b88190a3e06fba25dd1bf90f5e57b78dad7d52",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Hjemmelavet pizza. Retbeskrivelse: Spr\u00f8d hjemmelavet pizza med tomatsovs og mozzarella.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Hvedemel, G\u00e6r, Vand, Olivenolie, Tomatpassata, Mozzarella, Skinke, Oregano. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Opl\u00f8s g\u00e6r i lunkent vand. Bland mel, olie og g\u00e6rvand til en dej. \u00c6lt 10 min. | Trin 2: Lad dejen h\u00e6ve 30 min under et viskestykke. | Trin 3: Rul dejen ud. Sm\u00f8r passata p\u00e5. Top med revet mozzarella og skinke. | Trin 4: Bag ved 250\u00b0C i 10-12 min til bunden er spr\u00f8d.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

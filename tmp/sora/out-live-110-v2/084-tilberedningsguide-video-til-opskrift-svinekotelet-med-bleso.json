@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624241,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8197183a88193b6a54e5d8da5e2790d810ab936a0a495",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Svinekotelet med \u00e6blesovs. Retbeskrivelse: Stegt svinekotelet med hjemmelavet \u00e6blesovs og kartofler.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Svinekotelet, \u00c6bler, Sukker, Sm\u00f8r, Kartofler, Salt, Peber. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Skr\u00e6l \u00e6bler. Kog med sukker og lidt vand til mos. | Trin 2: Krydr koteletter med salt og peber. Steg i sm\u00f8r 4-5 min pr side. | Trin 3: Kog kartofler i saltet vand. | Trin 4: Server koteletter med \u00e6blesovs og kartofler.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

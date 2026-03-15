@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624223,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8195f68bc8198b806d9a9a7a4aa3e05f03504eab51781",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Koldsk\u00e5l med kammerjunker. Retbeskrivelse: Klassisk dansk sommer-dessert med buttermilk og kammerjunker.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): K\u00e6rnem\u00e6lk, Yoghurt, \u00c6g (\u00e6ggeblomme), Sukker, Vaniljesukker, Citron (saft), Kammerjunker. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Pisk \u00e6ggeblommer og sukker hvidt. Tils\u00e6t vaniljesukker og citronsaft. | Trin 2: R\u00f8r k\u00e6rnem\u00e6lk og yoghurt i. | Trin 3: S\u00e6t i k\u00f8leskabet i minimum 30 min. | Trin 4: Server med kammerjunker og evt. friske jordb\u00e6r.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Dessert. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

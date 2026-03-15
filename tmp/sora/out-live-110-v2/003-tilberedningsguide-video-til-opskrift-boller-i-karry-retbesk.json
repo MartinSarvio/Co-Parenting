@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624204,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8194c7de88191aa6b8639b8801c440c621b86497e4cfb",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Boller i karry. Retbeskrivelse: Bl\u00f8de k\u00f8dboller i en mild karrysovs, serveret med ris.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Hakket kalvek\u00f8d, L\u00f8g, \u00c6g, Rasp, Karry, Sm\u00f8r, Hvedemel, Kyllingefond. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Hak den ene l\u00f8g fint og bland med k\u00f8d, \u00e6g og rasp. Krydr med salt. | Trin 2: Form sm\u00e5 boller med en teskefuld fars ad gangen. | Trin 3: Hak den anden l\u00f8g. Smelt sm\u00f8r, svits l\u00f8g, tils\u00e6t karry og mel. | Trin 4: Tils\u00e6t fond og fl\u00f8de under omr\u00f8ring. L\u00e6g bollerne i sovsen. | Trin 5: Lad simre i 20 min under l\u00e5g. Kog ris som tilbeh\u00f8r.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

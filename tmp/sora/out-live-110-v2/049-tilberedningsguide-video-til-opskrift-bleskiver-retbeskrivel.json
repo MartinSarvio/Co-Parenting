@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624224,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8196005a88190a09be9e44b6349f805f19bdb69385d6d",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: \u00c6bleskiver. Retbeskrivelse: Klassiske danske \u00e6bleskiver med flormelis og syltet\u00f8j.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Hvedemel, K\u00e6rnem\u00e6lk, \u00c6g, Sukker, Natron, Kardemomme, Salt, Sm\u00f8r (til stegning). Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Bland mel, sukker, natron, kardemomme og salt. Tils\u00e6t \u00e6ggeblommer og k\u00e6rnem\u00e6lk. | Trin 2: Pisk \u00e6ggehvider stive og vend dem forsigtigt i dejen. | Trin 3: Smelt sm\u00f8r i \u00e6bleskivepande. Fyld hullerne og steg 2-3 min. Vend. | Trin 4: Server med flormelis og syltet\u00f8j.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Bagv\u00e6rk. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

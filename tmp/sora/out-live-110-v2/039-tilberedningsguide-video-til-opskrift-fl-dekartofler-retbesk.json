@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624220,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8195c97c48198955531fcc38907e60c890cb6ba43ea04",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Fl\u00f8dekartofler. Retbeskrivelse: Ovnbagte kartofler i fl\u00f8de og hvidl\u00f8g.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Kartofler, Fl\u00f8de, M\u00e6lk, Hvidl\u00f8g, Revet ost, Salt, Muskatn\u00f8d. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Sk\u00e6r kartofler i tynde skiver. Pres hvidl\u00f8g. | Trin 2: Bland fl\u00f8de, m\u00e6lk, hvidl\u00f8g, salt og muskat. | Trin 3: Lag kartofler i smurt fad. H\u00e6ld fl\u00f8de-blanding over. Top med ost. | Trin 4: Bag ved 180\u00b0C i 45-50 min til gylden og m\u00f8r.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624249,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a81979502081908619fdd82e2b20d9027c0fa8bde452f0",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Flanksteak med chimichurri. Retbeskrivelse: Grillet flanksteak med frisk argentinsk chimichurri-sovs.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Flanksteak, Persille, Hvidl\u00f8g, Olivenolie, R\u00f8dvinseddike, Chiliflager, Salt. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Lav chimichurri: hak persille og hvidl\u00f8g fint. Bland med olie, eddike og chili. | Trin 2: Krydr steaken med salt og peber. | Trin 3: Grill ved h\u00f8j varme 4-5 min p\u00e5 hver side for medium. | Trin 4: Lad hvile 5 min. Sk\u00e6r i tynde skiver. Server med chimichurri.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Grill. B\u00f8rnevenlig: nej.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

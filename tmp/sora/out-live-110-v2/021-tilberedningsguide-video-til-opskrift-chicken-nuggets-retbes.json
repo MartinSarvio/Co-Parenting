@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624213,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8195480408191a76c8c1530ac5c0a0b4117b6c0e58212",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Chicken nuggets. Retbeskrivelse: Hjemmelavede spr\u00f8de chicken nuggets.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Kyllingebryst, Hvedemel, \u00c6g, Panko rasp, Paprika, Hvidl\u00f8gspulver, Salt, Olie. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Sk\u00e6r kylling i mundst\u00f8rrelse-stykker. Krydr med salt. | Trin 2: Bland mel med paprika og hvidl\u00f8gspulver. Pisk \u00e6g. Hav rasp klar. | Trin 3: Vend kylling i mel, \u00e6g og rasp. | Trin 4: Steg i olie ved middel-h\u00f8j varme 3-4 min p\u00e5 hver side.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

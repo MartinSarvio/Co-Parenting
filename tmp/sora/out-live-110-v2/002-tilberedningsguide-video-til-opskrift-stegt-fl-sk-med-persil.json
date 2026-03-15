@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624203,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8194b1fd08191b3f0de45388b12b90ba09884944b5794",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Stegt fl\u00e6sk med persillesovs. Retbeskrivelse: Danmarks nationalret med spr\u00f8dt fl\u00e6sk og cremet persillesovs.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Stegt fl\u00e6sk i skiver, Kartofler, Sm\u00f8r, Hvedemel, M\u00e6lk, Frisk persille, Salt, Peber. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Steg fl\u00e6skeskiverne spr\u00f8de p\u00e5 panden uden fedtstof. | Trin 2: Kog kartoflerne i saltet vand til de er m\u00f8re. | Trin 3: Smelt sm\u00f8r, r\u00f8r mel i og tils\u00e6t m\u00e6lk under omr\u00f8ring. | Trin 4: Kog sovsen op og tils\u00e6t hakket persille, salt og peber.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

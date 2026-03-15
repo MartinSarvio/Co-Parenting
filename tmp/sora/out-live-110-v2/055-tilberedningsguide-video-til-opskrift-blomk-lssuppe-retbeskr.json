@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624228,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a819638e9881918c0f2421445cb50b012a5a95b8fab6a3",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Blomk\u00e5lssuppe. Retbeskrivelse: Cremet blomk\u00e5lssuppe med ristede hasseln\u00f8dder.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Blomk\u00e5l, Kartoffel, L\u00f8g, Gr\u00f8ntsagsfond, Fl\u00f8de, Sm\u00f8r, Hasseln\u00f8dder. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Svits l\u00f8g i sm\u00f8r. Tils\u00e6t blomk\u00e5l og kartoffel i tern. | Trin 2: Tils\u00e6t fond og kog 15 min. | Trin 3: Blend suppen glat. Tils\u00e6t fl\u00f8de og krydr. | Trin 4: Rist hasseln\u00f8dder p\u00e5 pande. Server suppen toppet med n\u00f8dder.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Supper. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

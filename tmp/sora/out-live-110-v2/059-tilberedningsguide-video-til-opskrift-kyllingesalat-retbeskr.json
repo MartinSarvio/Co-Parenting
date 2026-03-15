@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624230,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8196659588191b276ca05d7d1fbf704ad4ff412d4cdc1",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Kyllingesalat. Retbeskrivelse: M\u00e6ttende salat med stegt kylling, avocado og dressing.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Kyllingebryst, Blandet salat, Avocado, Cherrytomater, Agurk, Olivenolie, Citron, Honning. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Steg kylling i olie 5-6 min p\u00e5 hver side. Sk\u00e6r i skiver. | Trin 2: Sk\u00e6r avocado, tomater og agurk. | Trin 3: Bland olie, citronsaft og honning til dressing. | Trin 4: Saml salat med kylling og dressing.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Salater. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

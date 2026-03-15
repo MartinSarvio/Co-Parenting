@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624249,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a819798eb081939ebff96d92d734900cd6dc5d64ccdc12",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Spinatsalat med bacon. Retbeskrivelse: Frisk spinatsalat med varm bacondressing og \u00e6g.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Baby spinat, Bacon, \u00c6g, R\u00f8dl\u00f8g, Olivenolie, Eddike, Honning. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Steg bacon spr\u00f8dt. Smuldr. | Trin 2: H\u00e5rdkog \u00e6g og sk\u00e6r i kvarte. | Trin 3: Bland olie, eddike og honning til dressing. | Trin 4: Saml spinat med r\u00f8dl\u00f8gsringe, bacon, \u00e6g og dressing.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Salater. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

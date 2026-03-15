@@ -1,0 +1,44 @@
+<svg width="4096" height="4096" viewBox="0 0 4096 4096" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Huska App Icon 4K</title>
+  <desc id="desc">4K premium Huska app icon.</desc>
+
+  <defs>
+    <linearGradient id="panel" x1="420" y1="360" x2="3600" y2="3770" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#3A3937"/>
+      <stop offset="1" stop-color="#1F1F1D"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="1180" y1="1140" x2="2990" y2="2910" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFB65F"/>
+      <stop offset="1" stop-color="#F58A2D"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#EDE9DE"/>
+    </linearGradient>
+    <filter id="outerShadow" x="250" y="250" width="3596" height="3596" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="34"/>
+      <feGaussianBlur stdDeviation="44"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.08 0 0 0 0 0.08 0 0 0 0 0.07 0 0 0 0.34 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_1"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_1" result="shape"/>
+    </filter>
+  </defs>
+
+  <rect width="4096" height="4096" rx="960" fill="#F3F0E8"/>
+  <rect x="12" y="12" width="4072" height="4072" rx="948" stroke="#DCD7CB" stroke-width="24"/>
+
+  <g filter="url(#outerShadow)">
+    <rect x="360" y="360" width="3376" height="3376" rx="880" fill="url(#panel)"/>
+
+    <path d="M650 910C910 620 1310 480 2048 480C2800 480 3190 630 3450 920V1160C3180 850 2790 734 2048 734C1324 734 940 840 650 1172V910Z" fill="#FFFFFF" fill-opacity="0.12"/>
+
+    <rect x="1220" y="1120" width="470" height="1900" rx="236" fill="url(#metal)"/>
+    <rect x="2406" y="1120" width="470" height="1900" rx="236" fill="url(#metal)"/>
+    <rect x="1688" y="1840" width="718" height="450" rx="224" fill="url(#metal)"/>
+
+    <path d="M1090 2040L1730 2648L2900 1440" stroke="url(#accent)" stroke-width="270" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

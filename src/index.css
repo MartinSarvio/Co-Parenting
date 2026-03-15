@@ -67,6 +67,48 @@
 }
 
 @layer utilities {
+  .bg-orange-tint {
+    background-color: #fff2e6;
+  }
+  .dark .bg-orange-tint {
+    background-color: hsl(28 40% 18%);
+  }
+  .bg-orange-tint-light {
+    background-color: #fff8f0;
+  }
+  .dark .bg-orange-tint-light {
+    background-color: hsl(28 30% 15%);
+  }
+  .border-orange-tint {
+    border-color: #f3c59d;
+  }
+  .dark .border-orange-tint {
+    border-color: hsl(28 50% 35%);
+  }
+  .bg-green-tint {
+    background-color: #eef9ee;
+  }
+  .dark .bg-green-tint {
+    background-color: hsl(140 30% 15%);
+  }
+  .bg-blue-tint {
+    background-color: #eef0ff;
+  }
+  .dark .bg-blue-tint {
+    background-color: hsl(230 30% 18%);
+  }
+  .bg-red-tint {
+    background-color: #fef2f2;
+  }
+  .dark .bg-red-tint {
+    background-color: hsl(0 30% 15%);
+  }
+  .bg-yellow-tint {
+    background-color: #fef3c7;
+  }
+  .dark .bg-yellow-tint {
+    background-color: hsl(45 30% 18%);
+  }
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -103,7 +145,7 @@ input[type="time"] {
     height: 100%;
     min-height: 100%;
     min-height: 100dvh;
-    background-color: #fef8f0;
+    background-color: hsl(var(--background));
     margin: 0;
     padding: 0;
   }
@@ -115,6 +157,11 @@ input[type="time"] {
       radial-gradient(circle at 12% -8%, rgba(255, 255, 255, 0.82), transparent 38%),
       radial-gradient(circle at 86% 2%, rgba(0, 0, 0, 0.04), transparent 40%);
     background-attachment: fixed;
+  }
+  .dark body {
+    background-image:
+      radial-gradient(circle at 12% -8%, rgba(255, 255, 255, 0.05), transparent 38%),
+      radial-gradient(circle at 86% 2%, rgba(0, 0, 0, 0.15), transparent 40%);
   }
 }
 

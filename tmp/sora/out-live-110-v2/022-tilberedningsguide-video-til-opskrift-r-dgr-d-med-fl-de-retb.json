@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624213,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8195504a88198a0fccb8b66f0dfbc09e202e30141822c",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: R\u00f8dgr\u00f8d med fl\u00f8de. Retbeskrivelse: Dansk sommer-dessert med b\u00e6r og kold fl\u00f8de.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Jordb\u00e6r, Hindb\u00e6r, Sukker, Vand, Kartoffelmel, Piskefl\u00f8de. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Kog b\u00e6r med vand og sukker i 10 min. Mos lidt med en gaffel. | Trin 2: R\u00f8r kartoffelmel ud i lidt koldt vand. Tils\u00e6t under omr\u00f8ring. | Trin 3: Kog op og lad afk\u00f8le. H\u00e6ld i sk\u00e5le. | Trin 4: Server kold med kold fl\u00f8de.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Dessert. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

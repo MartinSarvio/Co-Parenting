@@ -1,0 +1,21 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Huska App Icon</title>
+  <desc id="desc">Huska monogram icon for app store use.</desc>
+
+  <defs>
+    <linearGradient id="accent" x1="312" y1="268" x2="711" y2="707" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F7A24A"/>
+      <stop offset="1" stop-color="#F58A2D"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="64" y="64" width="896" height="896" rx="220" fill="#F4F2EB"/>
+  <rect x="64" y="64" width="896" height="896" rx="220" stroke="#DEDBD2" stroke-width="3"/>
+
+  <rect x="290" y="236" width="148" height="552" rx="74" fill="#2F2F2F"/>
+  <rect x="586" y="236" width="148" height="552" rx="74" fill="#2F2F2F"/>
+
+  <path d="M364 507C364 434.099 423.099 375 496 375H528C600.901 375 660 434.099 660 507V517C660 589.901 600.901 649 528 649H496C423.099 649 364 589.901 364 517V507Z" fill="#2F2F2F"/>
+
+  <path d="M351 554L476 679L681 437" stroke="url(#accent)" stroke-width="60" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

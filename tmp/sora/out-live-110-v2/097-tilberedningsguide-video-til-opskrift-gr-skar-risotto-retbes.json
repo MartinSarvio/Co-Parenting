@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624247,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a81977b794819084a3089e0b4df2da013b044b82d7c6f8",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Gr\u00e6skar risotto. Retbeskrivelse: Cremet risotto med bagt gr\u00e6skar og salvie.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Risottoris, Gr\u00e6skar, L\u00f8g, Gr\u00f8ntsagsfond, Parmesan, Sm\u00f8r, Salvie. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Bag gr\u00e6skar i tern ved 200\u00b0C i 20 min til det er bl\u00f8dt. | Trin 2: Svits l\u00f8g i sm\u00f8r. Tils\u00e6t ris og r\u00f8r 2 min. | Trin 3: Tils\u00e6t fond en slev ad gangen under omr\u00f8ring i 20 min. | Trin 4: Vend bagt gr\u00e6skar og parmesan i. Pynt med stegt salvie.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624232,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a819681b488198a51374801adb3a330da523385705f38a",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: French toast. Retbeskrivelse: Arme riddere med kanel, sukker og b\u00e6r.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Toastbr\u00f8d, \u00c6g, M\u00e6lk, Kanel, Sukker, Sm\u00f8r, Friske b\u00e6r. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Pisk \u00e6g, m\u00e6lk, kanel og sukker sammen. | Trin 2: Dyp br\u00f8dskiver i \u00e6ggeblandingen. | Trin 3: Steg i sm\u00f8r 2 min p\u00e5 hver side til de er gyldne. | Trin 4: Server med friske b\u00e6r og lidt sirup.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Morgenmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

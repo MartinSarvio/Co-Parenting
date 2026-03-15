@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624245,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a81974ea8481919cb1c840bf3632290d2f9265e9c42398",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Spr\u00f8de for\u00e5rsruller. Retbeskrivelse: Hjemmelavede spr\u00f8de for\u00e5rsruller med svinek\u00f8d og gr\u00f8ntsager.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Risdejsplader, Hakket svinek\u00f8d, K\u00e5l, Gulerod, Ingef\u00e6r, Sojasovs, Sesamolie, Olie (stegning). Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Steg k\u00f8d med revet ingef\u00e6r. Tils\u00e6t k\u00e5l og revet gulerod. Krydr med soja. | Trin 2: Lad fyldet k\u00f8le af. | Trin 3: Rul fyld i dejplader. Luk med lidt vand i kanterne. | Trin 4: Friter i olie ved 180\u00b0C i 3-4 min til de er spr\u00f8de.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Snacks. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

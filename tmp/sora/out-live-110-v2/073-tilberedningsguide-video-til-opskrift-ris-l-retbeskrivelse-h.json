@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624235,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8196b5b108190ade5662305f36e7908de9d12f5093a3b",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Ris \u00e0 l\\. Retbeskrivelse: Hjemmelavet is med risalamande-smag.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Piskefl\u00f8de, Kondenseret m\u00e6lk, Kogte gr\u00f8dris, Hakkede mandler, Vaniljeekstrakt, Kirseb\u00e6rsovs. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Pisk fl\u00f8de halvstift. Vend kondenseret m\u00e6lk i. | Trin 2: Fold kolde ris, mandler og vanilje i blandingen. | Trin 3: H\u00e6ld i form og frys i mindst 6 timer. | Trin 4: Server med kirseb\u00e6rsovs.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Dessert. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

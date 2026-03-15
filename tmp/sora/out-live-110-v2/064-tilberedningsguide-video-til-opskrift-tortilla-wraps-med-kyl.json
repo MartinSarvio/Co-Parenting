@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624231,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a819679d4c81909215aae6f4a25f1807a09cfbb96c1f92",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Tortilla wraps med kylling. Retbeskrivelse: Friske tortillaer med kylling, salat og dressing.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Tortilla wraps, Kyllingebryst, Iceberg salat, Tomat, Agurk, Dressing, Olie. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Sk\u00e6r kylling i strimler og steg i olie med salt og peber. | Trin 2: Snit salat, sk\u00e6r tomat og agurk. | Trin 3: Varm wraps kort p\u00e5 panden. | Trin 4: Fyld wraps med kylling, gr\u00f8ntsager og dressing. Rul sammen.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Frokost. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

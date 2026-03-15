@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624241,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a819719b208191bf8a59def0c58a5904c20914f8b2103e",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Falafel i pitabr\u00f8d. Retbeskrivelse: Spr\u00f8de falafel med hummus, salat og tahindressing.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Kik\u00e6rter (d\u00e5se), L\u00f8g, Hvidl\u00f8g, Persille, Spidskommen, Pitabr\u00f8d, Olie, Tahini. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Blend kik\u00e6rter, l\u00f8g, hvidl\u00f8g, persille og spidskommen til en dej. | Trin 2: Form sm\u00e5 boller og tryk lidt flade. | Trin 3: Steg i olie 3-4 min p\u00e5 hver side til de er spr\u00f8de. | Trin 4: Server i pitabr\u00f8d med salat, tahindressing og tomat.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Frokost. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

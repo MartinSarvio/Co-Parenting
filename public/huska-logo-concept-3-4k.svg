@@ -1,0 +1,25 @@
+<svg width="4096" height="2304" viewBox="0 0 4096 2304" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+<title id="title">Huska Concept 3</title>
+<desc id="desc">Soft family-oriented signature symbol logo.</desc>
+<defs>
+  <linearGradient id="bg3" x1="0" y1="0" x2="4096" y2="2304" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#FCFBF8"/>
+    <stop offset="1" stop-color="#EEE9DE"/>
+  </linearGradient>
+  <linearGradient id="sym3" x1="460" y1="420" x2="1420" y2="1400" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#343331"/>
+    <stop offset="1" stop-color="#252422"/>
+  </linearGradient>
+  <linearGradient id="acc3" x1="660" y1="620" x2="1250" y2="1220" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#FFB86B"/>
+    <stop offset="1" stop-color="#F58A2D"/>
+  </linearGradient>
+</defs>
+<rect width="4096" height="2304" rx="120" fill="url(#bg3)"/>
+<rect x="300" y="300" width="1260" height="1260" rx="340" fill="url(#sym3)"/>
+<path d="M600 1270V900C600 680 780 500 1000 500C1220 500 1400 680 1400 900V1270H1210V910C1210 800 1120 710 1010 710C900 710 810 800 810 910V1270H600Z" fill="#F8F4E9"/>
+<path d="M710 1040C710 840 870 680 1070 680H1100C1260 680 1390 810 1390 970C1390 1110 1290 1230 1158 1258L1158 1270H960V1120H1080C1154 1120 1214 1060 1214 986C1214 912 1154 852 1080 852H1070C966 852 882 936 882 1040V1270H710V1040Z" fill="#F8F4E9"/>
+<path d="M650 990L860 1200L1270 790" stroke="url(#acc3)" stroke-width="98" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="1778" y="1045" fill="#2F2F2F" font-family="'DM Serif Display', Georgia, 'Times New Roman', serif" font-size="500" font-weight="400" letter-spacing="-4">Huska</text>
+<text x="1790" y="1312" fill="#605B50" font-family="Avenir Next, SF Pro Text, sans-serif" font-size="114" font-weight="500" letter-spacing="14">CALM CO-PARENTING</text>
+</svg>

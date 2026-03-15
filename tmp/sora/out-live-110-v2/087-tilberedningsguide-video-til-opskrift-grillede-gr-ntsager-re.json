@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624243,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a819730e9c819185c5ed0df02b2fc1068f3c357a2c5d53",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Grillede gr\u00f8ntsager. Retbeskrivelse: Blandede gr\u00f8ntsager grillet med olie og urter.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Squash, Peberfrugt, R\u00f8dl\u00f8g, Aubergine, Olivenolie, Timian, Salt. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Sk\u00e6r gr\u00f8ntsager i tykke skiver. Pensle med olie. | Trin 2: Krydr med salt, peber og timian. | Trin 3: Grill 3-4 min p\u00e5 hver side til de har grillm\u00e6rker. | Trin 4: Drys med flagesalt og server.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Grill. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

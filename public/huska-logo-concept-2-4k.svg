@@ -1,0 +1,21 @@
+<svg width="4096" height="2304" viewBox="0 0 4096 2304" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+<title id="title">Huska Concept 2</title>
+<desc id="desc">Geometric monogram with refined typography.</desc>
+<defs>
+  <linearGradient id="bg2" x1="0" y1="0" x2="4096" y2="2304" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#F7F4EC"/>
+    <stop offset="1" stop-color="#E8E4D9"/>
+  </linearGradient>
+  <linearGradient id="edge2" x1="380" y1="340" x2="1480" y2="1460" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#2F2F2F"/>
+    <stop offset="1" stop-color="#1F1F1F"/>
+  </linearGradient>
+</defs>
+<rect width="4096" height="2304" rx="120" fill="url(#bg2)"/>
+<rect x="320" y="320" width="1280" height="1280" rx="320" fill="url(#edge2)"/>
+<rect x="356" y="356" width="1208" height="1208" rx="286" stroke="#50504C" stroke-width="6"/>
+<path d="M560 1280L560 640C560 578 610 528 672 528H736C798 528 848 578 848 640V848H1068V640C1068 578 1118 528 1180 528H1244C1306 528 1356 578 1356 640V1280H1188V1004H848V1280H560Z" fill="#F4F0E5"/>
+<path d="M690 1076L864 1246L1236 872" stroke="#F58A2D" stroke-width="90" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="1790" y="1075" fill="#2A2A28" font-family="Sora, Avenir Next, SF Pro Display, sans-serif" font-size="500" font-weight="600" letter-spacing="-8">Huska</text>
+<text x="1790" y="1318" fill="#5E584F" font-family="Sora, Avenir Next, SF Pro Text, sans-serif" font-size="114" font-weight="500" letter-spacing="13">SHARED LIFE, SIMPLIFIED</text>
+</svg>

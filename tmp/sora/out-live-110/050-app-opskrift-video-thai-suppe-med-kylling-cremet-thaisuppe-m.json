@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772485015,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a5f9975a9c819182deceb7e79d45c90e12bc37e59c19eb",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: App-opskrift video: Thai-suppe med kylling. Cremet thaisuppe med kokosm\u00e6lk, kylling og lime. Vis r\u00e5 ingredienser, hurtig tilberedning i 3 korte beats, og l\u00e6kker anretning p\u00e5 tallerken. Ingen mennesker i billedet. Ingen tekst-overlay. Stil: realistisk food cinematography, appetitlig, naturligt k\u00f8kkenlys, stabile close-ups. M\u00e5lgruppe: danske b\u00f8rnefamilier. Kategori: Supper. B\u00f8rnevenlig: nej.",
+  "remixed_from_video_id": null,
+  "seconds": "8",
+  "size": "1280x720",
+  "status": "queued"
+}

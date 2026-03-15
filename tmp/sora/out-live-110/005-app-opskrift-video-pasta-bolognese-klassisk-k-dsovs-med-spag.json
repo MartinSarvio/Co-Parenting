@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772484992,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a5f9805efc8190889ced4bdbe66c5201e4bd98b7238d5b",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: App-opskrift video: Pasta Bolognese. Klassisk k\u00f8dsovs med spaghetti, tilpasset danske familier. Vis r\u00e5 ingredienser, hurtig tilberedning i 3 korte beats, og l\u00e6kker anretning p\u00e5 tallerken. Ingen mennesker i billedet. Ingen tekst-overlay. Stil: realistisk food cinematography, appetitlig, naturligt k\u00f8kkenlys, stabile close-ups. M\u00e5lgruppe: danske b\u00f8rnefamilier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "8",
+  "size": "1280x720",
+  "status": "queued"
+}

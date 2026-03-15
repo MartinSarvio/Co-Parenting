@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772485016,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a5f99817f081908a7aaf5433a173bd0a586bd793bf4f74",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: App-opskrift video: Rugbr\u00f8dsmad med leverpostej. Rugbr\u00f8d med varm leverpostej, bacon og syltede agurker. Vis r\u00e5 ingredienser, hurtig tilberedning i 3 korte beats, og l\u00e6kker anretning p\u00e5 tallerken. Ingen mennesker i billedet. Ingen tekst-overlay. Stil: realistisk food cinematography, appetitlig, naturligt k\u00f8kkenlys, stabile close-ups. M\u00e5lgruppe: danske b\u00f8rnefamilier. Kategori: Frokost. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "8",
+  "size": "1280x720",
+  "status": "queued"
+}

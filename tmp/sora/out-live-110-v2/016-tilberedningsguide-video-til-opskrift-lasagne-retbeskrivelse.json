@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624210,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8195278d0819094dd05c3f310823d0b39e52602220d98",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Lasagne. Retbeskrivelse: Klassisk lasagne med k\u00f8dsovs og bechamelsovs.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Lasagneplader, Hakket oksek\u00f8d, L\u00f8g, D\u00e5setomater, Tomatpur\u00e9, Sm\u00f8r, Hvedemel, M\u00e6lk. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Brun oksek\u00f8d og l\u00f8g. Tils\u00e6t tomater og tomatpur\u00e9. Simre 20 min. | Trin 2: Lav bechamelsovs: smelt sm\u00f8r, r\u00f8r mel i, tils\u00e6t m\u00e6lk under omr\u00f8ring. | Trin 3: Lag k\u00f8dsovs, lasagneplader og bechamel i et ildfast fad. Gentag. | Trin 4: Top med ost. Bag ved 200\u00b0C i 30-35 min til gyldne.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

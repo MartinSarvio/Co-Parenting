@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624217,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a81958eaf0819180d2dc6574ee674c0c348c7cb8870ead",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Fl\u00e6skesteg. Retbeskrivelse: Dansk fl\u00e6skesteg med spr\u00f8d sv\u00e6r \u2013 perfekt til s\u00f8ndagsmiddag.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Svinenakke med sv\u00e6r, Salt, Laurb\u00e6rblad, Nellike, Kartofler, R\u00f8dk\u00e5l, Vand. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Sk\u00e6r sv\u00e6\u00adren i t\u00e6tte snit. Gnid salt i rillerne. | Trin 2: L\u00e6g laurb\u00e6r og nellike mellem snittene. H\u00e6ld vand i bunden af bradepanden. | Trin 3: Steg ved 220\u00b0C i 30 min, derefter 170\u00b0C i 90 min. | Trin 4: Lad k\u00f8det hvile 15 min. Server med brunede kartofler og r\u00f8dk\u00e5l.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

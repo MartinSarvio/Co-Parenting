@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772485043,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a5f9b305808190bfd925ba0f32415e02372e737d66ce12",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: App-opskrift video: Flanksteak med chimichurri. Grillet flanksteak med frisk argentinsk chimichurri-sovs. Vis r\u00e5 ingredienser, hurtig tilberedning i 3 korte beats, og l\u00e6kker anretning p\u00e5 tallerken. Ingen mennesker i billedet. Ingen tekst-overlay. Stil: realistisk food cinematography, appetitlig, naturligt k\u00f8kkenlys, stabile close-ups. M\u00e5lgruppe: danske b\u00f8rnefamilier. Kategori: Grill. B\u00f8rnevenlig: nej.",
+  "remixed_from_video_id": null,
+  "seconds": "8",
+  "size": "1280x720",
+  "status": "queued"
+}

@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624222,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8195e071081909bea31cf0be27ca102ce17411fa247dd",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Grillede p\u00f8lser. Retbeskrivelse: Klassiske grillp\u00f8lser med br\u00f8d, ketchup og sennep.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Grillp\u00f8lser, P\u00f8lsebr\u00f8d, Ketchup, Sennep, Ristede l\u00f8g, Agurkesalat. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: T\u00e6nd grillen og lad den varme op. | Trin 2: Grill p\u00f8lserne 3-4 min p\u00e5 hver side til de har grillstriber. | Trin 3: Varm p\u00f8lsebr\u00f8dene kort p\u00e5 grillen. | Trin 4: Server med ketchup, sennep, ristede l\u00f8g og agurkesalat.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Grill. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}
