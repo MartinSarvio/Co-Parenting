@@ -330,49 +330,6 @@ function FeatureSection() {
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════ */
-/*  STATS — Glassmorphism bar with animated counters                         */
-/* ═══════════════════════════════════════════════════════════════════════════ */
-
-const stats = [
-  { icon: Zap, value: '12+', label: 'Funktioner', color: '#f58a2d' },
-  { icon: Heart, value: '100%', label: 'Gratis', color: '#f43f5e' },
-  { icon: Globe, value: 'Dansk', label: 'Bygget i DK', color: '#3b82f6' },
-  { icon: Lock, value: 'Sikker', label: 'Krypteret data', color: '#10b981' },
-];
-
-function StatsSection() {
-  const { ref, visible } = useInView();
-
-  return (
-    <section className="py-16" ref={ref}>
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 ${visible ? '' : 'opacity-0'}`}>
-          {stats.map((s, i) => (
-            <div
-              key={s.label}
-              className={`relative text-center p-6 rounded-2xl backdrop-blur-xl bg-white/70 border border-white/40 shadow-lg shadow-black/[0.03] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${visible ? 'animate-countPulse' : ''}`}
-              style={{ animationDelay: `${i * 120}ms` }}
-            >
-              <div
-                className="absolute top-0 left-0 right-0 h-[2px]"
-                style={{ background: `linear-gradient(90deg, transparent, ${s.color}, transparent)` }}
-              />
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3"
-                style={{ background: `${s.color}12` }}
-              >
-                <s.icon size={20} style={{ color: s.color }} />
-              </div>
-              <p className="text-2xl font-[800] text-[#2f2f2f] tracking-tight">{s.value}</p>
-              <p className="text-[12px] text-[#9a978f] font-medium mt-0.5">{s.label}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
 /* ═══════════════════════════════════════════════════════════════════════════ */
 /*  HOW IT WORKS — Enhanced with gradient path and stagger                   */
@@ -922,7 +879,6 @@ export default function LandingPage() {
     <>
       <HeroSection />
       <FeatureSection />
-      <StatsSection />
       <FeatureSpotlight1 />
       <FeatureSpotlight2 />
       <HowItWorksSection />
