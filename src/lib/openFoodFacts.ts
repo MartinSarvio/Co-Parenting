@@ -18,6 +18,10 @@ export type OFFResult = {
   nutriscoreGrade?: string;
   novaGroup?: number;
   allergens?: string[];
+  traces?: string[];
+  ingredientsText?: string;
+  servingSize?: string;
+  servingQuantity?: number;
 };
 
 export async function fetchFromOpenFoodFacts(barcode: string): Promise<OFFResult | null> {
@@ -39,6 +43,11 @@ export async function fetchFromOpenFoodFacts(barcode: string): Promise<OFFResult
         nutriscore_grade?: string;
         nova_groups?: string;
         allergens_tags?: string[];
+        traces_tags?: string[];
+        ingredients_text?: string;
+        ingredients_text_da?: string;
+        serving_size?: string;
+        serving_quantity?: number;
         nutriments?: Record<string, number>;
       };
     };
@@ -63,6 +72,10 @@ export async function fetchFromOpenFoodFacts(barcode: string): Promise<OFFResult
       nutriscoreGrade: p.nutriscore_grade || undefined,
       novaGroup: p.nova_groups ? parseInt(p.nova_groups, 10) || undefined : undefined,
       allergens: p.allergens_tags?.length ? p.allergens_tags : undefined,
+      traces: p.traces_tags?.length ? p.traces_tags : undefined,
+      ingredientsText: p.ingredients_text_da || p.ingredients_text || undefined,
+      servingSize: p.serving_size || undefined,
+      servingQuantity: p.serving_quantity ?? undefined,
     };
   } catch {
     return null;
@@ -89,7 +102,7 @@ export async function searchProducts(
       json: '1',
       page: String(page),
       page_size: String(pageSize),
-      fields: 'code,product_name,product_name_da,generic_name,brands,quantity,categories,nutriments,nutriscore_grade,nova_groups,allergens_tags',
+      fields: 'code,product_name,product_name_da,generic_name,brands,quantity,categories,nutriments,nutriscore_grade,nova_groups,allergens_tags,traces_tags,ingredients_text,ingredients_text_da,serving_size,serving_quantity',
     });
     const mergedSignal = signal
       ? AbortSignal.any([signal, controller.signal])
@@ -114,6 +127,11 @@ export async function searchProducts(
         nutriscore_grade?: string;
         nova_groups?: string;
         allergens_tags?: string[];
+        traces_tags?: string[];
+        ingredients_text?: string;
+        ingredients_text_da?: string;
+        serving_size?: string;
+        serving_quantity?: number;
         nutriments?: Record<string, number>;
       }>;
     };
@@ -139,6 +157,10 @@ export async function searchProducts(
           nutriscoreGrade: p.nutriscore_grade || undefined,
           novaGroup: p.nova_groups ? parseInt(p.nova_groups, 10) || undefined : undefined,
           allergens: p.allergens_tags?.length ? p.allergens_tags : undefined,
+          traces: p.traces_tags?.length ? p.traces_tags : undefined,
+          ingredientsText: p.ingredients_text_da || p.ingredients_text || undefined,
+          servingSize: p.serving_size || undefined,
+          servingQuantity: p.serving_quantity ?? undefined,
         };
       });
     return { products, count: data.count ?? 0 };

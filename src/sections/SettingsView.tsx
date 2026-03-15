@@ -103,7 +103,6 @@ export function SettingsView() {
     setHousehold,
     addPaymentAccount,
     updatePaymentAccount,
-    addUser,
     addFamilyMember,
     removeFamilyMember,
     sideMenuOpen,
@@ -1254,7 +1253,7 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   ))}
                 </div>
                 {isActive && (
-                  <div className="mt-3 rounded-[8px] bg-[#f58a2d]/10 px-3 py-1.5 text-center text-[13px] font-semibold text-[#b96424]">
+                  <div className="mt-3 rounded-[8px] bg-[#f58a2d]/10 px-3 py-1.5 text-center text-[13px] font-semibold text-[#f58a2d]">
                     Aktiv plan
                   </div>
                 )}
@@ -1328,7 +1327,7 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                     </div>
                   </div>
                   {account.isPrimary ? (
-                    <span className="shrink-0 rounded-[8px] bg-orange-tint border border-orange-tint px-2.5 py-1 text-[11px] font-semibold text-[#cc6f1f]">Primær</span>
+                    <span className="shrink-0 rounded-[8px] bg-orange-tint border border-orange-tint px-2.5 py-1 text-[11px] font-semibold text-[#f58a2d]">Primær</span>
                   ) : (
                     <button
                       onClick={() => handleSetPrimaryPayment(account.id)}
@@ -1382,7 +1381,7 @@ const [evidenceDraft, setEvidenceDraft] = useState({
               Tilføj konto
             </button>
             {!features.inAppPayments && (
-              <p className="text-[11px] text-[#b98b5a] text-center">
+              <p className="text-[11px] text-muted-foreground text-center">
                 Opgrader til Family Plus for betalingsfunktioner
               </p>
             )}
@@ -1440,8 +1439,8 @@ const [evidenceDraft, setEvidenceDraft] = useState({
         <TabsContent value="members" className="space-y-2">
               {!features.familyMembers ? (
                 <div className="rounded-[8px] border border-orange-tint bg-orange-tint-light p-4 text-center">
-                  <p className="text-sm font-semibold text-[#b96424]">Opgrader til Family Plus</p>
-                  <p className="mt-1 text-xs text-[#cc8a4f]">
+                  <p className="text-sm font-semibold text-[#f58a2d] dark:text-[#f5a55d]">Opgrader til Family Plus</p>
+                  <p className="mt-1 text-xs text-[#f5a55d]">
                     Tilføj familiemedlemmer som teenagere, bedsteforældre og bonusforældre med Family Plus eller Enlig Plus.
                   </p>
                   <Button
@@ -1550,7 +1549,7 @@ const [evidenceDraft, setEvidenceDraft] = useState({
               ) : notifPermission === 'denied' ? (
                 <Button
                   variant="outline"
-                  className="w-full rounded-[8px] mb-4 text-[#b96424] border-orange-tint"
+                  className="w-full rounded-[8px] mb-4 text-[#f58a2d] dark:text-[#f5a55d] border-orange-tint"
                   onClick={() => toast.error('Notifikationer er blokeret. Tillad dem i enhedens indstillinger.')}
                 >
                   <Bell className="mr-2 h-4 w-4" />
@@ -1809,7 +1808,7 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                 <div className="flex-1 min-w-0">
                   <p className={cn(
                     "text-[14px] font-semibold",
-                    currentMode === option.value ? "text-[#b96424]" : "text-foreground"
+                    currentMode === option.value ? "text-[#f58a2d] dark:text-[#f5a55d]" : "text-foreground"
                   )}>{option.label}</p>
                   <p className="text-[11px] text-muted-foreground mt-0.5">{option.desc}</p>
                 </div>

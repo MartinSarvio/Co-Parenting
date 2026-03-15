@@ -40,7 +40,7 @@ const getParentDayPalette = (color: 'warm' | 'cool' | 'neutral') => {
   if (color === 'warm') {
     return {
       card: 'border-[#f4c89f] bg-orange-tint',
-      text: 'text-[#cc6f1f]',
+      text: 'text-[#f58a2d]',
       avatarClass: 'bg-[#f58a2d] text-white',
     };
   }
@@ -55,8 +55,8 @@ const getParentDayPalette = (color: 'warm' | 'cool' | 'neutral') => {
 
   return {
     card: 'border-border bg-card',
-    text: 'text-[#5f5c53]',
-    avatarClass: 'bg-muted text-[#5f5c53]',
+    text: 'text-muted-foreground',
+    avatarClass: 'bg-muted text-muted-foreground',
   };
 };
 
@@ -276,7 +276,7 @@ export function Samversplan() {
             </AvatarFallback>
           </Avatar>
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-[#cc6f1f]">
+            <p className="truncate text-sm font-medium text-[#f58a2d]">
               {otherParent ? otherParent.name : 'Forælder 2'}
             </p>
             <p className="text-xs text-[#d0792e]">

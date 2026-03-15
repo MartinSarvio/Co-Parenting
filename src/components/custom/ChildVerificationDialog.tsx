@@ -53,7 +53,10 @@ export function ChildVerificationDialog({ children, householdId, userId, onVerif
         .eq('household_id', householdId)
         .eq('user_id', userId);
 
-      if (data.birth_date === birthDate) {
+      // Normaliser begge datoer til YYYY-MM-DD for sammenligning
+      const storedDate = (data.birth_date || '').slice(0, 10);
+      const inputDate = birthDate.slice(0, 10);
+      if (storedDate === inputDate) {
         // Match! Mark as verified
         await supabase
           .from('household_members')
@@ -87,55 +90,55 @@ export function ChildVerificationDialog({ children, householdId, userId, onVerif
   };
 
   return (
-    <div className="min-h-[100svh] flex items-center justify-center bg-gradient-to-b from-slate-50 to-white px-4">
-      <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-card p-6 shadow-lg">
+    <div className="min-h-[100svh] flex items-center justify-center bg-background px-4">
+      <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-lg">
         <div className="mb-6 text-center">
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-blue-50">
-            <svg className="h-7 w-7 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-secondary">
+            <svg className="h-7 w-7 text-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
           </div>
-          <h2 className="text-lg font-semibold text-slate-900">Bekræft barn</h2>
-          <p className="mt-1 text-sm text-slate-500">
-            Indtast fødselsdatoen for <span className="font-medium text-slate-700">{child.name}</span> for at bekræfte adgang.
+          <h2 className="text-lg font-semibold text-foreground">Bekræft barn</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Indtast fødselsdatoen for <span className="font-medium text-foreground">{child.name}</span> for at bekræfte adgang.
           </p>
           {children.length > 1 && (
-            <p className="mt-1 text-xs text-slate-400">
+            <p className="mt-1 text-xs text-muted-foreground">
               Barn {currentIndex + 1} af {children.length}
             </p>
           )}
         </div>
 
         {locked ? (
-          <div className="rounded-xl bg-red-50 p-4 text-center">
-            <p className="text-sm font-medium text-red-700">Adgang låst</p>
-            <p className="mt-1 text-xs text-red-600">
+          <div className="rounded-xl bg-destructive/10 p-4 text-center">
+            <p className="text-sm font-medium text-destructive">Adgang låst</p>
+            <p className="mt-1 text-xs text-destructive/80">
               Kontakt den anden forælder for at få en ny invitation.
             </p>
           </div>
         ) : (
           <>
             <div className="mb-4">
-              <label className="mb-1.5 block text-sm font-medium text-slate-700">
+              <label className="mb-1.5 block text-sm font-medium text-foreground">
                 Fødselsdato
               </label>
               <input
                 type="date"
                 value={birthDate}
                 onChange={(e) => setBirthDate(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-100"
+                className="w-full rounded-xl border border-border bg-secondary px-4 py-3 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring"
                 disabled={verifying}
               />
             </div>
 
             {error && (
-              <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
+              <p className="mb-4 rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>
             )}
 
             <button
               onClick={handleVerify}
               disabled={!birthDate || verifying}
-              className="w-full rounded-xl bg-blue-600 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-400"
+              className="w-full rounded-xl bg-primary px-4 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground"
             >
               {verifying ? 'Bekræfter...' : 'Bekræft'}
             </button>
@@ -147,7 +150,7 @@ export function ChildVerificationDialog({ children, householdId, userId, onVerif
             supabase.auth.signOut();
             useAppStore.getState().logout();
           }}
-          className="mt-4 w-full text-center text-sm text-slate-400 hover:text-slate-600"
+          className="mt-4 w-full text-center text-sm text-muted-foreground hover:text-foreground"
         >
           Log ud
         </button>

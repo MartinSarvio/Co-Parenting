@@ -432,6 +432,10 @@ interface AppStore {
     routineLogs?: RoutineLog[];
     fridgeItems?: FridgeItem[];
     custodyPlans?: CustodyPlan[];
+    budgetGoals?: BudgetGoal[];
+    wishItems?: WishItem[];
+    photos?: FamilyPhoto[];
+    notificationPreferences?: NotificationPreferences | null;
   }) => void;
 
   // Auth
@@ -1114,7 +1118,7 @@ export const useAppStore = create<AppStore>()(
         budgetGoals: data.budgetGoals ?? state.budgetGoals,
         wishItems: data.wishItems ?? state.wishItems,
         photos: data.photos ?? state.photos,
-        notificationPreferences: data.notificationPreferences ?? state.notificationPreferences,
+        notificationPreferences: data.notificationPreferences != null ? data.notificationPreferences : state.notificationPreferences,
         currentChildId: data.children !== undefined && data.children.length > 0
           ? (state.currentChildId && data.children.some(c => c.id === state.currentChildId)
               ? state.currentChildId

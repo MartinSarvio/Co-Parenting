@@ -4,6 +4,7 @@ export interface AllergenMatch {
   allergenTag: string;       // OFF format: "en:milk"
   allergenLabel: string;     // Dansk: "Mælk"
   affectedMembers: string[]; // Navne: ["Emma", "Oliver"]
+  isTrace?: boolean;         // true = "kan indeholde spor af"
 }
 
 /** OFF tag → dansk label */
@@ -66,11 +67,14 @@ function danishToTag(label: string): string | undefined {
 export function matchFamilyAllergens(
   itemAllergens: string[],
   familyProfiles: { name: string; allergens: string[] }[],
+  itemTraces?: string[],
 ): AllergenMatch[] {
-  if (!itemAllergens.length || !familyProfiles.length) return [];
+  if (!familyProfiles.length) return [];
+  if (!itemAllergens.length && !itemTraces?.length) return [];
 
   const matches: AllergenMatch[] = [];
 
+  // Match direct allergens
   for (const tag of itemAllergens) {
     const label = ALLERGEN_LABELS[tag];
     if (!label) continue;
@@ -88,6 +92,32 @@ export function matchFamilyAllergens(
 
     if (affected.length > 0) {
       matches.push({ allergenTag: tag, allergenLabel: label, affectedMembers: affected });
+    }
+  }
+
+  // Match traces ("kan indeholde spor af")
+  if (itemTraces?.length) {
+    for (const tag of itemTraces) {
+      // Skip if already matched as direct allergen
+      if (matches.some(m => m.allergenTag === tag)) continue;
+
+      const label = ALLERGEN_LABELS[tag];
+      if (!label) continue;
+
+      const affected: string[] = [];
+      for (const profile of familyProfiles) {
+        for (const allergy of profile.allergens) {
+          const allergyTag = danishToTag(allergy);
+          if (allergyTag === tag) {
+            affected.push(profile.name);
+            break;
+          }
+        }
+      }
+
+      if (affected.length > 0) {
+        matches.push({ allergenTag: tag, allergenLabel: label, affectedMembers: affected, isTrace: true });
+      }
     }
   }
 

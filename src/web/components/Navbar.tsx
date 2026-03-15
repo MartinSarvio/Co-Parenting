@@ -14,6 +14,7 @@ export function Navbar() {
   const navLinks = [
     { label: 'Funktioner', href: '#funktioner' },
     { label: 'Sådan virker det', href: '#hvordan' },
+    { label: 'Priser', href: '#priser' },
     { label: 'Om os', href: '#om' },
   ];
 
