@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAppStore } from '@/store';
 import { useFamilyContext } from '@/hooks/useFamilyContext';
-import { generateId } from '@/lib/id';
+
 import { format } from 'date-fns';
 import { da } from 'date-fns/locale';
 import { Plus, Trash2, Camera, X, ChevronLeft, ChevronRight, Share2, Loader2 } from 'lucide-react';
@@ -17,9 +17,11 @@ import {
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { SavingOverlay } from '@/components/custom/SavingOverlay';
+import { useApiActions } from '@/hooks/useApiActions';
 
 export function Fotoalbum() {
-  const { currentUser, photos, addPhoto, deletePhoto, children, currentChildId, setFullScreenOverlayOpen } = useAppStore();
+  const { currentUser, photos, children, currentChildId, setFullScreenOverlayOpen } = useAppStore();
+  const { createPhoto, deletePhoto } = useApiActions();
   const { currentChild } = useFamilyContext();
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -56,14 +58,12 @@ export function Fotoalbum() {
     try {
       // Upload til Supabase Storage (komprimeret)
       const publicUrl = await uploadPhoto(selectedFile, childForPhotos.id);
-      addPhoto({
-        id: generateId('photo'),
+      await createPhoto({
         childId: childForPhotos.id,
         url: publicUrl,
         caption: caption.trim() || undefined,
         takenAt: new Date().toISOString(),
         addedBy: currentUser.id,
-        addedAt: new Date().toISOString(),
       });
       setAddDialogOpen(false);
       setPreviewUrl(null);

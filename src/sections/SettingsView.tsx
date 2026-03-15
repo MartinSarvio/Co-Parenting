@@ -110,13 +110,12 @@ export function SettingsView() {
     setSideMenuOpen,
     sideMenuContext,
     notificationPreferences,
-    updateNotificationPreferences,
     activeSettingsTab,
     setActiveSettingsTab,
     settingsDetailView,
     setSettingsDetailView,
   } = useAppStore();
-  const { createDocument } = useApiActions();
+  const { createDocument, saveNotificationPreferences } = useApiActions();
 
   const [isSaving, setIsSaving] = useState(false);
   const [profileDraft, setProfileDraft] = useState({
@@ -1525,7 +1524,7 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                     <Label htmlFor="reminder-minutes" className="text-[13px] text-muted-foreground">Påmind mig (minutter før aflevering)</Label>
                     <SelectSheet
                       value={String(notificationPreferences.handoverReminderMinutes)}
-                      onValueChange={(v) => updateNotificationPreferences({ handoverReminderMinutes: Number(v) })}
+                      onValueChange={(v) => saveNotificationPreferences({ handoverReminderMinutes: Number(v) })}
                       title="Påmindelsestid"
                       options={[
                         { value: '15', label: '15 minutter' },
@@ -1613,14 +1612,14 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                         <p className="text-[15px] font-medium text-foreground">Afleveringspåmindelser</p>
                         <p className="text-[13px] text-muted-foreground">Før hver aflevering</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.handoverReminders} onCheckedChange={(v) => updateNotificationPreferences({ handoverReminders: v })} />
+                      <IOSSwitch checked={notificationPreferences.handoverReminders} onCheckedChange={(v) => saveNotificationPreferences({ handoverReminders: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
                         <p className="text-[15px] font-medium text-foreground">Samværsændringer</p>
                         <p className="text-[13px] text-muted-foreground">Bytteanmodninger & planændringer</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.scheduleChanges} onCheckedChange={(v) => updateNotificationPreferences({ scheduleChanges: v })} />
+                      <IOSSwitch checked={notificationPreferences.scheduleChanges} onCheckedChange={(v) => saveNotificationPreferences({ scheduleChanges: v })} />
                     </div>
                   </div>
                 </div>
@@ -1635,14 +1634,14 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                         <p className="text-[15px] font-medium text-foreground">Kalenderbegivenheder</p>
                         <p className="text-[13px] text-muted-foreground">Nye events & ændringer</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.eventReminders} onCheckedChange={(v) => updateNotificationPreferences({ eventReminders: v })} />
+                      <IOSSwitch checked={notificationPreferences.eventReminders} onCheckedChange={(v) => saveNotificationPreferences({ eventReminders: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
                         <p className="text-[15px] font-medium text-foreground">Vigtige datoer</p>
                         <p className="text-[13px] text-muted-foreground">Fødselsdage, vaccinationer, skole</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.importantDates} onCheckedChange={(v) => updateNotificationPreferences({ importantDates: v })} />
+                      <IOSSwitch checked={notificationPreferences.importantDates} onCheckedChange={(v) => saveNotificationPreferences({ importantDates: v })} />
                     </div>
                   </div>
                 </div>
@@ -1657,14 +1656,14 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                         <p className="text-[15px] font-medium text-foreground">Opgavetildeling</p>
                         <p className="text-[13px] text-muted-foreground">Når du får en ny opgave</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.taskAssigned} onCheckedChange={(v) => updateNotificationPreferences({ taskAssigned: v })} />
+                      <IOSSwitch checked={notificationPreferences.taskAssigned} onCheckedChange={(v) => saveNotificationPreferences({ taskAssigned: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
                         <p className="text-[15px] font-medium text-foreground">Deadlines</p>
                         <p className="text-[13px] text-muted-foreground">Forfaldne & kommende opgaver</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.taskDeadline} onCheckedChange={(v) => updateNotificationPreferences({ taskDeadline: v })} />
+                      <IOSSwitch checked={notificationPreferences.taskDeadline} onCheckedChange={(v) => saveNotificationPreferences({ taskDeadline: v })} />
                     </div>
                   </div>
                 </div>
@@ -1679,14 +1678,14 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                         <p className="text-[15px] font-medium text-foreground">Nye udgifter</p>
                         <p className="text-[13px] text-muted-foreground">Afventer din godkendelse</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.expensePending} onCheckedChange={(v) => updateNotificationPreferences({ expensePending: v })} />
+                      <IOSSwitch checked={notificationPreferences.expensePending} onCheckedChange={(v) => saveNotificationPreferences({ expensePending: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
                         <p className="text-[15px] font-medium text-foreground">Udgiftsopdateringer</p>
                         <p className="text-[13px] text-muted-foreground">Godkendt, afvist, anfægtet</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.expenseUpdates} onCheckedChange={(v) => updateNotificationPreferences({ expenseUpdates: v })} />
+                      <IOSSwitch checked={notificationPreferences.expenseUpdates} onCheckedChange={(v) => saveNotificationPreferences({ expenseUpdates: v })} />
                     </div>
                   </div>
                 </div>
@@ -1701,14 +1700,14 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                         <p className="text-[15px] font-medium text-foreground">Nye beskeder</p>
                         <p className="text-[13px] text-muted-foreground">Kommunikation & dagbog</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.newMessages} onCheckedChange={(v) => updateNotificationPreferences({ newMessages: v })} />
+                      <IOSSwitch checked={notificationPreferences.newMessages} onCheckedChange={(v) => saveNotificationPreferences({ newMessages: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
                         <p className="text-[15px] font-medium text-foreground">Professionelle beskeder</p>
                         <p className="text-[13px] text-muted-foreground">Fra fagpersoner</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.professionalMessages} onCheckedChange={(v) => updateNotificationPreferences({ professionalMessages: v })} />
+                      <IOSSwitch checked={notificationPreferences.professionalMessages} onCheckedChange={(v) => saveNotificationPreferences({ professionalMessages: v })} />
                     </div>
                   </div>
                 </div>
@@ -1723,21 +1722,21 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                         <p className="text-[15px] font-medium text-foreground">Madplan</p>
                         <p className="text-[13px] text-muted-foreground">Daglig påmindelse om aftensmad</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.mealPlanReminder} onCheckedChange={(v) => updateNotificationPreferences({ mealPlanReminder: v })} />
+                      <IOSSwitch checked={notificationPreferences.mealPlanReminder} onCheckedChange={(v) => saveNotificationPreferences({ mealPlanReminder: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
                         <p className="text-[15px] font-medium text-foreground">Indkøb</p>
                         <p className="text-[13px] text-muted-foreground">Ugentlig indkøbspåmindelse</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.shoppingReminder} onCheckedChange={(v) => updateNotificationPreferences({ shoppingReminder: v })} />
+                      <IOSSwitch checked={notificationPreferences.shoppingReminder} onCheckedChange={(v) => saveNotificationPreferences({ shoppingReminder: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
                         <p className="text-[15px] font-medium text-foreground">Rengøring</p>
                         <p className="text-[13px] text-muted-foreground">Rengøringsopgave-påmindelser</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.cleaningReminder} onCheckedChange={(v) => updateNotificationPreferences({ cleaningReminder: v })} />
+                      <IOSSwitch checked={notificationPreferences.cleaningReminder} onCheckedChange={(v) => saveNotificationPreferences({ cleaningReminder: v })} />
                     </div>
                   </div>
                 </div>
@@ -1752,14 +1751,14 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                         <p className="text-[15px] font-medium text-foreground">Delte dokumenter</p>
                         <p className="text-[13px] text-muted-foreground">Nye filer delt med dig</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.documentShared} onCheckedChange={(v) => updateNotificationPreferences({ documentShared: v })} />
+                      <IOSSwitch checked={notificationPreferences.documentShared} onCheckedChange={(v) => saveNotificationPreferences({ documentShared: v })} />
                     </div>
                     <div className="flex items-center justify-between py-3 px-1">
                       <div>
                         <p className="text-[15px] font-medium text-foreground">Beslutningsforslag</p>
                         <p className="text-[13px] text-muted-foreground">Nye forslag der kræver svar</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.decisionProposed} onCheckedChange={(v) => updateNotificationPreferences({ decisionProposed: v })} />
+                      <IOSSwitch checked={notificationPreferences.decisionProposed} onCheckedChange={(v) => saveNotificationPreferences({ decisionProposed: v })} />
                     </div>
                   </div>
                 </div>
@@ -1774,7 +1773,7 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                         <p className="text-[15px] font-medium text-foreground">Dagbogspåmindelse</p>
                         <p className="text-[13px] text-muted-foreground">Daglig påmindelse om at logge</p>
                       </div>
-                      <IOSSwitch checked={notificationPreferences.diaryReminder} onCheckedChange={(v) => updateNotificationPreferences({ diaryReminder: v })} />
+                      <IOSSwitch checked={notificationPreferences.diaryReminder} onCheckedChange={(v) => saveNotificationPreferences({ diaryReminder: v })} />
                     </div>
                   </div>
                 </div>

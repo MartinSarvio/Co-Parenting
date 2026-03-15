@@ -37,7 +37,7 @@ import type {
   DbRiskAssessment,
   DbCaseActivity,
 } from '@/lib/mappers';
-import type { CalendarEvent, Task, Expense, MealPlan, Child, DiaryEntry, KeyDate, DecisionLog, Milestone, ShoppingItem, ShoppingList, Recipe, ProfessionalCase, RiskAssessment, CaseActivity } from '@/types';
+import type { CalendarEvent, Task, Expense, MealPlan, Child, DiaryEntry, KeyDate, DecisionLog, Milestone, ShoppingItem, ShoppingList, Recipe, ProfessionalCase, RiskAssessment, CaseActivity, BudgetGoal, WishItem, FamilyPhoto, NotificationPreferences } from '@/types';
 import { shoppingItemId, shoppingListId, generateId, professionalCaseId, riskAssessmentId, caseActivityId, diaryEntryId, keyDateId, decisionId, milestoneId, documentId, eventId } from '@/lib/id';
 import { toast } from 'sonner';
 
@@ -1399,6 +1399,150 @@ export function useApiActions() {
     [store],
   );
 
+  // ── Budget Goals ─────────────────────────────────────────
+
+  const saveBudgetGoals = useCallback(
+    async (goals: BudgetGoal[]) => {
+      const householdId = getHouseholdId();
+      const userId = getCurrentUserId();
+      if (!householdId || !userId) return;
+
+      store.setBudgetGoals(goals);
+
+      try {
+        // Delete existing then insert fresh
+        await supabase.from('budget_goals').delete().eq('household_id', householdId);
+        if (goals.length > 0) {
+          await supabase.from('budget_goals').insert(
+            goals.map(g => ({
+              id: `bg_${householdId}_${g.category}`,
+              household_id: householdId,
+              category: g.category,
+              monthly_amount: g.monthlyAmount,
+              created_by: userId,
+            }))
+          );
+        }
+      } catch (err) {
+        console.error('Failed to sync budget goals:', err);
+      }
+    },
+    [store],
+  );
+
+  // ── Wish Items ──────────────────────────────────────────
+
+  const createWishItem = useCallback(
+    async (data: Omit<WishItem, 'id' | 'createdAt'>) => {
+      const householdId = getHouseholdId();
+      if (!householdId) { toast.error('Ingen husstand'); return null; }
+      const item: WishItem = { ...data, id: `wish_${Date.now()}`, createdAt: new Date().toISOString() };
+      store.addWishItem(item);
+      const { error } = await supabase.from('wish_items').insert({
+        id: item.id, household_id: householdId, title: item.title,
+        price_estimate: item.priceEstimate, link: item.link, image_url: item.imageUrl,
+        description: item.description, child_id: item.childId, added_by: item.addedBy,
+        status: item.status, bought_by: item.boughtBy, created_at: item.createdAt,
+      });
+      if (error) { console.error('Supabase wish_items insert failed:', error); toast.error('Kunne ikke gemme ønske'); }
+      return item;
+    },
+    [store],
+  );
+
+  const updateWishItem = useCallback(
+    async (id: string, updates: Partial<WishItem>) => {
+      store.updateWishItem(id, updates);
+      const dbUpdates: Record<string, unknown> = {};
+      if (updates.title !== undefined) dbUpdates.title = updates.title;
+      if (updates.priceEstimate !== undefined) dbUpdates.price_estimate = updates.priceEstimate;
+      if (updates.link !== undefined) dbUpdates.link = updates.link;
+      if (updates.imageUrl !== undefined) dbUpdates.image_url = updates.imageUrl;
+      if (updates.description !== undefined) dbUpdates.description = updates.description;
+      if (updates.status !== undefined) dbUpdates.status = updates.status;
+      if (updates.boughtBy !== undefined) dbUpdates.bought_by = updates.boughtBy;
+      if (Object.keys(dbUpdates).length > 0) {
+        supabase.from('wish_items').update(dbUpdates).eq('id', id).then(({ error }) => {
+          if (error) console.error('Supabase wish_items update failed:', error);
+        });
+      }
+    },
+    [store],
+  );
+
+  const deleteWishItem = useCallback(
+    async (id: string) => {
+      store.deleteWishItem(id);
+      supabase.from('wish_items').delete().eq('id', id).then(({ error }) => {
+        if (error) console.error('Supabase wish_items delete failed:', error);
+      });
+    },
+    [store],
+  );
+
+  // ── Photos ──────────────────────────────────────────────
+
+  const createPhoto = useCallback(
+    async (data: Omit<FamilyPhoto, 'id' | 'addedAt'>) => {
+      const householdId = getHouseholdId();
+      if (!householdId) return null;
+      const photo: FamilyPhoto = { ...data, id: `photo_${Date.now()}`, addedAt: new Date().toISOString() };
+      store.addPhoto(photo);
+      const { error } = await supabase.from('family_photos').insert({
+        id: photo.id, household_id: householdId, child_id: photo.childId,
+        url: photo.url, caption: photo.caption, taken_at: photo.takenAt,
+        added_by: photo.addedBy, added_at: photo.addedAt,
+      });
+      if (error) { console.error('Supabase family_photos insert failed:', error); }
+      return photo;
+    },
+    [store],
+  );
+
+  const deletePhoto = useCallback(
+    async (id: string) => {
+      store.deletePhoto(id);
+      supabase.from('family_photos').delete().eq('id', id).then(({ error }) => {
+        if (error) console.error('Supabase family_photos delete failed:', error);
+      });
+    },
+    [store],
+  );
+
+  // ── Notification Preferences ────────────────────────────
+
+  const saveNotificationPreferences = useCallback(
+    async (prefs: Partial<NotificationPreferences>) => {
+      const userId = getCurrentUserId();
+      if (!userId) return;
+      store.updateNotificationPreferences(prefs);
+      const fullPrefs = useAppStore.getState().notificationPreferences;
+      supabase.from('notification_preferences').upsert({
+        user_id: userId,
+        handover_reminders: fullPrefs.handoverReminders,
+        handover_reminder_minutes: fullPrefs.handoverReminderMinutes,
+        schedule_changes: fullPrefs.scheduleChanges,
+        event_reminders: fullPrefs.eventReminders,
+        important_dates: fullPrefs.importantDates,
+        task_assigned: fullPrefs.taskAssigned,
+        task_deadline: fullPrefs.taskDeadline,
+        expense_pending: fullPrefs.expensePending,
+        expense_updates: fullPrefs.expenseUpdates,
+        new_messages: fullPrefs.newMessages,
+        professional_messages: fullPrefs.professionalMessages,
+        meal_plan_reminder: fullPrefs.mealPlanReminder,
+        shopping_reminder: fullPrefs.shoppingReminder,
+        cleaning_reminder: fullPrefs.cleaningReminder,
+        document_shared: fullPrefs.documentShared,
+        decision_proposed: fullPrefs.decisionProposed,
+        diary_reminder: fullPrefs.diaryReminder,
+      }, { onConflict: 'user_id' }).then(({ error }) => {
+        if (error) console.error('Supabase notification_preferences upsert failed:', error);
+      });
+    },
+    [store],
+  );
+
   return {
     // Events
     createEvent,
@@ -1477,5 +1621,16 @@ export function useApiActions() {
     deleteRoutineItem,
     createRoutineLog,
     updateRoutineLog,
+    // Budget Goals
+    saveBudgetGoals,
+    // Wish Items
+    createWishItem,
+    updateWishItem,
+    deleteWishItem,
+    // Photos
+    createPhoto,
+    deletePhoto,
+    // Notification Preferences
+    saveNotificationPreferences,
   };
 }

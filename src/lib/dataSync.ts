@@ -74,6 +74,10 @@ import type {
   RoutineLog,
   FridgeItem,
   CustodyPlan,
+  BudgetGoal,
+  WishItem,
+  FamilyPhoto,
+  NotificationPreferences,
 } from '@/types';
 
 export interface InitialData {
@@ -101,6 +105,10 @@ export interface InitialData {
   routineLogs: RoutineLog[];
   fridgeItems: FridgeItem[];
   custodyPlans: CustodyPlan[];
+  budgetGoals: BudgetGoal[];
+  wishItems: WishItem[];
+  photos: FamilyPhoto[];
+  notificationPreferences: NotificationPreferences | null;
 }
 
 /**
@@ -170,6 +178,10 @@ export async function loadInitialData(): Promise<InitialData> {
     routineLogsResult,
     fridgeItemsResult,
     custodyPlansResult,
+    budgetGoalsResult,
+    wishItemsResult,
+    photosResult,
+    notifPrefsResult,
   ] = await Promise.all([
     supabase.from('children').select('*').then(r => r.data as DbChild[] | null, () => null),
     supabase.from('calendar_events').select('*').order('start_date', { ascending: false }).limit(MAX_EVENTS).then(r => (r.data || []) as DbCalendarEvent[], () => [] as DbCalendarEvent[]),
@@ -193,6 +205,10 @@ export async function loadInitialData(): Promise<InitialData> {
     supabase.from('routine_logs').select('*').then(r => (r.data || []) as any[], () => [] as any[]),
     supabase.from('fridge_items').select('*').then(r => (r.data || []) as any[], () => [] as any[]),
     supabase.from('custody_plans').select('*').then(r => (r.data || []) as any[], () => [] as any[]),
+    supabase.from('budget_goals').select('*').then(r => (r.data || []) as any[], () => [] as any[]),
+    supabase.from('wish_items').select('*').then(r => (r.data || []) as any[], () => [] as any[]),
+    supabase.from('family_photos').select('*').order('taken_at', { ascending: false }).limit(200).then(r => (r.data || []) as any[], () => [] as any[]),
+    supabase.from('notification_preferences').select('*').eq('user_id', userId).single().then(r => r.data as any | null, () => null),
   ]);
 
   return {
@@ -271,5 +287,50 @@ export async function loadInitialData(): Promise<InitialData> {
       holidays: r.holidays ?? undefined,
       specialDays: r.special_days ?? undefined,
     })),
+    budgetGoals: budgetGoalsResult.map((r: any): BudgetGoal => ({
+      category: r.category,
+      monthlyAmount: r.monthly_amount ?? 0,
+    })),
+    wishItems: wishItemsResult.map((r: any): WishItem => ({
+      id: r.id,
+      title: r.title,
+      priceEstimate: r.price_estimate ?? undefined,
+      link: r.link ?? undefined,
+      imageUrl: r.image_url ?? undefined,
+      description: r.description ?? undefined,
+      childId: r.child_id,
+      addedBy: r.added_by,
+      status: r.status ?? 'wanted',
+      boughtBy: r.bought_by ?? undefined,
+      createdAt: r.created_at ?? '',
+    })),
+    photos: photosResult.map((r: any): FamilyPhoto => ({
+      id: r.id,
+      childId: r.child_id,
+      url: r.url,
+      caption: r.caption ?? undefined,
+      takenAt: r.taken_at ?? '',
+      addedBy: r.added_by,
+      addedAt: r.added_at ?? '',
+    })),
+    notificationPreferences: notifPrefsResult ? {
+      handoverReminders: notifPrefsResult.handover_reminders ?? true,
+      handoverReminderMinutes: notifPrefsResult.handover_reminder_minutes ?? 30,
+      scheduleChanges: notifPrefsResult.schedule_changes ?? true,
+      eventReminders: notifPrefsResult.event_reminders ?? true,
+      importantDates: notifPrefsResult.important_dates ?? true,
+      taskAssigned: notifPrefsResult.task_assigned ?? true,
+      taskDeadline: notifPrefsResult.task_deadline ?? true,
+      expensePending: notifPrefsResult.expense_pending ?? true,
+      expenseUpdates: notifPrefsResult.expense_updates ?? true,
+      newMessages: notifPrefsResult.new_messages ?? true,
+      professionalMessages: notifPrefsResult.professional_messages ?? true,
+      mealPlanReminder: notifPrefsResult.meal_plan_reminder ?? true,
+      shoppingReminder: notifPrefsResult.shopping_reminder ?? true,
+      cleaningReminder: notifPrefsResult.cleaning_reminder ?? true,
+      documentShared: notifPrefsResult.document_shared ?? true,
+      decisionProposed: notifPrefsResult.decision_proposed ?? true,
+      diaryReminder: notifPrefsResult.diary_reminder ?? true,
+    } : null,
   };
 }

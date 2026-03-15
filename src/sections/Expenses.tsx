@@ -140,13 +140,9 @@ export function Expenses() {
     setActiveTab: setAppTab,
     activeTab,
     budgetGoals,
-    updateBudgetGoal,
     wishItems,
-    addWishItem,
-    updateWishItem,
-    deleteWishItem,
   } = useAppStore();
-  const { createExpense, updateExpense, approveExpense } = useApiActions();
+  const { createExpense, updateExpense, approveExpense, saveBudgetGoals, createWishItem, updateWishItem, deleteWishItem } = useApiActions();
 
   const features = getPlanFeatures(household, currentUser?.isAdmin);
   const canUseExpenses = features.expenses;
@@ -982,7 +978,12 @@ export function Expenses() {
               <Input type="number" value={budgetEditAmount} onChange={(e) => setBudgetEditAmount(e.target.value)} placeholder="0" />
             </div>
             <Button className="w-full mt-2" onClick={() => {
-              updateBudgetGoal(budgetEditCategory, Number(budgetEditAmount) || 0);
+              const amount = Number(budgetEditAmount) || 0;
+              const existing = budgetGoals.find(g => g.category === budgetEditCategory);
+              const updatedGoals = existing
+                ? budgetGoals.map(g => g.category === budgetEditCategory ? { ...g, monthlyAmount: amount } : g)
+                : [...budgetGoals, { category: budgetEditCategory!, monthlyAmount: amount }];
+              saveBudgetGoals(updatedGoals);
               setShowBudgetEdit(false);
               setBudgetEditCategory(null);
               toast.success('Budget opdateret');
@@ -1156,8 +1157,7 @@ export function Expenses() {
               }
               setIsSaving(true);
               try {
-                const item: WishItem = {
-                  id: `wish-${Date.now()}`,
+                await createWishItem({
                   title: newWish.title.trim(),
                   priceEstimate: newWish.priceEstimate ? Number(newWish.priceEstimate) : undefined,
                   link: newWish.link || undefined,
@@ -1166,9 +1166,7 @@ export function Expenses() {
                   childId: newWish.childId,
                   addedBy: currentUser?.id || '',
                   status: 'wanted',
-                  createdAt: new Date().toISOString(),
-                };
-                addWishItem(item);
+                });
                 toast.success('Ønske tilføjet');
                 setNewWish({ title: '', priceEstimate: '', link: '', childId: '', description: '' });
                 setWishImagePreview(null);

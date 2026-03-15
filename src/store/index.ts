@@ -1111,6 +1111,10 @@ export const useAppStore = create<AppStore>()(
         routineLogs: data.routineLogs ?? state.routineLogs,
         fridgeItems: data.fridgeItems ?? state.fridgeItems,
         custodyPlans: data.custodyPlans ?? state.custodyPlans,
+        budgetGoals: data.budgetGoals ?? state.budgetGoals,
+        wishItems: data.wishItems ?? state.wishItems,
+        photos: data.photos ?? state.photos,
+        notificationPreferences: data.notificationPreferences ?? state.notificationPreferences,
         currentChildId: data.children !== undefined && data.children.length > 0
           ? (state.currentChildId && data.children.some(c => c.id === state.currentChildId)
               ? state.currentChildId
