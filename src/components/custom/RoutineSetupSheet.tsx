@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAppStore } from '@/store';
+import { useApiActions } from '@/hooks/useApiActions';
 import { routineItemId } from '@/lib/id';
 import { BottomSheet } from '@/components/custom/BottomSheet';
 import { Button } from '@/components/ui/button';
@@ -48,7 +49,8 @@ const SUGGESTIONS: Record<RoutineCategory, { label: string; emoji: string; type:
 const CATEGORY_ORDER: RoutineCategory[] = ['morgen', 'dag', 'aften'];
 
 export function RoutineSetupSheet({ open, onOpenChange, childId }: Props) {
-  const { currentUser, routineItems, addRoutineItem, deleteRoutineItem } = useAppStore();
+  const { currentUser, routineItems } = useAppStore();
+  const { createRoutineItem, deleteRoutineItem: apiDeleteRoutineItem } = useApiActions();
   const [activeCategory, setActiveCategory] = useState<RoutineCategory>('morgen');
   const [customLabel, setCustomLabel] = useState('');
   const [customEmoji, setCustomEmoji] = useState('✅');
@@ -60,10 +62,10 @@ export function RoutineSetupSheet({ open, onOpenChange, childId }: Props) {
     return existingItems.some(i => i.category === cat && i.label === label);
   }
 
-  function addSuggestion(cat: RoutineCategory, sug: typeof SUGGESTIONS['morgen'][0]) {
+  async function addSuggestion(cat: RoutineCategory, sug: typeof SUGGESTIONS['morgen'][0]) {
     if (!currentUser || hasSuggestion(cat, sug.label)) return;
     const maxOrder = Math.max(0, ...existingItems.filter(i => i.category === cat).map(i => i.order));
-    addRoutineItem({
+    await createRoutineItem({
       id: routineItemId(),
       childId,
       category: cat,
@@ -78,10 +80,10 @@ export function RoutineSetupSheet({ open, onOpenChange, childId }: Props) {
     });
   }
 
-  function addCustom() {
+  async function addCustom() {
     if (!currentUser || !customLabel.trim()) return;
     const maxOrder = Math.max(0, ...existingItems.filter(i => i.category === activeCategory).map(i => i.order));
-    addRoutineItem({
+    await createRoutineItem({
       id: routineItemId(),
       childId,
       category: activeCategory,
@@ -140,7 +142,7 @@ export function RoutineSetupSheet({ open, onOpenChange, childId }: Props) {
               return (
                 <button
                   key={sug.label}
-                  onClick={() => !exists && addSuggestion(activeCategory, sug)}
+                  onClick={() => { if (!exists) addSuggestion(activeCategory, sug).catch(() => {}); }}
                   disabled={exists}
                   className={cn(
                     'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[12px] font-medium transition-all',
@@ -172,7 +174,7 @@ export function RoutineSetupSheet({ open, onOpenChange, childId }: Props) {
                   <span className="text-[14px]">{item.emoji}</span>
                   <span className="flex-1 text-[13px] font-medium text-foreground">{item.label}</span>
                   <button
-                    onClick={() => deleteRoutineItem(item.id)}
+                    onClick={() => { apiDeleteRoutineItem(item.id).catch(() => {}); }}
                     className="rounded-full p-1 text-muted-foreground hover:text-rose-500"
                   >
                     <Trash2 className="h-3.5 w-3.5" />

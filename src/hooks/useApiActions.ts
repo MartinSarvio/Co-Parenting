@@ -55,15 +55,6 @@ function getHouseholdId(): string {
   return useAppStore.getState().household?.id || '';
 }
 
-/** Fire-and-forget Supabase sync — item er allerede gemt lokalt i store */
-function syncToSupabase(table: string, payload: Record<string, unknown>, errorMsg: string) {
-  supabase.from(table).insert(payload).then(({ error }) => {
-    if (error) {
-      console.error(`Supabase sync failed for ${table}:`, error);
-      toast.error(`${errorMsg} (lokal kopi gemt)`);
-    }
-  });
-}
 
 export function useApiActions() {
   const store = useAppStore();
@@ -71,7 +62,7 @@ export function useApiActions() {
   // ── Events ──────────────────────────────────────────────
 
   const createEvent = useCallback(
-    (data: Omit<CalendarEvent, 'id'>) => {
+    async (data: Omit<CalendarEvent, 'id'>) => {
       const userId = getCurrentUserId();
       if (!userId) { toast.error('Du skal være logget ind'); return null; }
       const event: CalendarEvent = {
@@ -88,19 +79,24 @@ export function useApiActions() {
         isRecurring: data.isRecurring || false,
       };
       store.addEvent(event);
-      syncToSupabase('calendar_events', {
-        id: event.id,
-        title: event.title,
-        description: event.description || null,
-        start_date: event.startDate,
-        end_date: event.endDate,
-        type: event.type,
-        child_id: event.childId || null,
-        created_by: userId,
-        location: event.location || null,
-        assigned_to: event.assignedTo || [],
-        is_recurring: event.isRecurring || false,
-      }, 'Kunne ikke synkronisere begivenhed');
+      try {
+        const { error } = await supabase.from('calendar_events').insert({
+          id: event.id,
+          title: event.title,
+          description: event.description || null,
+          start_date: event.startDate,
+          end_date: event.endDate,
+          type: event.type,
+          child_id: event.childId || null,
+          created_by: userId,
+          location: event.location || null,
+          assigned_to: event.assignedTo || [],
+          is_recurring: event.isRecurring || false,
+        });
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke gemme begivenhed');
+      }
       return event;
     },
     [store],
@@ -318,7 +314,7 @@ export function useApiActions() {
   // ── Documents ───────────────────────────────────────────
 
   const createDocument = useCallback(
-    (data: { title: string; type: string; url: string; sharedWith?: string[]; isOfficial?: boolean; validFrom?: string; validUntil?: string }) => {
+    async (data: { title: string; type: string; url: string; sharedWith?: string[]; isOfficial?: boolean; validFrom?: string; validUntil?: string }) => {
       const userId = getCurrentUserId();
       if (!userId) { toast.error('Du skal være logget ind'); return null; }
       const doc: import('@/types').Document = {
@@ -334,17 +330,22 @@ export function useApiActions() {
         validUntil: data.validUntil,
       };
       store.addDocument(doc);
-      syncToSupabase('documents', {
-        id: doc.id,
-        title: doc.title,
-        type: doc.type,
-        url: doc.url,
-        uploaded_by: userId,
-        shared_with: doc.sharedWith,
-        is_official: doc.isOfficial || false,
-        valid_from: doc.validFrom || null,
-        valid_until: doc.validUntil || null,
-      }, 'Kunne ikke synkronisere dokument');
+      try {
+        const { error } = await supabase.from('documents').insert({
+          id: doc.id,
+          title: doc.title,
+          type: doc.type,
+          url: doc.url,
+          uploaded_by: userId,
+          shared_with: doc.sharedWith,
+          is_official: doc.isOfficial || false,
+          valid_from: doc.validFrom || null,
+          valid_until: doc.validUntil || null,
+        });
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke gemme dokument');
+      }
       return doc;
     },
     [store],
@@ -559,7 +560,7 @@ export function useApiActions() {
   // ── Diary Entries ─────────────────────────────────────────
 
   const createDiaryEntry = useCallback(
-    (data: Omit<DiaryEntry, 'id' | 'createdAt' | 'writtenBy'>) => {
+    async (data: Omit<DiaryEntry, 'id' | 'createdAt' | 'writtenBy'>) => {
       const userId = getCurrentUserId();
       if (!userId) { toast.error('Du skal være logget ind'); return null; }
       const entry: DiaryEntry = {
@@ -575,16 +576,21 @@ export function useApiActions() {
         createdAt: new Date().toISOString(),
       };
       store.addDiaryEntry(entry);
-      syncToSupabase('diary_entries', {
-        id: entry.id,
-        child_id: entry.childId,
-        date: entry.date,
-        mood: entry.mood,
-        sleep: entry.sleep,
-        appetite: entry.appetite,
-        note: entry.note || null,
-        written_by: userId,
-      }, 'Kunne ikke synkronisere dagbogsindlæg');
+      try {
+        const { error } = await supabase.from('diary_entries').insert({
+          id: entry.id,
+          child_id: entry.childId,
+          date: entry.date,
+          mood: entry.mood,
+          sleep: entry.sleep,
+          appetite: entry.appetite,
+          note: entry.note || null,
+          written_by: userId,
+        });
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke gemme dagbogsindlæg');
+      }
       return entry;
     },
     [store],
@@ -626,7 +632,7 @@ export function useApiActions() {
   // ── Key Dates ───────────────────────────────────────────
 
   const createKeyDate = useCallback(
-    (data: Omit<KeyDate, 'id' | 'createdAt' | 'addedBy'>) => {
+    async (data: Omit<KeyDate, 'id' | 'createdAt' | 'addedBy'>) => {
       const userId = getCurrentUserId();
       if (!userId) { toast.error('Du skal være logget ind'); return null; }
       const kd: KeyDate = {
@@ -642,17 +648,22 @@ export function useApiActions() {
         createdAt: new Date().toISOString(),
       };
       store.addKeyDate(kd);
-      syncToSupabase('key_dates', {
-        id: kd.id,
-        child_id: kd.childId || null,
-        title: kd.title,
-        date: kd.date,
-        type: kd.type,
-        recurrence: kd.recurrence,
-        reminder_days_before: kd.reminderDaysBefore,
-        notes: kd.notes || null,
-        added_by: userId,
-      }, 'Kunne ikke synkronisere vigtig dato');
+      try {
+        const { error } = await supabase.from('key_dates').insert({
+          id: kd.id,
+          child_id: kd.childId || null,
+          title: kd.title,
+          date: kd.date,
+          type: kd.type,
+          recurrence: kd.recurrence,
+          reminder_days_before: kd.reminderDaysBefore,
+          notes: kd.notes || null,
+          added_by: userId,
+        });
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke gemme vigtig dato');
+      }
       return kd;
     },
     [store],
@@ -695,7 +706,7 @@ export function useApiActions() {
   // ── Decisions ───────────────────────────────────────────
 
   const createDecision = useCallback(
-    (data: Omit<DecisionLog, 'id' | 'createdAt' | 'proposedBy'>) => {
+    async (data: Omit<DecisionLog, 'id' | 'createdAt' | 'proposedBy'>) => {
       const userId = getCurrentUserId();
       if (!userId) { toast.error('Du skal være logget ind'); return null; }
       const decision: DecisionLog = {
@@ -715,21 +726,26 @@ export function useApiActions() {
         createdAt: new Date().toISOString(),
       };
       store.addDecision(decision);
-      syncToSupabase('decision_logs', {
-        id: decision.id,
-        child_id: decision.childId || null,
-        title: decision.title,
-        description: decision.description,
-        category: decision.category,
-        decided_at: decision.decidedAt,
-        proposed_by: userId,
-        approved_by: decision.approvedBy,
-        status: decision.status,
-        valid_from: decision.validFrom || null,
-        valid_until: decision.validUntil || null,
-        notes: decision.notes || null,
-        document_ids: decision.documentIds || null,
-      }, 'Kunne ikke synkronisere beslutning');
+      try {
+        const { error } = await supabase.from('decision_logs').insert({
+          id: decision.id,
+          child_id: decision.childId || null,
+          title: decision.title,
+          description: decision.description,
+          category: decision.category,
+          decided_at: decision.decidedAt,
+          proposed_by: userId,
+          approved_by: decision.approvedBy,
+          status: decision.status,
+          valid_from: decision.validFrom || null,
+          valid_until: decision.validUntil || null,
+          notes: decision.notes || null,
+          document_ids: decision.documentIds || null,
+        });
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke gemme beslutning');
+      }
       return decision;
     },
     [store],
@@ -771,7 +787,7 @@ export function useApiActions() {
   // ── Milestones ──────────────────────────────────────────
 
   const createMilestone = useCallback(
-    (data: Omit<Milestone, 'id'>) => {
+    async (data: Omit<Milestone, 'id'>) => {
       const userId = getCurrentUserId();
       if (!userId) { toast.error('Du skal være logget ind'); return null; }
       const milestone: Milestone = {
@@ -785,16 +801,21 @@ export function useApiActions() {
         photos: data.photos || [],
       };
       store.addMilestone(milestone);
-      syncToSupabase('milestones', {
-        id: milestone.id,
-        child_id: milestone.childId,
-        title: milestone.title,
-        description: milestone.description || null,
-        date: milestone.date,
-        category: milestone.category,
-        added_by: milestone.addedBy,
-        photos: milestone.photos || [],
-      }, 'Kunne ikke synkronisere milepæl');
+      try {
+        const { error } = await supabase.from('milestones').insert({
+          id: milestone.id,
+          child_id: milestone.childId,
+          title: milestone.title,
+          description: milestone.description || null,
+          date: milestone.date,
+          category: milestone.category,
+          added_by: milestone.addedBy,
+          photos: milestone.photos || [],
+        });
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke gemme milepæl');
+      }
       return milestone;
     },
     [store],
@@ -840,6 +861,142 @@ export function useApiActions() {
       } catch (err) {
         handleError(err, 'Kunne ikke slette milepæl');
         return false;
+      }
+    },
+    [store],
+  );
+
+  // ── Custody Plans ──────────────────────────────────────
+
+  const createCustodyPlan = useCallback(
+    async (plan: import('@/types').CustodyPlan) => {
+      store.addCustodyPlan(plan);
+      try {
+        const { error } = await supabase.from('custody_plans').insert({
+          id: plan.id,
+          household_id: getHouseholdId(),
+          child_id: plan.childId,
+          name: plan.name,
+          pattern: plan.pattern,
+          start_date: plan.startDate,
+          swap_day: plan.swapDay,
+          swap_time: plan.swapTime,
+          swap_location: plan.swapLocation || null,
+          parent1_weeks: plan.parent1Weeks ?? null,
+          parent2_weeks: plan.parent2Weeks ?? null,
+          parent1_days: plan.parent1Days,
+          parent2_days: plan.parent2Days,
+          weekly_schedule: plan.weeklySchedule || null,
+          custom_week_config: plan.customWeekConfig || null,
+          custom_schedule: plan.customSchedule || null,
+          supervised_config: plan.supervisedConfig || null,
+          holidays: plan.holidays || null,
+          special_days: plan.specialDays || null,
+          created_by: getCurrentUserId(),
+        });
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke gemme samværsplan');
+      }
+      return plan;
+    },
+    [store],
+  );
+
+  const updateCustodyPlan = useCallback(
+    async (id: string, data: Partial<import('@/types').CustodyPlan>) => {
+      store.updateCustodyPlan(id, data);
+      try {
+        const updateData: Record<string, unknown> = {};
+        if (data.name !== undefined) updateData.name = data.name;
+        if (data.pattern !== undefined) updateData.pattern = data.pattern;
+        if (data.startDate !== undefined) updateData.start_date = data.startDate;
+        if (data.swapDay !== undefined) updateData.swap_day = data.swapDay;
+        if (data.swapTime !== undefined) updateData.swap_time = data.swapTime;
+        if (data.swapLocation !== undefined) updateData.swap_location = data.swapLocation || null;
+        if (data.parent1Days !== undefined) updateData.parent1_days = data.parent1Days;
+        if (data.parent2Days !== undefined) updateData.parent2_days = data.parent2Days;
+        if (data.weeklySchedule !== undefined) updateData.weekly_schedule = data.weeklySchedule;
+        if (data.customWeekConfig !== undefined) updateData.custom_week_config = data.customWeekConfig;
+        if (data.customSchedule !== undefined) updateData.custom_schedule = data.customSchedule;
+        if (data.supervisedConfig !== undefined) updateData.supervised_config = data.supervisedConfig;
+        if (data.holidays !== undefined) updateData.holidays = data.holidays;
+        if (data.specialDays !== undefined) updateData.special_days = data.specialDays;
+        const { error } = await supabase.from('custody_plans').update(updateData).eq('id', id);
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke opdatere samværsplan');
+      }
+    },
+    [store],
+  );
+
+  // ── Fridge Items ──────────────────────────────────────
+
+  const createFridgeItem = useCallback(
+    async (item: import('@/types').FridgeItem) => {
+      store.addFridgeItem(item);
+      try {
+        const { error } = await supabase.from('fridge_items').insert({
+          id: item.id,
+          household_id: getHouseholdId(),
+          name: item.name,
+          barcode: item.barcode || null,
+          added_at: item.addedAt,
+          added_by: item.addedBy,
+          expires_at: item.expiresAt || null,
+          nutrition_per_100g: item.nutritionPer100g || null,
+          allergens: item.allergens || null,
+        });
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke gemme køleskabsvare');
+      }
+      return item;
+    },
+    [store],
+  );
+
+  const deleteFridgeItem = useCallback(
+    async (id: string) => {
+      store.removeFridgeItem(id);
+      try {
+        const { error } = await supabase.from('fridge_items').delete().eq('id', id);
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke slette køleskabsvare');
+      }
+    },
+    [store],
+  );
+
+  const updateFridgeItem = useCallback(
+    async (id: string, data: Partial<import('@/types').FridgeItem>) => {
+      store.updateFridgeItem(id, data);
+      try {
+        const updateData: Record<string, unknown> = {};
+        if (data.name !== undefined) updateData.name = data.name;
+        if (data.barcode !== undefined) updateData.barcode = data.barcode || null;
+        if (data.expiresAt !== undefined) updateData.expires_at = data.expiresAt || null;
+        if (data.nutritionPer100g !== undefined) updateData.nutrition_per_100g = data.nutritionPer100g || null;
+        if (data.allergens !== undefined) updateData.allergens = data.allergens || null;
+        const { error } = await supabase.from('fridge_items').update(updateData).eq('id', id);
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke opdatere køleskabsvare');
+      }
+    },
+    [store],
+  );
+
+  const archiveFridgeItem = useCallback(
+    async (id: string, reason: 'used' | 'thrown_away') => {
+      store.archiveFridgeItem(id, reason);
+      try {
+        const { error } = await supabase.from('fridge_items').delete().eq('id', id);
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke arkivere køleskabsvare');
       }
     },
     [store],
@@ -1167,20 +1324,25 @@ export function useApiActions() {
   // ── Routines ──────────────────────────────────────────────
 
   const createRoutineItem = useCallback(
-    (data: import('@/types').RoutineItem) => {
+    async (data: import('@/types').RoutineItem) => {
       store.addRoutineItem(data);
-      syncToSupabase('routine_items', {
-        id: data.id,
-        child_id: data.childId,
-        category: data.category,
-        type: data.type,
-        label: data.label,
-        emoji: data.emoji,
-        'order': data.order,
-        meal_key: data.mealKey || null,
-        is_active: data.isActive,
-        created_by: data.createdBy,
-      }, 'Kunne ikke synkronisere rutine');
+      try {
+        const { error } = await supabase.from('routine_items').insert({
+          id: data.id,
+          child_id: data.childId,
+          category: data.category,
+          type: data.type,
+          label: data.label,
+          emoji: data.emoji,
+          'order': data.order,
+          meal_key: data.mealKey || null,
+          is_active: data.isActive,
+          created_by: data.createdBy,
+        });
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke gemme rutine');
+      }
       return data;
     },
     [store],
@@ -1197,20 +1359,25 @@ export function useApiActions() {
   );
 
   const createRoutineLog = useCallback(
-    (data: import('@/types').RoutineLog) => {
+    async (data: import('@/types').RoutineLog) => {
       store.addRoutineLog(data);
-      syncToSupabase('routine_logs', {
-        id: data.id,
-        routine_item_id: data.routineItemId,
-        child_id: data.childId,
-        date: data.date,
-        completed: data.completed,
-        completed_at: data.completedAt || null,
-        completed_by: data.completedBy || null,
-        time: data.time || null,
-        note: data.note || null,
-        linked_food_log_id: data.linkedFoodLogId || null,
-      }, 'Kunne ikke synkronisere rutine-log');
+      try {
+        const { error } = await supabase.from('routine_logs').insert({
+          id: data.id,
+          routine_item_id: data.routineItemId,
+          child_id: data.childId,
+          date: data.date,
+          completed: data.completed,
+          completed_at: data.completedAt || null,
+          completed_by: data.completedBy || null,
+          time: data.time || null,
+          note: data.note || null,
+          linked_food_log_id: data.linkedFoodLogId || null,
+        });
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke gemme rutine-log');
+      }
       return data;
     },
     [store],
@@ -1277,6 +1444,14 @@ export function useApiActions() {
     createMilestone,
     updateMilestone,
     deleteMilestone,
+    // Custody Plans
+    createCustodyPlan,
+    updateCustodyPlan,
+    // Fridge Items
+    createFridgeItem,
+    deleteFridgeItem,
+    updateFridgeItem,
+    archiveFridgeItem,
     // Shopping Items
     createShoppingItem,
     updateShoppingItem,

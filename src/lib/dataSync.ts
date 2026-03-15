@@ -70,6 +70,10 @@ import type {
   RiskAssessment,
   ProfessionalDepartment,
   CaseActivity,
+  RoutineItem,
+  RoutineLog,
+  FridgeItem,
+  CustodyPlan,
 } from '@/types';
 
 export interface InitialData {
@@ -93,6 +97,10 @@ export interface InitialData {
   riskAssessments: RiskAssessment[];
   departments: ProfessionalDepartment[];
   caseActivities: CaseActivity[];
+  routineItems: RoutineItem[];
+  routineLogs: RoutineLog[];
+  fridgeItems: FridgeItem[];
+  custodyPlans: CustodyPlan[];
 }
 
 /**
@@ -158,6 +166,10 @@ export async function loadInitialData(): Promise<InitialData> {
     riskAssessmentsResult,
     departmentsResult,
     caseActivitiesResult,
+    routineItemsResult,
+    routineLogsResult,
+    fridgeItemsResult,
+    custodyPlansResult,
   ] = await Promise.all([
     supabase.from('children').select('*').then(r => r.data as DbChild[] | null, () => null),
     supabase.from('calendar_events').select('*').order('start_date', { ascending: false }).limit(MAX_EVENTS).then(r => (r.data || []) as DbCalendarEvent[], () => [] as DbCalendarEvent[]),
@@ -177,6 +189,10 @@ export async function loadInitialData(): Promise<InitialData> {
     supabase.from('risk_assessments').select('*').then(r => (r.data || []) as DbRiskAssessment[], () => [] as DbRiskAssessment[]),
     supabase.from('professional_departments').select('*').then(r => (r.data || []) as DbProfessionalDepartment[], () => [] as DbProfessionalDepartment[]),
     supabase.from('case_activity_log').select('*').order('created_at', { ascending: false }).limit(200).then(r => (r.data || []) as DbCaseActivity[], () => [] as DbCaseActivity[]),
+    supabase.from('routine_items').select('*').then(r => (r.data || []) as any[], () => [] as any[]),
+    supabase.from('routine_logs').select('*').then(r => (r.data || []) as any[], () => [] as any[]),
+    supabase.from('fridge_items').select('*').then(r => (r.data || []) as any[], () => [] as any[]),
+    supabase.from('custody_plans').select('*').then(r => (r.data || []) as any[], () => [] as any[]),
   ]);
 
   return {
@@ -200,5 +216,60 @@ export async function loadInitialData(): Promise<InitialData> {
     riskAssessments: riskAssessmentsResult.map(mapRiskAssessment),
     departments: departmentsResult.map(mapProfessionalDepartment),
     caseActivities: caseActivitiesResult.map(mapCaseActivity),
+    routineItems: routineItemsResult.map((r: any): RoutineItem => ({
+      id: r.id,
+      childId: r.child_id,
+      category: r.category,
+      type: r.type,
+      label: r.label,
+      emoji: r.emoji,
+      order: r.order,
+      mealKey: r.meal_key ?? undefined,
+      isActive: r.is_active ?? true,
+      createdBy: r.created_by,
+      createdAt: r.created_at ?? '',
+    })),
+    routineLogs: routineLogsResult.map((r: any): RoutineLog => ({
+      id: r.id,
+      routineItemId: r.routine_item_id,
+      childId: r.child_id,
+      date: r.date,
+      completed: r.completed ?? false,
+      completedAt: r.completed_at ?? undefined,
+      completedBy: r.completed_by ?? undefined,
+      time: r.time ?? undefined,
+      note: r.note ?? undefined,
+      linkedFoodLogId: r.linked_food_log_id ?? undefined,
+    })),
+    fridgeItems: fridgeItemsResult.map((r: any): FridgeItem => ({
+      id: r.id,
+      name: r.name,
+      barcode: r.barcode ?? undefined,
+      addedAt: r.added_at ?? '',
+      addedBy: r.added_by ?? '',
+      expiresAt: r.expires_at ?? undefined,
+      nutritionPer100g: r.nutrition_per_100g ?? undefined,
+      allergens: r.allergens ?? undefined,
+    })),
+    custodyPlans: custodyPlansResult.map((r: any): CustodyPlan => ({
+      id: r.id,
+      childId: r.child_id,
+      name: r.name,
+      pattern: r.pattern,
+      startDate: r.start_date ?? '',
+      swapDay: r.swap_day ?? 0,
+      swapTime: r.swap_time ?? '18:00',
+      swapLocation: r.swap_location ?? undefined,
+      parent1Weeks: r.parent1_weeks ?? undefined,
+      parent2Weeks: r.parent2_weeks ?? undefined,
+      parent1Days: r.parent1_days ?? [],
+      parent2Days: r.parent2_days ?? [],
+      weeklySchedule: r.weekly_schedule ?? undefined,
+      customWeekConfig: r.custom_week_config ?? undefined,
+      customSchedule: r.custom_schedule ?? undefined,
+      supervisedConfig: r.supervised_config ?? undefined,
+      holidays: r.holidays ?? undefined,
+      specialDays: r.special_days ?? undefined,
+    })),
   };
 }

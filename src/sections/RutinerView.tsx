@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useAppStore } from '@/store';
+import { useApiActions } from '@/hooks/useApiActions';
 import { useFamilyContext } from '@/hooks/useFamilyContext';
 import { OverblikSidePanel } from '@/components/custom/OverblikSidePanel';
 import { RoutineSetupSheet } from '@/components/custom/RoutineSetupSheet';
@@ -32,7 +33,8 @@ const CATEGORY_META: Record<RoutineCategory, { label: string; emoji: string }> =
 const CATEGORY_ORDER: RoutineCategory[] = ['morgen', 'dag', 'aften'];
 
 export function RutinerView() {
-  const { currentUser, routineItems, routineLogs, children, currentChildId, addRoutineLog, updateRoutineLog } = useAppStore();
+  const { currentUser, routineItems, routineLogs, children, currentChildId } = useAppStore();
+  const { createRoutineLog, updateRoutineLog: apiUpdateRoutineLog } = useApiActions();
   const { currentChild } = useFamilyContext();
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [setupOpen, setSetupOpen] = useState(false);
@@ -71,17 +73,17 @@ export function RutinerView() {
   const totalItems = activeItems.length;
   const completedCount = todayLogs.filter(l => l.completed).length;
 
-  function handleToggle(item: RoutineItem, existingLog?: RoutineLog) {
+  async function handleToggle(item: RoutineItem, existingLog?: RoutineLog) {
     if (!currentUser || !child) return;
     if (existingLog) {
-      updateRoutineLog(existingLog.id, {
+      await apiUpdateRoutineLog(existingLog.id, {
         completed: !existingLog.completed,
         completedAt: !existingLog.completed ? new Date().toISOString() : undefined,
         completedBy: !existingLog.completed ? currentUser.id : undefined,
         time: !existingLog.completed ? format(new Date(), 'HH:mm') : undefined,
       });
     } else {
-      addRoutineLog({
+      await createRoutineLog({
         id: routineLogId(),
         routineItemId: item.id,
         childId: child.id,

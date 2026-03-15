@@ -182,6 +182,10 @@ interface AppStore {
   tilbudAdminCreateOpen: boolean;
   nyhederAdminCreateOpen: boolean;
 
+  // Network state
+  isOnline: boolean;
+  setOnline: (online: boolean) => void;
+
   // Actions
   setCurrentUser: (user: User | null) => void;
   setAuthenticated: (value: boolean) => void;
@@ -424,6 +428,10 @@ interface AppStore {
     riskAssessments?: RiskAssessment[];
     departments?: ProfessionalDepartment[];
     caseActivities?: CaseActivity[];
+    routineItems?: RoutineItem[];
+    routineLogs?: RoutineLog[];
+    fridgeItems?: FridgeItem[];
+    custodyPlans?: CustodyPlan[];
   }) => void;
 
   // Auth
@@ -569,11 +577,15 @@ export const useAppStore = create<AppStore>()(
       tilbudAdminCreateOpen: false,
       nyhederAdminCreateOpen: false,
 
+      // Network state
+      isOnline: true,
+      setOnline: (online) => set({ isOnline: online }),
+
       // Actions
       setCurrentUser: (user) => set({ currentUser: user }),
       setAuthenticated: (value) => set({ isAuthenticated: value }),
       setProfessionalView: (value) => set((state) => ({
-        isProfessionalView: state.currentUser?.isAdmin ? value : false
+        isProfessionalView: (state.currentUser?.isAdmin || state.currentUser?.role === 'professional') ? value : false
       })),
       setCurrentChildId: (id) => set({ currentChildId: id }),
       setActiveTab: (tab) => set((state) => ({
@@ -710,8 +722,8 @@ export const useAppStore = create<AppStore>()(
           ...household,
           subscription: normalizeSubscription(household)
         },
-        isProfessionalView: state.currentUser?.isAdmin ? state.isProfessionalView : false,
-        activeTab: !state.currentUser?.isAdmin && state.activeTab === 'cases' ? 'dashboard' : state.activeTab
+        isProfessionalView: (state.currentUser?.isAdmin || state.currentUser?.role === 'professional') ? state.isProfessionalView : false,
+        activeTab: !(state.currentUser?.isAdmin || state.currentUser?.role === 'professional') && state.activeTab === 'cases' ? 'dashboard' : state.activeTab
       })),
       addPaymentAccount: (account) => set((state) => ({
         paymentAccounts: [
@@ -1095,6 +1107,10 @@ export const useAppStore = create<AppStore>()(
         riskAssessments: data.riskAssessments ?? state.riskAssessments,
         departments: data.departments ?? state.departments,
         caseActivities: data.caseActivities ?? state.caseActivities,
+        routineItems: data.routineItems ?? state.routineItems,
+        routineLogs: data.routineLogs ?? state.routineLogs,
+        fridgeItems: data.fridgeItems ?? state.fridgeItems,
+        custodyPlans: data.custodyPlans ?? state.custodyPlans,
         currentChildId: data.children !== undefined && data.children.length > 0
           ? (state.currentChildId && data.children.some(c => c.id === state.currentChildId)
               ? state.currentChildId

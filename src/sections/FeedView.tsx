@@ -79,6 +79,7 @@ interface ForumGroup {
 
 /* ─── Demo-data ─── */
 
+// TODO: Replace with Supabase news table
 export const DEMO_NEWS = [
   {
     id: '1',

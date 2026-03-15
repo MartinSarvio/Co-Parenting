@@ -1,6 +1,7 @@
 import { useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
+import { useKeyboardHeight } from '@/hooks/useKeyboardHeight';
 
 interface BottomSheetProps {
   open: boolean;
@@ -13,6 +14,7 @@ interface BottomSheetProps {
 
 export function BottomSheet({ open, onOpenChange, title, children, compact }: BottomSheetProps) {
   const close = useCallback(() => onOpenChange(false), [onOpenChange]);
+  const keyboardHeight = useKeyboardHeight();
 
   // Close on Escape key
   useEffect(() => {
@@ -52,7 +54,13 @@ export function BottomSheet({ open, onOpenChange, title, children, compact }: Bo
 
           {/* Sheet */}
           <motion.div
-            className={`fixed inset-x-0 bottom-0 z-[81] mx-auto max-w-[430px] flex flex-col bg-background rounded-t-3xl shadow-[0_-8px_40px_rgba(0,0,0,0.12)] ${compact ? 'max-h-[70vh]' : 'max-h-[90vh]'}`}
+            className={`fixed inset-x-0 z-[81] mx-auto max-w-[430px] flex flex-col bg-background rounded-t-3xl shadow-[0_-8px_40px_rgba(0,0,0,0.12)]`}
+            style={{
+              bottom: keyboardHeight,
+              maxHeight: keyboardHeight > 0
+                ? `calc(100dvh - ${keyboardHeight}px)`
+                : compact ? '70vh' : '90vh',
+            }}
             initial={{ y: '100%' }}
             animate={{ y: 0 }}
             exit={{ y: '100%' }}

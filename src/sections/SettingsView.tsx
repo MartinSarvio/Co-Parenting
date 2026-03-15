@@ -144,11 +144,7 @@ export function SettingsView() {
     accountLabel: '',
     accountHandle: ''
   });
-  const [lawyerDraft, setLawyerDraft] = useState({
-    name: '',
-    email: ''
-  });
-  const [evidenceDraft, setEvidenceDraft] = useState({
+const [evidenceDraft, setEvidenceDraft] = useState({
     title: '',
     url: '',
     description: ''
@@ -183,17 +179,13 @@ export function SettingsView() {
   const features = getPlanFeatures(household, currentUser?.isAdmin);
   const currentMode = household?.familyMode || 'co_parenting';
   const isTogetherMode = currentMode === 'together';
-  const allowProfessionalTools = currentUser?.isAdmin === true;
+  const allowProfessionalTools = currentUser?.isAdmin === true || currentUser?.role === 'professional';
 
   const myPaymentAccounts = useMemo(() => {
     if (!currentUser) return [];
     return paymentAccounts.filter((account) => account.userId === currentUser.id);
   }, [paymentAccounts, currentUser]);
 
-  const lawyerUsers = useMemo(() => {
-    const lawyerIds = household?.singleParentSupport?.lawyerIds || [];
-    return users.filter((user) => lawyerIds.includes(user.id));
-  }, [household, users]);
 
   const evidenceDocuments = useMemo(() => {
     return documents.filter((document) => (
@@ -417,46 +409,6 @@ export function SettingsView() {
     });
   };
 
-  const handleInviteLawyer = () => {
-    if (!household) return;
-    if (!features.lawyerAccess) {
-      toast.error('Advokatadgang kræver Enlig Plus abonnement');
-      return;
-    }
-    if (!lawyerDraft.name.trim() || !lawyerDraft.email.trim()) {
-      toast.error('Udfyld navn og email');
-      return;
-    }
-
-    const lawyerId = generateUserId();
-    addUser({
-      id: lawyerId,
-      name: lawyerDraft.name.trim(),
-      email: lawyerDraft.email.trim(),
-      role: 'professional',
-      professionalType: 'lawyer',
-      organization: 'Ekstern advokat',
-      color: 'neutral',
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(lawyerDraft.name.trim())}`
-    });
-
-    const support = household.singleParentSupport || {
-      evidenceVaultEnabled: true,
-      autoArchiveReceipts: true,
-      lawyerIds: []
-    };
-
-    setHousehold({
-      ...household,
-      singleParentSupport: {
-        ...support,
-        lawyerIds: [...support.lawyerIds, lawyerId]
-      }
-    });
-
-    setLawyerDraft({ name: '', email: '' });
-    toast.success('Advokat inviteret og fået adgang');
-  };
 
   const handleAddEvidence = () => {
     if (!currentUser || !household) return;
@@ -469,17 +421,11 @@ export function SettingsView() {
       return;
     }
 
-    const support = household.singleParentSupport || {
-      evidenceVaultEnabled: true,
-      autoArchiveReceipts: true,
-      lawyerIds: []
-    };
-
     createDocument({
       title: evidenceDraft.title.trim(),
       type: 'authority_document',
       url: evidenceDraft.url.trim(),
-      sharedWith: [currentUser.id, ...support.lawyerIds],
+      sharedWith: [currentUser.id],
       isOfficial: true,
     });
 
@@ -1098,41 +1044,10 @@ export function SettingsView() {
                 </div>
 
                 <div className="rounded-[8px] border border-border bg-card p-3">
-                  <p className="mb-2 text-sm font-medium">Inviter advokat</p>
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                    <Input
-                      value={lawyerDraft.name}
-                      onChange={(e) => setLawyerDraft((prev) => ({ ...prev, name: e.target.value }))}
-                      placeholder="Navn"
-                    />
-                    <Input
-                      value={lawyerDraft.email}
-                      onChange={(e) => setLawyerDraft((prev) => ({ ...prev, email: e.target.value }))}
-                      placeholder="Email"
-                    />
-                  </div>
-                  <Button className="mt-2 w-full" variant="outline" onClick={handleInviteLawyer} disabled={!features.lawyerAccess}>
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    Tilføj advokatadgang
-                  </Button>
-                  {!features.lawyerAccess && (
-                    <p className="text-xs text-muted-foreground mt-1">Kræver Enlig Plus abonnement</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  {lawyerUsers.length === 0 ? (
-                    <p className="rounded-[8px] border border-dashed border-border bg-card p-3 text-sm text-muted-foreground">
-                      Ingen advokater tilknyttet endnu.
-                    </p>
-                  ) : (
-                    lawyerUsers.map((lawyer) => (
-                      <div key={lawyer.id} className="rounded-[8px] border border-border bg-card p-3">
-                        <p className="font-medium">{lawyer.name}</p>
-                        <p className="text-[13px] text-muted-foreground">{lawyer.email}</p>
-                      </div>
-                    ))
-                  )}
+                  <p className="mb-1 text-sm font-medium">Del med din advokat</p>
+                  <p className="text-[13px] text-muted-foreground">
+                    Eksportér dokumenter fra Dokumenter-sektionen og del dem sikkert med din advokat via email eller besked.
+                  </p>
                 </div>
 
                 <div className="rounded-[8px] border border-border bg-card p-3">
@@ -1583,8 +1498,10 @@ export function SettingsView() {
                     <UserPlus className="mr-2 h-4 w-4" />
                     Tilføj familiemedlem
                   </Button>
+
                 </>
               )}
+
         </TabsContent>
 
         {/* ─── Notifikationer (fra sidepanel) ─── */}
@@ -2449,7 +2366,7 @@ export function SettingsView() {
                 <div>
                   <p className="text-[15px] font-medium text-foreground dark:text-slate-200">Professionel visning</p>
                   <p className="text-[13px] text-muted-foreground dark:text-slate-400">
-                    {allowProfessionalTools ? 'Kan slås til/fra' : 'Kun tilgængelig for administratorer'}
+                    {allowProfessionalTools ? 'Kan slås til/fra' : 'Kun tilgængelig for professionelle brugere og administratorer'}
                   </p>
                 </div>
                 <IOSSwitch
@@ -2531,6 +2448,9 @@ export function SettingsView() {
           </div>
         </DialogContent>
       </Dialog>
+
+
+
       <SavingOverlay open={isSaving} />
     </div>
   );

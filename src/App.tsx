@@ -137,13 +137,13 @@ function SectionLoading() {
 }
 
 function App() {
-  const { isAuthenticated, isProfessionalView, activeTab, setActiveTab, household, currentUser, children, setCurrentUser, setAuthenticated, hydrateFromServer, logout } = useAppStore();
+  const { isAuthenticated, isProfessionalView, activeTab, setActiveTab, household, currentUser, children, setCurrentUser, setAuthenticated, hydrateFromServer, logout, isOnline } = useAppStore();
   const [isReady, setIsReady] = useState(false);
   const [authScreen, setAuthScreen] = useState<'login' | 'register'>('login');
   const [childVerified, setChildVerified] = useState(false);
   const [verificationChecked, setVerificationChecked] = useState(false);
   const [needsVerification, setNeedsVerification] = useState(false);
-  const canUseProfessionalView = currentUser?.isAdmin === true;
+  const canUseProfessionalView = currentUser?.isAdmin === true || currentUser?.role === 'professional';
   const showProfessionalView = isProfessionalView && canUseProfessionalView;
 
   // Session restore — check for existing Supabase session on mount
@@ -284,16 +284,52 @@ function App() {
     return () => { backHandle?.remove(); };
   }, []);
 
-  // Keyboard dismiss: tap outside input fields blurs active element
+  // Offline detection
   useEffect(() => {
-    const handler = (e: TouchEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target.closest('input, textarea, select, [contenteditable]')) {
-        (document.activeElement as HTMLElement)?.blur();
+    const store = useAppStore.getState();
+    const handleOnline = () => store.setOnline(true);
+    const handleOffline = () => store.setOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    // Set initial state
+    store.setOnline(navigator.onLine);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Keyboard dismiss: tap (not scroll) outside input fields blurs active element
+  useEffect(() => {
+    let startX = 0;
+    let startY = 0;
+
+    const onTouchStart = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      startX = touch.clientX;
+      startY = touch.clientY;
+    };
+
+    const onTouchEnd = (e: TouchEvent) => {
+      const touch = e.changedTouches[0];
+      const dx = Math.abs(touch.clientX - startX);
+      const dy = Math.abs(touch.clientY - startY);
+
+      // Only dismiss keyboard if it was a tap (not a scroll gesture)
+      if (dx < 10 && dy < 10) {
+        const target = e.target as HTMLElement;
+        if (!target.closest('input, textarea, select, [contenteditable]')) {
+          (document.activeElement as HTMLElement)?.blur();
+        }
       }
     };
-    document.addEventListener('touchstart', handler, { passive: true });
-    return () => document.removeEventListener('touchstart', handler);
+
+    document.addEventListener('touchstart', onTouchStart, { passive: true });
+    document.addEventListener('touchend', onTouchEnd, { passive: true });
+    return () => {
+      document.removeEventListener('touchstart', onTouchStart);
+      document.removeEventListener('touchend', onTouchEnd);
+    };
   }, []);
 
   if (!isReady) {
@@ -491,6 +527,11 @@ function App() {
 
   return (
     <div className="app-shell min-h-[100svh] bg-transparent">
+      {!isOnline && (
+        <div className="fixed top-0 inset-x-0 z-[9999] bg-red-500 text-white text-center text-[13px] font-semibold py-1.5" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+          Ingen internetforbindelse — ændringer gemmes lokalt
+        </div>
+      )}
       {!hideChrome && <TopBar />}
       <main className={cn(
         "mx-auto w-full",

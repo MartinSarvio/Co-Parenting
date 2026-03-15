@@ -16,6 +16,7 @@ import {
   Eye,
   FolderOpen,
   Info,
+  Share2,
 } from 'lucide-react';
 import { SavingOverlay } from '@/components/custom/SavingOverlay';
 import { toast } from 'sonner';
@@ -561,7 +562,33 @@ export function Dokumenter() {
                   <div className="flex gap-2">
                     <Button className="flex-1 rounded-[8px] bg-[#f58a2d] text-white hover:bg-[#e47921]">
                       <Eye className="mr-2 h-4 w-4" />
-                      Åbn dokument
+                      Åbn
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="flex-1 rounded-[8px]"
+                      onClick={async () => {
+                        const docTitle = selectedDocument.title;
+                        const docUrl = selectedDocument.url;
+                        const shareData = {
+                          title: docTitle,
+                          text: `Dokument: ${docTitle}`,
+                          ...(docUrl ? { url: docUrl } : {}),
+                        };
+                        if (navigator.share) {
+                          try {
+                            await navigator.share(shareData);
+                          } catch {
+                            // User cancelled share
+                          }
+                        } else {
+                          await navigator.clipboard.writeText(`${docTitle}\n${docUrl || ''}`);
+                          toast.success('Kopieret til udklipsholder');
+                        }
+                      }}
+                    >
+                      <Share2 className="mr-2 h-4 w-4" />
+                      Del
                     </Button>
                   </div>
                 </div>

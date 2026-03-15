@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAppStore } from '@/store';
+import { useApiActions } from '@/hooks/useApiActions';
 import { routineLogId } from '@/lib/id';
 import { BottomSheet } from '@/components/custom/BottomSheet';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,8 @@ interface Props {
 }
 
 export function RoutineLogSheet({ open, onOpenChange, item, log, dateStr }: Props) {
-  const { currentUser, addRoutineLog, updateRoutineLog } = useAppStore();
+  const { currentUser } = useAppStore();
+  const { createRoutineLog, updateRoutineLog: apiUpdateRoutineLog } = useApiActions();
   const [time, setTime] = useState('');
   const [note, setNote] = useState('');
 
@@ -32,10 +34,10 @@ export function RoutineLogSheet({ open, onOpenChange, item, log, dateStr }: Prop
 
   if (!item) return null;
 
-  function handleSave() {
+  async function handleSave() {
     if (!currentUser || !item) return;
     if (log) {
-      updateRoutineLog(log.id, {
+      await apiUpdateRoutineLog(log.id, {
         time: time || undefined,
         note: note.trim() || undefined,
         completed: true,
@@ -43,7 +45,7 @@ export function RoutineLogSheet({ open, onOpenChange, item, log, dateStr }: Prop
         completedBy: log.completedBy || currentUser.id,
       });
     } else {
-      addRoutineLog({
+      await createRoutineLog({
         id: routineLogId(),
         routineItemId: item.id,
         childId: item.childId,
