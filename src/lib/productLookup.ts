@@ -19,6 +19,10 @@ export interface ProductRecord {
   proteins_100g: number | null;
   salt_100g: number | null;
   allergens: string[];
+  traces: string[];
+  ingredients_text: string | null;
+  serving_size: string | null;
+  serving_quantity: number | null;
   image_url: string | null;
   quantity: string | null;
 }

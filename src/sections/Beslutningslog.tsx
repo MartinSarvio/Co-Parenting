@@ -457,7 +457,7 @@ export function Beslutningslog() {
                           className={cn(
                             "flex items-center gap-1.5 rounded-[8px] px-2.5 py-1.5 text-[12px] font-medium transition-all",
                             isSelected
-                              ? "bg-orange-tint border border-orange-tint text-[#cc6f1f]"
+                              ? "bg-orange-tint border border-orange-tint text-[#f58a2d]"
                               : "bg-background border border-transparent text-muted-foreground hover:bg-muted"
                           )}
                         >

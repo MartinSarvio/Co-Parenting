@@ -2667,7 +2667,7 @@ export function MadOgHjem() {
                   className={cn(
                     "shrink-0 rounded-[8px] border-2 px-4 py-2 text-[13px] font-semibold transition-all",
                     (member.id === currentUser?.id ? dagbogSelectedChild === null : dagbogSelectedChild === member.id)
-                      ? "border-[#f58a2d] bg-orange-tint text-[#b96424]"
+                      ? "border-[#f58a2d] bg-orange-tint text-[#f58a2d] dark:text-[#f5a55d]"
                       : "border-border bg-card text-muted-foreground"
                   )}
                 >
@@ -2969,7 +2969,7 @@ export function MadOgHjem() {
               Tag hensyn til barnets allergier
             </label>
             {autoPlannerSettings.useChildAllergies && (
-              <p className="text-[11px] text-[#b98b5a] pl-8">
+              <p className="text-[11px] text-muted-foreground pl-8">
                 Aktive allergier: {currentChild?.allergies?.length ? currentChild.allergies.join(', ') : 'Ingen registreret'}
               </p>
             )}
@@ -3267,7 +3267,7 @@ export function MadOgHjem() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="text-[14px] font-semibold text-foreground">{recipe.name}</p>
                         {recipe.childFriendly && (
-                          <span className="inline-flex items-center gap-0.5 rounded-[8px] bg-orange-tint border border-orange-tint px-1.5 py-0.5 text-[10px] font-semibold text-[#cc6f1f]">
+                          <span className="inline-flex items-center gap-0.5 rounded-[8px] bg-orange-tint border border-orange-tint px-1.5 py-0.5 text-[10px] font-semibold text-[#f58a2d]">
                             <Baby className="h-3 w-3" /> Børnevenlig
                           </span>
                         )}
@@ -3466,7 +3466,7 @@ export function MadOgHjem() {
               <Label className="text-[12px] font-semibold text-muted-foreground">Tags</Label>
               <div className="flex flex-wrap gap-1.5 rounded-[8px] border border-border bg-card p-2 min-h-[42px] items-center">
                 {newRecipe.tags.map((tag, i) => (
-                  <span key={i} className="inline-flex items-center justify-center gap-0.5 rounded-full bg-orange-tint border border-orange-tint px-2 py-0.5 text-[11px] font-medium text-[#cc6f1f] leading-none">
+                  <span key={i} className="inline-flex items-center justify-center gap-0.5 rounded-full bg-orange-tint border border-orange-tint px-2 py-0.5 text-[11px] font-medium text-[#f58a2d] leading-none">
                     {tag}
                     <button type="button" onClick={() => setNewRecipe(prev => ({ ...prev, tags: prev.tags.filter((_, idx) => idx !== i) }))}>
                       <X className="h-2.5 w-2.5" />

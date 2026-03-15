@@ -125,11 +125,11 @@ function SectionLoading() {
   return (
     <div className="px-4 py-8">
       <div className="mx-auto max-w-lg">
-        <div className="h-6 w-48 animate-pulse rounded bg-slate-200" />
-        <div className="mt-3 h-4 w-64 animate-pulse rounded bg-slate-100" />
+        <div className="h-6 w-48 animate-pulse rounded bg-muted" />
+        <div className="mt-3 h-4 w-64 animate-pulse rounded bg-muted/60" />
         <div className="mt-6 space-y-3">
-          <div className="h-24 animate-pulse rounded-xl bg-slate-100" />
-          <div className="h-24 animate-pulse rounded-xl bg-slate-100" />
+          <div className="h-24 animate-pulse rounded-xl bg-muted/60" />
+          <div className="h-24 animate-pulse rounded-xl bg-muted/60" />
         </div>
       </div>
     </div>
@@ -337,12 +337,12 @@ function App() {
     return (
       <div className="app-shell min-h-[100svh] flex items-center justify-center bg-transparent">
         <div className="animate-pulse flex flex-col items-center">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-3xl border border-slate-200 bg-white shadow-[0_14px_28px_rgba(15,23,42,0.14)]">
-            <svg className="w-8 h-8 text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-3xl border border-border bg-card shadow-lg">
+            <svg className="w-8 h-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
           </div>
-          <p className="text-slate-700 font-medium">Indlæser app...</p>
+          <p className="text-foreground font-medium">Indlæser app...</p>
         </div>
       </div>
     );

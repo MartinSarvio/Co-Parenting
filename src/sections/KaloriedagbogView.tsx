@@ -628,7 +628,7 @@ function FoodPickerView({ meal, meals, userRecipes, onClose, onAdd }: FoodPicker
                     <div className="flex items-center gap-2">
                       <p className="text-[14px] font-semibold text-foreground truncate">{recipe.name}</p>
                       {recipe.isUserRecipe && (
-                        <span className="shrink-0 rounded-full bg-orange-tint text-[#b96424] text-[10px] font-bold px-2 py-0.5">Min</span>
+                        <span className="shrink-0 rounded-full bg-orange-tint text-[#f58a2d] dark:text-[#f5a55d] text-[10px] font-bold px-2 py-0.5">Min</span>
                       )}
                       {recipe.childFriendly && <span className="shrink-0 text-[13px]">👶</span>}
                     </div>
@@ -2119,7 +2119,7 @@ export function KaloriedagbogView({ onBack }: Props) {
                     <div className="rounded-[8px] bg-orange-tint-light border border-orange-tint p-4 text-center">
                       <p className="text-[12px] text-muted-foreground mb-1">Dit anbefalede daglige kalorieindtag</p>
                       <p className="text-[36px] font-black text-[#f58a2d] leading-none">{calculatedTDEE}</p>
-                      <p className="text-[13px] text-[#cc6f1f] mt-1">kcal / dag</p>
+                      <p className="text-[13px] text-[#f58a2d] mt-1">kcal / dag</p>
                       {calcData.goal !== 'maintain' && (
                         <div className="mt-2 pt-2 border-t border-orange-tint">
                           <p className="text-[11px] text-muted-foreground">

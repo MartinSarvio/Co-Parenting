@@ -174,7 +174,7 @@ export function RoutineSetupSheet({ open, onOpenChange, childId }: Props) {
                   <span className="text-[14px]">{item.emoji}</span>
                   <span className="flex-1 text-[13px] font-medium text-foreground">{item.label}</span>
                   <button
-                    onClick={() => { apiDeleteRoutineItem(item.id).catch(() => {}); }}
+                    onClick={() => { apiDeleteRoutineItem(item.id); }}
                     className="rounded-full p-1 text-muted-foreground hover:text-rose-500"
                   >
                     <Trash2 className="h-3.5 w-3.5" />

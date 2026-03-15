@@ -658,7 +658,7 @@ export function OnboardingFlow({ onSwitchToLogin }: OnboardingFlowProps) {
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-[13px] text-muted-foreground">Trin {step} af 6</span>
-                    <span className="text-[13px] font-semibold text-[#b96424]">{Math.round((step / 6) * 100)}%</span>
+                    <span className="text-[13px] font-semibold text-[#f58a2d] dark:text-[#f5a55d]">{Math.round((step / 6) * 100)}%</span>
                   </div>
                   <div className="h-2 bg-background rounded-full overflow-hidden">
                     <motion.div

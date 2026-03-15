@@ -242,7 +242,7 @@ export function Kommunikation() {
                       "shrink-0 rounded-full border px-3.5 py-1.5 text-[13px] font-medium",
                       newThreadCategory === template.key
                         ? "border-orange-tint bg-card text-foreground"
-                        : "border-[#e4cdb7] bg-orange-tint text-[#946539]"
+                        : "border-[#e4cdb7] bg-orange-tint text-[#f58a2d]"
                     )}
                   >
                     {template.label}

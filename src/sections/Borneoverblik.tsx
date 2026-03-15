@@ -727,7 +727,7 @@ export function Borneoverblik() {
             </Avatar>
             <span className={cn(
               "text-sm font-medium",
-              parent1.id === currentUser?.id ? "text-white" : "text-[#cc6f1f]"
+              parent1.id === currentUser?.id ? "text-white" : "text-[#f58a2d]"
             )}>{parent1.name}</span>
           </div>
         )}
@@ -751,7 +751,7 @@ export function Borneoverblik() {
           </Avatar>
           <span className={cn(
             "text-sm font-medium",
-            parent2 && parent2.id === currentUser?.id ? "text-white" : "text-[#cc6f1f]"
+            parent2 && parent2.id === currentUser?.id ? "text-white" : "text-[#f58a2d]"
           )}>{parent2Name}</span>
         </div>
       </motion.div>
@@ -869,7 +869,7 @@ export function Borneoverblik() {
                           <div className="flex h-6 w-6 items-center justify-center rounded-[8px] bg-orange-tint">
                             <Sparkles className="h-3.5 w-3.5 text-[#e8842a]" />
                           </div>
-                          <span className="text-[13px] font-bold text-[#cc6f1f]">
+                          <span className="text-[13px] font-bold text-[#f58a2d]">
                             {stage.type === 'tigerspring' ? 'Tegn på krise' : 'Udfordringer'}
                           </span>
                         </div>

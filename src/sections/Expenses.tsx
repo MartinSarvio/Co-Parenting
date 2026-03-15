@@ -46,7 +46,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-import type { Expense, MoneyTransfer, WishItem } from '@/types';
+import type { Expense, MoneyTransfer } from '@/types';
 import { SavingOverlay } from '@/components/custom/SavingOverlay';
 import { ExpensesSidePanel } from '@/components/custom/ExpensesSidePanel';
 import { AnalyseView } from '@/sections/AnalyseView';
@@ -55,12 +55,12 @@ import { ProductCard, type ProductCardData } from '@/components/custom/ProductCa
 
 const expenseCategories = [
   { value: 'institution', label: 'Institution', icon: Building2, color: 'bg-secondary text-foreground' },
-  { value: 'medical', label: 'Medicin/Sundhed', icon: Pill, color: 'bg-orange-tint text-[#b96424]' },
-  { value: 'clothing', label: 'Tøj', icon: Shirt, color: 'bg-card text-[#5f5c53]' },
+  { value: 'medical', label: 'Medicin/Sundhed', icon: Pill, color: 'bg-orange-tint text-[#f58a2d] dark:text-[#f5a55d]' },
+  { value: 'clothing', label: 'Tøj', icon: Shirt, color: 'bg-card text-muted-foreground' },
   { value: 'activities', label: 'Aktiviteter', icon: GraduationCap, color: 'bg-orange-tint text-[#c66f23]' },
   { value: 'school', label: 'Skole', icon: GraduationCap, color: 'bg-secondary text-foreground' },
   { value: 'food', label: 'Mad', icon: UtensilsCrossed, color: 'bg-orange-tint text-[#c66f23]' },
-  { value: 'transport', label: 'Transport', icon: Bus, color: 'bg-card text-[#5f5c53]' },
+  { value: 'transport', label: 'Transport', icon: Bus, color: 'bg-card text-muted-foreground' },
   { value: 'other', label: 'Andet', icon: MoreHorizontal, color: 'bg-secondary text-foreground' },
 ] as const;
 
@@ -1631,7 +1631,7 @@ export function Expenses() {
           className={cn(
             'h-9 shrink-0 px-2.5 text-sm font-semibold transition-colors rounded-[8px]',
             periodMonth === null
-              ? 'text-[#b96424] bg-orange-tint'
+              ? 'text-[#f58a2d] dark:text-[#f5a55d] bg-orange-tint'
               : 'text-foreground hover:text-foreground'
           )}
         >
@@ -1823,7 +1823,7 @@ export function Expenses() {
                                 {expense.isRecurring && (
                                   <>
                                     <span>·</span>
-                                    <span className="flex items-center gap-0.5 text-[#b96424]"><Repeat2 className="h-3 w-3" /> Fast</span>
+                                    <span className="flex items-center gap-0.5 text-[#f58a2d] dark:text-[#f5a55d]"><Repeat2 className="h-3 w-3" /> Fast</span>
                                   </>
                                 )}
                               </div>
@@ -1835,7 +1835,7 @@ export function Expenses() {
                             )}
                             {expense.status === 'disputed' && (
                               <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-orange-tint">
-                                <TriangleAlert className="h-3.5 w-3.5 text-[#b96424]" />
+                                <TriangleAlert className="h-3.5 w-3.5 text-[#f58a2d] dark:text-[#f5a55d]" />
                               </div>
                             )}
                             {expense.status === 'paid' && (
@@ -1953,7 +1953,7 @@ export function Expenses() {
                     <Badge
                       className={cn(
                         'shrink-0',
-                        detailExpense.status === 'pending' && 'bg-orange-tint text-[#b96424]',
+                        detailExpense.status === 'pending' && 'bg-orange-tint text-[#f58a2d] dark:text-[#f5a55d]',
                         detailExpense.status === 'paid' && 'bg-secondary text-foreground',
                         detailExpense.status === 'disputed' && 'bg-orange-tint text-[#b55f22]'
                       )}
@@ -2049,7 +2049,7 @@ export function Expenses() {
                       href={detailExpense.receiptUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="block rounded-[8px] border border-border bg-card p-3 text-center text-sm font-medium text-[#b96424]"
+                      className="block rounded-[8px] border border-border bg-card p-3 text-center text-sm font-medium text-[#f58a2d] dark:text-[#f5a55d]"
                     >
                       Åbn kvittering
                     </a>
