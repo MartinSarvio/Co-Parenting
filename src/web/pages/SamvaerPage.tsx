@@ -5,53 +5,118 @@ import {
   Users,
   RefreshCw,
   Bell,
+  FileText,
+  Share2,
 } from 'lucide-react';
 import FeaturePageLayout from '../components/FeaturePageLayout';
 
 const features = [
-  { icon: CalendarRange, title: 'Faste modeller', desc: 'Vælg mellem 7/7, 10/4, 14/14 eller andre faste samværsmodeller med ét klik.', color: '#f58a2d' },
-  { icon: RefreshCw, title: 'Fleksibel plan', desc: 'Lav din helt egen model dag-for-dag. Tilpas løbende efter behov.', color: '#3b82f6' },
-  { icon: Palmtree, title: 'Ferie- og helligdage', desc: 'Planlæg ferier, helligdage og skolefridage separat. Aldrig tvivl om hvem der har børnene.', color: '#10b981' },
-  { icon: Users, title: 'Del med netværket', desc: 'Del samværsplanen med bedsteforældre, nye partnere og andre vigtige personer.', color: '#8b5cf6' },
-  { icon: Bell, title: 'Skift-påmindelser', desc: 'Automatisk påmindelse dagen før et skift. Aldrig glem forberedelse.', color: '#f43f5e' },
-  { icon: Calendar, title: 'Historik', desc: 'Se hele samværshistorikken. Dokumentation til enhver tid.', color: '#06b6d4' },
+  { icon: CalendarRange, title: 'Faste modeller', desc: 'Vælg mellem 7/7, 10/4, 14/14 eller andre faste samværsmodeller med ét klik. Planen genereres automatisk for hele året.', color: '#1a1a1a' },
+  { icon: RefreshCw, title: 'Fleksibel plan', desc: 'Byg din helt egen model dag-for-dag. Tilpas løbende efter familiens behov, aftaler og ændringer.', color: '#1a1a1a' },
+  { icon: Palmtree, title: 'Ferie- og helligdage', desc: 'Planlæg ferier, jul, påske og skolefridage separat fra den faste plan. Klare aftaler reducerer konflikter.', color: '#1a1a1a' },
+  { icon: Users, title: 'Del med netværket', desc: 'Del samværsplanen med bedsteforældre, nye partnere, pædagoger eller sagsbehandlere — med begrænset adgang.', color: '#1a1a1a' },
+  { icon: Bell, title: 'Skift-påmindelser', desc: 'Automatiske påmindelser dagen før et skift. Vælg selv tidspunktet og hvem der skal have besked.', color: '#1a1a1a' },
+  { icon: FileText, title: 'Fuld historik', desc: 'Se hele samværshistorikken. Hvem havde børnene hvornår? Perfekt som dokumentation ved behov.', color: '#1a1a1a' },
 ];
 
 const details = [
   {
-    title: 'Samværsplan der bare virker',
-    highlightText: 'bare virker',
-    desc: 'Vælg en fast model eller byg din egen. Planen synkroniseres automatisk, så begge forældre altid kan se den aktuelle plan.',
-    bullets: ['7/7, 10/4, 14/14 og flere modeller', 'Automatisk synkronisering i realtid', 'Enkel visning dag-for-dag'],
-    color: '#f58a2d',
+    badge: 'Samværsmodeller',
+    title: 'Vælg den model der passer jeres familie',
+    desc: 'Huska understøtter alle gængse samværsmodeller ud af boksen. Vælg en fast model eller byg jeres helt egen — dag for dag.',
+    paragraphs: [
+      'De mest almindelige modeller (7/7, 10/4, 14/14) kan sættes op med ét klik. Planen genereres automatisk for hele året, inklusive skiftedage og tider.',
+      'Har I en unik aftale? Brug den fleksible model til at planlægge præcis som det passer. Flyt enkeltdage, tilføj undtagelser og tilpas løbende.',
+    ],
+    bullets: [
+      '7/7, 10/4, 14/14 og flere faste modeller',
+      'Fleksibel model med dag-for-dag planlægning',
+      'Automatisk generering for hele året',
+      'Enkel redigering af enkeltdage og undtagelser',
+    ],
+    color: '#1a1a1a',
     icon: Calendar,
     visual: (
-      <div className="grid grid-cols-7 gap-1 max-w-[280px]">
-        {Array.from({ length: 14 }, (_, i) => (
-          <div
-            key={i}
-            className={`w-9 h-9 rounded-lg flex items-center justify-center text-[12px] font-semibold ${i < 7 ? 'bg-[#f58a2d]/15 text-[#f58a2d]' : 'bg-[#3b82f6]/15 text-[#3b82f6]'}`}
-          >
-            {i + 1}
-          </div>
+      <div className="grid grid-cols-7 gap-1.5 max-w-[280px]">
+        {['Ma', 'Ti', 'On', 'To', 'Fr', 'Lø', 'Sø'].map(d => (
+          <div key={d} className="text-[10px] font-bold text-[#78766d] text-center uppercase">{d}</div>
         ))}
-        <div className="col-span-7 flex gap-3 mt-2 text-[11px] text-[#78766d]">
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-[#f58a2d]/20" /> Forælder 1</span>
-          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded bg-[#3b82f6]/20" /> Forælder 2</span>
+        {Array.from({ length: 28 }, (_, i) => {
+          const week = Math.floor(i / 7);
+          const isParent1 = week < 2;
+          return (
+            <div key={i} className={`w-9 h-9 rounded-lg flex items-center justify-center text-[12px] font-semibold ${isParent1 ? 'bg-[#1a1a1a]/10 text-[#1a1a1a]' : 'bg-[#d4d3cd]/30 text-[#78766d]'}`}>
+              {i + 1}
+            </div>
+          );
+        })}
+        <div className="col-span-7 flex gap-4 mt-3 text-[11px] text-[#78766d]">
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-[#1a1a1a]/15" /> Forælder 1</span>
+          <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-[#d4d3cd]/40" /> Forælder 2</span>
         </div>
       </div>
     ),
   },
   {
+    badge: 'Ferier',
     title: 'Ferier og helligdage uden konflikter',
-    highlightText: 'uden konflikter',
-    desc: 'Planlæg ferier, jul, påske og skolefridage separat fra den faste plan. Klare aftaler reducerer konflikter.',
-    bullets: ['Separate ferieplaner', 'Alternerende helligdage', 'Eksporter til kalender-apps'],
-    color: '#10b981',
+    desc: 'Ferieplanlægning er ofte det mest konfliktfyldte emne for skilte forældre. Huska gør det enkelt med separate ferieplaner og klare aftaler.',
+    paragraphs: [
+      'Opret separate ferieplaner for sommerferie, efterårsferie, juleferie og påskeferie. Vælg alternerende helligdage, så fordelingen er retfærdig over tid.',
+      'Se hele årets feriefordeling i en samlet visning. Eksportér ferieplanen til PDF eller del den direkte med skoler og institutioner.',
+    ],
+    bullets: ['Separate ferieplaner for hver ferieperiode', 'Alternerende helligdage og mærkedage', 'Årsvisning af feriefordeling', 'Eksportér til PDF eller kalender-apps'],
+    color: '#1a1a1a',
     icon: Palmtree,
     reversed: true,
   },
+  {
+    badge: 'Deling',
+    title: 'Del planen med dem der har brug for den',
+    desc: 'Børnenes hverdag involverer flere end bare forældrene. Bedsteforældre, nye partnere, pædagoger og sagsbehandlere kan alle have gavn af at se samværsplanen.',
+    paragraphs: [
+      'Med Huska kan du dele samværsplanen med udvalgte personer via et sikkert link. De får adgang til at se planen, men ikke ændre den.',
+      'Perfekt til bedsteforældre der vil vide hvornår de kan se børnebørnene, eller sagsbehandlere der har brug for dokumentation.',
+    ],
+    bullets: ['Del med bedsteforældre, nye partnere og pædagoger', 'Begrænset adgang — kan se men ikke ændre', 'Sikre delingslinks med udløbsdato', 'Professionel adgang for sagsbehandlere'],
+    color: '#1a1a1a',
+    icon: Share2,
+  },
 ];
+
+const comparison = {
+  title: 'Samværsplan med Huska vs. uden',
+  subtitle: 'Se forskellen på at koordinere samvær med og uden et dedikeret værktøj.',
+  rows: [
+    { label: 'Planlægning', without: 'SMS og mundtlige aftaler', with: 'Digital plan med automatik' },
+    { label: 'Ændringsanmodninger', without: 'Kaotisk SMS-kommunikation', with: 'Strukturerede anmodninger med log' },
+    { label: 'Feriefordeling', without: 'Diskussion hvert år', with: 'Automatisk alternering' },
+    { label: 'Påmindelser', without: 'Ingen — ren hukommelse', with: 'Automatiske skift-påmindelser' },
+    { label: 'Dokumentation', without: 'Ingen — ord mod ord', with: 'Fuld historik med tidsstempler' },
+    { label: 'Deling', without: 'Screenshot af SMS', with: 'Sikkert delingslink' },
+  ],
+};
+
+const steps = {
+  title: 'Opret jeres samværsplan i 3 trin',
+  subtitle: 'Det tager under 2 minutter at have en komplet digital samværsplan.',
+  items: [
+    { number: '1', title: 'Vælg model', desc: 'Vælg en fast samværsmodel (7/7, 10/4 osv.) eller start med en fleksibel plan. Planen genereres automatisk.' },
+    { number: '2', title: 'Tilpas detaljer', desc: 'Juster skiftetider, tilføj ferier og helligdage, og sæt eventuelle undtagelser op.' },
+    { number: '3', title: 'Del og brug', desc: 'Invitér din medforælder, del med relevante personer, og begynd at bruge planen i hverdagen.' },
+  ],
+};
+
+const faq = {
+  title: 'Ofte stillede spørgsmål om samvær',
+  items: [
+    { q: 'Hvilke samværsmodeller understøtter Huska?', a: 'Huska understøtter alle gængse modeller: 7/7, 10/4, 14/14, 12/2, og mange flere. Du kan også bygge din helt egen model dag-for-dag.' },
+    { q: 'Kan jeg ændre samværsplanen løbende?', a: 'Ja. Du kan sende en ændringsanmodning til din medforælder direkte i appen. Ændringen træder først i kraft når begge har godkendt den.' },
+    { q: 'Hvad sker der ved uenighed om en ændring?', a: 'Hvis en ændringsanmodning afvises, forbliver den eksisterende plan gældende. Al kommunikation om ændringer gemmes som dokumentation.' },
+    { q: 'Kan samværsplanen bruges som juridisk dokumentation?', a: 'Huska gemmer en komplet historik over alle planer, ændringer og godkendelser med tidsstempler. Mange forældre bruger dette som supplement i samværssager.' },
+    { q: 'Kan bedsteforældre se samværsplanen?', a: 'Ja. Du kan dele planen via et sikkert link med begrænset adgang. Modtageren kan se planen men ikke ændre den.' },
+  ],
+};
 
 export default function SamvaerPage() {
   return (
@@ -59,14 +124,20 @@ export default function SamvaerPage() {
       badge="Samvær"
       badgeIcon={Calendar}
       title="Samværsplan"
-      titleHighlight="der virker"
-      subtitle="Planlæg samvær med fast 7/7, 10/4 eller fleksibel model. Altid overblik over hvem der har børnene."
-      color="#f58a2d"
+      titleHighlight="der bare virker"
+      subtitle="Planlæg samvær med fast 7/7, 10/4 eller fleksibel model. Altid overblik over hvem der har børnene — med automatiske påmindelser og fuld historik."
+      subtitleExtra="Brugt af tusindvis af danske forældre til at koordinere hverdagen."
+      color="#1a1a1a"
       features={features}
+      featuresTitle="Alt du har brug for til samværsplanlægning"
+      featuresSubtitle="Fra faste modeller til fleksible planer, ferieplanlægning og deling — alt samlet ét sted."
       details={details}
-      ctaTitle="Kom i gang med samværsplanen"
-      ctaSubtitle="Opret din første samværsplan på under 2 minutter. Helt gratis."
-      ctaButtonLabel="Prøv gratis"
+      comparison={comparison}
+      steps={steps}
+      faq={faq}
+      ctaTitle="Opret jeres samværsplan i dag"
+      ctaSubtitle="Det tager under 2 minutter at have en komplet digital samværsplan. Helt gratis."
+      ctaButtonLabel="Kom i gang — gratis"
       ctaButtonHref="#funktioner"
     />
   );
