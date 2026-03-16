@@ -347,12 +347,6 @@ export default function FeaturePageLayout({
         </div>
       </section>
 
-      {/* Back link */}
-      <div className="text-center py-10 bg-white">
-        <a href="#" className="text-[14px] text-[#78766d] hover:text-[#1a1a1a] transition-colors">
-          ← Tilbage til forsiden
-        </a>
-      </div>
     </div>
   );
 }

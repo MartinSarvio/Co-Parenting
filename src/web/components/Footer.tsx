@@ -15,8 +15,8 @@ export function Footer() {
 
   return (
     <footer className="relative bg-[#1a1a1a] text-white/80 overflow-hidden">
-      {/* Gradient top border */}
-      <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: 'linear-gradient(90deg, transparent, #f58a2d, #f7a95c, #f58a2d, transparent)' }} />
+      {/* Subtle top border */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-white/10" />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
@@ -94,12 +94,11 @@ export function Footer() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="din@email.dk"
                   required
-                  className="flex-1 min-w-0 px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]/30 transition-all"
+                  className="flex-1 min-w-0 px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-white/20 transition-all"
                 />
                 <button
                   type="submit"
-                  className="px-3.5 py-2.5 rounded-xl text-white font-medium transition-all duration-200 hover:shadow-lg hover:shadow-[#f58a2d]/20 shrink-0"
-                  style={{ background: 'linear-gradient(135deg, #f7a95c, #e8773f)' }}
+                  className="px-3.5 py-2.5 rounded-xl bg-white text-[#1a1a1a] font-medium transition-all duration-200 hover:bg-white/90 shrink-0"
                 >
                   <Send size={16} />
                 </button>
@@ -113,7 +112,7 @@ export function Footer() {
             &copy; {new Date().getFullYear()} Huska. Alle rettigheder forbeholdes.
           </p>
           <p className="text-[12px] text-white/30 flex items-center gap-1">
-            Lavet med <Heart size={11} className="text-[#f58a2d]/60 fill-[#f58a2d]/60" /> i Danmark
+            Lavet med <Heart size={11} className="text-white/40 fill-white/40" /> i Danmark
           </p>
         </div>
       </div>
