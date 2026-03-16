@@ -99,6 +99,29 @@ const details = [
     color: '#1a1a1a',
     icon: Stethoscope,
     reversed: true,
+    visual: (
+      <div className="max-w-[280px]">
+        <div className="p-4 rounded-2xl bg-[#fafaf9] border border-[#e5e3dc]">
+          <p className="text-[13px] font-bold text-[#1a1a1a] mb-3">Sundhedsaftaler</p>
+          <div className="space-y-2">
+            {[
+              { date: '22. mar', type: 'Tandlæge', child: 'Emma', note: 'Kontrol + fluorbehandling', time: '10:00' },
+              { date: '5. apr', type: 'Vaccination', child: 'Magnus', note: 'MFR booster', time: '09:30' },
+              { date: '18. apr', type: 'Øjenlæge', child: 'Emma', note: 'Synsprøve, medbring briller', time: '14:00' },
+              { date: '2. maj', type: 'Tandlæge', child: 'Magnus', note: 'Kontrol', time: '11:00' },
+            ].map((a, i) => (
+              <div key={i} className="px-3 py-2.5 rounded-lg bg-white border border-[#e5e3dc]">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[11px] font-semibold text-[#1a1a1a]">{a.type}</span>
+                  <span className="text-[10px] text-[#78766d]">{a.date} kl. {a.time}</span>
+                </div>
+                <p className="text-[10px] text-[#78766d]">{a.child} — {a.note}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    ),
   },
   {
     badge: 'Skole',
@@ -116,6 +139,30 @@ const details = [
     ],
     color: '#1a1a1a',
     icon: GraduationCap,
+    visual: (
+      <div className="max-w-[280px]">
+        <div className="p-4 rounded-2xl bg-[#fafaf9] border border-[#e5e3dc]">
+          <p className="text-[13px] font-bold text-[#1a1a1a] mb-3">Skolekalender</p>
+          <div className="space-y-2">
+            {[
+              { date: '20. mar', event: 'Forældremøde 3.A', type: 'Møde' },
+              { date: '28. mar', event: 'Påskeferie starter', type: 'Ferie' },
+              { date: '7. apr', event: 'Skolen åbner igen', type: 'Ferie' },
+              { date: '15. apr', event: 'Fotografering', type: 'Arrangement' },
+              { date: '1. maj', event: 'Pædagogisk dag (lukket)', type: 'Lukkedag' },
+              { date: '22. maj', event: 'Forårskoncert kl. 14', type: 'Arrangement' },
+            ].map((e, i) => (
+              <div key={i} className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-white border border-[#e5e3dc]">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#1a1a1a] shrink-0" />
+                <span className="text-[10px] text-[#78766d] w-12 shrink-0">{e.date}</span>
+                <span className="text-[11px] text-[#1a1a1a] font-medium flex-1">{e.event}</span>
+                <span className="px-1.5 py-0.5 rounded bg-[#1a1a1a]/5 text-[9px] text-[#78766d] shrink-0">{e.type}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    ),
   },
 ];
 

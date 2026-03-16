@@ -96,6 +96,30 @@ const details = [
     color: '#1a1a1a',
     icon: History,
     reversed: true,
+    visual: (
+      <div className="max-w-[280px]">
+        <div className="p-4 rounded-2xl bg-[#fafaf9] border border-[#e5e3dc]">
+          <p className="text-[13px] font-bold text-[#1a1a1a] mb-3">Beskedhistorik</p>
+          <div className="space-y-2">
+            {[
+              { date: '14. mar 15:32', sender: 'Anna', msg: 'Kan vi bytte weekend i uge 14?', read: true },
+              { date: '14. mar 16:01', sender: 'Thomas', msg: 'Ja, det passer fint.', read: true },
+              { date: '14. mar 16:03', sender: 'Anna', msg: 'Super! Jeg opdaterer planen.', read: true },
+              { date: '14. mar 16:05', sender: 'System', msg: 'Samværsplan opdateret for uge 14', read: true },
+            ].map((m, i) => (
+              <div key={i} className="px-3 py-2 rounded-lg bg-white border border-[#e5e3dc]">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] font-semibold text-[#1a1a1a]">{m.sender}</span>
+                  <span className="text-[9px] text-[#78766d]">{m.date}</span>
+                </div>
+                <p className="text-[11px] text-[#4a4a4a]">{m.msg}</p>
+                {m.read && <p className="text-[9px] text-[#78766d] mt-0.5">✓✓ Læst</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    ),
   },
   {
     badge: 'Tone-guide',
@@ -113,6 +137,28 @@ const details = [
     ],
     color: '#1a1a1a',
     icon: Shield,
+    visual: (
+      <div className="max-w-[280px]">
+        <div className="p-4 rounded-2xl bg-[#fafaf9] border border-[#e5e3dc]">
+          <p className="text-[13px] font-bold text-[#1a1a1a] mb-3">Kommunikationsguide</p>
+          <div className="space-y-2.5">
+            {[
+              { bad: '"Du glemmer altid..."', good: '"Kan vi aftale at..."', tip: 'Brug jeg-sprog' },
+              { bad: '"Det er din skyld"', good: '"Jeg oplever at..."', tip: 'Undgå beskyldninger' },
+              { bad: '"Du skal bare..."', good: '"Hvad tænker du om..."', tip: 'Stil spørgsmål' },
+            ].map((ex, i) => (
+              <div key={i} className="px-3 py-2.5 rounded-lg bg-white border border-[#e5e3dc]">
+                <div className="flex items-center gap-1.5 mb-1">
+                  <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#1a1a1a]/5 font-semibold text-[#78766d]">{ex.tip}</span>
+                </div>
+                <p className="text-[10px] text-[#78766d] line-through">{ex.bad}</p>
+                <p className="text-[11px] text-[#1a1a1a] font-medium mt-0.5">{ex.good}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    ),
   },
 ];
 

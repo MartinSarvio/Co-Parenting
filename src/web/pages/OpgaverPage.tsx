@@ -78,6 +78,33 @@ const details = [
     color: '#1a1a1a',
     icon: RefreshCw,
     reversed: true,
+    visual: (
+      <div className="max-w-[280px]">
+        <div className="p-4 rounded-2xl bg-[#fafaf9] border border-[#e5e3dc]">
+          <p className="text-[13px] font-bold text-[#1a1a1a] mb-3">Automatiske opgaver</p>
+          <div className="space-y-2">
+            {[
+              { task: 'Pakke skoletaske', freq: 'Hver søndag', icon: '🎒' },
+              { task: 'Vaske sengetøj', freq: 'Hver 2. uge', icon: '🛏️' },
+              { task: 'Købe madpakke-ting', freq: 'Hver mandag', icon: '🥪' },
+              { task: 'Rydde op på værelset', freq: 'Hver fredag', icon: '🧹' },
+              { task: 'Betale fritidsaktivitet', freq: 'Hver måned', icon: '⚽' },
+            ].map((t, i) => (
+              <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white border border-[#e5e3dc]">
+                <span className="text-[14px]">{t.icon}</span>
+                <div className="flex-1">
+                  <p className="text-[11px] font-semibold text-[#1a1a1a]">{t.task}</p>
+                  <p className="text-[10px] text-[#78766d]">{t.freq}</p>
+                </div>
+                <div className="w-5 h-5 rounded border border-[#e5e3dc] flex items-center justify-center">
+                  <svg width="10" height="10" viewBox="0 0 10 10" className="text-[#1a1a1a]/30"><path d="M2 5L4 7L8 3" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    ),
   },
 ];
 

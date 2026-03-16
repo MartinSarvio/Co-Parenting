@@ -69,6 +69,31 @@ const details = [
     color: '#1a1a1a',
     icon: Palmtree,
     reversed: true,
+    visual: (
+      <div className="max-w-[280px]">
+        <div className="p-4 rounded-2xl bg-[#fafaf9] border border-[#e5e3dc]">
+          <p className="text-[13px] font-bold text-[#1a1a1a] mb-3">Ferieplan 2026</p>
+          <div className="space-y-2">
+            {[
+              { period: 'Vinterferie', dates: '8-15 feb', who: 'Mor' },
+              { period: 'Påske', dates: '29 mar - 5 apr', who: 'Far' },
+              { period: 'Sommerferie uge 28-29', dates: '6-19 jul', who: 'Mor' },
+              { period: 'Sommerferie uge 30-31', dates: '20 jul - 2 aug', who: 'Far' },
+              { period: 'Efterårsferie', dates: '11-18 okt', who: 'Mor' },
+              { period: 'Juleferie', dates: '23-31 dec', who: 'Far' },
+            ].map((f, i) => (
+              <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg bg-white border border-[#e5e3dc]">
+                <div>
+                  <p className="text-[11px] font-semibold text-[#1a1a1a]">{f.period}</p>
+                  <p className="text-[10px] text-[#78766d]">{f.dates}</p>
+                </div>
+                <span className="px-2 py-0.5 rounded-full bg-[#1a1a1a]/5 text-[10px] font-semibold text-[#1a1a1a]">{f.who}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    ),
   },
   {
     badge: 'Deling',
@@ -81,6 +106,34 @@ const details = [
     bullets: ['Del med bedsteforældre, nye partnere og pædagoger', 'Begrænset adgang — kan se men ikke ændre', 'Sikre delingslinks med udløbsdato', 'Professionel adgang for sagsbehandlere'],
     color: '#1a1a1a',
     icon: Share2,
+    visual: (
+      <div className="max-w-[280px]">
+        <div className="p-4 rounded-2xl bg-[#fafaf9] border border-[#e5e3dc]">
+          <p className="text-[13px] font-bold text-[#1a1a1a] mb-3">Delt med</p>
+          <div className="space-y-2.5">
+            {[
+              { name: 'Mormor Inger', role: 'Bedsteforælder', access: 'Kun visning' },
+              { name: 'Farmor Lise', role: 'Bedsteforælder', access: 'Kun visning' },
+              { name: 'Advokat Nielsen', role: 'Professionel', access: 'Tidsbegrænset' },
+            ].map((p, i) => (
+              <div key={i} className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white border border-[#e5e3dc]">
+                <div className="w-8 h-8 rounded-full bg-[#1a1a1a]/5 flex items-center justify-center text-[11px] font-bold text-[#1a1a1a]">
+                  {p.name.charAt(0)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] font-semibold text-[#1a1a1a]">{p.name}</p>
+                  <p className="text-[10px] text-[#78766d]">{p.role}</p>
+                </div>
+                <span className="px-2 py-0.5 rounded-full bg-[#1a1a1a]/5 text-[9px] font-semibold text-[#78766d] shrink-0">{p.access}</span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-[#e5e3dc] text-[11px] text-[#78766d]">
+            <span>+</span> Tilføj person...
+          </div>
+        </div>
+      </div>
+    ),
   },
 ];
 
@@ -139,6 +192,36 @@ export default function SamvaerPage() {
       ctaSubtitle="Det tager under 2 minutter at have en komplet digital samværsplan. Helt gratis."
       ctaButtonLabel="Kom i gang — gratis"
       ctaButtonHref="#funktioner"
+      heroVisual={
+        <div className="relative">
+          <div className="w-[260px] h-[520px] rounded-[3rem] border-[10px] border-[#1a1a1a] bg-white overflow-hidden shadow-2xl shadow-black/20">
+            <div className="p-4 pt-12">
+              <p className="text-[11px] font-bold text-[#78766d] uppercase tracking-wider mb-1">Uge 12</p>
+              <p className="text-[16px] font-bold text-[#1a1a1a] mb-4">Samværsplan</p>
+              <div className="space-y-1.5">
+                {[
+                  { day: 'Man 16/3', who: 'Mor', color: 'bg-[#1a1a1a]/10' },
+                  { day: 'Tir 17/3', who: 'Mor', color: 'bg-[#1a1a1a]/10' },
+                  { day: 'Ons 18/3', who: 'Mor', color: 'bg-[#1a1a1a]/10' },
+                  { day: 'Tor 19/3', who: 'Far', color: 'bg-[#d4d3cd]/30' },
+                  { day: 'Fre 20/3', who: 'Far', color: 'bg-[#d4d3cd]/30' },
+                  { day: 'Lør 21/3', who: 'Far', color: 'bg-[#d4d3cd]/30' },
+                  { day: 'Søn 22/3', who: 'Far', color: 'bg-[#d4d3cd]/30' },
+                ].map((d, i) => (
+                  <div key={i} className={`flex items-center justify-between px-3 py-2.5 rounded-xl ${d.color}`}>
+                    <span className="text-[12px] font-semibold text-[#1a1a1a]">{d.day}</span>
+                    <span className="text-[11px] font-medium text-[#78766d]">{d.who}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-4 mt-4 text-[10px] text-[#78766d]">
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-[#1a1a1a]/15" /> Mor</span>
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded bg-[#d4d3cd]/40" /> Far</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
     />
   );
 }

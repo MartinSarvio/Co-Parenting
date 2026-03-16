@@ -79,6 +79,35 @@ const details = [
     color: '#1a1a1a',
     icon: PiggyBank,
     reversed: true,
+    visual: (
+      <div className="max-w-[280px]">
+        <div className="p-4 rounded-2xl bg-[#fafaf9] border border-[#e5e3dc]">
+          <p className="text-[13px] font-bold text-[#1a1a1a] mb-3">Månedlige budgetter</p>
+          <div className="space-y-3">
+            {[
+              { category: 'Fritidsaktiviteter', spent: 850, budget: 1200 },
+              { category: 'Tøj & sko', spent: 600, budget: 800 },
+              { category: 'Sundhed', spent: 350, budget: 500 },
+              { category: 'Skoleting', spent: 200, budget: 300 },
+            ].map((b, i) => (
+              <div key={i}>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[11px] font-semibold text-[#1a1a1a]">{b.category}</span>
+                  <span className="text-[10px] text-[#78766d]">Kr. {b.spent} / {b.budget}</span>
+                </div>
+                <div className="h-2 rounded-full bg-[#e5e3dc] overflow-hidden">
+                  <div className="h-full rounded-full bg-[#1a1a1a]" style={{ width: `${(b.spent / b.budget) * 100}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 pt-3 border-t border-[#e5e3dc] flex items-center justify-between">
+            <span className="text-[11px] font-bold text-[#1a1a1a]">Total brugt</span>
+            <span className="text-[11px] font-bold text-[#1a1a1a]">Kr. 2.000 / 2.800</span>
+          </div>
+        </div>
+      </div>
+    ),
   },
 ];
 

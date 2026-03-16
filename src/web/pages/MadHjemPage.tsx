@@ -75,6 +75,32 @@ const details = [
     color: '#1a1a1a',
     icon: ShoppingCart,
     reversed: true,
+    visual: (
+      <div className="max-w-[280px]">
+        <div className="p-4 rounded-2xl bg-[#fafaf9] border border-[#e5e3dc]">
+          <p className="text-[13px] font-bold text-[#1a1a1a] mb-3">Indkøbsliste</p>
+          <div className="space-y-1.5">
+            {[
+              { item: 'Hakket oksekød 500g', checked: true, tilbud: 'Netto: Kr. 35' },
+              { item: 'Pasta, fuldkorn', checked: true, tilbud: null },
+              { item: 'Mozzarella', checked: false, tilbud: 'Rema: Kr. 15' },
+              { item: 'Tomater 6 stk', checked: false, tilbud: null },
+              { item: 'Basilikum', checked: false, tilbud: null },
+              { item: 'Rugbrød', checked: false, tilbud: 'Føtex: Kr. 12' },
+              { item: 'Æbler 1 kg', checked: false, tilbud: 'Lidl: Kr. 10' },
+            ].map((item, i) => (
+              <div key={i} className={`flex items-center gap-2.5 px-3 py-2 rounded-lg ${item.checked ? 'bg-[#1a1a1a]/3' : 'bg-white border border-[#e5e3dc]'}`}>
+                <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 ${item.checked ? 'bg-[#1a1a1a] border-[#1a1a1a]' : 'border-[#e5e3dc]'}`}>
+                  {item.checked && <svg width="10" height="10" viewBox="0 0 10 10" className="text-white"><path d="M2 5L4 7L8 3" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                </div>
+                <span className={`text-[11px] flex-1 ${item.checked ? 'line-through text-[#78766d]' : 'text-[#1a1a1a]'}`}>{item.item}</span>
+                {item.tilbud && <span className="px-1.5 py-0.5 rounded bg-[#1a1a1a]/5 text-[9px] font-semibold text-[#1a1a1a]">{item.tilbud}</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    ),
   },
 ];
 
