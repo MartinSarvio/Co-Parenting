@@ -11,6 +11,14 @@ const ContactPage = lazy(() => import('./pages/ContactPage'));
 const TermsPage = lazy(() => import('./pages/TermsPage'));
 const WebLoginPage = lazy(() => import('./pages/WebLoginPage'));
 const PartnerPage = lazy(() => import('./pages/PartnerPage'));
+const WebAppPage = lazy(() => import('./pages/WebAppPage'));
+const MobilAppPage = lazy(() => import('./pages/MobilAppPage'));
+const SamvaerPage = lazy(() => import('./pages/SamvaerPage'));
+const OpgaverPage = lazy(() => import('./pages/OpgaverPage'));
+const MadHjemPage = lazy(() => import('./pages/MadHjemPage'));
+const KommunikationPage = lazy(() => import('./pages/KommunikationPage'));
+const UdgifterPage = lazy(() => import('./pages/UdgifterPage'));
+const KalenderPage = lazy(() => import('./pages/KalenderPage'));
 
 function LoadingFallback() {
   return (
@@ -36,6 +44,14 @@ export function WebApp() {
   const isTerms = route === '#vilkar';
   const isLogin = route === '#login';
   const isPartner = route === '#partner';
+  const isWebApp = route === '#webapp';
+  const isMobilApp = route === '#mobilapp';
+  const isSamvaer = route === '#samvaer';
+  const isOpgaver = route === '#opgaver';
+  const isMadHjem = route === '#madhjem';
+  const isKommunikation = route === '#kommunikation';
+  const isUdgifter = route === '#udgifter';
+  const isKalender = route === '#kalender';
   const hideChrome = isAdmin || isLogin;
 
   const renderPage = () => {
@@ -46,6 +62,14 @@ export function WebApp() {
     if (isContact) return <ContactPage />;
     if (isTerms) return <TermsPage />;
     if (isPartner) return <PartnerPage />;
+    if (isWebApp) return <WebAppPage />;
+    if (isMobilApp) return <MobilAppPage />;
+    if (isSamvaer) return <SamvaerPage />;
+    if (isOpgaver) return <OpgaverPage />;
+    if (isMadHjem) return <MadHjemPage />;
+    if (isKommunikation) return <KommunikationPage />;
+    if (isUdgifter) return <UdgifterPage />;
+    if (isKalender) return <KalenderPage />;
     return <LandingPage />;
   };
 
