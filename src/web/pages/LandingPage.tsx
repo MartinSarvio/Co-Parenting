@@ -505,20 +505,10 @@ const familyFeatures = [
 
 function PricingSection() {
   const { ref, visible } = useInView();
-  const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
-  const [contactSent, setContactSent] = useState(false);
-
-  const handleContact = (e: React.FormEvent) => {
-    e.preventDefault();
-    const subject = encodeURIComponent('Henvendelse fra huska.dk');
-    const body = encodeURIComponent(`Navn: ${contactForm.name}\n\n${contactForm.message}`);
-    window.location.href = `mailto:kontakt@huska.dk?subject=${subject}&body=${body}`;
-    setContactSent(true);
-  };
 
   return (
     <section id="priser" className="py-24 bg-[#fafaf9]" ref={ref}>
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`text-center mb-12 ${visible ? 'animate-slideUp' : 'opacity-0'}`}>
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1a1a1a]/5 text-[#1a1a1a] text-xs font-semibold mb-4">
             <Sparkles size={13} /> Kom i gang
@@ -531,90 +521,37 @@ function PricingSection() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Pricing card */}
-          <div
-            className={`relative p-8 rounded-3xl bg-white border-2 border-[#1a1a1a] shadow-lg ${visible ? 'animate-slideUp' : 'opacity-0'}`}
-            style={{ animationDelay: '100ms' }}
-          >
-            <div className="text-center mb-6">
-              <span className="text-5xl font-[800] text-[#1a1a1a]">Kr. 0</span>
-              <span className="text-[#78766d] text-sm ml-2">/ måned</span>
-            </div>
-
-            <ul className="space-y-3 mb-8">
-              {familyFeatures.map((f) => (
-                <li key={f} className="flex items-center gap-3 text-[15px] text-[#4a4a4a]">
-                  <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 bg-[#1a1a1a]/5">
-                    <Check size={12} className="text-[#1a1a1a]" />
-                  </div>
-                  {f}
-                </li>
-              ))}
-            </ul>
-
-            <a
-              href="https://apps.apple.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full text-center py-3.5 rounded-xl font-semibold text-white bg-[#1a1a1a] shadow-lg hover:bg-[#333] hover:shadow-xl transition-all duration-200"
-            >
-              Hent appen
-            </a>
+        <div
+          className={`relative p-8 rounded-3xl bg-white border-2 border-[#1a1a1a] shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${visible ? 'animate-slideUp' : 'opacity-0'}`}
+          style={{ animationDelay: '100ms' }}
+        >
+          <div className="text-center mb-6">
+            <span className="text-5xl font-[800] text-[#1a1a1a]">Kr. 0</span>
+            <span className="text-[#78766d] text-sm ml-2">/ måned</span>
           </div>
 
-          {/* Contact form */}
-          <div
-            className={`p-8 rounded-3xl bg-white border border-[#e5e3dc] shadow-sm ${visible ? 'animate-slideUp' : 'opacity-0'}`}
-            style={{ animationDelay: '200ms' }}
-          >
-            <h3 className="text-lg font-bold text-[#1a1a1a] mb-1">Har du spørgsmål?</h3>
-            <p className="text-[13px] text-[#78766d] mb-6">Skriv til os — vi svarer hurtigt.</p>
+          <ul className="space-y-3 mb-8">
+            {familyFeatures.map((f) => (
+              <li key={f} className="flex items-center gap-3 text-[15px] text-[#4a4a4a]">
+                <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 bg-[#1a1a1a]/5">
+                  <Check size={12} className="text-[#1a1a1a]" />
+                </div>
+                {f}
+              </li>
+            ))}
+          </ul>
 
-            {contactSent ? (
-              <div className="flex flex-col items-center justify-center py-8 text-center">
-                <Heart size={24} className="text-[#f58a2d] fill-[#f58a2d] mb-3" />
-                <p className="text-[15px] font-semibold text-[#1a1a1a]">Tak for din henvendelse!</p>
-                <p className="text-[13px] text-[#78766d] mt-1">Vi vender tilbage hurtigst muligt.</p>
-              </div>
-            ) : (
-              <form onSubmit={handleContact} className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Dit navn"
-                  required
-                  value={contactForm.name}
-                  onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border border-[#e5e3dc] bg-white text-[14px] text-[#1a1a1a] placeholder:text-[#b5b3ab] focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]/50 transition-all"
-                />
-                <input
-                  type="email"
-                  placeholder="Din email"
-                  required
-                  value={contactForm.email}
-                  onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border border-[#e5e3dc] bg-white text-[14px] text-[#1a1a1a] placeholder:text-[#b5b3ab] focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]/50 transition-all"
-                />
-                <textarea
-                  placeholder="Din besked"
-                  required
-                  rows={3}
-                  value={contactForm.message}
-                  onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border border-[#e5e3dc] bg-white text-[14px] text-[#1a1a1a] placeholder:text-[#b5b3ab] focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]/50 transition-all resize-none"
-                />
-                <button
-                  type="submit"
-                  className="w-full py-3.5 rounded-xl font-semibold text-white bg-[#f58a2d] shadow-lg hover:bg-[#e8773f] hover:shadow-xl transition-all duration-200"
-                >
-                  Send besked
-                </button>
-              </form>
-            )}
-          </div>
+          <a
+            href="https://apps.apple.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full text-center py-3.5 rounded-xl font-semibold text-white bg-[#1a1a1a] shadow-lg hover:bg-[#333] hover:shadow-xl transition-all duration-200"
+          >
+            Hent appen
+          </a>
         </div>
 
-        <p className={`text-center text-[14px] text-[#78766d] mt-6 ${visible ? 'animate-slideUp' : 'opacity-0'}`} style={{ animationDelay: '300ms' }}>
+        <p className={`text-center text-[14px] text-[#78766d] mt-6 ${visible ? 'animate-slideUp' : 'opacity-0'}`} style={{ animationDelay: '200ms' }}>
           Er du kommune eller professionel?{' '}
           <a href="#partner" className="text-[#1a1a1a] font-medium underline underline-offset-2 hover:no-underline transition-colors">
             Se partnerprogrammet <ArrowRight size={13} className="inline" />

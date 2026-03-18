@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Building2,
   Check,
@@ -7,8 +8,8 @@ import {
   Users,
   Sparkles,
   ArrowRight,
-  Clock,
-  Crown,
+  Heart,
+  Send,
 } from 'lucide-react';
 
 const proFeatures = [
@@ -18,13 +19,17 @@ const proFeatures = [
   { icon: Users, title: 'Sagsbehandler-overblik', desc: 'Fordel og følg sager på tværs af teamet.' },
 ];
 
-const kommunePlans = [
-  { size: 'Lille', borgere: '< 30.000', sager: '~50–150', pris: '60.000–80.000' },
-  { size: 'Mellem', borgere: '30–60.000', sager: '~150–400', pris: '80.000–120.000' },
-  { size: 'Stor', borgere: '> 60.000', sager: '400+', pris: '120.000–200.000' },
-];
-
 export default function PartnerPage() {
+  const [form, setForm] = useState({ name: '', email: '', organisation: '', message: '' });
+  const [sent, setSent] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const subject = encodeURIComponent(`Partnerhenvendelse fra ${form.organisation || form.name}`);
+    const body = encodeURIComponent(`Navn: ${form.name}\nOrganisation: ${form.organisation}\nEmail: ${form.email}\n\n${form.message}`);
+    window.location.href = `mailto:kontakt@huska.dk?subject=${subject}&body=${body}`;
+    setSent(true);
+  };
   return (
     <div className="min-h-screen bg-[#f2f1ed]">
       {/* Hero */}
@@ -79,135 +84,86 @@ export default function PartnerPage() {
         </div>
       </section>
 
-      {/* Pricing options */}
+      {/* Contact form */}
       <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl font-bold text-[#2f2f2f] text-center mb-3">Prismodeller</h2>
-          <p className="text-center text-[#78766d] mb-10">Vælg den model der passer til jeres behov.</p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-            {/* Per-sagsbehandler */}
-            <div className="p-7 rounded-2xl backdrop-blur-sm bg-white/70 border border-white/40 shadow-lg shadow-black/[0.03]">
-              <div className="flex items-center gap-2 mb-4">
-                <Clock size={18} className="text-[#3b82f6]" />
-                <h3 className="text-[15px] font-bold text-[#2f2f2f]">Per sagsbehandler</h3>
-              </div>
-              <div className="mb-4">
-                <span className="text-3xl font-[800] text-[#2f2f2f]">Kr. 299–499</span>
-                <span className="text-[#9a978f] text-sm ml-1">/md. pr. sagsbehandler</span>
-              </div>
-              <p className="text-[13px] text-[#78766d] mb-4 leading-relaxed">
-                Lav indgangsbarriere — perfekt til at teste platformen med et mindre team.
-              </p>
-              <ul className="space-y-2">
-                {['Ingen binding', 'Start med 1 sagsbehandler', 'Skalér efter behov'].map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-[13px] text-[#5f5d56]">
-                    <Check size={12} className="text-[#3b82f6] shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Kommune-licens */}
-            <div
-              className="relative p-7 rounded-2xl border overflow-hidden"
-              style={{
-                background: 'linear-gradient(135deg, #fff7ed, #fff0de)',
-                borderColor: '#f58a2d30',
-                borderTopWidth: '3px',
-                borderTopColor: '#f58a2d60',
-                boxShadow: '0 8px 32px #f58a2d10',
-              }}
-            >
-              <div className="absolute top-3 right-3">
-                <span className="px-2 py-0.5 rounded-full bg-[#f58a2d]/10 text-[#e8773f] text-[10px] font-bold uppercase tracking-wide flex items-center gap-1">
-                  <Crown size={10} /> Anbefalet
-                </span>
-              </div>
-              <div className="flex items-center gap-2 mb-4">
-                <Building2 size={18} className="text-[#f58a2d]" />
-                <h3 className="text-[15px] font-bold text-[#2f2f2f]">Kommune-licens</h3>
-              </div>
-              <div className="mb-4">
-                <span className="text-3xl font-[800] text-[#2f2f2f]">Fast årspris</span>
-              </div>
-              <p className="text-[13px] text-[#78766d] mb-4 leading-relaxed">
-                Simpelt for kommunens budgettering — fast beløb, ingen overraskelser. Ubegrænsede sagsbehandlere og sager.
-              </p>
-              <ul className="space-y-2">
-                {['Ubegrænsede brugere', 'Inkl. support & onboarding', 'Familier bruger appen gratis'].map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-[13px] text-[#5f5d56]">
-                    <Check size={12} className="text-[#f58a2d] shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl font-bold text-[#2f2f2f] mb-3">Kontakt os</h2>
+            <p className="text-[#78766d] text-[1.05rem]">
+              Fortæl os om jeres behov — vi vender tilbage med en skræddersyet løsning.
+            </p>
           </div>
 
-          {/* Kommune-licens tabel */}
-          <div className="max-w-2xl mx-auto">
-            <h3 className="text-lg font-bold text-[#2f2f2f] text-center mb-4">Kommune-licens priser</h3>
-
-            <div className="rounded-2xl backdrop-blur-xl bg-white/70 border border-white/40 shadow-lg shadow-black/[0.03] overflow-hidden">
-              <div className="grid grid-cols-4 text-[11px] font-bold text-[#78766d] uppercase tracking-wider px-5 py-3 border-b border-[#e8e6df]/50 bg-[#f9f8f5]/50">
-                <div>Størrelse</div>
-                <div>Borgere</div>
-                <div>Årlige sager</div>
-                <div>Årspris</div>
+          <div className="p-8 rounded-2xl backdrop-blur-sm bg-white/70 border border-white/40 shadow-lg shadow-black/[0.03]">
+            {sent ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <Heart size={28} className="text-[#f58a2d] fill-[#f58a2d] mb-4" />
+                <p className="text-lg font-bold text-[#2f2f2f]">Tak for din henvendelse!</p>
+                <p className="text-[14px] text-[#78766d] mt-2">Vi vender tilbage hurtigst muligt.</p>
               </div>
-              {kommunePlans.map((p, i) => (
-                <div
-                  key={p.size}
-                  className={`grid grid-cols-4 px-5 py-3.5 text-[14px] text-[#5f5d56] ${i < kommunePlans.length - 1 ? 'border-b border-[#e8e6df]/30' : ''} hover:bg-[#f58a2d]/3 transition-colors`}
-                >
-                  <div className="font-semibold text-[#2f2f2f]">{p.size}</div>
-                  <div>{p.borgere}</div>
-                  <div>{p.sager}</div>
-                  <div className="font-semibold text-[#f58a2d]">Kr. {p.pris}</div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-[#5f5d56] mb-1.5">Navn</label>
+                    <input
+                      type="text"
+                      required
+                      value={form.name}
+                      onChange={(e) => setForm({ ...form, name: e.target.value })}
+                      placeholder="Dit navn"
+                      className="w-full px-4 py-3 rounded-xl border border-[#e5e3dc] bg-white text-[14px] text-[#2f2f2f] placeholder:text-[#b5b3ab] focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]/50 transition-all"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#5f5d56] mb-1.5">Email</label>
+                    <input
+                      type="email"
+                      required
+                      value={form.email}
+                      onChange={(e) => setForm({ ...form, email: e.target.value })}
+                      placeholder="din@email.dk"
+                      className="w-full px-4 py-3 rounded-xl border border-[#e5e3dc] bg-white text-[14px] text-[#2f2f2f] placeholder:text-[#b5b3ab] focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]/50 transition-all"
+                    />
+                  </div>
                 </div>
-              ))}
-            </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#5f5d56] mb-1.5">Organisation</label>
+                  <input
+                    type="text"
+                    value={form.organisation}
+                    onChange={(e) => setForm({ ...form, organisation: e.target.value })}
+                    placeholder="Kommune, familieretshus, eller andet"
+                    className="w-full px-4 py-3 rounded-xl border border-[#e5e3dc] bg-white text-[14px] text-[#2f2f2f] placeholder:text-[#b5b3ab] focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]/50 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#5f5d56] mb-1.5">Besked</label>
+                  <textarea
+                    required
+                    rows={4}
+                    value={form.message}
+                    onChange={(e) => setForm({ ...form, message: e.target.value })}
+                    placeholder="Fortæl os om jeres behov..."
+                    className="w-full px-4 py-3 rounded-xl border border-[#e5e3dc] bg-white text-[14px] text-[#2f2f2f] placeholder:text-[#b5b3ab] focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]/50 transition-all resize-none"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="group w-full flex items-center justify-center gap-2.5 py-4 rounded-xl text-[15px] font-bold text-white shadow-lg shadow-[#f58a2d]/25 hover:shadow-xl hover:shadow-[#f58a2d]/35 hover:-translate-y-0.5 transition-all duration-300"
+                  style={{ background: 'linear-gradient(135deg, #f7a95c 0%, #f58a2d 50%, #e8773f 100%)' }}
+                >
+                  <Send size={16} />
+                  Send henvendelse
+                  <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              </form>
+            )}
           </div>
-        </div>
-      </section>
 
-      {/* Pilot-tilbud */}
-      <section className="py-16">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div
-            className="relative text-center rounded-[2rem] p-10 md:p-14 overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, #fef3e7, #fff0de, #fde8d0)' }}
-          >
-            <div className="absolute top-[-60px] right-[-30px] w-[250px] h-[250px] rounded-full bg-[#f58a2d]/10 blur-[50px] pointer-events-none" />
-
-            <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 text-[#e8773f] text-xs font-bold mb-5 shadow-sm">
-                <Sparkles size={14} /> Pilot-tilbud
-              </div>
-
-              <h2 className="text-2xl sm:text-3xl font-[800] text-[#2f2f2f] tracking-[-0.02em]">
-                3 måneders gratis pilot
-              </h2>
-              <p className="mt-4 text-[#5f5d56] max-w-lg mx-auto leading-relaxed">
-                De første kommuner kan teste Huska gratis i 3 måneder. Formålet er at dokumentere
-                effekten: reduceret sagsbehandlingstid og bedre forældresamarbejde.
-              </p>
-              <p className="mt-3 text-[14px] text-[#78766d]">
-                Ved succes: overgang til årslicens med 20% rabat i år 1.
-              </p>
-
-              <a
-                href="mailto:kontakt@huska.dk?subject=Pilot-tilbud%20for%20kommune"
-                className="group inline-flex items-center justify-center gap-2.5 mt-8 px-8 py-4 text-[15px] font-bold text-white rounded-full shadow-lg shadow-[#f58a2d]/30 hover:shadow-xl hover:shadow-[#f58a2d]/40 hover:-translate-y-0.5 transition-all duration-300"
-                style={{ background: 'linear-gradient(135deg, #f7a95c 0%, #f58a2d 50%, #e8773f 100%)' }}
-              >
-                Kontakt os
-                <ArrowRight size={17} className="group-hover:translate-x-0.5 transition-transform" />
-              </a>
-            </div>
-          </div>
+          <p className="text-center text-[13px] text-[#78766d] mt-6">
+            Eller skriv direkte til <a href="mailto:kontakt@huska.dk" className="text-[#f58a2d] font-medium hover:underline">kontakt@huska.dk</a>
+          </p>
         </div>
       </section>
 
