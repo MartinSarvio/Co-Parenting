@@ -62,6 +62,7 @@ interface AppStore {
   currentUser: User | null;
   isAuthenticated: boolean;
   isProfessionalView: boolean;
+  isFamilyMemberView: boolean;
   currentChildId: string | null;
   
   // Data
@@ -190,6 +191,7 @@ interface AppStore {
   setCurrentUser: (user: User | null) => void;
   setAuthenticated: (value: boolean) => void;
   setProfessionalView: (value: boolean) => void;
+  setFamilyMemberView: (value: boolean) => void;
   setCurrentChildId: (id: string | null) => void;
   setActiveTab: (tab: string) => void;
   goBack: () => void;
@@ -453,6 +455,7 @@ export const useAppStore = create<AppStore>()(
       currentUser: null,
       isAuthenticated: false,
       isProfessionalView: false,
+      isFamilyMemberView: false,
       currentChildId: null,
       users: [],
       children: [],
@@ -591,6 +594,7 @@ export const useAppStore = create<AppStore>()(
       setProfessionalView: (value) => set((state) => ({
         isProfessionalView: (state.currentUser?.isAdmin || state.currentUser?.role === 'professional') ? value : false
       })),
+      setFamilyMemberView: (value) => set({ isFamilyMemberView: value }),
       setCurrentChildId: (id) => set({ currentChildId: id }),
       setActiveTab: (tab) => set((state) => ({
         activeTab: tab,
