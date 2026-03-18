@@ -168,10 +168,6 @@ const features: Feature[] = [
 function FeatureSection() {
   const { ref, visible } = useInView(0.1);
 
-  const heroFeature = features[0];
-  const primaryFeatures = features.slice(1, 6);
-  const secondaryFeatures = features.slice(6);
-
   return (
     <section id="funktioner" className="py-24 bg-white" ref={ref}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -187,76 +183,24 @@ function FeatureSection() {
           </p>
         </div>
 
-        {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          {/* Hero feature — spans 2 columns */}
-          <div
-            className={`md:col-span-2 group relative p-8 rounded-3xl border border-[#e5e3dc] bg-[#fafaf9] overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${visible ? 'animate-slideUp' : 'opacity-0'}`}
-          >
-            <div className="relative flex flex-col md:flex-row gap-6 items-start md:items-center">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-[#1a1a1a] shadow-lg shrink-0 transition-transform duration-300 group-hover:scale-110">
-                <heroFeature.icon size={28} className="text-white" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2.5 mb-2">
-                  <h3 className="text-xl font-bold text-[#1a1a1a]">{heroFeature.title}</h3>
-                  <span className="px-2.5 py-1 rounded-full bg-[#1a1a1a]/10 text-[#1a1a1a] text-[10px] font-bold uppercase tracking-wide">
-                    {heroFeature.badge}
-                  </span>
-                </div>
-                <p className="text-[#4a4a4a] leading-relaxed max-w-xl text-[15px]">{heroFeature.desc}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* First regular feature beside hero */}
-          {(() => {
-            const FirstIcon = primaryFeatures[0].icon;
-            return (
-              <div
-                className={`group p-6 rounded-2xl border border-[#e5e3dc] bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${visible ? 'animate-slideUp' : 'opacity-0'}`}
-                style={{ animationDelay: '80ms' }}
-              >
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-[#1a1a1a]/5 transition-transform duration-300 group-hover:scale-110">
-                  <FirstIcon size={24} className="text-[#1a1a1a]" />
-                </div>
-                <h3 className="text-[15px] font-bold text-[#1a1a1a] mb-1.5">{primaryFeatures[0].title}</h3>
-                <p className="text-[13px] text-[#4a4a4a] leading-relaxed">{primaryFeatures[0].desc}</p>
-              </div>
-            );
-          })()}
-        </div>
-
-        {/* Primary features — 3 column grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-          {primaryFeatures.slice(1).map((f, i) => (
+        {/* Uniform grid — all cards same size */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {features.map((f, i) => (
             <div
               key={f.title}
-              className={`group p-6 rounded-2xl border border-[#e5e3dc] bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${visible ? 'animate-slideUp' : 'opacity-0'}`}
-              style={{ animationDelay: `${(i + 2) * 80}ms` }}
+              className={`group text-center p-5 rounded-xl border border-[#e5e3dc] bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${visible ? 'animate-slideUp' : 'opacity-0'}`}
+              style={{ animationDelay: `${i * 60}ms` }}
             >
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-[#1a1a1a]/5 transition-transform duration-300 group-hover:scale-110">
-                <f.icon size={24} className="text-[#1a1a1a]" />
-              </div>
-              <h3 className="text-[15px] font-bold text-[#1a1a1a] mb-1.5">{f.title}</h3>
-              <p className="text-[13px] text-[#4a4a4a] leading-relaxed">{f.desc}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Secondary features — compact grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {secondaryFeatures.map((f, i) => (
-            <div
-              key={f.title}
-              className={`group text-center p-4 rounded-xl border border-[#e5e3dc] bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${visible ? 'animate-slideUp' : 'opacity-0'}`}
-              style={{ animationDelay: `${(i + 7) * 80}ms` }}
-            >
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center mx-auto mb-2.5 bg-[#1a1a1a]/5 transition-transform duration-300 group-hover:scale-110">
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center mx-auto mb-3 bg-[#1a1a1a]/5 transition-transform duration-300 group-hover:scale-110">
                 <f.icon size={20} className="text-[#1a1a1a]" />
               </div>
               <p className="text-[13px] font-semibold text-[#1a1a1a]">{f.title}</p>
-              <p className="text-[11px] text-[#78766d] mt-0.5 leading-snug">{f.desc}</p>
+              {f.badge && (
+                <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-[#1a1a1a]/10 text-[#1a1a1a] text-[9px] font-bold uppercase tracking-wide">
+                  {f.badge}
+                </span>
+              )}
+              <p className="text-[11px] text-[#78766d] mt-1 leading-snug">{f.desc}</p>
             </div>
           ))}
         </div>
