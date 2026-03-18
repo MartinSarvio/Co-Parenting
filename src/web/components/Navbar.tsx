@@ -86,7 +86,7 @@ export function Navbar() {
             <div ref={dropdownRef} className="relative">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-1 text-sm font-medium text-[#5f5d56] hover:text-[#2f2f2f] relative after:absolute after:bottom-[-2px] after:left-0 after:right-0 after:h-[2px] after:bg-[#f58a2d] after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left transition-colors"
+                className="flex items-center gap-1 text-sm font-medium text-[#5f5d56] hover:text-[#2f2f2f] relative after:absolute after:bottom-[-2px] after:left-0 after:right-0 after:h-[2px] after:bg-[#2f2f2f] after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left transition-colors"
               >
                 Funktioner
                 <ChevronDown size={14} className={`transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
@@ -117,7 +117,7 @@ export function Navbar() {
               <a
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-[#5f5d56] hover:text-[#2f2f2f] relative after:absolute after:bottom-[-2px] after:left-0 after:right-0 after:h-[2px] after:bg-[#f58a2d] after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left transition-colors"
+                className="text-sm font-medium text-[#5f5d56] hover:text-[#2f2f2f] relative after:absolute after:bottom-[-2px] after:left-0 after:right-0 after:h-[2px] after:bg-[#2f2f2f] after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left transition-colors"
               >
                 {link.label}
               </a>

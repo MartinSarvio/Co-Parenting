@@ -68,6 +68,28 @@ export default function SamvaerPage() {
       ctaSubtitle="Opret din første samværsplan på under 2 minutter. Helt gratis."
       ctaButtonLabel="Prøv gratis"
       ctaButtonHref="#funktioner"
+      heroVisual={
+        <div className="p-5 rounded-2xl bg-white/70 border border-white/40 shadow-xl max-w-[300px]">
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-[13px] font-bold text-[#2f2f2f]">Uge 12 — marts 2026</p>
+            <span className="text-[11px] text-[#78766d]">7/7 model</span>
+          </div>
+          <div className="grid grid-cols-7 gap-1.5">
+            {['Ma','Ti','On','To','Fr','Lø','Sø'].map(d => (
+              <div key={d} className="text-[10px] text-center text-[#78766d] font-semibold pb-1">{d}</div>
+            ))}
+            {Array.from({ length: 14 }, (_, i) => (
+              <div key={i} className={`h-9 rounded-lg flex items-center justify-center text-[12px] font-semibold ${i < 7 ? 'bg-[#2f2f2f] text-white' : 'bg-[#e8e6df]/60 text-[#78766d]'}`}>
+                {i + 10}
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-4 mt-3 text-[11px] text-[#78766d]">
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#2f2f2f]" /> Forælder 1</span>
+            <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#e8e6df]" /> Forælder 2</span>
+          </div>
+        </div>
+      }
     />
   );
 }

@@ -5,6 +5,7 @@ import {
   RefreshCw,
   Bell,
   ListChecks,
+  Check,
 } from 'lucide-react';
 import FeaturePageLayout from '../components/FeaturePageLayout';
 
@@ -72,6 +73,26 @@ export default function OpgaverPage() {
       ctaSubtitle="Opret din første opgaveliste på få sekunder. Helt gratis."
       ctaButtonLabel="Prøv gratis"
       ctaButtonHref="#funktioner"
+      heroVisual={
+        <div className="space-y-2.5 max-w-[280px]">
+          {[
+            { task: 'Madpakker mandag', done: true, who: 'Dig', deadline: 'I dag' },
+            { task: 'Hente fra fodbold', done: false, who: 'Medforælder', deadline: 'Onsdag' },
+            { task: 'Lektiehjælp', done: false, who: 'Dig', deadline: 'Torsdag' },
+            { task: 'Tandlæge kl. 10', done: true, who: 'Medforælder', deadline: 'Fredag' },
+          ].map((t, i) => (
+            <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-white/70 border border-white/40 shadow-sm">
+              <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 ${t.done ? 'bg-[#2f2f2f] border-[#2f2f2f]' : 'border-[#d4d3cd]'}`}>
+                {t.done && <Check size={12} className="text-white" />}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className={`text-[13px] font-medium ${t.done ? 'line-through text-[#9a978f]' : 'text-[#2f2f2f]'}`}>{t.task}</p>
+                <p className="text-[11px] text-[#78766d]">{t.who} · {t.deadline}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      }
     />
   );
 }

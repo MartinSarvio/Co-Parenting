@@ -53,6 +53,24 @@ export default function WebAppPage() {
       ctaSubtitle="Gratis adgang fra enhver browser. Ingen installation nødvendig."
       ctaButtonLabel="Kom i gang"
       ctaButtonHref="#funktioner"
+      heroVisual={
+        <div className="w-[340px] h-[220px] rounded-xl border border-[#d4d3cd] bg-white shadow-xl overflow-hidden">
+          <div className="flex items-center gap-1.5 px-3 py-2 bg-[#f9f8f5] border-b border-[#e8e6df]">
+            <div className="w-2.5 h-2.5 rounded-full bg-[#d4d3cd]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#d4d3cd]" />
+            <div className="w-2.5 h-2.5 rounded-full bg-[#d4d3cd]" />
+            <div className="flex-1 mx-8 h-5 rounded bg-[#e8e6df]/60 flex items-center justify-center text-[9px] text-[#9a978f]">huska.dk</div>
+          </div>
+          <div className="p-4 grid grid-cols-3 gap-2">
+            {['Samvær','Opgaver','Kalender','Udgifter','Beskeder','Mad'].map((label) => (
+              <div key={label} className="p-2 rounded-lg bg-[#f9f8f5] border border-[#e8e6df]/60 text-center">
+                <div className="w-6 h-6 rounded bg-[#e8e6df] mx-auto mb-1" />
+                <p className="text-[9px] font-medium text-[#5f5d56]">{label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      }
     />
   );
 }

@@ -71,6 +71,28 @@ export default function MadHjemPage() {
       ctaSubtitle="Opret din første madplan på under et minut. Helt gratis."
       ctaButtonLabel="Prøv gratis"
       ctaButtonHref="#funktioner"
+      heroVisual={
+        <div className="space-y-2 max-w-[280px]">
+          <div className="p-3 rounded-2xl bg-white/70 border border-white/40 shadow-xl">
+            <p className="text-[11px] font-bold text-[#2f2f2f] mb-2">Denne uge — Hjem 1</p>
+            {[
+              { day: 'Mandag', meal: 'Kylling med ris', emoji: '🍗' },
+              { day: 'Tirsdag', meal: 'Pasta bolognese', emoji: '🍝' },
+              { day: 'Onsdag', meal: 'Fiskefrikadeller', emoji: '🐟' },
+              { day: 'Torsdag', meal: 'Grøntsagssuppe', emoji: '🥣' },
+              { day: 'Fredag', meal: 'Pizza-fredag!', emoji: '🍕' },
+            ].map((d, i) => (
+              <div key={i} className="flex items-center gap-2.5 py-1.5 border-b border-[#e8e6df]/40 last:border-0">
+                <span className="text-base">{d.emoji}</span>
+                <div>
+                  <p className="text-[11px] font-semibold text-[#5f5d56]">{d.day}</p>
+                  <p className="text-[12px] text-[#2f2f2f]">{d.meal}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      }
     />
   );
 }

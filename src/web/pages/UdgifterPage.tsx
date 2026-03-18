@@ -74,6 +74,28 @@ export default function UdgifterPage() {
       ctaSubtitle="Start med at dele udgifter i dag. Helt gratis."
       ctaButtonLabel="Prøv gratis"
       ctaButtonHref="#funktioner"
+      heroVisual={
+        <div className="max-w-[280px] space-y-3">
+          <div className="p-4 rounded-2xl bg-white/70 border border-white/40 shadow-xl">
+            <p className="text-[11px] font-bold text-[#78766d] uppercase tracking-wider mb-1">Balance denne måned</p>
+            <p className="text-2xl font-[800] text-[#2f2f2f]">Kr. 0</p>
+            <p className="text-[12px] text-[#78766d] mt-0.5">I balance ✓</p>
+          </div>
+          {[
+            { item: 'Fodboldsko', amount: 'Kr. 450', who: 'Dig' },
+            { item: 'Tandlæge', amount: 'Kr. 380', who: 'Medforælder' },
+            { item: 'SFO-betaling', amount: 'Kr. 1.200', who: 'Dig' },
+          ].map((e, i) => (
+            <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white/70 border border-white/40 shadow-sm">
+              <div>
+                <p className="text-[13px] font-medium text-[#2f2f2f]">{e.item}</p>
+                <p className="text-[11px] text-[#78766d]">{e.who}</p>
+              </div>
+              <p className="text-[13px] font-bold text-[#2f2f2f]">{e.amount}</p>
+            </div>
+          ))}
+        </div>
+      }
     />
   );
 }

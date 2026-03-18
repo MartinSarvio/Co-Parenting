@@ -74,8 +74,8 @@ export default function FeaturePageLayout({
       {/* Hero */}
       <section className="relative overflow-hidden pt-20 pb-16">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full blur-[80px]" style={{ background: '#f58a2d10', animation: 'meshFloat 12s ease-in-out infinite' }} />
-          <div className="absolute bottom-[-10%] left-[-8%] w-[400px] h-[400px] rounded-full blur-[60px]" style={{ background: '#f58a2d08', animation: 'meshFloat 10s ease-in-out infinite reverse' }} />
+          <div className="absolute top-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full blur-[80px]" style={{ background: '#1a1a1a08', animation: 'meshFloat 12s ease-in-out infinite' }} />
+          <div className="absolute bottom-[-10%] left-[-8%] w-[400px] h-[400px] rounded-full blur-[60px]" style={{ background: '#1a1a1a05', animation: 'meshFloat 10s ease-in-out infinite reverse' }} />
         </div>
 
         <div
@@ -89,8 +89,8 @@ export default function FeaturePageLayout({
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-[800] text-[#2f2f2f] tracking-[-0.03em] leading-[1.1]">
-                {title}
-                <span className="block text-[#f58a2d]">
+                {title}{' '}
+                <span className="text-[#2f2f2f]">
                   {titleHighlight}
                 </span>
               </h1>
@@ -165,7 +165,7 @@ export default function FeaturePageLayout({
                       {d.highlightText ? (
                         <>
                           {d.title.replace(d.highlightText, '')}
-                          <span className="text-[#f58a2d]">{d.highlightText}</span>
+                          <span className="text-[#2f2f2f] underline decoration-[#1a1a1a]/15 underline-offset-4">{d.highlightText}</span>
                         </>
                       ) : d.title}
                     </h3>
@@ -173,7 +173,7 @@ export default function FeaturePageLayout({
                     <ul className="mt-5 space-y-3">
                       {d.bullets.map((b) => (
                         <li key={b} className="flex items-center gap-3 text-[14px] text-[#5f5d56]">
-                          <Check size={16} className="shrink-0 text-[#f58a2d]" />
+                          <Check size={16} className="shrink-0 text-[#1a1a1a]" />
                           {b}
                         </li>
                       ))}
@@ -197,9 +197,9 @@ export default function FeaturePageLayout({
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div
             className="relative text-center rounded-[2rem] p-10 md:p-14 overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, #f58a2d08, #f58a2d12, #f58a2d08)' }}
+            style={{ background: 'linear-gradient(135deg, #1a1a1a04, #1a1a1a08, #1a1a1a04)' }}
           >
-            <div className="absolute top-[-60px] right-[-30px] w-[250px] h-[250px] rounded-full blur-[50px] pointer-events-none" style={{ background: '#f58a2d12' }} />
+            <div className="absolute top-[-60px] right-[-30px] w-[250px] h-[250px] rounded-full blur-[50px] pointer-events-none" style={{ background: '#1a1a1a06' }} />
             <div className="relative z-10">
               <h2 className="text-2xl sm:text-3xl font-[800] text-[#2f2f2f] tracking-[-0.02em]">
                 {ctaTitle}
