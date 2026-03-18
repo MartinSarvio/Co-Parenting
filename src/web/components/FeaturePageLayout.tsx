@@ -74,8 +74,8 @@ export default function FeaturePageLayout({
       {/* Hero */}
       <section className="relative overflow-hidden pt-20 pb-16">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full blur-[80px]" style={{ background: `${color}15`, animation: 'meshFloat 12s ease-in-out infinite' }} />
-          <div className="absolute bottom-[-10%] left-[-8%] w-[400px] h-[400px] rounded-full blur-[60px]" style={{ background: `${color}10`, animation: 'meshFloat 10s ease-in-out infinite reverse' }} />
+          <div className="absolute top-[-15%] right-[-10%] w-[500px] h-[500px] rounded-full blur-[80px]" style={{ background: '#f58a2d10', animation: 'meshFloat 12s ease-in-out infinite' }} />
+          <div className="absolute bottom-[-10%] left-[-8%] w-[400px] h-[400px] rounded-full blur-[60px]" style={{ background: '#f58a2d08', animation: 'meshFloat 10s ease-in-out infinite reverse' }} />
         </div>
 
         <div
@@ -84,13 +84,13 @@ export default function FeaturePageLayout({
         >
           <div className={heroVisual ? 'grid grid-cols-1 lg:grid-cols-2 gap-12 items-center' : 'text-center'}>
             <div className={heroVisual ? '' : 'max-w-3xl mx-auto'}>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-6" style={{ background: `${color}12`, color }}>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold mb-6 bg-[#1a1a1a]/5 text-[#1a1a1a]">
                 <BadgeIcon size={14} /> {badge}
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-[800] text-[#2f2f2f] tracking-[-0.03em] leading-[1.1]">
                 {title}
-                <span className="block bg-clip-text text-transparent" style={{ backgroundImage: `linear-gradient(135deg, ${color}, ${color}cc)` }}>
+                <span className="block text-[#f58a2d]">
                   {titleHighlight}
                 </span>
               </h1>
@@ -102,8 +102,7 @@ export default function FeaturePageLayout({
               <div className="flex flex-wrap gap-4 mt-8">
                 <a
                   href={ctaButtonHref}
-                  className="group inline-flex items-center gap-2.5 px-7 py-3.5 text-[15px] font-bold text-white rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
-                  style={{ background: `linear-gradient(135deg, ${color}cc, ${color})`, boxShadow: `0 8px 24px ${color}30` }}
+                  className="group inline-flex items-center gap-2.5 px-7 py-3.5 text-[15px] font-bold text-white rounded-full bg-[#1a1a1a] shadow-lg shadow-black/10 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
                 >
                   {ctaButtonLabel}
                   <ArrowRight size={17} className="group-hover:translate-x-0.5 transition-transform" />
@@ -134,8 +133,8 @@ export default function FeaturePageLayout({
                 className="p-6 rounded-2xl backdrop-blur-sm bg-white/70 border border-white/40 shadow-lg shadow-black/[0.03] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                 style={{ animationDelay: `${i * 80}ms` }}
               >
-                <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4" style={{ background: `${f.color}15` }}>
-                  <f.icon size={22} style={{ color: f.color }} />
+                <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4 bg-[#1a1a1a]/[0.04]">
+                  <f.icon size={22} className="text-[#1a1a1a]" />
                 </div>
                 <h3 className="text-[15px] font-bold text-[#2f2f2f] mb-1">{f.title}</h3>
                 <p className="text-[13px] text-[#78766d] leading-relaxed">{f.desc}</p>
@@ -158,7 +157,7 @@ export default function FeaturePageLayout({
                 <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${d.reversed ? 'lg:direction-rtl' : ''}`}>
                   <div className={d.reversed ? 'lg:order-2' : ''}>
                     {d.icon && (
-                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-4" style={{ background: `${d.color}12`, color: d.color }}>
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-4 bg-[#1a1a1a]/5 text-[#1a1a1a]">
                         <d.icon size={14} /> {d.title}
                       </div>
                     )}
@@ -166,7 +165,7 @@ export default function FeaturePageLayout({
                       {d.highlightText ? (
                         <>
                           {d.title.replace(d.highlightText, '')}
-                          <span style={{ color: d.color }}>{d.highlightText}</span>
+                          <span className="text-[#f58a2d]">{d.highlightText}</span>
                         </>
                       ) : d.title}
                     </h3>
@@ -174,7 +173,7 @@ export default function FeaturePageLayout({
                     <ul className="mt-5 space-y-3">
                       {d.bullets.map((b) => (
                         <li key={b} className="flex items-center gap-3 text-[14px] text-[#5f5d56]">
-                          <Check size={16} style={{ color: d.color }} className="shrink-0" />
+                          <Check size={16} className="shrink-0 text-[#f58a2d]" />
                           {b}
                         </li>
                       ))}
@@ -198,9 +197,9 @@ export default function FeaturePageLayout({
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div
             className="relative text-center rounded-[2rem] p-10 md:p-14 overflow-hidden"
-            style={{ background: `linear-gradient(135deg, ${color}08, ${color}15, ${color}10)` }}
+            style={{ background: 'linear-gradient(135deg, #f58a2d08, #f58a2d12, #f58a2d08)' }}
           >
-            <div className="absolute top-[-60px] right-[-30px] w-[250px] h-[250px] rounded-full blur-[50px] pointer-events-none" style={{ background: `${color}15` }} />
+            <div className="absolute top-[-60px] right-[-30px] w-[250px] h-[250px] rounded-full blur-[50px] pointer-events-none" style={{ background: '#f58a2d12' }} />
             <div className="relative z-10">
               <h2 className="text-2xl sm:text-3xl font-[800] text-[#2f2f2f] tracking-[-0.02em]">
                 {ctaTitle}
@@ -210,8 +209,7 @@ export default function FeaturePageLayout({
               </p>
               <a
                 href={ctaButtonHref}
-                className="group inline-flex items-center justify-center gap-2.5 mt-8 px-8 py-4 text-[15px] font-bold text-white rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
-                style={{ background: `linear-gradient(135deg, ${color}cc, ${color})`, boxShadow: `0 8px 24px ${color}30` }}
+                className="group inline-flex items-center justify-center gap-2.5 mt-8 px-8 py-4 text-[15px] font-bold text-white rounded-full bg-[#f58a2d] shadow-lg shadow-[#f58a2d]/25 hover:shadow-xl hover:shadow-[#f58a2d]/35 hover:-translate-y-0.5 transition-all duration-300"
               >
                 {ctaButtonLabel}
                 <ArrowRight size={17} className="group-hover:translate-x-0.5 transition-transform" />

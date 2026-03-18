@@ -71,40 +71,40 @@ export function Navbar() {
   ];
 
   return (
-    <nav className={`sticky top-0 z-50 transition-all duration-300 backdrop-blur-xl ${scrolled ? 'bg-white/70 shadow-lg shadow-black/[0.04] border-b border-[#e5e3dc]/40' : 'bg-white/50 border-b border-[#e5e3dc]/40'}`}>
+    <nav className={`sticky top-0 z-50 transition-all duration-300 backdrop-blur-xl ${scrolled ? 'bg-white/70 shadow-lg shadow-black/[0.04] border-b border-white/40' : 'bg-white/50 border-b border-[#e5e3dc]/40'}`}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <a href="/web.html" className="flex items-center gap-2.5 group shrink-0">
-            <img src="/huska-logo.svg" alt="Huska" className="h-9 w-9" />
-            <span className="text-xl font-bold text-[#1a1a1a] tracking-tight">Huska</span>
+          <a href="/web.html" className="flex items-center gap-2.5 group">
+            <img src="/huska-logo.svg" alt="Huska" className="h-9 w-9 rounded-xl shadow-sm group-hover:shadow-md transition-shadow" />
+            <span className="text-xl font-bold text-[#2f2f2f] tracking-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Huska</span>
           </a>
 
-          {/* Desktop nav — centered links */}
-          <div className="hidden md:flex items-center justify-center flex-1 gap-8">
+          {/* Desktop nav */}
+          <div className="hidden md:flex items-center gap-8">
             {/* Funktioner dropdown */}
             <div ref={dropdownRef} className="relative">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center gap-1 text-sm font-medium text-[#4a4a4a] hover:text-[#1a1a1a] relative after:absolute after:bottom-[-2px] after:left-0 after:right-0 after:h-[2px] after:bg-[#1a1a1a] after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left transition-colors"
+                className="flex items-center gap-1 text-sm font-medium text-[#5f5d56] hover:text-[#2f2f2f] relative after:absolute after:bottom-[-2px] after:left-0 after:right-0 after:h-[2px] after:bg-[#f58a2d] after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left transition-colors"
               >
                 Funktioner
                 <ChevronDown size={14} className={`transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
               </button>
 
               {dropdownOpen && (
-                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[520px] p-4 rounded-2xl bg-white/95 backdrop-blur-xl border border-[#e5e3dc] shadow-xl shadow-black/[0.08] grid grid-cols-2 gap-1 animate-fadeIn">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-[520px] p-4 rounded-2xl bg-white/95 backdrop-blur-xl border border-white/40 shadow-xl shadow-black/[0.08] grid grid-cols-2 gap-1 animate-fadeIn">
                   {funktionerLinks.map((item) => (
                     <a
                       key={item.href}
                       href={item.href}
-                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#fafaf9] transition-colors group"
+                      className="flex items-center gap-3 p-3 rounded-xl hover:bg-[#f2f1ed]/80 transition-colors group"
                     >
                       <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover:scale-110 bg-[#1a1a1a]/5">
                         <item.icon size={18} className="text-[#1a1a1a]" />
                       </div>
                       <div>
-                        <p className="text-[13px] font-semibold text-[#1a1a1a]">{item.label}</p>
+                        <p className="text-[13px] font-semibold text-[#2f2f2f]">{item.label}</p>
                         <p className="text-[11px] text-[#78766d]">{item.desc}</p>
                       </div>
                     </a>
@@ -117,24 +117,21 @@ export function Navbar() {
               <a
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-[#4a4a4a] hover:text-[#1a1a1a] relative after:absolute after:bottom-[-2px] after:left-0 after:right-0 after:h-[2px] after:bg-[#1a1a1a] after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left transition-colors"
+                className="text-sm font-medium text-[#5f5d56] hover:text-[#2f2f2f] relative after:absolute after:bottom-[-2px] after:left-0 after:right-0 after:h-[2px] after:bg-[#f58a2d] after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:origin-left transition-colors"
               >
                 {link.label}
               </a>
             ))}
-          </div>
-
-          {/* Right side — login + CTA */}
-          <div className="hidden md:flex items-center gap-4 shrink-0">
             <a
               href="#login"
-              className="text-sm font-medium text-[#4a4a4a] hover:text-[#1a1a1a] transition-colors"
+              className="text-sm font-medium text-[#5f5d56] hover:text-[#2f2f2f] transition-colors"
             >
               Log ind
             </a>
             <a
               href="#funktioner"
-              className="inline-flex items-center px-5 py-2.5 text-sm font-semibold text-white bg-[#f58a2d] rounded-full hover:bg-[#e8773f] hover:shadow-lg hover:shadow-[#f58a2d]/20 transition-all duration-200"
+              className="inline-flex items-center px-5 py-2.5 text-sm font-semibold text-white rounded-full hover:shadow-lg hover:shadow-[#f58a2d]/25 transition-shadow duration-200"
+              style={{ background: '#f58a2d' }}
             >
               Hent appen
             </a>
@@ -142,7 +139,7 @@ export function Navbar() {
 
           {/* Mobile menu button */}
           <button
-            className="md:hidden p-2 rounded-lg text-[#4a4a4a] hover:bg-[#fafaf9] transition-colors"
+            className="md:hidden p-2 rounded-lg text-[#5f5d56] hover:bg-[#f2f1ed] transition-colors"
             onClick={() => setMobileOpen(!mobileOpen)}
           >
             {mobileOpen ? <X size={24} /> : <Menu size={24} />}
@@ -155,7 +152,7 @@ export function Navbar() {
             {/* Funktioner expandable */}
             <button
               onClick={() => setMobileExpanded(!mobileExpanded)}
-              className="flex items-center justify-between w-full px-4 py-2.5 text-[15px] font-medium text-[#4a4a4a] hover:text-[#1a1a1a] rounded-lg hover:bg-[#fafaf9] transition-colors"
+              className="flex items-center justify-between w-full px-4 py-2.5 text-[15px] font-medium text-[#5f5d56] hover:text-[#2f2f2f] rounded-lg hover:bg-[#f2f1ed] transition-colors"
             >
               Funktioner
               <ChevronDown size={16} className={`transition-transform duration-200 ${mobileExpanded ? 'rotate-180' : ''}`} />
@@ -168,10 +165,10 @@ export function Navbar() {
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-[#fafaf9] transition-colors"
+                    className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-[#f2f1ed] transition-colors"
                   >
                     <item.icon size={16} className="text-[#1a1a1a]" />
-                    <span className="text-[14px] text-[#4a4a4a]">{item.label}</span>
+                    <span className="text-[14px] text-[#5f5d56]">{item.label}</span>
                   </a>
                 ))}
               </div>
@@ -182,7 +179,7 @@ export function Navbar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className="block px-4 py-2.5 text-[15px] font-medium text-[#4a4a4a] hover:text-[#1a1a1a] rounded-lg hover:bg-[#fafaf9] transition-colors"
+                className="block px-4 py-2.5 text-[15px] font-medium text-[#5f5d56] hover:text-[#2f2f2f] rounded-lg hover:bg-[#f2f1ed] transition-colors"
               >
                 {link.label}
               </a>
@@ -190,14 +187,15 @@ export function Navbar() {
             <a
               href="#login"
               onClick={() => setMobileOpen(false)}
-              className="block px-4 py-2.5 text-[15px] font-medium text-[#4a4a4a] hover:text-[#1a1a1a] rounded-lg hover:bg-[#fafaf9] transition-colors"
+              className="block px-4 py-2.5 text-[15px] font-medium text-[#5f5d56] hover:text-[#2f2f2f] rounded-lg hover:bg-[#f2f1ed] transition-colors"
             >
               Log ind
             </a>
             <a
               href="#funktioner"
               onClick={() => setMobileOpen(false)}
-              className="block mx-3 mt-3 text-center px-5 py-3 text-[15px] font-semibold text-white bg-[#f58a2d] rounded-full"
+              className="block mx-3 mt-3 text-center px-5 py-3 text-[15px] font-semibold text-white rounded-full"
+              style={{ background: '#f58a2d' }}
             >
               Hent appen
             </a>
