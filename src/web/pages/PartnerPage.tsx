@@ -74,7 +74,7 @@ export default function PartnerPage() {
           </div>
 
           <p className="text-center text-[14px] text-[#78766d] mt-8">
-            Familier bruger appen <strong className="text-[#10b981]">gratis</strong> — finansieret af kommunen.
+            Familier bruger appen <strong className="text-[#f58a2d]">gratis</strong> — finansieret af kommunen.
           </p>
         </div>
       </section>
@@ -89,7 +89,7 @@ export default function PartnerPage() {
             {/* Per-sagsbehandler */}
             <div className="p-7 rounded-2xl backdrop-blur-sm bg-white/70 border border-white/40 shadow-lg shadow-black/[0.03]">
               <div className="flex items-center gap-2 mb-4">
-                <Clock size={18} className="text-[#3b82f6]" />
+                <Clock size={18} className="text-[#1a1a1a]" />
                 <h3 className="text-[15px] font-bold text-[#2f2f2f]">Per sagsbehandler</h3>
               </div>
               <div className="mb-4">
@@ -102,7 +102,7 @@ export default function PartnerPage() {
               <ul className="space-y-2">
                 {['Ingen binding', 'Start med 1 sagsbehandler', 'Skalér efter behov'].map((item) => (
                   <li key={item} className="flex items-center gap-2 text-[13px] text-[#5f5d56]">
-                    <Check size={12} className="text-[#3b82f6] shrink-0" />
+                    <Check size={12} className="text-[#1a1a1a] shrink-0" />
                     {item}
                   </li>
                 ))}

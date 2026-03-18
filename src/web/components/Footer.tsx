@@ -16,7 +16,7 @@ export function Footer() {
   return (
     <footer className="relative bg-[#111111] text-white/80 overflow-hidden">
       {/* Gradient top border */}
-      <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: 'linear-gradient(90deg, transparent, #2F6BFF, #5B8EFF, #2F6BFF, transparent)' }} />
+      <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: 'linear-gradient(90deg, transparent, #f58a2d, #f7a95c, #f58a2d, transparent)' }} />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
@@ -75,8 +75,8 @@ export function Footer() {
               Få tips til familien og nyheder om Huska.
             </p>
             {subscribed ? (
-              <div className="flex items-center gap-2 text-sm text-[#10b981]">
-                <Heart size={14} className="fill-[#10b981]" />
+              <div className="flex items-center gap-2 text-sm text-[#f58a2d]">
+                <Heart size={14} className="fill-[#f58a2d]" />
                 Tak for din tilmelding!
               </div>
             ) : (
@@ -87,12 +87,12 @@ export function Footer() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="din@email.dk"
                   required
-                  className="flex-1 min-w-0 px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#2F6BFF]/30 focus:border-[#2F6BFF]/30 transition-all"
+                  className="flex-1 min-w-0 px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]/30 transition-all"
                 />
                 <button
                   type="submit"
                   className="px-3.5 py-2.5 rounded-xl text-white font-medium transition-all duration-200 hover:shadow-lg hover:shadow-[#f58a2d]/20 shrink-0"
-                  style={{ background: '#2F6BFF' }}
+                  style={{ background: '#f58a2d' }}
                 >
                   <Send size={16} />
                 </button>
