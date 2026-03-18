@@ -1,7 +1,7 @@
 import { useRef, useLayoutEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Quote } from 'lucide-react';
+import { Quote, Star } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -10,13 +10,22 @@ const testimonials = [
     quote: 'Endelig en app der forstår hverdagen som skilsmissefamilie. Samværsplanen er genial!',
     name: 'Maria K.',
     role: 'Co-parenting mor',
-    avatar: '/images/avatar-maria.jpg',
+    initial: 'M',
+    stars: 5,
   },
   {
     quote: 'Vi sparer så mange misforståelser. Alt er dokumenteret og begge har overblikket.',
     name: 'Thomas J.',
     role: 'Far til to',
-    avatar: '/images/avatar-thomas.jpg',
+    initial: 'T',
+    stars: 5,
+  },
+  {
+    quote: 'Med 4 børn og 3 kalendere var vi ved at drukne. Huska samler det hele.',
+    name: 'Line & Anders',
+    role: 'Sammensat familie',
+    initial: 'L',
+    stars: 5,
   },
 ];
 
@@ -83,37 +92,37 @@ export function TestimonialsSection() {
         <div ref={headerRef} className="text-center mb-12 lg:mb-16">
           <h2 className="heading-2 mb-4">Familier elsker Huska</h2>
           <p className="body-text text-[var(--color-text-secondary)] max-w-md mx-auto">
-            Brugt af familier over hele Danmark.
+            Brugt af familier over hele Danmark
           </p>
         </div>
 
         <div
           ref={cardsRef}
-          className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8"
+          className="grid grid-cols-1 md:grid-cols-3 gap-6"
         >
           {testimonials.map((testimonial, index) => (
             <div
               key={index}
-              className="testimonial-card huska-card-lg p-8 lg:p-10 will-change-transform"
+              className="testimonial-card relative p-6 rounded-2xl bg-white border border-[#e5e3dc] shadow-sm will-change-transform transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
             >
-              <div className="w-10 h-10 rounded-full bg-[var(--color-accent)]/10 flex items-center justify-center mb-6">
-                <Quote className="w-5 h-5 text-[var(--color-accent)]" />
-              </div>
+              <Quote className="w-5 h-5 text-[#1a1a1a]/15 mb-3" />
 
-              <blockquote className="text-lg lg:text-xl font-medium leading-relaxed mb-8" style={{ fontFamily: 'var(--font-heading)' }}>
+              <p className="text-[14px] text-[#4a4a4a] leading-relaxed mb-4">
                 &ldquo;{testimonial.quote}&rdquo;
-              </blockquote>
+              </p>
 
-              <div className="flex items-center gap-4">
-                <img
-                  src={testimonial.avatar}
-                  alt={testimonial.name}
-                  loading="lazy"
-                  className="w-12 h-12 rounded-full object-cover"
-                />
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-[#1a1a1a] flex items-center justify-center text-white text-[13px] font-bold">
+                  {testimonial.initial}
+                </div>
                 <div>
-                  <p className="font-semibold">{testimonial.name}</p>
-                  <p className="text-sm text-[var(--color-text-secondary)]">{testimonial.role}</p>
+                  <p className="text-[13px] font-semibold text-[#1a1a1a]">{testimonial.name}</p>
+                  <p className="text-[11px] text-[#78766d]">{testimonial.role}</p>
+                </div>
+                <div className="ml-auto flex gap-0.5">
+                  {Array.from({ length: testimonial.stars }).map((_, j) => (
+                    <Star key={j} className="w-3 h-3 fill-[#1a1a1a] text-[#1a1a1a]" />
+                  ))}
                 </div>
               </div>
             </div>

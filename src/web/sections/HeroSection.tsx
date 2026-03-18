@@ -1,7 +1,7 @@
 import { useRef, useLayoutEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Apple, ChevronDown, Shield, Clock, Sparkles, Heart } from 'lucide-react';
+import { ArrowRight, ArrowDown, Shield, Clock, Sparkles, Heart, Smartphone } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -95,7 +95,7 @@ export function HeroSection() {
           <div ref={contentRef} className="max-w-xl">
             <div ref={eyebrowRef} className="mb-6">
               <span className="eyebrow-pill">
-                <Heart className="w-4 h-4 text-[var(--color-accent)]" />
+                <Heart className="w-4 h-4 text-[#1a1a1a]" />
                 Lavet til familier i Danmark
               </span>
             </div>
@@ -119,27 +119,33 @@ export function HeroSection() {
             </p>
 
             <div ref={buttonsRef} className="flex flex-wrap gap-4 mb-10">
-              <a href="#download" className="btn-primary inline-flex items-center gap-2">
-                <Apple className="w-5 h-5" />
+              <a
+                href="https://apps.apple.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-2.5 px-8 py-4 text-[15px] font-semibold text-white bg-[#1a1a1a] rounded-full shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
+              >
+                <Smartphone className="w-[18px] h-[18px]" />
                 Hent til iPhone
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </a>
               <a href="#features" className="btn-secondary inline-flex items-center gap-2">
                 Se funktioner
-                <ChevronDown className="w-4 h-4" />
+                <ArrowDown className="w-4 h-4" />
               </a>
             </div>
 
             <div ref={badgesRef} className="flex flex-wrap gap-6">
               <span className="trust-badge">
-                <Shield className="w-4 h-4 text-[var(--color-accent)]" />
+                <Shield className="w-4 h-4" />
                 Sikker
               </span>
               <span className="trust-badge">
-                <Clock className="w-4 h-4 text-[var(--color-accent)]" />
+                <Clock className="w-4 h-4" />
                 Tidsbesparende
               </span>
-              <span className="trust-badge">
-                <Sparkles className="w-4 h-4 text-[var(--color-accent)]" />
+              <span className="trust-badge text-[#1a1a1a] font-bold">
+                <Sparkles className="w-4 h-4" />
                 Gratis
               </span>
             </div>
@@ -149,16 +155,19 @@ export function HeroSection() {
             ref={phoneRef}
             className="hidden lg:flex justify-center items-center will-change-transform"
           >
-            <div className="phone-mockup relative">
-              <img
-                src="/images/hero-phone-ui.jpg"
-                alt="Huska App Brugerflade"
-                loading="lazy"
-                className="w-full max-w-[280px] xl:max-w-[320px] rounded-[36px]"
-                style={{
-                  boxShadow: '0 25px 60px rgba(0, 0, 0, 0.15)',
-                }}
-              />
+            <div className="relative">
+              <div className="absolute inset-0 scale-110 rounded-[3.5rem] bg-[#1a1a1a]/5 blur-xl" />
+              <div className="relative w-[290px] h-[590px] bg-gradient-to-b from-[#fafafa] to-white rounded-[3rem] shadow-2xl shadow-black/15 border border-[#e5e3dc] p-3">
+                <div className="w-full h-full rounded-[2.2rem] overflow-hidden relative">
+                  <img
+                    src="/app-screenshot.png"
+                    alt="Huska App — samværsplan indstillinger"
+                    className="w-full h-full object-cover object-top"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-[100px] h-[28px] bg-[#1a1a1a] rounded-full" />
+              </div>
             </div>
           </div>
         </div>
