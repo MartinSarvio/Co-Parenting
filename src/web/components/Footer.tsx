@@ -23,7 +23,7 @@ export function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <img src="/huska-logo.svg" alt="Huska" className="h-9 w-9 rounded-xl" />
+              <img src="/huska-logo.svg" alt="Huska" className="h-9 w-9" />
               <span className="text-lg font-bold text-white tracking-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Huska</span>
             </div>
             <p className="text-sm text-white/50 max-w-xs leading-relaxed">
