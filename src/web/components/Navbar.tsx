@@ -75,13 +75,13 @@ export function Navbar() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <a href="/web.html" className="flex items-center gap-2.5 group">
+          <a href="/web.html" className="flex items-center gap-2.5 group shrink-0">
             <img src="/huska-logo.svg" alt="Huska" className="h-9 w-9 rounded-xl shadow-sm group-hover:shadow-md transition-shadow" />
             <span className="text-xl font-bold text-[#1a1a1a] tracking-tight">Huska</span>
           </a>
 
-          {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-8">
+          {/* Desktop nav — centered links */}
+          <div className="hidden md:flex items-center justify-center flex-1 gap-8">
             {/* Funktioner dropdown */}
             <div ref={dropdownRef} className="relative">
               <button
@@ -122,6 +122,10 @@ export function Navbar() {
                 {link.label}
               </a>
             ))}
+          </div>
+
+          {/* Right side — login + CTA */}
+          <div className="hidden md:flex items-center gap-4 shrink-0">
             <a
               href="#login"
               className="text-sm font-medium text-[#4a4a4a] hover:text-[#1a1a1a] transition-colors"

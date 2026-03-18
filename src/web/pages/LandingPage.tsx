@@ -170,8 +170,8 @@ function FeatureSection() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const totalCards = features.length;
-  const arcSpread = 160; // degrees
-  const arcRadius = 300; // px
+  const arcSpread = 180; // degrees
+  const arcRadius = 420; // px
 
   return (
     <section id="funktioner" className="py-24 bg-white overflow-hidden" ref={ref}>
@@ -189,7 +189,7 @@ function FeatureSection() {
         </div>
 
         {/* Arc layout — desktop */}
-        <div className={`hidden lg:block relative mx-auto ${visible ? 'animate-slideUp' : 'opacity-0'}`} style={{ width: '800px', height: '420px' }}>
+        <div className={`hidden lg:block relative mx-auto ${visible ? 'animate-slideUp' : 'opacity-0'}`} style={{ width: '960px', height: '480px' }}>
           {features.map((f, i) => {
             const angle = -arcSpread / 2 + (arcSpread / (totalCards - 1)) * i;
             const rad = (angle * Math.PI) / 180;
