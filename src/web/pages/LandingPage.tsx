@@ -167,11 +167,16 @@ const features: Feature[] = [
 
 function FeatureSection() {
   const { ref, visible } = useInView(0.1);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  const totalCards = features.length;
+  const arcSpread = 160; // degrees
+  const arcRadius = 300; // px
 
   return (
-    <section id="funktioner" className="py-24 bg-white" ref={ref}>
+    <section id="funktioner" className="py-24 bg-white overflow-hidden" ref={ref}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className={`text-center mb-16 ${visible ? 'animate-slideUp' : 'opacity-0'}`}>
+        <div className={`text-center mb-8 ${visible ? 'animate-slideUp' : 'opacity-0'}`}>
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1a1a1a]/5 text-[#1a1a1a] text-xs font-semibold mb-4">
             <Zap size={13} /> Alt-i-én platform
           </div>
@@ -183,24 +188,68 @@ function FeatureSection() {
           </p>
         </div>
 
-        {/* Uniform grid — all cards same size */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+        {/* Arc layout — desktop */}
+        <div className={`hidden lg:block relative mx-auto ${visible ? 'animate-slideUp' : 'opacity-0'}`} style={{ width: '800px', height: '420px' }}>
+          {features.map((f, i) => {
+            const angle = -arcSpread / 2 + (arcSpread / (totalCards - 1)) * i;
+            const rad = (angle * Math.PI) / 180;
+            const x = Math.sin(rad) * arcRadius;
+            const y = -Math.cos(rad) * arcRadius + arcRadius;
+            const rotate = angle * 0.25;
+            const centerDist = Math.abs(i - (totalCards - 1) / 2);
+            const baseZ = totalCards - Math.round(centerDist);
+            const isHovered = hoveredIndex === i;
+
+            return (
+              <div
+                key={f.title}
+                className="absolute w-[120px] text-center cursor-pointer"
+                style={{
+                  left: `calc(50% + ${x}px - 60px)`,
+                  top: `${y * 0.55 + 20}px`,
+                  transform: `rotate(${rotate}deg) scale(${isHovered ? 1.15 : 1}) translateY(${isHovered ? -12 : 0}px)`,
+                  zIndex: isHovered ? 50 : baseZ,
+                  transition: 'transform 0.3s ease, z-index 0s',
+                }}
+                onMouseEnter={() => setHoveredIndex(i)}
+                onMouseLeave={() => setHoveredIndex(null)}
+              >
+                <div className={`p-4 rounded-xl border bg-white shadow-md ${isHovered ? 'shadow-xl border-[#1a1a1a]/20' : 'border-[#e5e3dc]'} transition-shadow duration-300`}>
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center mx-auto mb-2 bg-[#1a1a1a]/5">
+                    <f.icon size={20} className="text-[#1a1a1a]" />
+                  </div>
+                  <p className="text-[12px] font-semibold text-[#1a1a1a] leading-tight">{f.title}</p>
+                  {f.badge && (
+                    <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-[#1a1a1a]/10 text-[#1a1a1a] text-[8px] font-bold uppercase tracking-wide">
+                      {f.badge}
+                    </span>
+                  )}
+                </div>
+                {/* Tooltip on hover */}
+                {isHovered && (
+                  <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[200px] p-3 rounded-xl bg-[#1a1a1a] text-white text-[11px] leading-relaxed shadow-xl z-[60]">
+                    {f.desc}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Mobile/Tablet — horizontal scroll with overlap */}
+        <div className={`lg:hidden flex items-end overflow-x-auto pb-4 pt-2 -mx-4 px-4 no-scrollbar ${visible ? 'animate-slideUp' : 'opacity-0'}`}>
           {features.map((f, i) => (
             <div
               key={f.title}
-              className={`group text-center p-5 rounded-xl border border-[#e5e3dc] bg-white transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${visible ? 'animate-slideUp' : 'opacity-0'}`}
-              style={{ animationDelay: `${i * 60}ms` }}
+              className="shrink-0 text-center"
+              style={{ marginLeft: i === 0 ? 0 : '-12px', zIndex: totalCards - Math.abs(i - Math.floor(totalCards / 2)) }}
             >
-              <div className="w-10 h-10 rounded-lg flex items-center justify-center mx-auto mb-3 bg-[#1a1a1a]/5 transition-transform duration-300 group-hover:scale-110">
-                <f.icon size={20} className="text-[#1a1a1a]" />
+              <div className="w-[100px] p-3 rounded-xl border border-[#e5e3dc] bg-white shadow-sm">
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center mx-auto mb-2 bg-[#1a1a1a]/5">
+                  <f.icon size={18} className="text-[#1a1a1a]" />
+                </div>
+                <p className="text-[11px] font-semibold text-[#1a1a1a] leading-tight">{f.title}</p>
               </div>
-              <p className="text-[13px] font-semibold text-[#1a1a1a]">{f.title}</p>
-              {f.badge && (
-                <span className="inline-block mt-1 px-2 py-0.5 rounded-full bg-[#1a1a1a]/10 text-[#1a1a1a] text-[9px] font-bold uppercase tracking-wide">
-                  {f.badge}
-                </span>
-              )}
-              <p className="text-[11px] text-[#78766d] mt-1 leading-snug">{f.desc}</p>
             </div>
           ))}
         </div>
