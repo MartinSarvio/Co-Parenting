@@ -4,6 +4,7 @@ import { BottomNav } from '@/components/custom/BottomNav';
 import { TopBar } from '@/components/custom/TopBar';
 import { Toaster } from '@/components/ui/sonner';
 import { ErrorBoundary } from '@/components/custom/ErrorBoundary';
+import { AppStateScreen } from '@/components/custom/AppStateScreen';
 import { supabase } from '@/lib/supabase';
 import { fetchMe } from '@/lib/auth';
 import { loadInitialData } from '@/lib/dataSync';
@@ -334,18 +335,7 @@ function App() {
   }, []);
 
   if (!isReady) {
-    return (
-      <div className="app-shell min-h-[100svh] flex items-center justify-center bg-transparent">
-        <div className="animate-pulse flex flex-col items-center">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-3xl border border-border bg-card shadow-lg">
-            <svg className="w-8 h-8 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
-          </div>
-          <p className="text-foreground font-medium">Indlæser app...</p>
-        </div>
-      </div>
-    );
+    return <AppStateScreen state={isOnline ? 'loading' : 'offline'} />;
   }
 
   if (!isAuthenticated) {

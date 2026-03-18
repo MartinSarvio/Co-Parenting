@@ -2,6 +2,7 @@ import { useState, useEffect, Suspense, lazy } from 'react';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { Toaster } from 'sonner';
+import { AppStateScreen } from '@/components/custom/AppStateScreen';
 
 const LandingPage = lazy(() => import('./pages/LandingPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
@@ -23,7 +24,7 @@ const KalenderPage = lazy(() => import('./pages/KalenderPage'));
 function LoadingFallback() {
   return (
     <div className="flex items-center justify-center py-20">
-      <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#1a1a1a] border-t-transparent" />
+      <AppStateScreen state="loading" />
     </div>
   );
 }
@@ -74,7 +75,7 @@ export function WebApp() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-[#F6F7F9] flex flex-col">
       {!hideChrome && <Navbar />}
       <main className="flex-1">
         <Suspense fallback={<LoadingFallback />}>

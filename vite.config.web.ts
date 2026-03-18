@@ -35,7 +35,7 @@ export default defineConfig({
         manualChunks(id) {
           if (!id.includes('node_modules')) return undefined;
           if (/node_modules\/(react|react-dom|scheduler)\//.test(id)) return 'react-vendor';
-          // Let Vite naturally code-split other deps with their lazy chunks
+          if (id.includes('gsap')) return 'gsap-vendor';
           return undefined;
         }
       }

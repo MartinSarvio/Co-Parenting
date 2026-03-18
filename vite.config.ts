@@ -87,6 +87,7 @@ export default defineConfig({
           if (id.includes('@supabase')) return 'supabase-vendor';
           if (id.includes('framer-motion')) return 'motion-vendor';
           if (id.includes('@radix-ui')) return 'radix-vendor';
+          if (id.includes('gsap')) return 'gsap-vendor';
           return 'vendor';
         }
       }
