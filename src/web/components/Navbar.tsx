@@ -76,7 +76,7 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <a href="/web.html" className="flex items-center gap-2.5 group shrink-0">
-            <img src="/huska-logo.svg" alt="Huska" className="h-9 w-9 rounded-xl shadow-sm group-hover:shadow-md transition-shadow" />
+            <img src="/huska-logo.svg" alt="Huska" className="h-9 w-9" />
             <span className="text-xl font-bold text-[#1a1a1a] tracking-tight">Huska</span>
           </a>
 
@@ -134,7 +134,7 @@ export function Navbar() {
             </a>
             <a
               href="#funktioner"
-              className="inline-flex items-center px-5 py-2.5 text-sm font-semibold text-white bg-[#1a1a1a] rounded-full hover:bg-[#333] hover:shadow-lg transition-all duration-200"
+              className="inline-flex items-center px-5 py-2.5 text-sm font-semibold text-white bg-[#f58a2d] rounded-full hover:bg-[#e8773f] hover:shadow-lg hover:shadow-[#f58a2d]/20 transition-all duration-200"
             >
               Hent appen
             </a>
@@ -197,7 +197,7 @@ export function Navbar() {
             <a
               href="#funktioner"
               onClick={() => setMobileOpen(false)}
-              className="block mx-3 mt-3 text-center px-5 py-3 text-[15px] font-semibold text-white bg-[#1a1a1a] rounded-full"
+              className="block mx-3 mt-3 text-center px-5 py-3 text-[15px] font-semibold text-white bg-[#f58a2d] rounded-full"
             >
               Hent appen
             </a>

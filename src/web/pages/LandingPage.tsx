@@ -99,7 +99,7 @@ function HeroSection() {
               </a>
               <a
                 href="#funktioner"
-                className="inline-flex items-center gap-2 px-7 py-4 text-[15px] font-semibold text-[#1a1a1a] rounded-full border border-[#e5e3dc] bg-white hover:bg-[#fafaf9] hover:-translate-y-0.5 transition-all duration-300"
+                className="inline-flex items-center gap-2 px-7 py-4 text-[15px] font-semibold text-[#f58a2d] rounded-full border border-[#f58a2d]/30 bg-white hover:bg-[#f58a2d]/5 hover:-translate-y-0.5 transition-all duration-300"
               >
                 Se funktioner
                 <ArrowDown size={16} />
@@ -151,7 +151,6 @@ interface Feature {
 }
 
 const features: Feature[] = [
-  { icon: Calendar, title: 'Samværsplan', desc: 'Planlæg samvær med fast 7/7, 10/4 eller fleksibel model. Altid overblik over hvem der har børnene.', badge: 'Populær' },
   { icon: CalendarHeart, title: 'Kalender', desc: 'Fælles familiekalender med begivenheder, aktiviteter og vigtige datoer for alle.' },
   { icon: MessageCircle, title: 'Kommunikation', desc: 'Struktureret kommunikation mellem forældre. Tråde, beskeder og delt historik.' },
   { icon: Wallet, title: 'Udgifter', desc: 'Del udgifter retfærdigt. Hold styr på budgetter, balancer og kvitteringer.' },
@@ -162,7 +161,6 @@ const features: Feature[] = [
   { icon: BookOpen, title: 'Dagbog', desc: 'Hold styr på hverdagen med noter og dagbogsindlæg.' },
   { icon: Scale, title: 'Beslutningslog', desc: 'Dokumentér fælles beslutninger. Altid enighed om hvad der er aftalt.' },
   { icon: Tag, title: 'Tilbud', desc: 'Se ugens bedste tilbud fra danske supermarkeder.' },
-  { icon: CalendarHeart, title: 'Vigtige Datoer', desc: 'Glem aldrig fødselsdage, lægebesøg og milepæle.' },
 ];
 
 function FeatureSection() {
@@ -348,12 +346,12 @@ function FeatureSpotlight1() {
           </div>
 
           <div className={`flex justify-center ${visible ? 'animate-slideInRight' : 'opacity-0'}`}>
-            <div className="relative w-[260px] h-[520px] bg-gradient-to-b from-[#fafafa] to-white rounded-[2.5rem] shadow-2xl shadow-black/10 border border-[#e5e3dc] p-2.5">
-              <div className="w-full h-full rounded-[2rem] overflow-hidden bg-[#fafaf9] flex items-center justify-center">
-                <img src="/app-screenshot.png" alt="Samværsplan" className="w-full h-full object-cover object-top" loading="lazy" />
-              </div>
-              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[90px] h-[25px] bg-[#1a1a1a] rounded-full" />
-            </div>
+            <img
+              src="/samvaersplan-screenshot.png"
+              alt="Samværsplan indstillinger"
+              className="w-full max-w-[320px] rounded-2xl shadow-xl"
+              loading="lazy"
+            />
           </div>
         </div>
       </div>
@@ -438,9 +436,10 @@ const testimonials = [
 
 function SocialProofSection() {
   const { ref, visible } = useInView();
+  const allTestimonials = [...testimonials, ...testimonials];
 
   return (
-    <section className="py-20 bg-white" ref={ref}>
+    <section className="py-20 bg-white overflow-hidden" ref={ref}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`text-center mb-12 ${visible ? 'animate-slideUp' : 'opacity-0'}`}>
           <h2 className="text-3xl sm:text-4xl font-[800] text-[#1a1a1a] tracking-[-0.03em]">
@@ -450,18 +449,23 @@ function SocialProofSection() {
             Brugt af familier over hele Danmark
           </p>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((t, i) => (
+      {/* Scrolling ticker */}
+      <div className="group relative">
+        <div
+          className="flex gap-6 w-max hover:[animation-play-state:paused]"
+          style={{ animation: 'ticker 20s linear infinite' }}
+        >
+          {allTestimonials.map((t, i) => (
             <div
-              key={t.name}
-              className={`relative p-6 rounded-2xl bg-white border border-[#e5e3dc] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg ${visible ? 'animate-slideUp' : 'opacity-0'}`}
-              style={{ animationDelay: `${i * 150}ms` }}
+              key={`${t.name}-${i}`}
+              className="relative w-[340px] shrink-0 p-6 rounded-2xl bg-white border border-[#e5e3dc] shadow-sm"
             >
               <Quote size={20} className="text-[#1a1a1a]/15 mb-3" />
 
               <p className="text-[14px] text-[#4a4a4a] leading-relaxed mb-4">
-                "{t.quote}"
+                &ldquo;{t.quote}&rdquo;
               </p>
 
               <div className="flex items-center gap-3">
@@ -501,54 +505,116 @@ const familyFeatures = [
 
 function PricingSection() {
   const { ref, visible } = useInView();
+  const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
+  const [contactSent, setContactSent] = useState(false);
+
+  const handleContact = (e: React.FormEvent) => {
+    e.preventDefault();
+    const subject = encodeURIComponent('Henvendelse fra huska.dk');
+    const body = encodeURIComponent(`Navn: ${contactForm.name}\n\n${contactForm.message}`);
+    window.location.href = `mailto:kontakt@huska.dk?subject=${subject}&body=${body}`;
+    setContactSent(true);
+  };
 
   return (
     <section id="priser" className="py-24 bg-[#fafaf9]" ref={ref}>
-      <div className="max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className={`text-center mb-12 ${visible ? 'animate-slideUp' : 'opacity-0'}`}>
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1a1a1a]/5 text-[#1a1a1a] text-xs font-semibold mb-4">
-            <Sparkles size={13} /> Ingen skjulte omkostninger
+            <Sparkles size={13} /> Kom i gang
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-[800] text-[#1a1a1a] tracking-[-0.03em]">
-            Helt gratis.
-            <span className="block text-[#1a1a1a]/60">For altid.</span>
+            Start gratis
           </h2>
           <p className="mt-4 text-[#4a4a4a] max-w-md mx-auto text-[1.05rem] leading-relaxed">
-            Alle funktioner er gratis for familier. Ingen abonnement, ingen prøveperiode.
+            Start gratis og udforsk alle funktioner direkte i appen.
           </p>
         </div>
 
-        <div
-          className={`relative p-8 rounded-3xl bg-white border-2 border-[#1a1a1a] shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-xl ${visible ? 'animate-slideUp' : 'opacity-0'}`}
-          style={{ animationDelay: '100ms' }}
-        >
-          <div className="text-center mb-6">
-            <span className="text-5xl font-[800] text-[#1a1a1a]">Kr. 0</span>
-            <span className="text-[#78766d] text-sm ml-2">/ måned</span>
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Pricing card */}
+          <div
+            className={`relative p-8 rounded-3xl bg-white border-2 border-[#1a1a1a] shadow-lg ${visible ? 'animate-slideUp' : 'opacity-0'}`}
+            style={{ animationDelay: '100ms' }}
+          >
+            <div className="text-center mb-6">
+              <span className="text-5xl font-[800] text-[#1a1a1a]">Kr. 0</span>
+              <span className="text-[#78766d] text-sm ml-2">/ måned</span>
+            </div>
+
+            <ul className="space-y-3 mb-8">
+              {familyFeatures.map((f) => (
+                <li key={f} className="flex items-center gap-3 text-[15px] text-[#4a4a4a]">
+                  <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 bg-[#1a1a1a]/5">
+                    <Check size={12} className="text-[#1a1a1a]" />
+                  </div>
+                  {f}
+                </li>
+              ))}
+            </ul>
+
+            <a
+              href="https://apps.apple.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full text-center py-3.5 rounded-xl font-semibold text-white bg-[#1a1a1a] shadow-lg hover:bg-[#333] hover:shadow-xl transition-all duration-200"
+            >
+              Hent appen
+            </a>
           </div>
 
-          <ul className="space-y-3 mb-8">
-            {familyFeatures.map((f) => (
-              <li key={f} className="flex items-center gap-3 text-[15px] text-[#4a4a4a]">
-                <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 bg-[#1a1a1a]/5">
-                  <Check size={12} className="text-[#1a1a1a]" />
-                </div>
-                {f}
-              </li>
-            ))}
-          </ul>
-
-          <a
-            href="https://apps.apple.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-full text-center py-3.5 rounded-xl font-semibold text-white bg-[#1a1a1a] shadow-lg hover:bg-[#333] hover:shadow-xl transition-all duration-200"
+          {/* Contact form */}
+          <div
+            className={`p-8 rounded-3xl bg-white border border-[#e5e3dc] shadow-sm ${visible ? 'animate-slideUp' : 'opacity-0'}`}
+            style={{ animationDelay: '200ms' }}
           >
-            Hent appen gratis
-          </a>
+            <h3 className="text-lg font-bold text-[#1a1a1a] mb-1">Har du spørgsmål?</h3>
+            <p className="text-[13px] text-[#78766d] mb-6">Skriv til os — vi svarer hurtigt.</p>
+
+            {contactSent ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <Heart size={24} className="text-[#f58a2d] fill-[#f58a2d] mb-3" />
+                <p className="text-[15px] font-semibold text-[#1a1a1a]">Tak for din henvendelse!</p>
+                <p className="text-[13px] text-[#78766d] mt-1">Vi vender tilbage hurtigst muligt.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleContact} className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Dit navn"
+                  required
+                  value={contactForm.name}
+                  onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border border-[#e5e3dc] bg-white text-[14px] text-[#1a1a1a] placeholder:text-[#b5b3ab] focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]/50 transition-all"
+                />
+                <input
+                  type="email"
+                  placeholder="Din email"
+                  required
+                  value={contactForm.email}
+                  onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border border-[#e5e3dc] bg-white text-[14px] text-[#1a1a1a] placeholder:text-[#b5b3ab] focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]/50 transition-all"
+                />
+                <textarea
+                  placeholder="Din besked"
+                  required
+                  rows={3}
+                  value={contactForm.message}
+                  onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl border border-[#e5e3dc] bg-white text-[14px] text-[#1a1a1a] placeholder:text-[#b5b3ab] focus:outline-none focus:ring-2 focus:ring-[#f58a2d]/30 focus:border-[#f58a2d]/50 transition-all resize-none"
+                />
+                <button
+                  type="submit"
+                  className="w-full py-3.5 rounded-xl font-semibold text-white bg-[#f58a2d] shadow-lg hover:bg-[#e8773f] hover:shadow-xl transition-all duration-200"
+                >
+                  Send besked
+                </button>
+              </form>
+            )}
+          </div>
         </div>
 
-        <p className={`text-center text-[14px] text-[#78766d] mt-6 ${visible ? 'animate-slideUp' : 'opacity-0'}`} style={{ animationDelay: '200ms' }}>
+        <p className={`text-center text-[14px] text-[#78766d] mt-6 ${visible ? 'animate-slideUp' : 'opacity-0'}`} style={{ animationDelay: '300ms' }}>
           Er du kommune eller professionel?{' '}
           <a href="#partner" className="text-[#1a1a1a] font-medium underline underline-offset-2 hover:no-underline transition-colors">
             Se partnerprogrammet <ArrowRight size={13} className="inline" />
