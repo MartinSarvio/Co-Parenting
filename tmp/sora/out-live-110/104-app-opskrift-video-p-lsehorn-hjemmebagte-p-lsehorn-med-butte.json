@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772485045,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a5f9b4fbac819085c50a36838842960cea0b7dc4bff862",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: App-opskrift video: P\u00f8lsehorn. Hjemmebagte p\u00f8lsehorn med butterdej \u2013 b\u00f8rnenes yndlings-snack. Vis r\u00e5 ingredienser, hurtig tilberedning i 3 korte beats, og l\u00e6kker anretning p\u00e5 tallerken. Ingen mennesker i billedet. Ingen tekst-overlay. Stil: realistisk food cinematography, appetitlig, naturligt k\u00f8kkenlys, stabile close-ups. M\u00e5lgruppe: danske b\u00f8rnefamilier. Kategori: Snacks. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "8",
+  "size": "1280x720",
+  "status": "queued"
+}

@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624234,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8196ae45c81908d3e6b238be2b08b02971ad95006413d",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Ostetoast. Retbeskrivelse: Spr\u00f8de ostetoast med skinke \u2013 b\u00f8rnenes hurtige favorit.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Toastbr\u00f8d, Revet ost, Skinke, Sm\u00f8r. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Sm\u00f8r br\u00f8dskiverne. L\u00e6g skinke og ost mellem to skiver. | Trin 2: Rist i toastjern eller p\u00e5 pande 2-3 min p\u00e5 hver side. | Trin 3: Sk\u00e6r diagonalt og server varme.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Snacks. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

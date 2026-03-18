@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624254,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8197e1e6081918cd4091cb25ccb990699438aa8ec52f1",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Spaghetti med k\u00f8dboller. Retbeskrivelse: Italiensk-inspireret pasta med hjemmelavede k\u00f8dboller i tomatsovs.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Spaghetti, Hakket svin/okse, Rasp, \u00c6g, D\u00e5setomater, Hvidl\u00f8g, Basilikum, Parmesan. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Bland k\u00f8d, rasp, \u00e6g og salt til fars. Form sm\u00e5 boller. | Trin 2: Brun bollerne i olie. Tag op. | Trin 3: Lav sovs med hvidl\u00f8g og tomater. L\u00e6g bollerne i og simre 15 min. | Trin 4: Kog spaghetti. Server med k\u00f8dboller, sovs og parmesan.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

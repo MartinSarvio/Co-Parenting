@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624240,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a819709e2081908203a8e0173c9df10317775b1e558e02",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Ostesuffl\u00e9. Retbeskrivelse: Let og luftig ostesuffl\u00e9 med gruy\u00e8re.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Sm\u00f8r, Hvedemel, M\u00e6lk, Gruy\u00e8re (revet), \u00c6g, Salt, Muskatn\u00f8d. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Lav bechamel: smelt sm\u00f8r, r\u00f8r mel i, tils\u00e6t m\u00e6lk. Afk\u00f8l lidt. | Trin 2: R\u00f8r ost og \u00e6ggeblommer i bechamelen. | Trin 3: Pisk \u00e6ggehvider stive med salt. Vend forsigtigt i osteblanding. | Trin 4: H\u00e6ld i smurte suffl\u00e9-forme. Bag ved 200\u00b0C i 20-25 min. Server straks.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: nej.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

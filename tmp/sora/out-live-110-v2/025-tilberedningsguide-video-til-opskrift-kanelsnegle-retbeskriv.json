@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624214,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8195628dc819092170b215bfa141f0cbac4d18cb4993a",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Kanelsnegle. Retbeskrivelse: Bl\u00f8de hjemmebagte kanelsnegle med glasur.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Hvedemel, M\u00e6lk, G\u00e6r, Sm\u00f8r, Sukker, \u00c6g, Kanel, Brun farin. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Opl\u00f8s g\u00e6r i lun m\u00e6lk. Bland mel, sukker, \u00e6g og smeltet sm\u00f8r til dej. | Trin 2: \u00c6lt dejen og lad den h\u00e6ve 45 min. | Trin 3: Rul ud. Sm\u00f8r bl\u00f8dt sm\u00f8r, drys kanel og farin. Rul sammen og sk\u00e6r i skiver. | Trin 4: Bag ved 200\u00b0C i 15-18 min. Glas\u00e9r med flormelis r\u00f8rt ud med lidt vand.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Bagv\u00e6rk. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

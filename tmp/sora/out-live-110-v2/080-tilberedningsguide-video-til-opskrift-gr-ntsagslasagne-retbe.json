@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624240,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8196fe7388191ab42e91f9b3fdbd105e4e3938dd93fcf",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Gr\u00f8ntsagslasagne. Retbeskrivelse: Vegetarisk lasagne med spinat, svampe og ricotta.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Lasagneplader, Spinat, Champignon, Ricotta, D\u00e5setomater, Mozzarella, Hvidl\u00f8g, Olivenolie. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Svits svampe og hvidl\u00f8g i olie. Tils\u00e6t spinat og lad falde sammen. | Trin 2: Lav tomatsovs med d\u00e5setomater og krydderier. | Trin 3: Lag tomatsovs, plader, gr\u00f8ntsager, ricotta. Gentag. Top med mozzarella. | Trin 4: Bag ved 190\u00b0C i 35-40 min.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

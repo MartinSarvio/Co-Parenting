@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624218,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8195ae4908190a9527e8909663205048fac55d73700ba",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: \u00c6ggesmadder. Retbeskrivelse: Rugbr\u00f8d med \u00e6ggesalat \u2013 perfekt til frokostpakken.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): \u00c6g, Mayonnaise, Sennep, Purl\u00f8g, Salt, Peber, Rugbr\u00f8d. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: H\u00e5rdkog \u00e6g i 10 min. K\u00f8l af og pil dem. | Trin 2: Hak \u00e6ggene groft. Bland med mayo, sennep, purl\u00f8g, salt og peber. | Trin 3: Fordel \u00e6ggesalat p\u00e5 rugbr\u00f8d. Pynt med purl\u00f8g.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Frokost. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

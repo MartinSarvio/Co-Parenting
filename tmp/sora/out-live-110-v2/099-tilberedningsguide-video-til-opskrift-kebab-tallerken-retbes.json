@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624248,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a81978b58c819086dd59635cd94d8b048bd58e194aedf9",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Kebab tallerken. Retbeskrivelse: Hjemmelavet kebab med pitabr\u00f8d, salat og dressing.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Hakket lam/okse, Spidskommen, Paprika, Hvidl\u00f8g, Pitabr\u00f8d, Iceberg salat, Tomat, Yoghurtdressing. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Bland k\u00f8d med krydderier og presset hvidl\u00f8g. Form aflange kebab. | Trin 2: Grill eller steg kebab 5-6 min p\u00e5 hver side. | Trin 3: Varm pitabr\u00f8d. Snit salat og tomat. | Trin 4: Server kebab med br\u00f8d, salat og yoghurtdressing.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

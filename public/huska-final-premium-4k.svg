@@ -1,0 +1,49 @@
+<svg width="4096" height="2304" viewBox="0 0 4096 2304" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Huska Final Premium Logo</title>
+  <desc id="desc">Elegant Huska logo with refined monogram and premium wordmark.</desc>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="4096" y2="2304" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FBFAF6"/>
+      <stop offset="1" stop-color="#ECE7DC"/>
+    </linearGradient>
+    <linearGradient id="badge" x1="260" y1="260" x2="1580" y2="1580" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2F2E2B"/>
+      <stop offset="1" stop-color="#201F1D"/>
+    </linearGradient>
+    <linearGradient id="ink" x1="580" y1="560" x2="1260" y2="1260" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F8F4EA"/>
+      <stop offset="1" stop-color="#EDE7DA"/>
+    </linearGradient>
+    <filter id="shadow" x="180" y="180" width="1560" height="1560" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="38"/>
+      <feGaussianBlur stdDeviation="42"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0 0.06 0 0 0 0.26 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_1"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_1" result="shape"/>
+    </filter>
+  </defs>
+
+  <rect width="4096" height="2304" rx="120" fill="url(#bg)"/>
+  <circle cx="3660" cy="280" r="200" fill="#FFFFFF" fill-opacity="0.42"/>
+  <circle cx="280" cy="2000" r="260" fill="#FFFFFF" fill-opacity="0.32"/>
+
+  <g filter="url(#shadow)">
+    <rect x="300" y="300" width="1260" height="1260" rx="336" fill="url(#badge)"/>
+    <path d="M450 550C610 430 810 376 1110 376C1320 376 1450 415 1560 486V590C1420 520 1290 492 1110 492C840 492 650 548 450 706V550Z" fill="#FFFFFF" fill-opacity="0.11"/>
+
+    <rect x="610" y="610" width="194" height="700" rx="97" fill="url(#ink)"/>
+    <rect x="1056" y="610" width="194" height="700" rx="97" fill="url(#ink)"/>
+    <path d="M804 902C804 800 887 717 989 717H1067V895H989C946 895 912 929 912 972V1309H804V902Z" fill="url(#ink)"/>
+    <path d="M1056 902C1056 800 973 717 871 717H793V895H871C914 895 948 929 948 972V1309H1056V902Z" fill="url(#ink)"/>
+
+    <path d="M760 1040C760 930 850 840 960 840H992C1102 840 1192 930 1192 1040V1102C1192 1212 1102 1302 992 1302H960C850 1302 760 1212 760 1102V1040Z" stroke="#D9CEB6" stroke-width="34"/>
+  </g>
+
+  <text x="1778" y="1055" fill="#2E2D2A" font-family="'Cormorant Garamond', 'Bodoni 72', 'Didot', Georgia, serif" font-size="548" font-weight="600" letter-spacing="-8">Huska</text>
+  <text x="1796" y="1310" fill="#625D52" font-family="Avenir Next, SF Pro Text, -apple-system, sans-serif" font-size="110" font-weight="500" letter-spacing="14">CALM CO-PARENTING</text>
+  <rect x="1796" y="1366" width="420" height="10" rx="5" fill="#B6AA92"/>
+</svg>

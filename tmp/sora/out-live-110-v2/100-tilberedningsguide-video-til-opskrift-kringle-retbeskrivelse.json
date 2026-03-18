@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624248,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a81978b1e4819093501392cbdf80b00f4a4db2a14464aa",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Kringle. Retbeskrivelse: Dansk sm\u00f8rkringle med remonce og glasur.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Hvedemel, Sm\u00f8r (koldt), M\u00e6lk, G\u00e6r, Sukker, Brun farin, Kanel, Marcipan. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Lav dej af mel, g\u00e6r, m\u00e6lk og sukker. Rul sm\u00f8r ind (som wienerbr\u00f8d). | Trin 2: Lav remonce: bland bl\u00f8dt sm\u00f8r, farin, kanel og revet marcipan. | Trin 3: Rul dejen ud, sm\u00f8r remonce p\u00e5, fold og form til kringle. | Trin 4: Bag ved 200\u00b0C i 20-25 min. Glas\u00e9r med flormelis-glasur.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Bagv\u00e6rk. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

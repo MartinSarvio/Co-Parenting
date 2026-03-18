@@ -1,0 +1,24 @@
+<svg width="4096" height="2304" viewBox="0 0 4096 2304" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="4096" y2="2304" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F8FAFB"/>
+      <stop offset="1" stop-color="#E7ECEF"/>
+    </linearGradient>
+    <linearGradient id="m2" x1="340" y1="300" x2="1400" y2="1410" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1F2B33"/>
+      <stop offset="1" stop-color="#283844"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="4096" height="2304" rx="120" fill="url(#bg2)"/>
+
+  <g transform="translate(300 340)">
+    <rect x="0" y="0" width="1180" height="1180" rx="300" fill="#EFF3F6"/>
+    <path d="M214 944V500C214 426 274 366 348 366H438C512 366 572 426 572 500V640H608V500C608 426 668 366 742 366H832C906 366 966 426 966 500V944H820V524H754V944H426V524H360V944H214Z" fill="url(#m2)"/>
+    <circle cx="590" cy="760" r="110" fill="#A7BBCB"/>
+    <circle cx="590" cy="760" r="62" fill="#EFF3F6"/>
+  </g>
+
+  <text x="1710" y="1138" fill="#23313A" font-family="'Plus Jakarta Sans','Sora',sans-serif" font-size="462" font-weight="700" letter-spacing="-8">Huska</text>
+  <text x="1718" y="1368" fill="#4B6170" font-family="'Plus Jakarta Sans',sans-serif" font-size="98" font-weight="500" letter-spacing="10">SHARED FAMILY OS</text>
+</svg>

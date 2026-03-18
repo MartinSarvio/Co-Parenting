@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624208,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8194ff414819191e22563a47772c0033e9326370653a0",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Br\u00e6ndende k\u00e6rlighed. Retbeskrivelse: Kartoffelmos med stegt bacon og l\u00f8g \u2013 klassisk dansk comfort food.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Kartofler, Bacon i tern, L\u00f8g, Sm\u00f8r, M\u00e6lk, Salt, Peber. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Skr\u00e6l og kog kartoflerne i saltet vand til de er m\u00f8re. | Trin 2: Steg bacon spr\u00f8dt. Tag op. Steg l\u00f8gringe i baconfedt. | Trin 3: Mos kartoflerne med sm\u00f8r og varm m\u00e6lk. Krydr med salt og peber. | Trin 4: Anret mosen med spr\u00f8dt bacon og stegte l\u00f8g ovenp\u00e5.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

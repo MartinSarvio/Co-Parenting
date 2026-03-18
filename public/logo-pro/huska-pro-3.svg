@@ -1,0 +1,27 @@
+<svg width="4096" height="2304" viewBox="0 0 4096 2304" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg3" x1="0" y1="0" x2="4096" y2="2304" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FBFAF7"/>
+      <stop offset="1" stop-color="#EEE8DD"/>
+    </linearGradient>
+    <linearGradient id="m3" x1="300" y1="300" x2="1420" y2="1420" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#302C27"/>
+      <stop offset="1" stop-color="#231F1A"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="520" y1="530" x2="1110" y2="1110" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#D8C9A9"/>
+      <stop offset="1" stop-color="#BCA584"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="4096" height="2304" rx="120" fill="url(#bg3)"/>
+
+  <g transform="translate(300 340)">
+    <rect x="0" y="0" width="1180" height="1180" rx="300" fill="url(#m3)"/>
+    <path d="M270 960V690C270 460 456 274 686 274C916 274 1102 460 1102 690V960H948V700C948 555 831 438 686 438C542 438 424 555 424 700V960H270Z" fill="#F6F1E6"/>
+    <path d="M510 950V756C510 656 591 575 691 575H692C792 575 873 656 873 756V950H720V772C720 756 707 743 691 743C675 743 662 756 662 772V950H510Z" fill="url(#gold)"/>
+  </g>
+
+  <text x="1710" y="1138" fill="#2D2924" font-family="'Cormorant Garamond','Didot',serif" font-size="518" font-weight="600" letter-spacing="-8">Huska</text>
+  <text x="1718" y="1368" fill="#63584B" font-family="'Avenir Next',sans-serif" font-size="100" font-weight="500" letter-spacing="12">CALM CO-PARENTING</text>
+</svg>

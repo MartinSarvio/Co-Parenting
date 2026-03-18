@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624215,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a81957d5408190a2452245e44216510539e492eca5cbaf",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Gr\u00f8ntsagssuppe. Retbeskrivelse: N\u00e6rende gr\u00f8ntsagssuppe med s\u00e6sonens gr\u00f8ntsager.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Kartofler, Guler\u00f8dder, L\u00f8g, Selleri, Porre, Gr\u00f8ntsagsfond, Sm\u00f8r, Persille. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Sk\u00e6r alle gr\u00f8ntsager i tern. | Trin 2: Svits l\u00f8g og porre i sm\u00f8r. Tils\u00e6t \u00f8vrige gr\u00f8ntsager. | Trin 3: Tils\u00e6t fond og kog i 20 min til gr\u00f8ntsagerne er m\u00f8re. | Trin 4: Krydr med salt og peber. Drys med persille ved servering.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Supper. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

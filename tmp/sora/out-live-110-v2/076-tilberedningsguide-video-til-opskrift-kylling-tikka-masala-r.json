@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624238,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8196e4b88819199c0b3e9b32c75a80a78f75068295fe6",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Kylling tikka masala. Retbeskrivelse: Cremet indisk-inspireret kylling i tomatsovs med ris.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Kyllingebryst, Yoghurt, D\u00e5setomater, Fl\u00f8de, Garam masala, Hvidl\u00f8g, Ingef\u00e6r, Ris. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Marin\u00e9r kylling i yoghurt og garam masala i 30 min. | Trin 2: Steg kyllingen gyldenbrun. Tag op. | Trin 3: Svits hvidl\u00f8g og ingef\u00e6r. Tils\u00e6t tomater og fl\u00f8de. Simre 15 min. | Trin 4: Tils\u00e6t kylling. Simre 5 min mere. Server med ris.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: nej.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

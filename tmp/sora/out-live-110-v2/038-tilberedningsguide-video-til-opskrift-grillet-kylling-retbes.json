@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624220,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8195c8b808198849d0a7cc0b0a4250f198b37659e3fee",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Grillet kylling. Retbeskrivelse: Marineret grillet kylling med urter og citron.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Kyllingel\u00e5r, Olivenolie, Citron, Hvidl\u00f8g, Rosmarin, Timian, Salt, Peber. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Bland olie, citronsaft, presset hvidl\u00f8g, urter, salt og peber. | Trin 2: Marin\u00e9r kyllingel\u00e5rene i mindst 30 min (gerne natten over). | Trin 3: Grill ved middel varme 12-15 min p\u00e5 hver side. | Trin 4: Check at kyllingen er gennemstegt. Server med salat.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Grill. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

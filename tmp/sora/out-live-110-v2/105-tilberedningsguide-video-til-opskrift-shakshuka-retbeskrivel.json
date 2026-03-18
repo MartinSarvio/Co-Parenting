@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624250,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8197ae4e08198b73c21ab90a559c900f599db0f50fcae",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Shakshuka. Retbeskrivelse: Pocherede \u00e6g i krydret tomatsovs med feta \u2013 nordafrikansk favorit.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): D\u00e5setomater, \u00c6g, L\u00f8g, Peberfrugt, Hvidl\u00f8g, Spidskommen, Feta, Olivenolie. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Svits l\u00f8g, peberfrugt og hvidl\u00f8g i olie. Tils\u00e6t spidskommen. | Trin 2: Tils\u00e6t tomater. Simre 10 min til sovsen er tyk. | Trin 3: Lav fordybninger og sl\u00e5 \u00e6g ned i. D\u00e6k til og kog 5-7 min. | Trin 4: Smuldr feta over. Server med br\u00f8d.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Morgenmad. B\u00f8rnevenlig: nej.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

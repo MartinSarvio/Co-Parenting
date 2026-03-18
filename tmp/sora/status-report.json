@@ -1,0 +1,656 @@
+{
+  "total": 110,
+  "completed": 94,
+  "failed": 16,
+  "in_progress": 0,
+  "queued": 0,
+  "downloaded": 94,
+  "download_errors": 0,
+  "status_errors": 0,
+  "items": [
+    {
+      "id": "video_69a5f97e638c81908c270e63136808d607ee2ef7401444c6",
+      "file_stem": "001-app-opskrift-video-frikadeller-klassiske-danske-frikadeller-",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/001-app-opskrift-video-frikadeller-klassiske-danske-frikadeller-.mp4"
+    },
+    {
+      "id": "video_69a5f97e80a08190b403bb1867d1dbcf09d8ff62c5c8ddde",
+      "file_stem": "002-app-opskrift-video-stegt-fl-sk-med-persillesovs-danmarks-nat",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/002-app-opskrift-video-stegt-fl-sk-med-persillesovs-danmarks-nat.mp4"
+    },
+    {
+      "id": "video_69a5f97fc14c81918d468e1b9860b74a06e8ee11bb008aa8",
+      "file_stem": "003-app-opskrift-video-boller-i-karry-bl-de-k-dboller-i-en-mild-",
+      "status": "failed"
+    },
+    {
+      "id": "video_69a5f97f6bc48193a055d620c1b2fcfd0b60068ece763ac6",
+      "file_stem": "004-app-opskrift-video-pandekager-tynde-danske-pandekager-med-su",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/004-app-opskrift-video-pandekager-tynde-danske-pandekager-med-su.mp4"
+    },
+    {
+      "id": "video_69a5f9805efc8190889ced4bdbe66c5201e4bd98b7238d5b",
+      "file_stem": "005-app-opskrift-video-pasta-bolognese-klassisk-k-dsovs-med-spag",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/005-app-opskrift-video-pasta-bolognese-klassisk-k-dsovs-med-spag.mp4"
+    },
+    {
+      "id": "video_69a5f98162648191ba7e41bce7d768cb06b50f04b038096a",
+      "file_stem": "006-app-opskrift-video-karbonader-panerede-svinekoteleteter-steg",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/006-app-opskrift-video-karbonader-panerede-svinekoteleteter-steg.mp4"
+    },
+    {
+      "id": "video_69a5f98134a08190ad0caadc43730d900578d794bfa79e3f",
+      "file_stem": "007-app-opskrift-video-biksemad-stegte-kartofler-med-k-d-l-g-og-",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/007-app-opskrift-video-biksemad-stegte-kartofler-med-k-d-l-g-og-.mp4"
+    },
+    {
+      "id": "video_69a5f9822ed08190a515de3c41b36d2a0698d68e514adef8",
+      "file_stem": "008-app-opskrift-video-million-rb-f-hakket-oksek-d-i-cremet-sovs",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/008-app-opskrift-video-million-rb-f-hakket-oksek-d-i-cremet-sovs.mp4"
+    },
+    {
+      "id": "video_69a5f9839ad88191bf761006c71ca22507260483c045e606",
+      "file_stem": "009-app-opskrift-video-ggekage-dansk-omelet-med-bacon-og-purl-g-",
+      "status": "failed"
+    },
+    {
+      "id": "video_69a5f983d9608191932e88ec60036842046f72ce09d380a3",
+      "file_stem": "010-app-opskrift-video-br-ndende-k-rlighed-kartoffelmos-med-steg",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/010-app-opskrift-video-br-ndende-k-rlighed-kartoffelmos-med-steg.mp4"
+    },
+    {
+      "id": "video_69a5f984f7848190b36e78cd73e9239401737a1d44bc7433",
+      "file_stem": "011-app-opskrift-video-medisterp-lse-stegt-medisterp-lse-med-kar",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/011-app-opskrift-video-medisterp-lse-stegt-medisterp-lse-med-kar.mp4"
+    },
+    {
+      "id": "video_69a5f984dabc8190937792bfff78c96f0a07e859ec0d9ea5",
+      "file_stem": "012-app-opskrift-video-hakkeb-f-med-bl-de-l-g-saftige-hakkeb-ffe",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/012-app-opskrift-video-hakkeb-f-med-bl-de-l-g-saftige-hakkeb-ffe.mp4"
+    },
+    {
+      "id": "video_69a5f986722081989a8daa7a8af7a3dd0a3e5cd555cfb660",
+      "file_stem": "013-app-opskrift-video-leverpostej-hjemmelavet-dansk-leverpostej",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/013-app-opskrift-video-leverpostej-hjemmelavet-dansk-leverpostej.mp4"
+    },
+    {
+      "id": "video_69a5f986afa081919ceef472578e2141067f16fd95554851",
+      "file_stem": "014-app-opskrift-video-fiskefrikadeller-lette-fiskefrikadeller-a",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/014-app-opskrift-video-fiskefrikadeller-lette-fiskefrikadeller-a.mp4"
+    },
+    {
+      "id": "video_69a5f9873e30819091afe95364d382c60d8f083882c249cb",
+      "file_stem": "015-app-opskrift-video-kylling-i-karry-cremet-karrykylling-med-r",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/015-app-opskrift-video-kylling-i-karry-cremet-karrykylling-med-r.mp4"
+    },
+    {
+      "id": "video_69a5f98784948190a43d3aaef29168f109186de5654e7f0f",
+      "file_stem": "016-app-opskrift-video-lasagne-klassisk-lasagne-med-k-dsovs-og-b",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/016-app-opskrift-video-lasagne-klassisk-lasagne-med-k-dsovs-og-b.mp4"
+    },
+    {
+      "id": "video_69a5f987e2208190bba72df17040de5e0c93111bd4528314",
+      "file_stem": "017-app-opskrift-video-taco-fredagstaco-med-krydret-k-d-salsa-og",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/017-app-opskrift-video-taco-fredagstaco-med-krydret-k-d-salsa-og.mp4"
+    },
+    {
+      "id": "video_69a5f98800d88190a6a727504430a66d01df0cd8d855146d",
+      "file_stem": "018-app-opskrift-video-hjemmelavet-pizza-spr-d-hjemmelavet-pizza",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/018-app-opskrift-video-hjemmelavet-pizza-spr-d-hjemmelavet-pizza.mp4"
+    },
+    {
+      "id": "video_69a5f98873c48190853372d8e660566d0d15ac7ba8359e77",
+      "file_stem": "019-app-opskrift-video-wok-med-kylling-hurtig-wok-med-kylling-gr",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/019-app-opskrift-video-wok-med-kylling-hurtig-wok-med-kylling-gr.mp4"
+    },
+    {
+      "id": "video_69a5f988f7fc8193bffcfe4907d831be0a7769037d8881bd",
+      "file_stem": "020-app-opskrift-video-fiskepinde-med-remoulade-spr-de-panerede-",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/020-app-opskrift-video-fiskepinde-med-remoulade-spr-de-panerede-.mp4"
+    },
+    {
+      "id": "video_69a5f988f59881908711fa65f2ac0e82072f7148e2279359",
+      "file_stem": "021-app-opskrift-video-chicken-nuggets-hjemmelavede-spr-de-chick",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/021-app-opskrift-video-chicken-nuggets-hjemmelavede-spr-de-chick.mp4"
+    },
+    {
+      "id": "video_69a5f98a13f481919c389af87985dff006ef8b251387fd74",
+      "file_stem": "022-app-opskrift-video-r-dgr-d-med-fl-de-dansk-sommer-dessert-me",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/022-app-opskrift-video-r-dgr-d-med-fl-de-dansk-sommer-dessert-me.mp4"
+    },
+    {
+      "id": "video_69a5f989f5cc81939b8432d505eecd780569f21e9dca8f85",
+      "file_stem": "023-app-opskrift-video-blekage-dansk-blekage-med-rasp-fl-deskum-",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/023-app-opskrift-video-blekage-dansk-blekage-med-rasp-fl-deskum-.mp4"
+    },
+    {
+      "id": "video_69a5f98abc3c8190a5ad0155c94123da0e74891b1256fdc3",
+      "file_stem": "024-app-opskrift-video-risalamande-dansk-juleklassiker-med-risgr",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/024-app-opskrift-video-risalamande-dansk-juleklassiker-med-risgr.mp4"
+    },
+    {
+      "id": "video_69a5f98b0a6081909dafc60cf4cb29680cd6cacfb0293537",
+      "file_stem": "025-app-opskrift-video-kanelsnegle-bl-de-hjemmebagte-kanelsnegle",
+      "status": "failed"
+    },
+    {
+      "id": "video_69a5f98b7c8081908f89807e60911efd0b59da6b45354c9b",
+      "file_stem": "026-app-opskrift-video-boller-klassiske-danske-hvede-boller-perf",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/026-app-opskrift-video-boller-klassiske-danske-hvede-boller-perf.mp4"
+    },
+    {
+      "id": "video_69a5f98c66cc81988c3cbe12c6d5c3e10e77b3f82d139cac",
+      "file_stem": "027-app-opskrift-video-vafler-spr-de-danske-hjerteformede-vafler",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/027-app-opskrift-video-vafler-spr-de-danske-hjerteformede-vafler.mp4"
+    },
+    {
+      "id": "video_69a5f98c30f88190ac886e8edbbb3ee90d7c83be14bc7eb4",
+      "file_stem": "028-app-opskrift-video-rugbr-dsmadder-med-g-og-rejer-klassisk-da",
+      "status": "failed"
+    },
+    {
+      "id": "video_69a5f98cc87c8190bbfc03c08ccff30f09b9640324c92c20",
+      "file_stem": "029-app-opskrift-video-gr-ntsagssuppe-n-rende-gr-ntsagssuppe-med",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/029-app-opskrift-video-gr-ntsagssuppe-n-rende-gr-ntsagssuppe-med.mp4"
+    },
+    {
+      "id": "video_69a5f98d9ae08198a2dc0586c536f94f019b7eca27e0e85e",
+      "file_stem": "030-app-opskrift-video-tomatsuppe-cremet-tomatsuppe-med-basiliku",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/030-app-opskrift-video-tomatsuppe-cremet-tomatsuppe-med-basiliku.mp4"
+    },
+    {
+      "id": "video_69a5f98d73a481908b43d5a12c66ae830037993c0d5dcb41",
+      "file_stem": "031-app-opskrift-video-fl-skesteg-dansk-fl-skesteg-med-spr-d-sv-",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/031-app-opskrift-video-fl-skesteg-dansk-fl-skesteg-med-spr-d-sv-.mp4"
+    },
+    {
+      "id": "video_69a5f98ec794819891ff0728f35ff8cb0f9c8fe9c7a74385",
+      "file_stem": "032-app-opskrift-video-kartoffelsuppe-cremet-kartoffelsuppe-med-",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/032-app-opskrift-video-kartoffelsuppe-cremet-kartoffelsuppe-med-.mp4"
+    },
+    {
+      "id": "video_69a5f98e5d8881908248a84dff22e90f0beab506fb1c9a0b",
+      "file_stem": "033-app-opskrift-video-spaghetti-carbonara-cremet-pasta-carbonar",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/033-app-opskrift-video-spaghetti-carbonara-cremet-pasta-carbonar.mp4"
+    },
+    {
+      "id": "video_69a5f98f376c819385fa5f440b71853302cbf67155ffad6b",
+      "file_stem": "034-app-opskrift-video-gulaschsuppe-varmende-ungarsk-inspireret-",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/034-app-opskrift-video-gulaschsuppe-varmende-ungarsk-inspireret-.mp4"
+    },
+    {
+      "id": "video_69a5f98fdec481988d3e503bf3af3d8807491285b09bd8cf",
+      "file_stem": "035-app-opskrift-video-havregr-d-varm-havregr-d-med-kanel-honnin",
+      "status": "failed"
+    },
+    {
+      "id": "video_69a5f990276c8190b9c2203548fae6c4056fe9b6d951618f",
+      "file_stem": "036-app-opskrift-video-ggesmadder-rugbr-d-med-ggesalat-perfekt-t",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/036-app-opskrift-video-ggesmadder-rugbr-d-med-ggesalat-perfekt-t.mp4"
+    },
+    {
+      "id": "video_69a5f990dfe08198b8b54074a10a77c5047f721227f57c1d",
+      "file_stem": "037-app-opskrift-video-kyllingesuppe-klassisk-hjemmelavet-kyllin",
+      "status": "failed"
+    },
+    {
+      "id": "video_69a5f9910c0c8193aabae4974d44a2b104f5ddefc1b1d618",
+      "file_stem": "038-app-opskrift-video-grillet-kylling-marineret-grillet-kylling",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/038-app-opskrift-video-grillet-kylling-marineret-grillet-kylling.mp4"
+    },
+    {
+      "id": "video_69a5f991e0e081919594306b233e183e0d1e607539db0d99",
+      "file_stem": "039-app-opskrift-video-fl-dekartofler-ovnbagte-kartofler-i-fl-de",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/039-app-opskrift-video-fl-dekartofler-ovnbagte-kartofler-i-fl-de.mp4"
+    },
+    {
+      "id": "video_69a5f9923314819186ff7fc230565e3501569351c0171d61",
+      "file_stem": "040-app-opskrift-video-pasta-med-pesto-og-kylling-hurtig-pasta-m",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/040-app-opskrift-video-pasta-med-pesto-og-kylling-hurtig-pasta-m.mp4"
+    },
+    {
+      "id": "video_69a5f9932d848191a28ce337474626fb06acdf28373beffe",
+      "file_stem": "041-app-opskrift-video-h-nsek-dssuppe-gammeldags-dansk-h-nsek-ds",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/041-app-opskrift-video-h-nsek-dssuppe-gammeldags-dansk-h-nsek-ds.mp4"
+    },
+    {
+      "id": "video_69a5f9937c208193b7058221d960f6fc05502cdeaa05acda",
+      "file_stem": "042-app-opskrift-video-jordb-rkage-frisk-lagkage-med-jordb-r-og-",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/042-app-opskrift-video-jordb-rkage-frisk-lagkage-med-jordb-r-og-.mp4"
+    },
+    {
+      "id": "video_69a5f9949e288191aa224e8d6b11d61c0f389a4764454080",
+      "file_stem": "043-app-opskrift-video-grillede-p-lser-klassiske-grillp-lser-med",
+      "status": "failed"
+    },
+    {
+      "id": "video_69a5f9942acc81908233719f52e0946e0cf6cefac5cddd62",
+      "file_stem": "044-app-opskrift-video-chili-con-carne-krydret-oksek-ds-chili-me",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/044-app-opskrift-video-chili-con-carne-krydret-oksek-ds-chili-me.mp4"
+    },
+    {
+      "id": "video_69a5f994a5948190b9c3f338c3e370040e5984d05a8dae2b",
+      "file_stem": "045-app-opskrift-video-smoothie-bowl-frisk-smoothie-bowl-med-b-r",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/045-app-opskrift-video-smoothie-bowl-frisk-smoothie-bowl-med-b-r.mp4"
+    },
+    {
+      "id": "video_69a5f995d2a481919eab1947093ca00c01a59ba63b5a9df2",
+      "file_stem": "046-app-opskrift-video-koldsk-l-med-kammerjunker-klassisk-dansk-",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/046-app-opskrift-video-koldsk-l-med-kammerjunker-klassisk-dansk-.mp4"
+    },
+    {
+      "id": "video_69a5f9955fa88190ad004be3b89ce86e0ad47c4576c0d732",
+      "file_stem": "047-app-opskrift-video-pulled-pork-burger-langsom-tilberedt-pull",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/047-app-opskrift-video-pulled-pork-burger-langsom-tilberedt-pull.mp4"
+    },
+    {
+      "id": "video_69a5f995eaac81908f13a83eb3f08eb904459529b4231124",
+      "file_stem": "048-app-opskrift-video-risotto-med-svampe-cremet-italiensk-risot",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/048-app-opskrift-video-risotto-med-svampe-cremet-italiensk-risot.mp4"
+    },
+    {
+      "id": "video_69a5f996801c8190ad1a42a6054edfd5030eda154da3a4f6",
+      "file_stem": "049-app-opskrift-video-bleskiver-klassiske-danske-bleskiver-med-",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/049-app-opskrift-video-bleskiver-klassiske-danske-bleskiver-med-.mp4"
+    },
+    {
+      "id": "video_69a5f9975a9c819182deceb7e79d45c90e12bc37e59c19eb",
+      "file_stem": "050-app-opskrift-video-thai-suppe-med-kylling-cremet-thaisuppe-m",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/050-app-opskrift-video-thai-suppe-med-kylling-cremet-thaisuppe-m.mp4"
+    },
+    {
+      "id": "video_69a5f99703708190b82460f1165f203a0ec185081fe700bf",
+      "file_stem": "051-app-opskrift-video-llebr-d-gammeldags-dansk-llebr-d-med-fl-d",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/051-app-opskrift-video-llebr-d-gammeldags-dansk-llebr-d-med-fl-d.mp4"
+    },
+    {
+      "id": "video_69a5f998470c819195b575d163da23150ea1607cdea15e15",
+      "file_stem": "052-app-opskrift-video-citronfromage-let-og-luftig-dansk-citronf",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/052-app-opskrift-video-citronfromage-let-og-luftig-dansk-citronf.mp4"
+    },
+    {
+      "id": "video_69a5f99817f081908a7aaf5433a173bd0a586bd793bf4f74",
+      "file_stem": "053-app-opskrift-video-rugbr-dsmad-med-leverpostej-rugbr-d-med-v",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/053-app-opskrift-video-rugbr-dsmad-med-leverpostej-rugbr-d-med-v.mp4"
+    },
+    {
+      "id": "video_69a5f99911788193ae7e3ac718b0d7ed070b8a451c4c73ac",
+      "file_stem": "054-app-opskrift-video-nachos-med-ost-ovnbagte-nachos-med-ost-ja",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/054-app-opskrift-video-nachos-med-ost-ovnbagte-nachos-med-ost-ja.mp4"
+    },
+    {
+      "id": "video_69a5f999cebc8191a8c1e53b593c00fa0f128f47ba21d6d7",
+      "file_stem": "055-app-opskrift-video-blomk-lssuppe-cremet-blomk-lssuppe-med-ri",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/055-app-opskrift-video-blomk-lssuppe-cremet-blomk-lssuppe-med-ri.mp4"
+    },
+    {
+      "id": "video_69a5f99a3a488191a4add45ce9762c5d01e1208501ccc0df",
+      "file_stem": "056-app-opskrift-video-grillet-laks-grillet-laks-med-citrondress",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/056-app-opskrift-video-grillet-laks-grillet-laks-med-citrondress.mp4"
+    },
+    {
+      "id": "video_69a5f99b17888190b0d807f194826e2e0d6089501b44d3f1",
+      "file_stem": "057-app-opskrift-video-rugbr-dsmad-med-roastbeef-sm-rrebr-d-med-",
+      "status": "failed"
+    },
+    {
+      "id": "video_69a5f99b735881918e29bedde001bd660df2fdb4ea432bf1",
+      "file_stem": "058-app-opskrift-video-gr-sk-salat-frisk-salat-med-tomat-agurk-o",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/058-app-opskrift-video-gr-sk-salat-frisk-salat-med-tomat-agurk-o.mp4"
+    },
+    {
+      "id": "video_69a5f99c0dc081918158f7fd92fe7eec03170a7d6c92bc6f",
+      "file_stem": "059-app-opskrift-video-kyllingesalat-m-ttende-salat-med-stegt-ky",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/059-app-opskrift-video-kyllingesalat-m-ttende-salat-med-stegt-ky.mp4"
+    },
+    {
+      "id": "video_69a5f99cbb6c8193b7dd8da5992e0f20020195823040c9f0",
+      "file_stem": "060-app-opskrift-video-rugbr-dsboller-sunde-rugbr-dsboller-med-k",
+      "status": "failed"
+    },
+    {
+      "id": "video_69a5f99d077881908ead45a6768d239e08a8058b210ce825",
+      "file_stem": "061-app-opskrift-video-butternut-squash-suppe-s-d-og-cremet-supp",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/061-app-opskrift-video-butternut-squash-suppe-s-d-og-cremet-supp.mp4"
+    },
+    {
+      "id": "video_69a5f99df138819197462dd8b9bcd00d0582e0d3203efac2",
+      "file_stem": "062-app-opskrift-video-oksesteg-med-brun-sovs-m-r-oksesteg-langt",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/062-app-opskrift-video-oksesteg-med-brun-sovs-m-r-oksesteg-langt.mp4"
+    },
+    {
+      "id": "video_69a5f99e05888198b8a1aa196f9e43390ba061c6e8c5b330",
+      "file_stem": "063-app-opskrift-video-french-toast-arme-riddere-med-kanel-sukke",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/063-app-opskrift-video-french-toast-arme-riddere-med-kanel-sukke.mp4"
+    },
+    {
+      "id": "video_69a5f99e8af081909456e93371c8f497073a83899151a489",
+      "file_stem": "064-app-opskrift-video-tortilla-wraps-med-kylling-friske-tortill",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/064-app-opskrift-video-tortilla-wraps-med-kylling-friske-tortill.mp4"
+    },
+    {
+      "id": "video_69a5f99f1fa48191b6dae4b3930cd75a0619a5fb625f58b4",
+      "file_stem": "065-app-opskrift-video-hjemmelavet-hummus-cremet-hummus-med-kik-",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/065-app-opskrift-video-hjemmelavet-hummus-cremet-hummus-med-kik-.mp4"
+    },
+    {
+      "id": "video_69a5f99f8f40819194940db3678910fe0a1218ee5770af1e",
+      "file_stem": "066-app-opskrift-video-brunchtallerken-komplet-brunchtallerken-m",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/066-app-opskrift-video-brunchtallerken-komplet-brunchtallerken-m.mp4"
+    },
+    {
+      "id": "video_69a5f99fcbb08190b07f41d3b884112f04936b4c93127cd1",
+      "file_stem": "067-app-opskrift-video-pastasalat-kold-pastasalat-med-gr-ntsager",
+      "status": "failed"
+    },
+    {
+      "id": "video_69a5f9a05ef881909de5b67c6b289c000d26a7c45d61da8c",
+      "file_stem": "068-app-opskrift-video-gullash-varmende-dansk-gullash-med-kartof",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/068-app-opskrift-video-gullash-varmende-dansk-gullash-med-kartof.mp4"
+    },
+    {
+      "id": "video_69a5f9a08bcc8190ba18a82ab452f2540f18ffc883a22ee6",
+      "file_stem": "069-app-opskrift-video-bananpandekager-sunde-pandekager-lavet-ku",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/069-app-opskrift-video-bananpandekager-sunde-pandekager-lavet-ku.mp4"
+    },
+    {
+      "id": "video_69a5f9a185ac819182713224e7b2f8740d0b7c184d942f3b",
+      "file_stem": "070-app-opskrift-video-grillede-burgere-hjemmelavede-saftige-bur",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/070-app-opskrift-video-grillede-burgere-hjemmelavede-saftige-bur.mp4"
+    },
+    {
+      "id": "video_69a5f9a10a308190a21edc64a19020500a45581b94cc833b",
+      "file_stem": "071-app-opskrift-video-ostetoast-spr-de-ostetoast-med-skinke-b-r",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/071-app-opskrift-video-ostetoast-spr-de-ostetoast-med-skinke-b-r.mp4"
+    },
+    {
+      "id": "video_69a5f9a2bfe88191ac2d3f22faa13c370500a0df1246ee1a",
+      "file_stem": "072-app-opskrift-video-k-dgryde-med-rodfrugter-langtidskogt-okse",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/072-app-opskrift-video-k-dgryde-med-rodfrugter-langtidskogt-okse.mp4"
+    },
+    {
+      "id": "video_69a5f9a277408190a1445aca4db9da5103561474c11cb757",
+      "file_stem": "073-app-opskrift-video-ris-l-hjemmelavet-is-med-risalamande-smag",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/073-app-opskrift-video-ris-l-hjemmelavet-is-med-risalamande-smag.mp4"
+    },
+    {
+      "id": "video_69a5f9a371e48193959b743b5aa03bc204df2aca2d569083",
+      "file_stem": "074-app-opskrift-video-couscous-salat-let-couscous-salat-med-gr-",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/074-app-opskrift-video-couscous-salat-let-couscous-salat-med-gr-.mp4"
+    },
+    {
+      "id": "video_69a5f9a3c3908198a2970bb96adf77d408254492e4cfb363",
+      "file_stem": "075-app-opskrift-video-brunsviger-fynsk-brunsviger-med-bl-dt-sm-",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/075-app-opskrift-video-brunsviger-fynsk-brunsviger-med-bl-dt-sm-.mp4"
+    },
+    {
+      "id": "video_69a5f9a469dc8190a791b191fe9608180a14b5bd8bca7931",
+      "file_stem": "076-app-opskrift-video-kylling-tikka-masala-cremet-indisk-inspir",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/076-app-opskrift-video-kylling-tikka-masala-cremet-indisk-inspir.mp4"
+    },
+    {
+      "id": "video_69a5f9a4ad78819186a5e2f6f7f9c1e30687e0bb35a28b99",
+      "file_stem": "077-app-opskrift-video-focaccia-luftig-italiensk-focaccia-med-ha",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/077-app-opskrift-video-focaccia-luftig-italiensk-focaccia-med-ha.mp4"
+    },
+    {
+      "id": "video_69a5f9a5639c819397142e3b6c45b81e0dcb92166c83d69b",
+      "file_stem": "078-app-opskrift-video-omelet-med-gr-ntsager-hurtig-omelet-fyldt",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/078-app-opskrift-video-omelet-med-gr-ntsager-hurtig-omelet-fyldt.mp4"
+    },
+    {
+      "id": "video_69a5f9a5ec4081919b594f5db7d24e810c43dbb9269d9873",
+      "file_stem": "079-app-opskrift-video-bagt-laks-med-honning-soja-ovnbagt-laks-m",
+      "status": "failed"
+    },
+    {
+      "id": "video_69a5f9a62fd08190a1ca2366005832e30273b77e7b9bdb69",
+      "file_stem": "080-app-opskrift-video-gr-ntsagslasagne-vegetarisk-lasagne-med-s",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/080-app-opskrift-video-gr-ntsagslasagne-vegetarisk-lasagne-med-s.mp4"
+    },
+    {
+      "id": "video_69a5f9a6abd88190a4790b39a95c90cb0de721198f650826",
+      "file_stem": "081-app-opskrift-video-pok-bowl-frisk-pok-bowl-med-laks-ris-edam",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/081-app-opskrift-video-pok-bowl-frisk-pok-bowl-med-laks-ris-edam.mp4"
+    },
+    {
+      "id": "video_69a5f9a748e8819397cc7119d8eb192300c5da8056c1a5d9",
+      "file_stem": "082-app-opskrift-video-ostesuffl-let-og-luftig-ostesuffl-med-gru",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/082-app-opskrift-video-ostesuffl-let-og-luftig-ostesuffl-med-gru.mp4"
+    },
+    {
+      "id": "video_69a5f9a79f2c819183dfb622c9953cd50411129cb0df6f30",
+      "file_stem": "083-app-opskrift-video-falafel-i-pitabr-d-spr-de-falafel-med-hum",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/083-app-opskrift-video-falafel-i-pitabr-d-spr-de-falafel-med-hum.mp4"
+    },
+    {
+      "id": "video_69a5f9a887c081919026a9bdb1b7de3f0d82c714fc87dfed",
+      "file_stem": "084-app-opskrift-video-svinekotelet-med-blesovs-stegt-svinekotel",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/084-app-opskrift-video-svinekotelet-med-blesovs-stegt-svinekotel.mp4"
+    },
+    {
+      "id": "video_69a5f9a867a081908e904211564a0b8309e64e583a5cb9a5",
+      "file_stem": "085-app-opskrift-video-suppe-med-kylling-og-kokos-cremet-kokossu",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/085-app-opskrift-video-suppe-med-kylling-og-kokos-cremet-kokossu.mp4"
+    },
+    {
+      "id": "video_69a5f9a9205481908bbe92ab4fccf9360ccc1084939dc353",
+      "file_stem": "086-app-opskrift-video-chokoladekage-svampet-chokoladekage-med-c",
+      "status": "failed"
+    },
+    {
+      "id": "video_69a5f9ab7a088191a6c48a688577e67f09af15eb883bef2a",
+      "file_stem": "087-app-opskrift-video-grillede-gr-ntsager-blandede-gr-ntsager-g",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/087-app-opskrift-video-grillede-gr-ntsager-blandede-gr-ntsager-g.mp4"
+    },
+    {
+      "id": "video_69a5f9aa2fdc8191a3aea02a1497646a00bc66248a249727",
+      "file_stem": "088-app-opskrift-video-ggestand-med-skinke-ovnbagt-ggestand-med-",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/088-app-opskrift-video-ggestand-med-skinke-ovnbagt-ggestand-med-.mp4"
+    },
+    {
+      "id": "video_69a5f9ab817c8191a391ba36a7d5266901df653411faf6de",
+      "file_stem": "089-app-opskrift-video-broccolisuppe-sund-og-cremet-broccolisupp",
+      "status": "failed"
+    },
+    {
+      "id": "video_69a5f9ac97848198a75c4ced66ff05950796ca60278bcbe5",
+      "file_stem": "090-app-opskrift-video-spr-de-for-rsruller-hjemmelavede-spr-de-f",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/090-app-opskrift-video-spr-de-for-rsruller-hjemmelavede-spr-de-f.mp4"
+    },
+    {
+      "id": "video_69a5f9ad010c819180301aa2b5cc0634032a0d8f8bb05a86",
+      "file_stem": "091-app-opskrift-video-linsesuppe-n-rende-r-de-linsesuppe-med-sp",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/091-app-opskrift-video-linsesuppe-n-rende-r-de-linsesuppe-med-sp.mp4"
+    },
+    {
+      "id": "video_69a5f9ae11ac8191b49be27e1bc8a42008ed4f322b2cd027",
+      "file_stem": "092-app-opskrift-video-stegt-and-med-r-dk-l-stegt-andebryster-me",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/092-app-opskrift-video-stegt-and-med-r-dk-l-stegt-andebryster-me.mp4"
+    },
+    {
+      "id": "video_69a5f9ae4fb881918adafb973ac398490f6105ab6d367d9e",
+      "file_stem": "093-app-opskrift-video-energiboller-sunde-energiboller-med-havre",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/093-app-opskrift-video-energiboller-sunde-energiboller-med-havre.mp4"
+    },
+    {
+      "id": "video_69a5f9af8b688191af4c96238fdf5ce0020f4518ce6deed4",
+      "file_stem": "094-app-opskrift-video-gnocchi-med-tomatsovs-bl-de-kartoffelgnoc",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/094-app-opskrift-video-gnocchi-med-tomatsovs-bl-de-kartoffelgnoc.mp4"
+    },
+    {
+      "id": "video_69a5f9af004c819098bf2d5b812a4362089540539f9b2d14",
+      "file_stem": "095-app-opskrift-video-agurkesalat-syret-dansk-agurkesalat-perfe",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/095-app-opskrift-video-agurkesalat-syret-dansk-agurkesalat-perfe.mp4"
+    },
+    {
+      "id": "video_69a5f9afaa44819091afa236817ec79d0c37eec09c4355ce",
+      "file_stem": "096-app-opskrift-video-tarteletter-med-h-ns-i-asparges-klassiske",
+      "status": "failed"
+    },
+    {
+      "id": "video_69a5f9b052bc81908374facf5bfdcfbd06ca5424d589e3e0",
+      "file_stem": "097-app-opskrift-video-gr-skar-risotto-cremet-risotto-med-bagt-g",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/097-app-opskrift-video-gr-skar-risotto-cremet-risotto-med-bagt-g.mp4"
+    },
+    {
+      "id": "video_69a5f9b0cf2c8191b5797dfbf0e952000dbb7add11630e6a",
+      "file_stem": "098-app-opskrift-video-fiskefilet-med-kartoffelskiver-bagt-fiske",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/098-app-opskrift-video-fiskefilet-med-kartoffelskiver-bagt-fiske.mp4"
+    },
+    {
+      "id": "video_69a5f9b16e2c8191804f65ce584d884503f4a17a7fabe2f7",
+      "file_stem": "099-app-opskrift-video-kebab-tallerken-hjemmelavet-kebab-med-pit",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/099-app-opskrift-video-kebab-tallerken-hjemmelavet-kebab-med-pit.mp4"
+    },
+    {
+      "id": "video_69a5f9b269ac81939d343a8580a4b74c037b0409954720e0",
+      "file_stem": "100-app-opskrift-video-kringle-dansk-sm-rkringle-med-remonce-og-",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/100-app-opskrift-video-kringle-dansk-sm-rkringle-med-remonce-og-.mp4"
+    },
+    {
+      "id": "video_69a5f9b2b1bc8193ad5cbb02199047480b21c58adc8ed375",
+      "file_stem": "101-app-opskrift-video-spinatsalat-med-bacon-frisk-spinatsalat-m",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/101-app-opskrift-video-spinatsalat-med-bacon-frisk-spinatsalat-m.mp4"
+    },
+    {
+      "id": "video_69a5f9b305808190bfd925ba0f32415e02372e737d66ce12",
+      "file_stem": "102-app-opskrift-video-flanksteak-med-chimichurri-grillet-flanks",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/102-app-opskrift-video-flanksteak-med-chimichurri-grillet-flanks.mp4"
+    },
+    {
+      "id": "video_69a5f9b3793881909b19be62dd8abf8a000aed98aee66854",
+      "file_stem": "103-app-opskrift-video-kartoffelsalat-klassisk-dansk-kartoffelsa",
+      "status": "failed"
+    },
+    {
+      "id": "video_69a5f9b4fbac819085c50a36838842960cea0b7dc4bff862",
+      "file_stem": "104-app-opskrift-video-p-lsehorn-hjemmebagte-p-lsehorn-med-butte",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/104-app-opskrift-video-p-lsehorn-hjemmebagte-p-lsehorn-med-butte.mp4"
+    },
+    {
+      "id": "video_69a5f9b48e2c8198b22d26484287347208a33a643f069864",
+      "file_stem": "105-app-opskrift-video-shakshuka-pocherede-g-i-krydret-tomatsovs",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/105-app-opskrift-video-shakshuka-pocherede-g-i-krydret-tomatsovs.mp4"
+    },
+    {
+      "id": "video_69a5f9b596f481939bcd9823a0d2e3af01e7d710663f26cd",
+      "file_stem": "106-app-opskrift-video-peanutbutter-banantoast-ristet-br-d-med-p",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/106-app-opskrift-video-peanutbutter-banantoast-ristet-br-d-med-p.mp4"
+    },
+    {
+      "id": "video_69a5f9b5774c8190a7c4fde0c56315bb0a5323c3db45c0f3",
+      "file_stem": "107-app-opskrift-video-r-dbedesalat-med-gedeost-farverig-salat-m",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/107-app-opskrift-video-r-dbedesalat-med-gedeost-farverig-salat-m.mp4"
+    },
+    {
+      "id": "video_69a5f9b76c908198ae79c09ecf4387da078a4f4022f00a58",
+      "file_stem": "108-app-opskrift-video-torsk-i-ovn-med-gr-ntsager-let-ovnbagt-to",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/108-app-opskrift-video-torsk-i-ovn-med-gr-ntsager-let-ovnbagt-to.mp4"
+    },
+    {
+      "id": "video_69a5f9b64a4c8190a044c9fbe3d7351602e37392e87a454a",
+      "file_stem": "109-app-opskrift-video-spaghetti-med-k-dboller-italiensk-inspire",
+      "status": "completed",
+      "downloaded_to": "/Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/videos/109-app-opskrift-video-spaghetti-med-k-dboller-italiensk-inspire.mp4"
+    },
+    {
+      "id": "video_69a5f9b7374481938c1f0cfb9ae33b4b03eec15aa0dd896a",
+      "file_stem": "110-app-opskrift-video-frugtgr-d-varm-dansk-frugtgr-d-med-vanilj",
+      "status": "failed"
+    }
+  ]
+}

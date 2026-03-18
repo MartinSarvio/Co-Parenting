@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624244,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8197412ac81919f5aa0a0d04a2f6c060e8eaa2e8b391a",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: \u00c6ggestand med skinke. Retbeskrivelse: Ovnbagt \u00e6ggestand med skinke og ost \u2013 perfekt brunch.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): \u00c6g, M\u00e6lk, Skinke, Revet ost, Purl\u00f8g, Salt, Peber. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Pisk \u00e6g, m\u00e6lk, salt og peber sammen. | Trin 2: Sk\u00e6r skinke i tern. Bland med ost i et ildfast fad. | Trin 3: H\u00e6ld \u00e6ggemassen over. Drys med purl\u00f8g. | Trin 4: Bag ved 180\u00b0C i 25 min til den er fast og gylden.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Morgenmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

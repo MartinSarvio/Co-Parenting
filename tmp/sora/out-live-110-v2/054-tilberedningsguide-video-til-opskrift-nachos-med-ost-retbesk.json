@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624227,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8196351408191a7be5156232b0ccb0bdf47f0a89fb792",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Nachos med ost. Retbeskrivelse: Ovnbagte nachos med ost, jalape\u00f1os og salsa.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Tortillachips, Revet ost, Jalape\u00f1os, Salsa, Cremefraiche, Avocado. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Fordel chips p\u00e5 en bageplade. Drys med ost og jalape\u00f1os. | Trin 2: Bag ved 200\u00b0C i 8-10 min til osten er smeltet. | Trin 3: Server med salsa, cremefraiche og moset avocado.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Snacks. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

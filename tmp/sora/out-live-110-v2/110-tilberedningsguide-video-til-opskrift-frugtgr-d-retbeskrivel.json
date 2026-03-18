@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624252,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8197c81448190b00783be568118940bf3f6c41af1f39f",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Frugtgr\u00f8d. Retbeskrivelse: Varm dansk frugtgr\u00f8d med vaniljefl\u00f8de.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Blandede b\u00e6r (frosne), Sukker, Vand, Kartoffelmel, Piskefl\u00f8de, Vaniljesukker. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Kog b\u00e6r med vand og sukker i 10 min. | Trin 2: R\u00f8r kartoffelmel ud i lidt koldt vand og j\u00e6vn gr\u00f8den. | Trin 3: Pisk fl\u00f8de med vaniljesukker. | Trin 4: Server varm gr\u00f8d med kold vaniljefl\u00f8de.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Dessert. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

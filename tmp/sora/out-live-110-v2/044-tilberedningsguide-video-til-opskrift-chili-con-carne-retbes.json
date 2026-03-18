@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624222,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8195e4dcc8190ba620eb1cb7d48aa0ab3f73e48bce0e1",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Chili con carne. Retbeskrivelse: Krydret oksek\u00f8ds-chili med b\u00f8nner og ris.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Hakket oksek\u00f8d, L\u00f8g, Hvidl\u00f8g, D\u00e5setomater, Kidneyb\u00f8nner, Spidskommen, Chilipulver, Ris. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Brun oksek\u00f8det. Tils\u00e6t hakket l\u00f8g og hvidl\u00f8g. | Trin 2: Tils\u00e6t spidskommen og chilipulver. R\u00f8r 1 min. | Trin 3: Tils\u00e6t tomater og dr\u00e6nede b\u00f8nner. Simre 30 min. | Trin 4: Kog ris. Server med cremefraiche og revet ost.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: nej.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

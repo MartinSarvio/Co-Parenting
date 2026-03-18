@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624213,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a81955a68481909ee641594284350500bec8b2c74d0523",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Risalamande. Retbeskrivelse: Dansk juleklassiker med risgr\u00f8d, fl\u00f8deskum og kirseb\u00e6rsovs.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Gr\u00f8dris, M\u00e6lk, Vaniljestang, Piskefl\u00f8de, Sukker, Hakkede mandler, Kirseb\u00e6rsovs. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Kog risgr\u00f8d med m\u00e6lk og udskrabet vaniljestang i 40 min. | Trin 2: Lad gr\u00f8den k\u00f8le helt af. | Trin 3: Pisk fl\u00f8de. Vend fl\u00f8de, sukker og mandler i den kolde gr\u00f8d. | Trin 4: Server med varm kirseb\u00e6rsovs. Gem en hel mandel i!. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Dessert. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

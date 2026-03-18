@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624215,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a81957d0488190a30ab01351252e650020a74a7ffae0a3",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Rugbr\u00f8dsmadder med \u00e6g og rejer. Retbeskrivelse: Klassisk dansk frokost-sm\u00f8rrebr\u00f8d med \u00e6g og rejer.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Rugbr\u00f8d, \u00c6g, Rejer, Mayonnaise, Dild, Citron, Salt. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: H\u00e5rdkog \u00e6g i 10 min. K\u00f8l af under rindende vand. Sk\u00e6r i skiver. | Trin 2: Sm\u00f8r mayonnaise p\u00e5 rugbr\u00f8det. | Trin 3: L\u00e6g \u00e6ggeskiver p\u00e5 br\u00f8det. Top med rejer. | Trin 4: Pynt med dild og et drys citron. Krydr med salt.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Frokost. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

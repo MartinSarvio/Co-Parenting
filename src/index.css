@@ -64,56 +64,57 @@
     --sidebar-border: 225 12% 28%;
     --sidebar-ring: 211 100% 60%;
   }
-
-  * {
-    @apply border-border;
-  }
-
-  html, body {
-    height: 100%;
-    min-height: 100%;
-    margin: 0;
-    padding: 0;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-    font-family: "SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", sans-serif;
-    letter-spacing: -0.01em;
-    background-image:
-      radial-gradient(circle at 12% -8%, rgba(255, 255, 255, 0.82), transparent 38%),
-      radial-gradient(circle at 86% 2%, rgba(0, 0, 0, 0.04), transparent 40%);
-    background-attachment: fixed;
-  }
-
-  .dark body,
-  .dark {
-    background-image:
-      radial-gradient(circle at 12% -8%, rgba(255, 255, 255, 0.04), transparent 38%),
-      radial-gradient(circle at 86% 2%, rgba(0, 0, 0, 0.15), transparent 40%);
-  }
 }
 
 @layer utilities {
+  .bg-orange-tint {
+    background-color: #fff2e6;
+  }
+  .dark .bg-orange-tint {
+    background-color: hsl(28 40% 18%);
+  }
+  .bg-orange-tint-light {
+    background-color: #fff8f0;
+  }
+  .dark .bg-orange-tint-light {
+    background-color: hsl(28 30% 15%);
+  }
+  .border-orange-tint {
+    border-color: #f3c59d;
+  }
+  .dark .border-orange-tint {
+    border-color: hsl(28 50% 35%);
+  }
+  .bg-green-tint {
+    background-color: #eef9ee;
+  }
+  .dark .bg-green-tint {
+    background-color: hsl(140 30% 15%);
+  }
+  .bg-blue-tint {
+    background-color: #eef0ff;
+  }
+  .dark .bg-blue-tint {
+    background-color: hsl(230 30% 18%);
+  }
+  .bg-red-tint {
+    background-color: #fef2f2;
+  }
+  .dark .bg-red-tint {
+    background-color: hsl(0 30% 15%);
+  }
+  .bg-yellow-tint {
+    background-color: #fef3c7;
+  }
+  .dark .bg-yellow-tint {
+    background-color: hsl(45 30% 18%);
+  }
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
-  }
-  /* Orange tint utility colors — lys + dark mode */
-  .bg-orange-tint {
-    background-color: rgba(245, 138, 45, 0.12);
-  }
-  .bg-orange-tint-light {
-    background-color: rgba(245, 138, 45, 0.06);
-  }
-  .dark .bg-orange-tint {
-    background-color: rgba(245, 138, 45, 0.15);
-  }
-  .dark .bg-orange-tint-light {
-    background-color: rgba(245, 138, 45, 0.08);
   }
 }
 
@@ -135,3 +136,32 @@ input[type="time"] {
   max-width: 100% !important;
   box-sizing: border-box !important;
 }
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html, body {
+    height: 100%;
+    min-height: 100%;
+    min-height: 100dvh;
+    background-color: hsl(var(--background));
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: "SF Pro Text", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", sans-serif;
+    letter-spacing: -0.01em;
+    background-image:
+      radial-gradient(circle at 12% -8%, rgba(255, 255, 255, 0.82), transparent 38%),
+      radial-gradient(circle at 86% 2%, rgba(0, 0, 0, 0.04), transparent 40%);
+    background-attachment: fixed;
+  }
+  .dark body {
+    background-image:
+      radial-gradient(circle at 12% -8%, rgba(255, 255, 255, 0.05), transparent 38%),
+      radial-gradient(circle at 86% 2%, rgba(0, 0, 0, 0.15), transparent 40%);
+  }
+}
+

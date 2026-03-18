@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624232,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a81968a4048191992a5bd7c81a282f0a82b7f7a26337a5",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Hjemmelavet hummus. Retbeskrivelse: Cremet hummus med kik\u00e6rter, tahini og citron.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Kik\u00e6rter (d\u00e5se), Tahini, Citron (saft), Hvidl\u00f8g, Olivenolie, Spidskommen, Salt. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Dr\u00e6n kik\u00e6rter. Gem lidt lage. | Trin 2: Blend alle ingredienser glat. Tils\u00e6t lidt lage for konsistens. | Trin 3: Smag til med salt og citron. Server med br\u00f8d eller gr\u00f8ntsager.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Snacks. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

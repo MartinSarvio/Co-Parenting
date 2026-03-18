@@ -10,19 +10,19 @@ datasource db {
 // ─── Users & Authentication ───────────────────────────────
 
 model User {
-  id                String    @id @default(cuid())
+  id                String    @id @db.Uuid
   email             String    @unique
-  passwordHash      String
+  passwordHash      String    @map("password_hash")
   name              String
   avatar            String?
-  color             String    @default("warm") // warm | cool | neutral
+  color             String    @default("warm")
   phone             String?
-  role              String    @default("parent") // parent | guardian | professional | family_member
-  professionalType  String?   // caseworker | family_counselor | lawyer | mediator
+  role              String    @default("parent")
+  professionalType  String?   @map("professional_type")
   organization      String?
-  isAdmin           Boolean   @default(false)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  isAdmin           Boolean   @default(false) @map("is_admin")
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz
 
   // Relations
   householdMembers  HouseholdMember[]
@@ -39,21 +39,24 @@ model User {
   decisions         DecisionLog[]     @relation("DecisionProposer")
   deviceTokens      DeviceToken[]
   stripeSubscription StripeSubscription?
+
+  @@map("profiles")
 }
 
 // ─── Device Tokens (Push Notifications) ──────────────────
 
 model DeviceToken {
   id        String   @id @default(cuid())
-  userId    String
+  userId    String   @map("user_id") @db.Uuid
   token     String   @unique
-  platform  String   // 'ios' or 'android'
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  platform  String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@map("device_tokens")
 }
 
 // ─── Household ────────────────────────────────────────────
@@ -61,29 +64,31 @@ model DeviceToken {
 model Household {
   id          String   @id @default(cuid())
   name        String
-  familyMode  String   @default("co_parenting") // co_parenting | together | blended | single_parent
-  caseNumber  String?  // Official case number from authorities
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  familyMode  String   @default("co_parenting") @map("family_mode")
+  caseNumber  String?  @map("case_number")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
-  // Relations
   members       HouseholdMember[]
   children      Child[]
   custodyPlans  CustodyPlan[]
   institutions  Institution[]
+
+  @@map("households")
 }
 
 model HouseholdMember {
   id          String    @id @default(cuid())
-  userId      String
-  householdId String
-  role        String    @default("parent") // parent | guardian | professional
-  joinedAt    DateTime  @default(now())
+  userId      String    @map("user_id") @db.Uuid
+  householdId String    @map("household_id")
+  role        String    @default("parent")
+  joinedAt    DateTime  @default(now()) @map("joined_at") @db.Timestamptz
 
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
 
   @@unique([userId, householdId])
+  @@map("household_members")
 }
 
 // ─── Children ─────────────────────────────────────────────
@@ -91,17 +96,17 @@ model HouseholdMember {
 model Child {
   id              String   @id @default(cuid())
   name            String
-  birthDate       DateTime
+  birthDate       DateTime @map("birth_date") @db.Timestamptz
   avatar          String?
-  parent1Id       String
-  parent2Id       String
-  householdId     String
-  institutionName String?
-  institutionType String?  // vuggestue | børnehave | skole | sfo
+  parent1Id       String   @map("parent1_id") @db.Uuid
+  parent2Id       String   @map("parent2_id") @db.Uuid
+  householdId     String   @map("household_id")
+  institutionName String?  @map("institution_name")
+  institutionType String?  @map("institution_type")
   allergies       String[] @default([])
   medications     String[] @default([])
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   parent1       User          @relation("Parent1", fields: [parent1Id], references: [id])
   parent2       User          @relation("Parent2", fields: [parent2Id], references: [id])
@@ -112,6 +117,8 @@ model Child {
   photos        FamilyPhoto[]
   diaryEntries  DiaryEntry[]
   decisions     DecisionLog[]
+
+  @@map("children")
 }
 
 // ─── Institution ──────────────────────────────────────────
@@ -119,16 +126,18 @@ model Child {
 model Institution {
   id            String   @id @default(cuid())
   name          String
-  type          String   // daycare | school | after_school | other
+  type          String
   address       String?
   phone         String?
   email         String?
-  contactPerson String?
-  openingHours  String?
-  householdId   String
-  createdAt     DateTime @default(now())
+  contactPerson String?  @map("contact_person")
+  openingHours  String?  @map("opening_hours")
+  householdId   String   @map("household_id")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@map("institutions")
 }
 
 // ─── Custody Plan ─────────────────────────────────────────
@@ -136,32 +145,32 @@ model Institution {
 model CustodyPlan {
   id          String   @id @default(cuid())
   name        String
-  pattern     String   // 7/7 | 10/4 | 14/0 | custom | alternating | weekday-weekend
-  startDate   DateTime
-  childId     String
-  householdId String
-  swapDay     Int      @default(4)
-  swapTime    String   @default("18:00")
-  parent1Days Int[]    @default([])
-  parent2Days Int[]    @default([])
+  pattern     String
+  startDate   DateTime @map("start_date") @db.Timestamptz
+  childId     String   @map("child_id")
+  householdId String   @map("household_id")
+  swapDay     Int      @default(4) @map("swap_day")
+  swapTime    String   @default("18:00") @map("swap_time")
+  parent1Days Int[]    @default([]) @map("parent1_days")
+  parent2Days Int[]    @default([]) @map("parent2_days")
 
-  // JSON fields for complex configs
-  weeklySchedule   Json?
-  customWeekConfig Json?
-  customSchedule   Json?
+  weeklySchedule   Json? @map("weekly_schedule")
+  customWeekConfig Json? @map("custom_week_config")
+  customSchedule   Json? @map("custom_schedule")
   holidays         Json?
-  specialDays      Json?
+  specialDays      Json? @map("special_days")
 
-  // Agreement details
-  agreementDate      DateTime?
-  agreementValidUntil DateTime?
-  agreementText      String?
+  agreementDate       DateTime? @map("agreement_date") @db.Timestamptz
+  agreementValidUntil DateTime? @map("agreement_valid_until") @db.Timestamptz
+  agreementText       String?   @map("agreement_text")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   child     Child     @relation(fields: [childId], references: [id], onDelete: Cascade)
   household Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@map("custody_plans")
 }
 
 // ─── Calendar Events ──────────────────────────────────────
@@ -170,19 +179,21 @@ model CalendarEvent {
   id          String   @id @default(cuid())
   title       String
   description String?
-  startDate   DateTime
-  endDate     DateTime
-  type        String   // school | activity | work | personal | handover | appointment | meeting
-  childId     String?
-  createdBy   String
+  startDate   DateTime @map("start_date") @db.Timestamptz
+  endDate     DateTime @map("end_date") @db.Timestamptz
+  type        String
+  childId     String?  @map("child_id")
+  createdBy   String   @map("created_by") @db.Uuid
   location    String?
-  assignedTo  String[] @default([])
-  isRecurring Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  assignedTo  String[] @default([]) @map("assigned_to")
+  isRecurring Boolean  @default(false) @map("is_recurring")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   child   Child? @relation(fields: [childId], references: [id])
   creator User   @relation(fields: [createdBy], references: [id])
+
+  @@map("calendar_events")
 }
 
 // ─── Tasks ────────────────────────────────────────────────
@@ -191,20 +202,22 @@ model Task {
   id            String    @id @default(cuid())
   title         String
   description   String?
-  assignedTo    String
-  createdBy     String
-  deadline      DateTime?
+  assignedTo    String    @map("assigned_to") @db.Uuid
+  createdBy     String    @map("created_by") @db.Uuid
+  deadline      DateTime? @db.Timestamptz
   completed     Boolean   @default(false)
-  completedAt   DateTime?
-  category      String    @default("general") // general | shopping | child | handover | cleaning
-  isRecurring   Boolean   @default(false)
-  plannedWeekday Int?
+  completedAt   DateTime? @map("completed_at") @db.Timestamptz
+  category      String    @default("general")
+  isRecurring   Boolean   @default(false) @map("is_recurring")
+  plannedWeekday Int?     @map("planned_weekday")
   area          String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz
 
   creator  User @relation("TaskCreator", fields: [createdBy], references: [id])
   assignee User @relation("TaskAssignee", fields: [assignedTo], references: [id])
+
+  @@map("tasks")
 }
 
 // ─── Shopping Items ───────────────────────────────────────
@@ -214,26 +227,30 @@ model ShoppingItem {
   name         String
   quantity     String?
   purchased    Boolean   @default(false)
-  purchasedBy  String?
-  purchasedAt  DateTime?
-  addedBy      String
+  purchasedBy  String?   @map("purchased_by") @db.Uuid
+  purchasedAt  DateTime? @map("purchased_at") @db.Timestamptz
+  addedBy      String    @map("added_by") @db.Uuid
   category     String?
-  priority     String    @default("normal") // low | normal | high
-  createdAt    DateTime  @default(now())
+  priority     String    @default("normal")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("shopping_items")
 }
 
 // ─── Meal Plans ───────────────────────────────────────────
 
 model MealPlan {
   id         String   @id @default(cuid())
-  date       String   // YYYY-MM-DD
-  mealType   String   // breakfast | lunch | dinner | snack
+  date       String
+  mealType   String   @map("meal_type")
   title      String
   notes      String?
-  createdBy  String
-  recipe     Json?    // { name, ingredients[], instructions }
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdBy  String   @map("created_by") @db.Uuid
+  recipe     Json?
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("meal_plans")
 }
 
 // ─── Messages / Communication ─────────────────────────────
@@ -242,27 +259,31 @@ model MessageThread {
   id           String    @id @default(cuid())
   title        String
   participants String[]
-  childId      String?
-  unreadCount  Int       @default(0)
-  deletedBy    String[]  @default([])
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  childId      String?   @map("child_id")
+  unreadCount  Int       @default(0) @map("unread_count")
+  deletedBy    String[]  @default([]) @map("deleted_by")
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime  @updatedAt @map("updated_at") @db.Timestamptz
 
   messages Message[]
+
+  @@map("message_threads")
 }
 
 model Message {
   id          String    @id @default(cuid())
   content     String
-  senderId    String
-  threadId    String
-  readBy      String[]  @default([])
-  deletedBy   String[]  @default([])
-  attachments Json?     // [{ id, type, url, name }]
-  createdAt   DateTime  @default(now())
+  senderId    String    @map("sender_id") @db.Uuid
+  threadId    String    @map("thread_id")
+  readBy      String[]  @default([]) @map("read_by")
+  deletedBy   String[]  @default([]) @map("deleted_by")
+  attachments Json?
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz
 
   sender User          @relation(fields: [senderId], references: [id])
   thread MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@map("messages")
 }
 
 // ─── Expenses ─────────────────────────────────────────────
@@ -273,20 +294,22 @@ model Expense {
   description   String?
   amount        Float
   currency      String    @default("DKK")
-  category      String    // institution | medical | clothing | activities | school | food | transport | other
-  paidBy        String
-  splitWith     String[]  @default([])
-  splitAmounts  Json      @default("{}")
-  splitType     String    @default("equal")
-  date          DateTime
-  status        String    @default("pending") // pending | approved | paid | disputed
-  receiptUrl    String?
-  approvedBy    String[]  @default([])
-  isRecurring   Boolean   @default(false)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  category      String
+  paidBy        String    @map("paid_by") @db.Uuid
+  splitWith     String[]  @default([]) @map("split_with")
+  splitAmounts  Json      @default("{}") @map("split_amounts")
+  splitType     String    @default("equal") @map("split_type")
+  date          DateTime  @db.Timestamptz
+  status        String    @default("pending")
+  receiptUrl    String?   @map("receipt_url")
+  approvedBy    String[]  @default([]) @map("approved_by")
+  isRecurring   Boolean   @default(false) @map("is_recurring")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime  @updatedAt @map("updated_at") @db.Timestamptz
 
   payer User @relation(fields: [paidBy], references: [id])
+
+  @@map("expenses")
 }
 
 // ─── Documents ────────────────────────────────────────────
@@ -294,84 +317,94 @@ model Expense {
 model Document {
   id           String   @id @default(cuid())
   title        String
-  type         String   // contract | medical | school | insurance | other | meeting_minutes | court_order
+  type         String
   url          String
-  uploadedBy   String
-  sharedWith   String[] @default([])
-  isOfficial   Boolean  @default(false)
-  validFrom    DateTime?
-  validUntil   DateTime?
-  createdAt    DateTime @default(now())
+  uploadedBy   String   @map("uploaded_by") @db.Uuid
+  sharedWith   String[] @default([]) @map("shared_with")
+  isOfficial   Boolean  @default(false) @map("is_official")
+  validFrom    DateTime? @map("valid_from") @db.Timestamptz
+  validUntil   DateTime? @map("valid_until") @db.Timestamptz
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   uploader User @relation(fields: [uploadedBy], references: [id])
+
+  @@map("documents")
 }
 
 // ─── Milestones ───────────────────────────────────────────
 
 model Milestone {
   id          String   @id @default(cuid())
-  childId     String
+  childId     String   @map("child_id")
   title       String
   description String?
-  date        DateTime
-  category    String   // health | school | development | social
-  addedBy     String
+  date        DateTime @db.Timestamptz
+  category    String
+  addedBy     String   @map("added_by") @db.Uuid
   photos      String[] @default([])
-  createdAt   DateTime @default(now())
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   child Child @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@map("milestones")
 }
 
 // ─── Photos ───────────────────────────────────────────────
 
 model FamilyPhoto {
   id       String   @id @default(cuid())
-  childId  String
+  childId  String   @map("child_id")
   url      String
   caption  String?
-  takenAt  DateTime
-  addedBy  String
-  addedAt  DateTime @default(now())
+  takenAt  DateTime @map("taken_at") @db.Timestamptz
+  addedBy  String   @map("added_by") @db.Uuid
+  addedAt  DateTime @default(now()) @map("added_at") @db.Timestamptz
 
   child Child @relation(fields: [childId], references: [id], onDelete: Cascade)
   user  User  @relation(fields: [addedBy], references: [id])
+
+  @@map("family_photos")
 }
 
 // ─── Diary ────────────────────────────────────────────────
 
 model DiaryEntry {
   id        String   @id @default(cuid())
-  childId   String
-  date      DateTime
-  mood      String   // happy | neutral | tired | sad | anxious
-  sleep     String   // good | okay | poor
-  appetite  String   // good | okay | poor
+  childId   String   @map("child_id")
+  date      DateTime @db.Timestamptz
+  mood      String
+  sleep     String
+  appetite  String
   note      String?
-  writtenBy String
-  createdAt DateTime @default(now())
+  writtenBy String   @map("written_by") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   child Child @relation(fields: [childId], references: [id], onDelete: Cascade)
   user  User  @relation(fields: [writtenBy], references: [id])
+
+  @@map("diary_entries")
 }
 
 // ─── Decision Log ─────────────────────────────────────────
 
 model DecisionLog {
   id          String    @id @default(cuid())
-  childId     String?
+  childId     String?   @map("child_id")
   title       String
   description String
-  category    String    // school | health | activity | travel | finance | other
-  decidedAt   DateTime
-  proposedBy  String
-  approvedBy  String[]  @default([])
-  status      String    @default("proposed") // proposed | approved | rejected
+  category    String
+  decidedAt   DateTime  @map("decided_at") @db.Timestamptz
+  proposedBy  String    @map("proposed_by") @db.Uuid
+  approvedBy  String[]  @default([]) @map("approved_by")
+  status      String    @default("proposed")
   notes       String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime  @updatedAt @map("updated_at") @db.Timestamptz
 
   child    Child? @relation(fields: [childId], references: [id])
   proposer User   @relation("DecisionProposer", fields: [proposedBy], references: [id])
+
+  @@map("decision_logs")
 }
 
 // ─── Meeting Minutes ──────────────────────────────────────
@@ -379,50 +412,56 @@ model DecisionLog {
 model MeetingMinutes {
   id          String   @id @default(cuid())
   title       String
-  date        DateTime
+  date        DateTime @db.Timestamptz
   location    String?
   agenda      String?
-  decisions   Json?    // Decision[]
-  agreements  Json?    // Agreement[]
-  nextSteps   Json?    // NextStep[]
-  writtenBy   String
-  approvedBy  String[] @default([])
-  status      String   @default("draft") // draft | pending_approval | approved
-  isOfficial  Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  decisions   Json?
+  agreements  Json?
+  nextSteps   Json?    @map("next_steps")
+  writtenBy   String   @map("written_by") @db.Uuid
+  approvedBy  String[] @default([]) @map("approved_by")
+  status      String   @default("draft")
+  isOfficial  Boolean  @default(false) @map("is_official")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("meeting_minutes")
 }
 
 // ─── Stripe Subscriptions ────────────────────────────────
 
 model StripeSubscription {
   id                   String    @id @default(cuid())
-  userId               String    @unique
-  stripeCustomerId     String?
-  stripeSubscriptionId String?
-  stripePriceId        String?
-  plan                 String    @default("free") // free | family_plus | single_parent_plus
-  status               String    @default("inactive") // active | inactive | trialing | past_due | canceled
-  billingInterval      String    @default("monthly") // monthly | annual
-  currentPeriodEnd     DateTime?
-  cancelAtPeriodEnd    Boolean   @default(false)
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
+  userId               String    @unique @map("user_id") @db.Uuid
+  stripeCustomerId     String?   @map("stripe_customer_id")
+  stripeSubscriptionId String?   @map("stripe_subscription_id")
+  stripePriceId        String?   @map("stripe_price_id")
+  plan                 String    @default("free")
+  status               String    @default("inactive")
+  billingInterval      String    @default("monthly") @map("billing_interval")
+  currentPeriodEnd     DateTime? @map("current_period_end") @db.Timestamptz
+  cancelAtPeriodEnd    Boolean   @default(false) @map("cancel_at_period_end")
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt            DateTime  @updatedAt @map("updated_at") @db.Timestamptz
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("stripe_subscriptions")
 }
 
 // ─── Key Dates ────────────────────────────────────────────
 
 model KeyDate {
   id                String   @id @default(cuid())
-  childId           String?
+  childId           String?  @map("child_id")
   title             String
-  date              DateTime
-  type              String   // birthday | vaccination | school | appointment | anniversary | other
-  recurrence        String   @default("once") // once | yearly
-  reminderDaysBefore Int     @default(7)
+  date              DateTime @db.Timestamptz
+  type              String
+  recurrence        String   @default("once")
+  reminderDaysBefore Int     @default(7) @map("reminder_days_before")
   notes             String?
-  addedBy           String
-  createdAt         DateTime @default(now())
+  addedBy           String   @map("added_by") @db.Uuid
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("key_dates")
 }

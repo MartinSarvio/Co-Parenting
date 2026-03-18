@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624218,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8195a481c8190af6a91bd244788c104582a8254d52ba2",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Gulaschsuppe. Retbeskrivelse: Varmende ungarsk-inspireret suppe med oksek\u00f8d og paprika.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Oksek\u00f8d i tern, L\u00f8g, Paprika, D\u00e5setomater, Kartofler, Peberfrugt, Oksefond, Olie. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Brun oksek\u00f8det i olie portionsvis. Tag op. | Trin 2: Svits l\u00f8g og peberfrugt. Tils\u00e6t paprika og r\u00f8r. | Trin 3: Tils\u00e6t tomater, fond og kartofler. L\u00e6g k\u00f8det tilbage. | Trin 4: Simre i 50-60 min til k\u00f8det er m\u00f8rt. Krydr med salt og peber.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Supper. B\u00f8rnevenlig: nej.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

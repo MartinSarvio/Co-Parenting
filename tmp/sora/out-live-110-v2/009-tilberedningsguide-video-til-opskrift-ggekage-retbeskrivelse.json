@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624207,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8194ef2288190b8522b65d7554e4f0ba8f7437687334e",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: \u00c6ggekage. Retbeskrivelse: Dansk omelet med bacon og purl\u00f8g \u2013 hurtig hverdagsmad.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): \u00c6g, M\u00e6lk, Bacon, Purl\u00f8g, Sm\u00f8r, Salt, Peber, Tomater. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Steg baconen spr\u00f8d p\u00e5 panden. Tag op og lad dryppe af. | Trin 2: Pisk \u00e6g og m\u00e6lk sammen. Krydr med salt og peber. | Trin 3: Smelt sm\u00f8r i panden og h\u00e6ld \u00e6ggemassen i. Steg ved lav varme. | Trin 4: Drys med bacon og purl\u00f8g. Server med tomater og rugbr\u00f8d.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

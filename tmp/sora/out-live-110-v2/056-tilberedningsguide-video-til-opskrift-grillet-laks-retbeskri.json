@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624228,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8196445308193803703b7138d257b004b59e89b2095c0",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Grillet laks. Retbeskrivelse: Grillet laks med citrondressing og gr\u00f8ntsager.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Laksefileter, Olivenolie, Citron, Dild, Salt, Peber, Asparges. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Pensle laks med olie. Krydr med salt, peber og citronskal. | Trin 2: Grill laksen skindside ned i 5 min. Vend og grill 3-4 min mere. | Trin 3: Grill asparges 3-4 min. Drys med salt. | Trin 4: Server med citronb\u00e5de og frisk dild.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Grill. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

@@ -1,0 +1,22 @@
+<svg width="4096" height="2304" viewBox="0 0 4096 2304" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+<title id="title">Huska New Concept 1</title>
+<desc id="desc">Monochrome premium Huska logo.</desc>
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="4096" y2="2304" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#FCFBF8"/>
+    <stop offset="1" stop-color="#ECE8DE"/>
+  </linearGradient>
+  <linearGradient id="panel" x1="300" y1="300" x2="1560" y2="1560" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#363634"/>
+    <stop offset="1" stop-color="#21211F"/>
+  </linearGradient>
+</defs>
+<rect width="4096" height="2304" rx="120" fill="url(#bg)"/>
+<rect x="300" y="300" width="1260" height="1260" rx="330" fill="url(#panel)"/>
+<path d="M540 560C720 430 870 390 1120 390C1320 390 1440 426 1540 490V594C1410 536 1280 510 1120 510C890 510 740 556 540 714V560Z" fill="#FFFFFF" fill-opacity="0.12"/>
+<rect x="620" y="610" width="190" height="700" rx="95" fill="#F7F3E8"/>
+<rect x="1050" y="610" width="190" height="700" rx="95" fill="#F7F3E8"/>
+<rect x="810" y="860" width="250" height="190" rx="95" fill="#F7F3E8"/>
+<text x="1780" y="1068" fill="#2F2F2F" font-family="Avenir Next, SF Pro Display, -apple-system, sans-serif" font-size="516" font-weight="700" letter-spacing="-10">Huska</text>
+<text x="1790" y="1312" fill="#625D52" font-family="Avenir Next, SF Pro Text, -apple-system, sans-serif" font-size="116" font-weight="500" letter-spacing="12">CO-PARENTING</text>
+</svg>

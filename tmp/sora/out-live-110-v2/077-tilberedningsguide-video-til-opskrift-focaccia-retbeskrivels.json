@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624237,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8196de6b08190a7ae75c9a858205e0b246e1a801fb7cd",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Focaccia. Retbeskrivelse: Luftig italiensk focaccia med havsalt og rosmarin.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Hvedemel, Vand (lunkent), G\u00e6r, Olivenolie, Havsalt, Frisk rosmarin, Sukker. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Opl\u00f8s g\u00e6r i vand med sukker. Bland mel, 3 spsk olie og salt til dej. | Trin 2: \u00c6lt 10 min. Lad h\u00e6ve 1 time. | Trin 3: Tryk dejen ud i olieret fad. Tryk fingerm\u00e6rker i. Drys rosmarin og salt. H\u00e6ld olie over. | Trin 4: Bag ved 220\u00b0C i 20-25 min til gylden.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Bagv\u00e6rk. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

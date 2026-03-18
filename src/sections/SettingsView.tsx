@@ -98,6 +98,8 @@ export function SettingsView() {
     events,
     isProfessionalView,
     setProfessionalView,
+    isFamilyMemberView,
+    setFamilyMemberView,
     updateUser,
     updateChild,
     setHousehold,
@@ -2370,7 +2372,27 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                 <IOSSwitch
                   checked={isProfessionalView && allowProfessionalTools}
                   disabled={!allowProfessionalTools}
-                  onCheckedChange={(value) => setProfessionalView(value)}
+                  onCheckedChange={(value) => {
+                    setProfessionalView(value);
+                    if (value) setFamilyMemberView(false);
+                  }}
+                />
+              </div>
+
+              <div className="flex items-center justify-between rounded-[8px] border border-[#d8d7cf] bg-[#faf9f6] px-3 py-2 dark:border-slate-700 dark:bg-slate-800">
+                <div>
+                  <p className="text-[15px] font-medium text-[#2f2f2d] dark:text-slate-200">Familiemedlem visning</p>
+                  <p className="text-[13px] text-[#75736b] dark:text-slate-400">
+                    {allowProfessionalTools ? 'Se appen som et familiemedlem' : 'Kun tilgængelig for administratorer'}
+                  </p>
+                </div>
+                <IOSSwitch
+                  checked={isFamilyMemberView && allowProfessionalTools}
+                  disabled={!allowProfessionalTools}
+                  onCheckedChange={(value) => {
+                    setFamilyMemberView(value);
+                    if (value) setProfessionalView(false);
+                  }}
                 />
               </div>
         </TabsContent>

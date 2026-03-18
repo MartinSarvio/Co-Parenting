@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624229,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a81965e5608190a4faacf26a831ddf014c9078e626fa47",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Rugbr\u00f8dsboller. Retbeskrivelse: Sunde rugbr\u00f8dsboller med kerner og fr\u00f8.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Rugmel, Hvedemel, G\u00e6r, Vand, Solsikkekerner, H\u00f8rfr\u00f8, Salt, Honning. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Opl\u00f8s g\u00e6r i lunkent vand med honning. | Trin 2: Bland meltyper, kerner, fr\u00f8 og salt. Tils\u00e6t g\u00e6rvand og \u00e6lt. | Trin 3: Lad dejen h\u00e6ve 45 min. Form boller og h\u00e6v 20 min mere. | Trin 4: Bag ved 200\u00b0C i 20-25 min.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Bagv\u00e6rk. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

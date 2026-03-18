@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624252,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8197bc1f48191bb1415752855b3e8084330fabef955bf",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: R\u00f8dbedesalat med gedeost. Retbeskrivelse: Farverig salat med bagte r\u00f8dbeder, gedeost og valn\u00f8dder.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): R\u00f8dbeder, Gedeost, Blandet salat, Valn\u00f8dder, Olivenolie, Balsamico, Honning. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Bag r\u00f8dbeder i s\u00f8lvpapir ved 200\u00b0C i 40 min. Skr\u00e6l og sk\u00e6r i b\u00e5de. | Trin 2: Bland olie, balsamico og honning til dressing. | Trin 3: Saml salat med r\u00f8dbeder, smuldret gedeost og valn\u00f8dder. | Trin 4: H\u00e6ld dressing over og server.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Salater. B\u00f8rnevenlig: nej.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

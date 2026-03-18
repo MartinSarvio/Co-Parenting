@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624223,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8195f005c81908e5f8a419f992a450f2687a1ea4d6e6e",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Pulled pork burger. Retbeskrivelse: Langsom-tilberedt pulled pork i bl\u00f8de burgerboller.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Svinenakke, BBQ-sovs, Paprika, Brun farin, Hvidl\u00f8gspulver, Burgerboller, Coleslaw. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Gnid svinenakke ind i paprika, farin og hvidl\u00f8gspulver. | Trin 2: L\u00e6g i ovnfast fad med BBQ-sovs. D\u00e6k med s\u00f8lvpapir. | Trin 3: Tilbered ved 130\u00b0C i 4 timer til k\u00f8det falder fra hinanden. | Trin 4: Pull k\u00f8det med to gafler. Server i boller med coleslaw.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

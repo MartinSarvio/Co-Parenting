@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772485003,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a5f98b7c8081908f89807e60911efd0b59da6b45354c9b",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: App-opskrift video: Boller. Klassiske danske hvede-boller \u2013 perfekte til morgenmad. Vis r\u00e5 ingredienser, hurtig tilberedning i 3 korte beats, og l\u00e6kker anretning p\u00e5 tallerken. Ingen mennesker i billedet. Ingen tekst-overlay. Stil: realistisk food cinematography, appetitlig, naturligt k\u00f8kkenlys, stabile close-ups. M\u00e5lgruppe: danske b\u00f8rnefamilier. Kategori: Bagv\u00e6rk. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "8",
+  "size": "1280x720",
+  "status": "queued"
+}

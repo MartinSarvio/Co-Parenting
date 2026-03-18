@@ -1,0 +1,33 @@
+<svg width="4096" height="2304" viewBox="0 0 4096 2304" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+<title id="title">Huska Concept 1</title>
+<desc id="desc">Elegant crest monogram logo.</desc>
+<defs>
+  <linearGradient id="bg1" x1="0" y1="0" x2="4096" y2="2304" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#FBFAF7"/>
+    <stop offset="1" stop-color="#EFEADF"/>
+  </linearGradient>
+  <linearGradient id="gold1" x1="420" y1="360" x2="1240" y2="1300" gradientUnits="userSpaceOnUse">
+    <stop offset="0" stop-color="#FFC07A"/>
+    <stop offset="1" stop-color="#ED8A31"/>
+  </linearGradient>
+  <filter id="shadow1" x="180" y="180" width="1500" height="1700" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+    <feFlood flood-opacity="0"/>
+    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
+    <feOffset dy="36"/>
+    <feGaussianBlur stdDeviation="34"/>
+    <feColorMatrix type="matrix" values="0 0 0 0 0.08 0 0 0 0 0.07 0 0 0 0 0.06 0 0 0 0.25 0"/>
+  </filter>
+</defs>
+<rect width="4096" height="2304" rx="120" fill="url(#bg1)"/>
+<g filter="url(#shadow1)">
+  <rect x="300" y="300" width="1260" height="1260" rx="340" fill="#222221"/>
+  <path d="M460 560C610 420 800 360 1130 360C1330 360 1450 390 1540 450V550C1400 500 1300 474 1130 474C820 474 640 530 460 710V560Z" fill="#FFFFFF" fill-opacity="0.12"/>
+  <rect x="620" y="610" width="180" height="700" rx="90" fill="#F7F3E8"/>
+  <rect x="1060" y="610" width="180" height="700" rx="90" fill="#F7F3E8"/>
+  <path d="M740 950C740 832 835 736 953 736H987C1105 736 1200 832 1200 950V974C1200 1092 1105 1188 987 1188H953C835 1188 740 1092 740 974V950Z" fill="#F7F3E8"/>
+  <path d="M615 980L860 1218L1290 760" stroke="url(#gold1)" stroke-width="112" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="1780" y="1060" fill="#2F2F2F" font-family="Avenir Next, SF Pro Display, -apple-system, sans-serif" font-size="520" font-weight="700" letter-spacing="-12">Huska</text>
+<text x="1790" y="1316" fill="#6B665B" font-family="Avenir Next, SF Pro Text, -apple-system, sans-serif" font-size="124" font-weight="500" letter-spacing="16">CO-PARENTING</text>
+<rect x="1792" y="1386" width="520" height="24" rx="12" fill="#F58A2D"/>
+</svg>

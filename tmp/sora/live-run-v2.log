@@ -1,0 +1,331 @@
+OPENAI_API_KEY is set.
+[job 1/110] starting
+[job 2/110] starting
+[job 1/110] completed in 1.7s
+[job 3/110] starting
+[job 2/110] completed in 1.8s
+[job 4/110] starting
+[job 4/110] completed in 1.1s
+[job 5/110] starting
+[job 3/110] completed in 1.5s
+[job 6/110] starting
+[job 5/110] completed in 1.1s
+[job 7/110] starting
+[job 6/110] completed in 1.4s
+[job 8/110] starting
+[job 7/110] completed in 0.6s
+[job 9/110] starting
+[job 9/110] completed in 0.6s
+[job 10/110] starting
+[job 8/110] completed in 1.2s
+[job 11/110] starting
+[job 11/110] completed in 0.9s
+[job 12/110] starting
+[job 10/110] completed in 1.4s
+[job 13/110] starting
+[job 12/110] completed in 1.1s
+[job 14/110] starting
+[job 13/110] completed in 1.1s
+[job 15/110] starting
+[job 14/110] completed in 0.5s
+[job 16/110] starting
+[job 16/110] completed in 0.6s
+[job 17/110] starting
+[job 15/110] completed in 1.1s
+[job 18/110] starting
+[job 18/110] completed in 0.4s
+[job 19/110] starting
+[job 19/110] completed in 0.4s
+[job 20/110] starting
+[job 17/110] completed in 1.1s
+[job 21/110] starting
+[job 20/110] completed in 0.6s
+[job 22/110] starting
+[job 22/110] completed in 1.0s
+[job 23/110] starting
+[job 21/110] completed in 1.6s
+[job 24/110] starting
+[job 24/110] completed in 0.5s
+[job 25/110] starting
+[job 23/110] completed in 0.9s
+[job 26/110] starting
+[job 25/110] completed in 0.5s
+[job 27/110] starting
+[job 27/110] completed in 1.2s
+[job 28/110] starting
+[job 26/110] completed in 1.4s
+[job 29/110] starting
+[job 28/110] completed in 0.5s
+[job 29/110] completed in 0.5s
+[job 30/110] starting
+[job 31/110] starting
+[job 30/110] completed in 0.6s
+[job 32/110] starting
+[job 31/110] completed in 1.4s
+[job 33/110] starting
+[job 32/110] completed in 1.3s
+[job 34/110] starting
+[job 34/110] completed in 0.6s
+[job 35/110] starting
+[job 33/110] completed in 1.2s
+[job 36/110] starting
+[job 36/110] completed in 0.4s
+[job 37/110] starting
+[job 37/110] completed in 0.7s
+[job 38/110] starting
+[job 35/110] completed in 1.1s
+[job 39/110] starting
+[job 38/110] completed in 1.1s
+[job 40/110] starting
+[job 39/110] completed in 1.1s
+[job 41/110] starting
+[job 41/110] completed in 0.4s
+[job 42/110] starting
+[job 42/110] completed in 0.5s
+[job 43/110] starting
+[job 40/110] completed in 1.2s
+[job 44/110] starting
+[job 43/110] completed in 0.4s
+[job 45/110] starting
+[job 44/110] completed in 0.5s
+[job 46/110] starting
+[job 45/110] completed in 0.4s
+[job 47/110] starting
+[job 47/110] completed in 0.6s
+[job 48/110] starting
+[job 46/110] completed in 1.1s
+[job 49/110] starting
+[job 49/110] completed in 0.5s
+[job 50/110] starting
+[job 48/110] completed in 1.0s
+[job 51/110] starting
+[job 50/110] completed in 1.0s
+[job 52/110] starting
+[job 51/110] completed in 1.0s
+[job 53/110] starting
+[job 53/110] completed in 1.3s
+[job 54/110] starting
+[job 52/110] completed in 1.5s
+[job 55/110] starting
+[job 54/110] completed in 1.1s
+[job 56/110] starting
+[job 55/110] completed in 1.5s
+[job 57/110] starting
+[job 56/110] completed in 1.1s
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/001-tilberedningsguide-video-til-opskrift-frikadeller-retbeskriv.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/002-tilberedningsguide-video-til-opskrift-stegt-fl-sk-med-persil.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/004-tilberedningsguide-video-til-opskrift-pandekager-retbeskrive.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/003-tilberedningsguide-video-til-opskrift-boller-i-karry-retbesk.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/005-tilberedningsguide-video-til-opskrift-pasta-bolognese-retbes.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/006-tilberedningsguide-video-til-opskrift-karbonader-retbeskrive.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/007-tilberedningsguide-video-til-opskrift-biksemad-retbeskrivels.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/009-tilberedningsguide-video-til-opskrift-ggekage-retbeskrivelse.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/008-tilberedningsguide-video-til-opskrift-million-rb-f-retbeskri.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/011-tilberedningsguide-video-til-opskrift-medisterp-lse-retbeskr.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/010-tilberedningsguide-video-til-opskrift-br-ndende-k-rlighed-re.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/012-tilberedningsguide-video-til-opskrift-hakkeb-f-med-bl-de-l-g.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/013-tilberedningsguide-video-til-opskrift-leverpostej-retbeskriv.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/014-tilberedningsguide-video-til-opskrift-fiskefrikadeller-retbe.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/016-tilberedningsguide-video-til-opskrift-lasagne-retbeskrivelse.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/015-tilberedningsguide-video-til-opskrift-kylling-i-karry-retbes.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/018-tilberedningsguide-video-til-opskrift-hjemmelavet-pizza-retb.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/019-tilberedningsguide-video-til-opskrift-wok-med-kylling-retbes.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/017-tilberedningsguide-video-til-opskrift-taco-retbeskrivelse-fr.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/020-tilberedningsguide-video-til-opskrift-fiskepinde-med-remoula.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/022-tilberedningsguide-video-til-opskrift-r-dgr-d-med-fl-de-retb.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/021-tilberedningsguide-video-til-opskrift-chicken-nuggets-retbes.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/024-tilberedningsguide-video-til-opskrift-risalamande-retbeskriv.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/023-tilberedningsguide-video-til-opskrift-blekage-retbeskrivelse.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/025-tilberedningsguide-video-til-opskrift-kanelsnegle-retbeskriv.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/027-tilberedningsguide-video-til-opskrift-vafler-retbeskrivelse-.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/026-tilberedningsguide-video-til-opskrift-boller-retbeskrivelse-.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/028-tilberedningsguide-video-til-opskrift-rugbr-dsmadder-med-g-o.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/029-tilberedningsguide-video-til-opskrift-gr-ntsagssuppe-retbesk.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/030-tilberedningsguide-video-til-opskrift-tomatsuppe-retbeskrive.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/031-tilberedningsguide-video-til-opskrift-fl-skesteg-retbeskrive.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/032-tilberedningsguide-video-til-opskrift-kartoffelsuppe-retbesk.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/034-tilberedningsguide-video-til-opskrift-gulaschsuppe-retbeskri.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/033-tilberedningsguide-video-til-opskrift-spaghetti-carbonara-re.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/036-tilberedningsguide-video-til-opskrift-ggesmadder-retbeskrive.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/037-tilberedningsguide-video-til-opskrift-kyllingesuppe-retbeskr.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/035-tilberedningsguide-video-til-opskrift-havregr-d-retbeskrivel.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/038-tilberedningsguide-video-til-opskrift-grillet-kylling-retbes.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/039-tilberedningsguide-video-til-opskrift-fl-dekartofler-retbesk.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/041-tilberedningsguide-video-til-opskrift-h-nsek-dssuppe-retbesk.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/042-tilberedningsguide-video-til-opskrift-jordb-rkage-retbeskriv.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/040-tilberedningsguide-video-til-opskrift-pasta-med-pesto-og-kyl.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/043-tilberedningsguide-video-til-opskrift-grillede-p-lser-retbes.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/044-tilberedningsguide-video-til-opskrift-chili-con-carne-retbes.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/045-tilberedningsguide-video-til-opskrift-smoothie-bowl-retbeskr.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/047-tilberedningsguide-video-til-opskrift-pulled-pork-burger-ret.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/046-tilberedningsguide-video-til-opskrift-koldsk-l-med-kammerjun.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/049-tilberedningsguide-video-til-opskrift-bleskiver-retbeskrivel.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/048-tilberedningsguide-video-til-opskrift-risotto-med-svampe-ret.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/050-tilberedningsguide-video-til-opskrift-thai-suppe-med-kylling.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/051-tilberedningsguide-video-til-opskrift-llebr-d-retbeskrivelse.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/053-tilberedningsguide-video-til-opskrift-rugbr-dsmad-med-leverp.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/052-tilberedningsguide-video-til-opskrift-citronfromage-retbeskr.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/054-tilberedningsguide-video-til-opskrift-nachos-med-ost-retbesk.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/055-tilberedningsguide-video-til-opskrift-blomk-lssuppe-retbeskr.json
+[job 58/110] starting
+[job 57/110] completed in 1.3s
+[job 59/110] starting
+[job 58/110] completed in 1.0s
+[job 60/110] starting
+[job 60/110] completed in 0.5s
+[job 61/110] starting
+[job 59/110] completed in 1.1s
+[job 62/110] starting
+[job 62/110] completed in 0.6s
+[job 63/110] starting
+[job 61/110] completed in 1.1s
+[job 64/110] starting
+[job 64/110] completed in 0.6s
+[job 65/110] starting
+[job 63/110] completed in 1.1s
+[job 66/110] starting
+[job 65/110] completed in 1.1s
+[job 67/110] starting
+[job 66/110] completed in 1.4s
+[job 68/110] starting
+[job 68/110] completed in 0.4s
+[job 69/110] starting
+[job 67/110] completed in 1.3s
+[job 70/110] starting
+[job 69/110] completed in 0.4s
+[job 71/110] starting
+[job 70/110] completed in 0.6s
+[job 72/110] starting
+[job 71/110] completed in 0.5s
+[job 73/110] starting
+[job 73/110] completed in 0.5s
+[job 74/110] starting
+[job 72/110] completed in 1.5s
+[job 75/110] starting
+[job 75/110] completed in 1.2s
+[job 76/110] starting
+[job 74/110] completed in 2.1s
+[job 77/110] starting
+[job 77/110] completed in 0.4s
+[job 78/110] starting
+[job 76/110] completed in 1.2s
+[job 79/110] starting
+[job 78/110] completed in 1.0s
+[job 80/110] starting
+[job 79/110] completed in 0.5s
+[job 81/110] starting
+[job 81/110] completed in 1.1s
+[job 82/110] starting
+[job 80/110] completed in 1.6s
+[job 83/110] starting
+[job 82/110] completed in 0.6s
+[job 84/110] starting
+[job 83/110] completed in 1.1s
+[job 85/110] starting
+[job 84/110] completed in 1.1s
+[job 86/110] starting
+[job 85/110] completed in 0.5s
+[job 87/110] starting
+[job 86/110] completed in 1.4s
+[job 88/110] starting
+[job 87/110] completed in 1.1s
+[job 89/110] starting
+[job 89/110] completed in 0.6s
+[job 90/110] starting
+[job 88/110] completed in 1.5s
+[job 91/110] starting
+[job 90/110] completed in 1.1s
+[job 92/110] starting
+[job 91/110] completed in 1.3s
+[job 93/110] starting
+[job 92/110] completed in 1.1s
+[job 94/110] starting
+[job 93/110] completed in 0.9s
+[job 95/110] starting
+[job 94/110] completed in 1.1s
+[job 96/110] starting
+[job 95/110] completed in 0.4s
+[job 97/110] starting
+[job 97/110] completed in 0.5s
+[job 98/110] starting
+[job 98/110] completed in 0.4s
+[job 99/110] starting
+[job 96/110] completed in 1.1s
+[job 100/110] starting
+[job 100/110] completed in 0.4s
+[job 101/110] starting
+[job 99/110] completed in 0.6s
+[job 102/110] starting
+[job 102/110] completed in 0.6s
+[job 103/110] starting
+[job 101/110] completed in 1.1s
+[job 104/110] starting
+[job 103/110] completed in 0.6s
+[job 105/110] starting
+[job 104/110] completed in 0.5s
+[job 106/110] starting
+[job 106/110] completed in 0.6s
+[job 107/110] starting
+[job 105/110] completed in 1.0s
+[job 108/110] starting
+[job 108/110] completed in 1.1s
+[job 109/110] starting
+[job 107/110] completed in 1.3s
+[job 110/110] starting
+[job 110/110] completed in 0.4s
+[job 109/110] completed in 2.6s
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/056-tilberedningsguide-video-til-opskrift-grillet-laks-retbeskri.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/057-tilberedningsguide-video-til-opskrift-rugbr-dsmad-med-roastb.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/058-tilberedningsguide-video-til-opskrift-gr-sk-salat-retbeskriv.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/060-tilberedningsguide-video-til-opskrift-rugbr-dsboller-retbesk.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/059-tilberedningsguide-video-til-opskrift-kyllingesalat-retbeskr.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/062-tilberedningsguide-video-til-opskrift-oksesteg-med-brun-sovs.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/061-tilberedningsguide-video-til-opskrift-butternut-squash-suppe.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/064-tilberedningsguide-video-til-opskrift-tortilla-wraps-med-kyl.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/063-tilberedningsguide-video-til-opskrift-french-toast-retbeskri.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/065-tilberedningsguide-video-til-opskrift-hjemmelavet-hummus-ret.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/066-tilberedningsguide-video-til-opskrift-brunchtallerken-retbes.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/068-tilberedningsguide-video-til-opskrift-gullash-retbeskrivelse.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/067-tilberedningsguide-video-til-opskrift-pastasalat-retbeskrive.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/069-tilberedningsguide-video-til-opskrift-bananpandekager-retbes.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/070-tilberedningsguide-video-til-opskrift-grillede-burgere-retbe.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/071-tilberedningsguide-video-til-opskrift-ostetoast-retbeskrivel.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/073-tilberedningsguide-video-til-opskrift-ris-l-retbeskrivelse-h.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/072-tilberedningsguide-video-til-opskrift-k-dgryde-med-rodfrugte.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/075-tilberedningsguide-video-til-opskrift-brunsviger-retbeskrive.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/074-tilberedningsguide-video-til-opskrift-couscous-salat-retbesk.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/077-tilberedningsguide-video-til-opskrift-focaccia-retbeskrivels.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/076-tilberedningsguide-video-til-opskrift-kylling-tikka-masala-r.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/078-tilberedningsguide-video-til-opskrift-omelet-med-gr-ntsager-.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/079-tilberedningsguide-video-til-opskrift-bagt-laks-med-honning-.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/081-tilberedningsguide-video-til-opskrift-pok-bowl-retbeskrivels.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/080-tilberedningsguide-video-til-opskrift-gr-ntsagslasagne-retbe.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/082-tilberedningsguide-video-til-opskrift-ostesuffl-retbeskrivel.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/083-tilberedningsguide-video-til-opskrift-falafel-i-pitabr-d-ret.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/084-tilberedningsguide-video-til-opskrift-svinekotelet-med-bleso.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/085-tilberedningsguide-video-til-opskrift-suppe-med-kylling-og-k.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/086-tilberedningsguide-video-til-opskrift-chokoladekage-retbeskr.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/087-tilberedningsguide-video-til-opskrift-grillede-gr-ntsager-re.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/089-tilberedningsguide-video-til-opskrift-broccolisuppe-retbeskr.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/088-tilberedningsguide-video-til-opskrift-ggestand-med-skinke-re.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/090-tilberedningsguide-video-til-opskrift-spr-de-for-rsruller-re.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/091-tilberedningsguide-video-til-opskrift-linsesuppe-retbeskrive.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/092-tilberedningsguide-video-til-opskrift-stegt-and-med-r-dk-l-r.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/093-tilberedningsguide-video-til-opskrift-energiboller-retbeskri.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/094-tilberedningsguide-video-til-opskrift-gnocchi-med-tomatsovs-.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/095-tilberedningsguide-video-til-opskrift-agurkesalat-retbeskriv.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/097-tilberedningsguide-video-til-opskrift-gr-skar-risotto-retbes.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/098-tilberedningsguide-video-til-opskrift-fiskefilet-med-kartoff.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/096-tilberedningsguide-video-til-opskrift-tarteletter-med-h-ns-i.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/100-tilberedningsguide-video-til-opskrift-kringle-retbeskrivelse.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/099-tilberedningsguide-video-til-opskrift-kebab-tallerken-retbes.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/102-tilberedningsguide-video-til-opskrift-flanksteak-med-chimich.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/101-tilberedningsguide-video-til-opskrift-spinatsalat-med-bacon-.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/103-tilberedningsguide-video-til-opskrift-kartoffelsalat-retbesk.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/104-tilberedningsguide-video-til-opskrift-p-lsehorn-retbeskrivel.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/106-tilberedningsguide-video-til-opskrift-peanutbutter-banantoas.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/105-tilberedningsguide-video-til-opskrift-shakshuka-retbeskrivel.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/108-tilberedningsguide-video-til-opskrift-torsk-i-ovn-med-gr-nts.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/107-tilberedningsguide-video-til-opskrift-r-dbedesalat-med-gedeo.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/110-tilberedningsguide-video-til-opskrift-frugtgr-d-retbeskrivel.json
+Wrote /Users/martinsarvio/Downloads/Co Paranting App/tmp/sora/out-live-110-v2/109-tilberedningsguide-video-til-opskrift-spaghetti-med-k-dbolle.json

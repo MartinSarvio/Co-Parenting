@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624247,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a819773eb4819086861de31891807307a65d75c4227459",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Agurkesalat. Retbeskrivelse: Syret dansk agurkesalat \u2013 perfekt tilbeh\u00f8r.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Agurk, Eddike, Sukker, Vand, Persille, Salt. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Sk\u00e6r agurk i tynde skiver (brug gerne mandolin). | Trin 2: Bland eddike, sukker, vand og salt til lagen er klar. | Trin 3: H\u00e6ld lagen over agurkerne. Drys med persille. | Trin 4: Lad tr\u00e6kke i mindst 30 min i k\u00f8leskabet.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Salater. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

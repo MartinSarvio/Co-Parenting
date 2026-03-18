@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624248,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a81978372c8198a65a40347efd17230471d9544faa85e0",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Tarteletter med h\u00f8ns i asparges. Retbeskrivelse: Klassiske danske tarteletter med h\u00f8ns og asparges.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Tarteletter (skaller), Kyllingebryst, Asparges, Sm\u00f8r, Hvedemel, Kyllingefond, Fl\u00f8de. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Kog kylling i fond i 15 min. Tag op og pil i stykker. | Trin 2: Varm tarteletskaller i ovn ved 180\u00b0C. | Trin 3: Lav sovs: smelt sm\u00f8r, r\u00f8r mel i, tils\u00e6t fond og fl\u00f8de. | Trin 4: Bland kylling og sk\u00e5ret asparges i sovsen. Fyld tarteletterne.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

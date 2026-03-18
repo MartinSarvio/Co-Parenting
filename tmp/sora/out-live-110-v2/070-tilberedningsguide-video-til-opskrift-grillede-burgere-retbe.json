@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624234,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8196aa6a88190a14fbbf3727b6cb70500df7496189607",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Grillede burgere. Retbeskrivelse: Hjemmelavede saftige burgere p\u00e5 grillen.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Hakket oksek\u00f8d, L\u00f8g, Salt, Peber, Burgerboller, Salat, Tomat, Cheddar. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Bland hakket k\u00f8d med revet l\u00f8g, salt og peber. Form 4 b\u00f8ffer. | Trin 2: Grill b\u00f8ffer 4-5 min p\u00e5 hver side. L\u00e6g ost p\u00e5 i sidste minut. | Trin 3: Rist bollehalvdele kort p\u00e5 grillen. | Trin 4: Saml burgere med salat, tomat og dressing.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Grill. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

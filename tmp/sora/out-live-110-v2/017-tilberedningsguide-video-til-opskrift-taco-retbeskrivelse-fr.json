@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624211,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a819535fa48193b5beff5a764f0f0c0593448880c7e12c",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Taco. Retbeskrivelse: Fredagstaco med krydret k\u00f8d, salsa og friske gr\u00f8ntsager.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Hakket oksek\u00f8d, Tacokrydderi, Tacoskaller, Iceberg salat, Tomat, Revet ost, Cremefraiche, Salsa. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Brun oksek\u00f8det og tils\u00e6t tacokrydderi og lidt vand. Simre 10 min. | Trin 2: Snit salat, sk\u00e6r tomater i tern. | Trin 3: Varm tacoskaller i ovnen ved 180\u00b0C i 3 min. | Trin 4: Saml taco med k\u00f8d, gr\u00f8ntsager, ost, cremefraiche og salsa.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

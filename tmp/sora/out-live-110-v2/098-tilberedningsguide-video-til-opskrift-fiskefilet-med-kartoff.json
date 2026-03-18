@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624248,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a81978299c81908e711385eb0ff3fa0e1a9a9520e218d5",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Fiskefilet med kartoffelskiver. Retbeskrivelse: Bagt fiskefilet med ovnbagte kartoffelskiver og dild.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): R\u00f8dsp\u00e6ttefilet, Kartofler, Olivenolie, Citron, Dild, Salt, Peber. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Sk\u00e6r kartofler i tynde skiver. Vend i olie og salt. Bag ved 220\u00b0C i 15 min. | Trin 2: Krydr fisken med salt, peber og citron. | Trin 3: L\u00e6g fisk oven p\u00e5 kartoflerne. Bag 10 min mere. | Trin 4: Server med dild og citronb\u00e5de.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

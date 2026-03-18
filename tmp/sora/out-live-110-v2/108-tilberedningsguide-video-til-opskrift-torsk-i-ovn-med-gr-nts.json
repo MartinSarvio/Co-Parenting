@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624252,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8197bf1548198b58643a1b7632ac404c080229bda7ef4",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Torsk i ovn med gr\u00f8ntsager. Retbeskrivelse: Let ovnbagt torsk med tomat, squash og oliven.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Torskefilet, Cherrytomater, Squash, Sorte oliven, Olivenolie, Hvidl\u00f8g, Citron. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Sk\u00e6r squash i halve skiver. Halver tomater. | Trin 2: Fordel gr\u00f8ntsager i fad. Drys med hvidl\u00f8g og olie. Bag 10 min ved 200\u00b0C. | Trin 3: L\u00e6g fisk oven p\u00e5. Krydr med salt og peber. Bag 12 min mere. | Trin 4: Server med citronb\u00e5de og br\u00f8d.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Aftensmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624222,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a8195e74c481908d23bb9baa6a013e0c08ba70e8a65add",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Smoothie bowl. Retbeskrivelse: Frisk smoothie bowl med b\u00e6r, granola og frugt.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Frosne b\u00e6r, Banan, Yoghurt, Honning, Granola, Friske b\u00e6r, Kokosflager. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Blend frosne b\u00e6r, banan, yoghurt og honning til en tyk smoothie. | Trin 2: H\u00e6ld i sk\u00e5le. | Trin 3: Top med granola, friske b\u00e6r og kokosflager.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Morgenmad. B\u00f8rnevenlig: ja.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}

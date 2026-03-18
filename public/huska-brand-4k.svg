@@ -1,0 +1,58 @@
+<svg width="4096" height="2160" viewBox="0 0 4096 2160" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Huska Brand Logo 4K</title>
+  <desc id="desc">Premium rendered Huska wordmark with monogram icon.</desc>
+
+  <defs>
+    <linearGradient id="bg" x1="280" y1="140" x2="3810" y2="2060" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FBFAF6"/>
+      <stop offset="1" stop-color="#ECE8DE"/>
+    </linearGradient>
+    <linearGradient id="iconPanel" x1="366" y1="320" x2="1368" y2="1450" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#383735"/>
+      <stop offset="1" stop-color="#212120"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="554" y1="520" x2="1220" y2="1150" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFB35D"/>
+      <stop offset="1" stop-color="#F58A2D"/>
+    </linearGradient>
+    <linearGradient id="steel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="#F1EEE5" stop-opacity="0.9"/>
+    </linearGradient>
+    <filter id="softShadow" x="220" y="220" width="1420" height="1560" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+      <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+      <feOffset dy="36"/>
+      <feGaussianBlur stdDeviation="38"/>
+      <feComposite in2="hardAlpha" operator="out"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 0.08 0 0 0 0 0.08 0 0 0 0 0.07 0 0 0 0.28 0"/>
+      <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_1_1"/>
+      <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_1_1" result="shape"/>
+    </filter>
+  </defs>
+
+  <rect width="4096" height="2160" rx="120" fill="url(#bg)"/>
+  <circle cx="3500" cy="260" r="220" fill="#FFFFFF" fill-opacity="0.4"/>
+  <circle cx="260" cy="1870" r="280" fill="#FFFFFF" fill-opacity="0.3"/>
+
+  <g filter="url(#softShadow)">
+    <rect x="300" y="300" width="1260" height="1260" rx="320" fill="url(#iconPanel)"/>
+    <rect x="300" y="300" width="1260" height="1260" rx="320" stroke="#4B4A46" stroke-width="6"/>
+
+    <path d="M420 520C510 420 660 366 930 366C1210 366 1360 424 1440 530V620C1340 500 1200 454 930 454C668 454 530 498 420 626V520Z" fill="#FFFFFF" fill-opacity="0.12"/>
+
+    <rect x="610" y="570" width="190" height="720" rx="95" fill="url(#steel)"/>
+    <rect x="1060" y="570" width="190" height="720" rx="95" fill="url(#steel)"/>
+    <rect x="790" y="848" width="270" height="170" rx="84" fill="url(#steel)"/>
+
+    <path d="M590 920L830 1148L1270 690" stroke="url(#accent)" stroke-width="118" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <g fill="#2F2F2F">
+    <path d="M1790 1248V730H1968V920H2300V730H2478V1248H2300V1078H1968V1248H1790Z"/>
+    <path d="M2610 1248V730H2788V997C2788 1065 2828 1112 2902 1112C2975 1112 3016 1065 3016 997V730H3194V1000C3194 1164 3072 1264 2902 1264C2731 1264 2610 1164 2610 1000V1248Z"/>
+    <path d="M3320 1248V730H3662C3791 730 3882 797 3882 908C3882 1002 3816 1065 3708 1078L3910 1248H3688L3518 1090H3498V1248H3320ZM3498 967H3634C3677 967 3702 944 3702 910C3702 874 3677 852 3634 852H3498V967Z"/>
+  </g>
+
+  <text x="1790" y="1500" fill="#5A564D" font-family="SF Pro Text, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Segoe UI', sans-serif" font-size="122" font-weight="500" letter-spacing="10">CO-PARENTING PLATFORM</text>
+</svg>

@@ -4,6 +4,9 @@ module.exports = {
   content: ['./web.html', './src/main-web.tsx', './src/web/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        display: ['DM Serif Display', 'Georgia', 'serif'],
+      },
       borderRadius: {
         xl: "calc(var(--radius) + 4px)",
         lg: "var(--radius)",
@@ -13,6 +16,7 @@ module.exports = {
       },
       boxShadow: {
         xs: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+        glass: "0 8px 32px rgba(0, 0, 0, 0.08)",
       },
     },
   },

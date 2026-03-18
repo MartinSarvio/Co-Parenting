@@ -1,0 +1,15 @@
+{
+  "completed_at": null,
+  "created_at": 1772624225,
+  "error": null,
+  "expires_at": null,
+  "id": "video_69a81960f0d88191a048a723a02162eb09f36de83ab50467",
+  "model": "sora-2",
+  "object": "video",
+  "progress": 0,
+  "prompt": "Primary request: Tilberedningsguide video til opskrift: Thai-suppe med kylling. Retbeskrivelse: Cremet thaisuppe med kokosm\u00e6lk, kylling og lime.. Vis KUN denne ret og dens reelle tilberedning i korrekt r\u00e6kkef\u00f8lge. Ingredienser p\u00e5 sk\u00e6rm (visuelt): Kyllingebryst, Kokosm\u00e6lk, Kyllingefond, R\u00f8d karrypasta, Champignon, Fiskesovs, Lime, Koriander. Sekvensen SKAL f\u00f8lge disse trin: Trin 1: Varm karrypasta i en gryde 1 min. Tils\u00e6t kokosm\u00e6lk og fond. | Trin 2: Sk\u00e6r kylling i strimler og champignon i skiver. Tils\u00e6t. | Trin 3: Simre 15 min. Tils\u00e6t fiskesovs og limesaft. | Trin 4: Server med frisk koriander og risnudler.. Hvert trin skal vises tydeligt med h\u00e5ndtering af ingredienser, varme/kogning/stegning hvor relevant, og overgang til n\u00e6ste trin f\u00f8rst n\u00e5r handlingen er vist. Afslut med f\u00e6rdig anretning af samme ret. Ingen mennesker/ansigter. Ingen tekst-overlay. Ingen tilf\u00e6ldige retter. Kamera: stabile n\u00e6rbilleder og top-down af proces. Stil: realistisk instructional cooking video. M\u00e5lgruppe: danske familier. Kategori: Supper. B\u00f8rnevenlig: nej.",
+  "remixed_from_video_id": null,
+  "seconds": "12",
+  "size": "1280x720",
+  "status": "queued"
+}
