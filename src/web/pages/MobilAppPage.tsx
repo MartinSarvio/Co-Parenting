@@ -112,10 +112,10 @@ export default function MobilAppPage() {
           <div className="w-[260px] h-[520px] rounded-[3rem] border-[10px] border-[#2f2f2f] bg-[#1a1a1a] overflow-hidden shadow-2xl shadow-black/20">
             <img src="/app-screenshot.png" alt="Huska app" className="w-full h-full object-cover" />
           </div>
-          <div className="absolute -bottom-4 -right-4 w-14 h-14 rounded-2xl bg-white shadow-xl flex items-center justify-center">
+          <div className="absolute -bottom-4 -right-4 w-14 h-14 rounded-2xl bg-white shadow-xl flex items-center justify-center animate-floatY">
             <Shield size={28} style={{ color: '#1a1a1a' }} />
           </div>
-          <div className="absolute -top-4 -left-4 w-14 h-14 rounded-2xl bg-white shadow-xl flex items-center justify-center">
+          <div className="absolute -top-4 -left-4 w-14 h-14 rounded-2xl bg-white shadow-xl flex items-center justify-center animate-floatY" style={{ animationDelay: '1.5s' }}>
             <Download size={28} style={{ color: '#1a1a1a' }} />
           </div>
         </div>
