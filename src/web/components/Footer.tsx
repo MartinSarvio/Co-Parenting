@@ -50,10 +50,10 @@ export function Footer() {
           <div>
             <h3 className="text-[13px] font-bold text-white/70 uppercase tracking-wider mb-4">Navigation</h3>
             <ul className="space-y-2.5 text-sm">
-              <li><a href="#funktioner" className="text-white/50 hover:text-white transition-colors">Funktioner</a></li>
+              <li><a href="#partner" className="text-white/50 hover:text-white transition-colors">Partnerprogrammet</a></li>
               <li><a href="#hvordan" className="text-white/50 hover:text-white transition-colors">Sådan virker det</a></li>
               <li><a href="#om" className="text-white/50 hover:text-white transition-colors">Om os</a></li>
-              <li><a href="#login" className="text-white/50 hover:text-white transition-colors">Log ind</a></li>
+              <li><a href="#anmeldelser" className="text-white/50 hover:text-white transition-colors">Anmeldelser</a></li>
             </ul>
           </div>
 
@@ -61,7 +61,7 @@ export function Footer() {
           <div>
             <h3 className="text-[13px] font-bold text-white/70 uppercase tracking-wider mb-4">Info</h3>
             <ul className="space-y-2.5 text-sm">
-              <li className="text-white/50">kontakt@huska.dk</li>
+              <li><a href="mailto:kontakt@huska.dk" className="text-white/50 hover:text-white transition-colors">kontakt@huska.dk</a></li>
               <li><a href="#privatlivspolitik" className="text-white/50 hover:text-white transition-colors">Privatlivspolitik</a></li>
               <li><a href="#kontakt" className="text-white/50 hover:text-white transition-colors">Kontakt</a></li>
               <li><a href="#vilkar" className="text-white/50 hover:text-white transition-colors">Vilkår og betingelser</a></li>

@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { supabase } from '@/lib/supabase';
 import {
   Calendar,
   MessageCircle,
@@ -168,8 +169,8 @@ function FeatureSection() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const totalCards = features.length;
-  const arcSpread = 180; // degrees
-  const arcRadius = 420; // px
+  const arcSpread = 120; // degrees
+  const arcRadius = 550; // px
 
   return (
     <section id="funktioner" className="py-24 bg-white overflow-hidden" ref={ref}>
@@ -187,7 +188,7 @@ function FeatureSection() {
         </div>
 
         {/* Arc layout — desktop */}
-        <div className={`hidden lg:block relative mx-auto ${visible ? 'animate-slideUp' : 'opacity-0'}`} style={{ width: '960px', height: '480px' }}>
+        <div className={`hidden lg:block relative mx-auto ${visible ? 'animate-slideUp' : 'opacity-0'}`} style={{ width: '960px', height: '380px' }}>
           {features.map((f, i) => {
             const angle = -arcSpread / 2 + (arcSpread / (totalCards - 1)) * i;
             const rad = (angle * Math.PI) / 180;
@@ -204,7 +205,7 @@ function FeatureSection() {
                 className="absolute w-[120px] text-center cursor-pointer"
                 style={{
                   left: `calc(50% + ${x}px - 60px)`,
-                  top: `${y * 0.55 + 20}px`,
+                  top: `${y * 0.35 + 20}px`,
                   transform: `rotate(${rotate}deg) scale(${isHovered ? 1.15 : 1}) translateY(${isHovered ? -12 : 0}px)`,
                   zIndex: isHovered ? 50 : baseZ,
                   transition: 'transform 0.3s ease, z-index 0s',
@@ -436,7 +437,17 @@ const testimonials = [
 
 function SocialProofSection() {
   const { ref, visible } = useInView();
-  const allTestimonials = [...testimonials, ...testimonials];
+  const [dbReviews, setDbReviews] = useState<typeof testimonials>([]);
+
+  useEffect(() => {
+    supabase.from('reviews').select('name, role, quote, stars').gte('stars', 3).order('created_at', { ascending: false }).limit(20)
+      .then(({ data }) => {
+        if (data) setDbReviews(data.map(r => ({ name: r.name, type: r.role, quote: r.quote, stars: r.stars })));
+      });
+  }, []);
+
+  const combined = [...testimonials, ...dbReviews];
+  const allTestimonials = [...combined, ...combined];
 
   return (
     <section className="py-20 bg-white overflow-hidden" ref={ref}>

@@ -2,7 +2,6 @@ import { useState, useEffect, Suspense, lazy } from 'react';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { Toaster } from 'sonner';
-import { AppStateScreen } from '@/components/custom/AppStateScreen';
 
 const LandingPage = lazy(() => import('./pages/LandingPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
@@ -20,11 +19,13 @@ const MadHjemPage = lazy(() => import('./pages/MadHjemPage'));
 const KommunikationPage = lazy(() => import('./pages/KommunikationPage'));
 const UdgifterPage = lazy(() => import('./pages/UdgifterPage'));
 const KalenderPage = lazy(() => import('./pages/KalenderPage'));
+const AnmeldelserPage = lazy(() => import('./pages/AnmeldelserPage'));
 
 function LoadingFallback() {
   return (
-    <div className="flex items-center justify-center py-20">
-      <AppStateScreen state="loading" />
+    <div className="min-h-[60vh] flex flex-col items-center justify-center">
+      <div className="w-10 h-10 border-[3px] border-[#e8e6df] border-t-[#2f2f2f] rounded-full animate-spin" />
+      <p className="mt-4 text-[15px] font-semibold text-[#2f2f2f]">Indlæser...</p>
     </div>
   );
 }
@@ -53,6 +54,7 @@ export function WebApp() {
   const isKommunikation = route === '#kommunikation';
   const isUdgifter = route === '#udgifter';
   const isKalender = route === '#kalender';
+  const isAnmeldelser = route === '#anmeldelser';
   const hideChrome = isAdmin || isLogin;
 
   const renderPage = () => {
@@ -71,6 +73,7 @@ export function WebApp() {
     if (isKommunikation) return <KommunikationPage />;
     if (isUdgifter) return <UdgifterPage />;
     if (isKalender) return <KalenderPage />;
+    if (isAnmeldelser) return <AnmeldelserPage />;
     return <LandingPage />;
   };
 
