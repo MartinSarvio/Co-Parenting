@@ -77,12 +77,6 @@ export default function WebLoginPage() {
 
         {/* Login card */}
         <div className="relative w-full max-w-md animate-fadeIn z-10">
-          {/* Logo */}
-          <div className="flex items-center justify-center gap-3 mb-8">
-            <img src="/huska-logo.svg" alt="Huska" className="h-12 w-12 rounded-2xl shadow-md" />
-            <span className="text-2xl font-bold text-[#2f2f2f] tracking-tight">Huska</span>
-          </div>
-
           {/* Card */}
           <div className="bg-white rounded-3xl p-8">
             <div className="text-center mb-6">
@@ -152,8 +146,7 @@ export default function WebLoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-white font-semibold shadow-lg shadow-[#f58a2d]/25 hover:shadow-xl hover:shadow-[#f58a2d]/30 disabled:opacity-60 transition-all duration-200"
-                style={{ background: 'linear-gradient(135deg, #f7a95c 0%, #f58a2d 50%, #e8773f 100%)' }}
+                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-white font-semibold bg-[#1a1a1a] hover:bg-[#2f2f2f] shadow-lg shadow-black/10 hover:shadow-xl disabled:opacity-60 transition-all duration-200"
               >
                 {loading ? (
                   <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
