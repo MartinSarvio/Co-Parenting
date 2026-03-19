@@ -21,7 +21,6 @@ import {
   Building2,
   Handshake,
 } from 'lucide-react';
-import { denmarkRegions } from '../assets/denmarkPaths';
 
 /* ── Intersection Observer hook ─────────────────────────────────────────── */
 
@@ -110,31 +109,27 @@ function MissionSection() {
 
           {/* Visual: Two houses connected */}
           <div className="flex justify-center">
-            <div className="relative w-full max-w-[340px] h-[280px]">
+            <div className="relative w-full max-w-[380px] h-[300px]">
               {/* House A */}
-              <div className="absolute left-0 top-8 w-[120px]">
-                <div className="bg-[#fafaf9] border border-[#e5e3dc] rounded-2xl p-4 text-center">
-                  <div className="w-12 h-12 mx-auto mb-2 rounded-xl bg-[#1a1a1a]/5 flex items-center justify-center">
-                    <span className="text-xl">🏠</span>
-                  </div>
-                  <p className="text-xs font-bold text-[#1a1a1a]">Hjem A</p>
-                  <p className="text-[10px] text-[#78766d] mt-1">Mor</p>
+              <div className="absolute left-0 top-8 w-[120px] text-center">
+                <div className="w-14 h-14 mx-auto mb-2 rounded-full bg-[#f2f1ed] flex items-center justify-center">
+                  <span className="text-2xl">🏠</span>
                 </div>
+                <p className="text-sm font-bold text-[#1a1a1a]">Hjem A</p>
+                <p className="text-[11px] text-[#78766d] mt-0.5">Mor</p>
               </div>
 
               {/* House B */}
-              <div className="absolute right-0 top-8 w-[120px]">
-                <div className="bg-[#fafaf9] border border-[#e5e3dc] rounded-2xl p-4 text-center">
-                  <div className="w-12 h-12 mx-auto mb-2 rounded-xl bg-[#1a1a1a]/5 flex items-center justify-center">
-                    <span className="text-xl">🏡</span>
-                  </div>
-                  <p className="text-xs font-bold text-[#1a1a1a]">Hjem B</p>
-                  <p className="text-[10px] text-[#78766d] mt-1">Far</p>
+              <div className="absolute right-0 top-8 w-[120px] text-center">
+                <div className="w-14 h-14 mx-auto mb-2 rounded-full bg-[#f2f1ed] flex items-center justify-center">
+                  <span className="text-2xl">🏡</span>
                 </div>
+                <p className="text-sm font-bold text-[#1a1a1a]">Hjem B</p>
+                <p className="text-[11px] text-[#78766d] mt-0.5">Far</p>
               </div>
 
               {/* Connection arrows */}
-              <div className="absolute top-[52px] left-[130px] right-[130px] flex flex-col items-center gap-2">
+              <div className="absolute top-[40px] left-[140px] right-[140px] flex flex-col items-center gap-2">
                 <div className="flex items-center gap-1.5 bg-white border border-[#e5e3dc] rounded-full px-3 py-1.5 shadow-sm">
                   <Calendar size={11} className="text-[#1a1a1a]" />
                   <span className="text-[10px] font-semibold text-[#1a1a1a]">Kalender</span>
@@ -152,13 +147,15 @@ function MissionSection() {
               </div>
 
               {/* Dashed connector lines */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 340 280">
-                <line x1="120" y1="60" x2="140" y2="60" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
-                <line x1="200" y1="60" x2="220" y2="60" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
-                <line x1="120" y1="95" x2="140" y2="95" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
-                <line x1="200" y1="95" x2="220" y2="95" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
-                <line x1="120" y1="130" x2="140" y2="130" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
-                <line x1="200" y1="130" x2="220" y2="130" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
+              <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 380 300">
+                {/* Left lines: House A → pill start */}
+                <line x1="90" y1="56" x2="148" y2="56" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
+                <line x1="90" y1="88" x2="148" y2="88" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
+                <line x1="90" y1="120" x2="148" y2="120" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
+                {/* Right lines: pill end → House B */}
+                <line x1="232" y1="56" x2="290" y2="56" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
+                <line x1="232" y1="88" x2="290" y2="88" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
+                <line x1="232" y1="120" x2="290" y2="120" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
               </svg>
 
               {/* Huska badge in center bottom */}
@@ -189,41 +186,81 @@ function VisionSection() {
         <div className="grid md:grid-cols-2 gap-16 items-center">
           {/* Visual: Denmark map with dots */}
           <div className="flex justify-center order-2 md:order-1">
-            <div className="relative w-[280px] h-[340px]">
-              {/* Realistic Denmark map from geographic SVG data */}
-              <svg viewBox="0 0 980 793" className="w-full h-full" fill="none">
-                {denmarkRegions.map((region) => (
-                  <path
-                    key={region.id}
-                    d={region.d}
-                    fill="#1a1a1a"
-                    fillOpacity="0.08"
-                    stroke="#1a1a1a"
-                    strokeOpacity="0.18"
-                    strokeWidth="1.5"
-                    strokeLinejoin="round"
-                  />
-                ))}
-
-                {/* City dots — SVG coordinates from geographic data */}
-                {[
-                  { x: 256, y: 175, label: 'Aalborg' },
-                  { x: 295, y: 395, label: 'Aarhus' },
-                  { x: 320, y: 585, label: 'Odense' },
-                  { x: 622, y: 515, label: 'København' },
-                ].map((city) => (
-                  <g key={city.label}>
-                    <circle cx={city.x} cy={city.y} r={10} fill="#1a1a1a" />
-                    <circle cx={city.x} cy={city.y} r={18} fill="#1a1a1a" fillOpacity="0.15" />
-                    <text x={city.x} y={city.y + 30} textAnchor="middle" fontSize="22" fontWeight="700" fill="#1a1a1a">{city.label}</text>
-                  </g>
-                ))}
+            <div className="relative w-[336px] h-[408px]">
+              {/* Simplified Denmark outline */}
+              <svg viewBox="0 0 280 340" className="w-full h-full" fill="none">
+                {/* Jylland simplified */}
+                <path
+                  d="M80 30 C85 25, 100 20, 110 30 C115 40, 120 60, 118 80 C116 100, 122 120, 130 140 C135 155, 140 170, 138 190 C136 210, 125 230, 115 250 C108 265, 95 270, 90 260 C85 250, 88 235, 85 220 C82 205, 75 195, 78 180 C80 165, 75 150, 72 135 C69 120, 70 100, 72 80 C74 60, 76 40, 80 30Z"
+                  fill="#1a1a1a"
+                  fillOpacity="0.06"
+                  stroke="#1a1a1a"
+                  strokeOpacity="0.15"
+                  strokeWidth="1.5"
+                />
+                {/* Fyn */}
+                <path
+                  d="M135 210 C140 205, 155 205, 160 210 C165 215, 165 225, 160 230 C155 235, 140 235, 135 230 C130 225, 130 215, 135 210Z"
+                  fill="#1a1a1a"
+                  fillOpacity="0.06"
+                  stroke="#1a1a1a"
+                  strokeOpacity="0.15"
+                  strokeWidth="1.5"
+                />
+                {/* Sjælland */}
+                <path
+                  d="M170 195 C180 185, 205 185, 215 195 C225 205, 225 225, 220 240 C215 255, 200 260, 185 255 C170 250, 165 235, 165 220 C165 205, 165 200, 170 195Z"
+                  fill="#1a1a1a"
+                  fillOpacity="0.06"
+                  stroke="#1a1a1a"
+                  strokeOpacity="0.15"
+                  strokeWidth="1.5"
+                />
+                {/* Bornholm */}
+                <ellipse
+                  cx="250"
+                  cy="200"
+                  rx="12"
+                  ry="15"
+                  fill="#1a1a1a"
+                  fillOpacity="0.06"
+                  stroke="#1a1a1a"
+                  strokeOpacity="0.15"
+                  strokeWidth="1.5"
+                />
               </svg>
 
+              {/* City dots */}
+              {[
+                { x: 108, y: 66, label: 'Aalborg', delay: '0s' },
+                { x: 114, y: 132, label: 'Aarhus', delay: '0.2s' },
+                { x: 102, y: 210, label: 'Odense', delay: '0.4s' },
+                { x: 178, y: 258, label: 'Odense', delay: '0.4s', hide: true },
+                { x: 234, y: 252, label: 'København', delay: '0.6s' },
+              ].map((city, i) => (
+                <div
+                  key={i}
+                  className="absolute"
+                  style={{ left: city.x, top: city.y, transform: 'translate(-50%, -50%)' }}
+                >
+                  <div
+                    className="w-3 h-3 rounded-full bg-[#1a1a1a] relative"
+                    style={{ animation: `pulse 2s ease-in-out ${city.delay} infinite` }}
+                  >
+                    <div className="absolute inset-0 rounded-full bg-[#1a1a1a]/20 animate-ping" />
+                  </div>
+                  {!city.hide && (
+                    <p className="absolute top-4 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-semibold text-[#1a1a1a]">
+                      {city.label}
+                    </p>
+                  )}
+                </div>
+              ))}
+
               {/* Growth indicator */}
-              <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white border border-[#e5e3dc] rounded-full px-4 py-2 shadow-sm">
+              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white border border-[#e5e3dc] rounded-full px-4 py-2 shadow-sm">
                 <TrendingUp size={14} className="text-[#1a1a1a]" />
-                <span className="text-[11px] font-bold text-[#1a1a1a]">Hele Danmark 2026</span>
+                <span className="text-[11px] font-bold text-[#1a1a1a]">Hele Danmark 2027</span>
               </div>
             </div>
           </div>
@@ -433,9 +470,9 @@ const team = [
   },
   {
     name: 'Frederik Hansen',
-    role: 'Grundlægger & CTO',
+    role: 'Grundlægger & CMO',
     initials: 'FH',
-    desc: 'Teknisk arkitekt og udvikler. Bygger den platform der samler familier — én funktion ad gangen.',
+    desc: 'Marketing og vækststrateg. Sikrer at Huska når de familier der har brug for det — med autenticitet og empati.',
   },
 ];
 
