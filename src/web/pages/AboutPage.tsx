@@ -208,10 +208,10 @@ function VisionSection() {
 
               {/* City dots — positioned on realistic Denmark map */}
               {[
-                { x: 30, y: 22, label: 'Aalborg', delay: '0s' },
-                { x: 35, y: 40, label: 'Aarhus', delay: '0.2s' },
-                { x: 38, y: 65, label: 'Odense', delay: '0.4s' },
-                { x: 72, y: 55, label: 'København', delay: '0.6s' },
+                { x: 25, y: 14.5, label: 'Aalborg', delay: '0s' },
+                { x: 29.5, y: 33, label: 'Aarhus', delay: '0.2s' },
+                { x: 31.5, y: 50, label: 'Odense', delay: '0.4s' },
+                { x: 63, y: 45, label: 'København', delay: '0.6s' },
               ].map((city, i) => (
                 <div
                   key={i}
