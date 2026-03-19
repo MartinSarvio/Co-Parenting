@@ -21,6 +21,7 @@ import {
   Building2,
   Handshake,
 } from 'lucide-react';
+import { denmarkRegions } from '../assets/denmarkPaths';
 
 /* ── Intersection Observer hook ─────────────────────────────────────────── */
 
@@ -186,79 +187,39 @@ function VisionSection() {
         <div className="grid md:grid-cols-2 gap-16 items-center">
           {/* Visual: Denmark map with dots */}
           <div className="flex justify-center order-2 md:order-1">
-            <div className="relative w-[336px] h-[408px]">
-              {/* Simplified Denmark outline */}
-              <svg viewBox="0 0 280 340" className="w-full h-full" fill="none">
-                {/* Jylland simplified */}
-                <path
-                  d="M80 30 C85 25, 100 20, 110 30 C115 40, 120 60, 118 80 C116 100, 122 120, 130 140 C135 155, 140 170, 138 190 C136 210, 125 230, 115 250 C108 265, 95 270, 90 260 C85 250, 88 235, 85 220 C82 205, 75 195, 78 180 C80 165, 75 150, 72 135 C69 120, 70 100, 72 80 C74 60, 76 40, 80 30Z"
-                  fill="#1a1a1a"
-                  fillOpacity="0.06"
-                  stroke="#1a1a1a"
-                  strokeOpacity="0.15"
-                  strokeWidth="1.5"
-                />
-                {/* Fyn */}
-                <path
-                  d="M135 210 C140 205, 155 205, 160 210 C165 215, 165 225, 160 230 C155 235, 140 235, 135 230 C130 225, 130 215, 135 210Z"
-                  fill="#1a1a1a"
-                  fillOpacity="0.06"
-                  stroke="#1a1a1a"
-                  strokeOpacity="0.15"
-                  strokeWidth="1.5"
-                />
-                {/* Sjælland */}
-                <path
-                  d="M170 195 C180 185, 205 185, 215 195 C225 205, 225 225, 220 240 C215 255, 200 260, 185 255 C170 250, 165 235, 165 220 C165 205, 165 200, 170 195Z"
-                  fill="#1a1a1a"
-                  fillOpacity="0.06"
-                  stroke="#1a1a1a"
-                  strokeOpacity="0.15"
-                  strokeWidth="1.5"
-                />
-                {/* Bornholm */}
-                <ellipse
-                  cx="250"
-                  cy="200"
-                  rx="12"
-                  ry="15"
-                  fill="#1a1a1a"
-                  fillOpacity="0.06"
-                  stroke="#1a1a1a"
-                  strokeOpacity="0.15"
-                  strokeWidth="1.5"
-                />
+            <div className="relative w-[280px] h-[340px]">
+              {/* Realistic Denmark map from geographic SVG data */}
+              <svg viewBox="0 0 980 793" className="w-full h-full" fill="none">
+                {denmarkRegions.map((region) => (
+                  <path
+                    key={region.id}
+                    d={region.d}
+                    fill="#1a1a1a"
+                    fillOpacity="0.08"
+                    stroke="#1a1a1a"
+                    strokeOpacity="0.18"
+                    strokeWidth="1.5"
+                    strokeLinejoin="round"
+                  />
+                ))}
+
+                {/* City dots — SVG coordinates from geographic data */}
+                {[
+                  { x: 256, y: 175, label: 'Aalborg' },
+                  { x: 295, y: 395, label: 'Aarhus' },
+                  { x: 320, y: 585, label: 'Odense' },
+                  { x: 622, y: 515, label: 'København' },
+                ].map((city) => (
+                  <g key={city.label}>
+                    <circle cx={city.x} cy={city.y} r={10} fill="#1a1a1a" />
+                    <circle cx={city.x} cy={city.y} r={18} fill="#1a1a1a" fillOpacity="0.15" />
+                    <text x={city.x} y={city.y + 30} textAnchor="middle" fontSize="22" fontWeight="700" fill="#1a1a1a">{city.label}</text>
+                  </g>
+                ))}
               </svg>
 
-              {/* City dots */}
-              {[
-                { x: 108, y: 66, label: 'Aalborg', delay: '0s' },
-                { x: 114, y: 132, label: 'Aarhus', delay: '0.2s' },
-                { x: 102, y: 210, label: 'Odense', delay: '0.4s' },
-                { x: 178, y: 258, label: 'Odense', delay: '0.4s', hide: true },
-                { x: 234, y: 252, label: 'København', delay: '0.6s' },
-              ].map((city, i) => (
-                <div
-                  key={i}
-                  className="absolute"
-                  style={{ left: city.x, top: city.y, transform: 'translate(-50%, -50%)' }}
-                >
-                  <div
-                    className="w-3 h-3 rounded-full bg-[#1a1a1a] relative"
-                    style={{ animation: `pulse 2s ease-in-out ${city.delay} infinite` }}
-                  >
-                    <div className="absolute inset-0 rounded-full bg-[#1a1a1a]/20 animate-ping" />
-                  </div>
-                  {!city.hide && (
-                    <p className="absolute top-4 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-semibold text-[#1a1a1a]">
-                      {city.label}
-                    </p>
-                  )}
-                </div>
-              ))}
-
               {/* Growth indicator */}
-              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white border border-[#e5e3dc] rounded-full px-4 py-2 shadow-sm">
+              <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white border border-[#e5e3dc] rounded-full px-4 py-2 shadow-sm">
                 <TrendingUp size={14} className="text-[#1a1a1a]" />
                 <span className="text-[11px] font-bold text-[#1a1a1a]">Hele Danmark 2027</span>
               </div>
