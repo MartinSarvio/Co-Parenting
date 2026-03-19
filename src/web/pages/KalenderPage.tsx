@@ -88,37 +88,8 @@ export default function KalenderPage() {
       ctaSubtitle="Opret din familiekalender i dag. Helt gratis."
       ctaButtonLabel="Prøv gratis"
       ctaButtonHref="#funktioner"
-      heroVisual={
-        <div className="p-5 rounded-2xl bg-white/70 border border-white/40 shadow-xl max-w-[280px]">
-          <p className="text-[13px] font-bold text-[#2f2f2f] mb-3">Marts 2026</p>
-          <div className="grid grid-cols-7 gap-1 text-center text-[11px]">
-            {['Ma','Ti','On','To','Fr','Lø','Sø'].map(d => (
-              <div key={d} className="text-[#78766d] font-semibold py-1">{d}</div>
-            ))}
-            {Array.from({ length: 31 }, (_, i) => {
-              const highlight = [5, 12, 18, 23, 28].includes(i + 1);
-              return (
-                <div key={i} className={`py-1.5 rounded-lg text-[11px] ${highlight ? 'bg-[#2f2f2f] text-white font-bold' : 'text-[#5f5d56]'}`}>
-                  {i + 1}
-                </div>
-              );
-            })}
-          </div>
-          <div className="mt-3 space-y-1.5">
-            {[
-              { date: '5. mar', event: 'Forældremøde' },
-              { date: '18. mar', event: 'Emmas fødselsdag' },
-              { date: '23. mar', event: 'Tandlæge' },
-            ].map((e, i) => (
-              <div key={i} className="flex items-center gap-2 text-[11px]">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#2f2f2f] shrink-0" />
-                <span className="text-[#78766d]">{e.date}</span>
-                <span className="text-[#2f2f2f] font-medium">{e.event}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      }
+      variant="photo-hero"
+      heroPhotoSrc="/images/kalender-photo.jpg"
     />
   );
 }

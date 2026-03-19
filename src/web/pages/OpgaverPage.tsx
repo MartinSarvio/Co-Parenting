@@ -206,6 +206,7 @@ export default function OpgaverPage() {
       ctaButtonLabel="Prøv gratis"
       ctaButtonHref="#funktioner"
       heroVisual={<HeroKanban />}
+      featurePhotoSrc="/images/samvaersplan-photo.jpg"
     />
   );
 }

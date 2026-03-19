@@ -76,27 +76,7 @@ export default function KommunikationPage() {
       ctaSubtitle="Start med strukturerede samtaler i dag. Helt gratis."
       ctaButtonLabel="Prøv gratis"
       ctaButtonHref="#funktioner"
-      heroVisual={
-        <div className="space-y-3 max-w-[300px]">
-          <div className="p-4 rounded-2xl bg-white/70 border border-white/40 shadow-xl">
-            <p className="text-[11px] font-bold text-[#2f2f2f] mb-3">Skole-emner</p>
-            <div className="space-y-2.5">
-              {[
-                { from: 'Dig', msg: 'Forældremøde den 23. — kan du deltage?', align: 'right' as const },
-                { from: 'Medforælder', msg: 'Ja, det passer fint. Skal vi tage noget op?', align: 'left' as const },
-                { from: 'Dig', msg: 'Vi bør snakke om SFO-skift', align: 'right' as const },
-              ].map((m, i) => (
-                <div key={i} className={`flex ${m.align === 'right' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`px-3.5 py-2 rounded-2xl text-[12px] max-w-[200px] ${m.align === 'right' ? 'bg-[#2f2f2f] text-white rounded-br-md' : 'bg-[#f2f1ed] text-[#2f2f2f] rounded-bl-md'}`}>
-                    {m.msg}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <p className="text-[10px] text-[#9a978f] mt-2 text-right">Læst kl. 14:32 ✓✓</p>
-          </div>
-        </div>
-      }
+      featurePhotoSrc="/images/kommunikation-photo.jpg"
     />
   );
 }
