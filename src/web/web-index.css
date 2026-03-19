@@ -116,39 +116,146 @@ html {
   animation: progressFill 1.2s ease-out both;
 }
 
-/* ═══ Web App Shell — override mobile constraints ═══ */
+/* ═══ Web App Shell — desktop overrides for mobile sections ═══ */
 
-/* Remove hardcoded mobile max-width (430px) inside web app */
+/* ── Base: remove mobile constraints ── */
+
 .web-app-content [class*="max-w-\[430px\]"] {
   max-width: 100% !important;
 }
 
-/* Expand max-w-lg (used by some inner panels) */
 .web-app-content [class*="max-w-lg"] {
-  max-width: 48rem !important;
+  max-width: 100% !important;
 }
 
-/* Remove safe-area inset padding (only relevant on native) */
 .web-app-content [style*="safe-area-inset"] {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
 }
 
-/* Make grid-based sections use available space */
-.web-app-content .grid {
-  width: 100%;
-}
-
-/* Cards and panels should expand */
 .web-app-content > div {
   width: 100%;
 }
 
-/* Better spacing for desktop */
+/* ── Desktop layout (≥1024px) ── */
+
 @media (min-width: 1024px) {
   .web-app-content {
-    padding-left: 2rem;
-    padding-right: 2rem;
+    padding: 1.5rem 2.5rem;
+  }
+
+  /* Convert mobile carousels (full-width slides) to side-by-side grid */
+  .web-app-content .overflow-hidden > .flex {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .web-app-content .overflow-hidden > .flex > [class*="flex-\[0_0_100\%\]"] {
+    flex: 0 0 calc(50% - 0.5rem) !important;
+    min-width: 0;
+  }
+
+  /* Space out root section containers */
+  .web-app-content > div > [class*="space-y-1.5"],
+  .web-app-content > div > [class*="space-y-1"] {
+    --tw-space-y-reverse: 0;
+    gap: 1rem;
+  }
+  .web-app-content > div.space-y-1\.5,
+  .web-app-content > div.space-y-1 {
+    --tw-space-y-reverse: 0;
+  }
+  .web-app-content > div.space-y-1\.5 > * + *,
+  .web-app-content > div.space-y-1 > * + * {
+    margin-top: 0.75rem;
+  }
+
+  /* Cards get more padding */
+  .web-app-content [class*="border-border"][class*="bg-card"] {
+    padding: 1.25rem;
+  }
+
+  /* Quick action grids: expand to more columns */
+  .web-app-content .grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+  }
+
+  /* 1-col grids → 2-col on desktop */
+  .web-app-content .grid-cols-1 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Larger text for desktop readability */
+  .web-app-content [class*="text-\[11px\]"] {
+    font-size: 0.8125rem !important;
+  }
+  .web-app-content [class*="text-\[12px\]"] {
+    font-size: 0.8125rem !important;
+  }
+  .web-app-content [class*="text-\[13px\]"] {
+    font-size: 0.875rem !important;
+  }
+  .web-app-content [class*="text-\[14px\]"] {
+    font-size: 0.9375rem !important;
+  }
+
+  /* Section titles bigger */
+  .web-app-content [class*="text-\[0.95rem\]"] {
+    font-size: 1.125rem !important;
+  }
+
+  /* Transaction / list items more spacious */
+  .web-app-content [class*="rounded-\[8px\]"][class*="border-border"] {
+    padding: 0.875rem 1rem;
+  }
+
+  /* Full-screen side panels → slide-in panel from right on desktop */
+  .web-app-content ~ [class*="fixed"][class*="inset-y-0"][class*="w-full"] {
+    width: 520px !important;
+    left: auto !important;
+    right: 0 !important;
+    border-left: 1px solid #e5e3dc;
+    box-shadow: -8px 0 30px rgba(0,0,0,0.08);
+  }
+
+  /* Task items spacing */
+  .web-app-content [class*="space-y-2"] > [class*="border-b"] {
+    padding: 0.875rem 1rem;
+  }
+}
+
+/* ── Tablet (768–1023px) ── */
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .web-app-content {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .web-app-content .overflow-hidden > .flex > [class*="flex-\[0_0_100\%\]"] {
+    flex: 0 0 calc(50% - 0.5rem) !important;
+    min-width: 0;
+  }
+
+  .web-app-content .grid-cols-1 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* ── Portals: fix side-menu panels rendering on web ── */
+
+body > [class*="fixed"][class*="z-\[9998\]"],
+body > [class*="fixed"][class*="z-\[9999\]"] {
+  /* Ensure portals work correctly above the web shell */
+  z-index: 9998;
+}
+
+@media (min-width: 1024px) {
+  body > [class*="fixed"][class*="z-\[9999\]"][class*="w-full"] {
+    width: 560px !important;
+    left: auto !important;
+    right: 0 !important;
+    border-left: 1px solid #e5e3dc;
+    box-shadow: -8px 0 30px rgba(0,0,0,0.08);
   }
 }
 
