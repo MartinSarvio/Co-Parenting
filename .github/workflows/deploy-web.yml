@@ -19,6 +19,9 @@ jobs:
       - run: npm install --legacy-peer-deps
 
       - run: npm run build:web
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
 
       - name: Deploy to VPS
         uses: burnett01/rsync-deployments@7.0.1
