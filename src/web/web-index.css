@@ -267,7 +267,7 @@ body > [class*="fixed"][class*="z-\[9999\]"] {
   }
 }
 
-/* ═══ TopBar & BottomNav overrides inside web shell ═══ */
+/* ═══ TopBar overrides inside web shell ═══ */
 
 /* TopBar: change from fixed mobile positioning to flow inside web shell */
 .web-topbar-wrapper > div {
@@ -285,40 +285,6 @@ body > [class*="fixed"][class*="z-\[9999\]"] {
   padding-top: 0 !important;
 }
 
-/* BottomNav: change from fixed mobile positioning to flow inside web shell */
-.web-bottomnav-wrapper > div,
-.web-bottomnav-wrapper > nav {
-  position: relative !important;
-  bottom: auto !important;
-  left: auto !important;
-  right: auto !important;
-  padding-bottom: 0 !important;
-  max-width: 100% !important;
-  width: 100% !important;
-}
-
-/* Remove safe-area padding from BottomNav */
-.web-bottomnav-wrapper [style*="safe-area-inset"] {
-  padding-bottom: 0 !important;
-}
-
-/* On desktop, restyle BottomNav as a horizontal toolbar */
-@media (min-width: 1024px) {
-  .web-bottomnav-wrapper {
-    border-top: 1px solid #e5e3dc;
-    background: white;
-  }
-
-  .web-bottomnav-wrapper > div,
-  .web-bottomnav-wrapper > nav {
-    max-width: 100% !important;
-  }
-}
-
-/* Remove mobile bottom padding from sections (no longer needed with inline BottomNav) */
-.web-app-content [class*="pb-\[calc"] {
-  padding-bottom: 0 !important;
-}
 
 /* Stagger delay utilities */
 .delay-100 { animation-delay: 100ms; }

@@ -7,7 +7,6 @@ import { startRealtimeSync, stopRealtimeSync } from '@/lib/realtime';
 import { WebErrorBoundary } from './WebErrorBoundary';
 import { Toaster } from '@/components/ui/sonner';
 import { TopBar } from '@/components/custom/TopBar';
-import { BottomNav } from '@/components/custom/BottomNav';
 import {
   LayoutDashboard,
   CalendarDays,
@@ -500,10 +499,7 @@ export function WebAppShell() {
             </Suspense>
           </div>
 
-          {/* BottomNav from mobile app — provides "+" create buttons, section quick-access */}
-          <div className="web-bottomnav-wrapper sticky bottom-0 z-20">
-            <BottomNav />
-          </div>
+
         </main>
       </div>
 

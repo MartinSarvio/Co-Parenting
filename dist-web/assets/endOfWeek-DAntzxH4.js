@@ -1,0 +1,1 @@
+import{aa as c,t as O}from"./StoreBadge-Bzmk40op.js";function i(o,e){const a=c(),s=e?.weekStartsOn??e?.locale?.options?.weekStartsOn??a.weekStartsOn??a.locale?.options?.weekStartsOn??0,t=O(o,e?.in),n=t.getDay(),r=(n<s?-7:0)+6-(n-s);return t.setDate(t.getDate()+r),t.setHours(23,59,59,999),t}export{i as e};
