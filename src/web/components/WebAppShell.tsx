@@ -6,6 +6,8 @@ import { loadInitialData } from '@/lib/dataSync';
 import { startRealtimeSync, stopRealtimeSync } from '@/lib/realtime';
 import { WebErrorBoundary } from './WebErrorBoundary';
 import { Toaster } from '@/components/ui/sonner';
+import { TopBar } from '@/components/custom/TopBar';
+import { BottomNav } from '@/components/custom/BottomNav';
 import {
   LayoutDashboard,
   CalendarDays,
@@ -61,6 +63,9 @@ const SwapRequest = lazy(() => import('@/sections/SwapRequest').then(m => ({ def
 const KalenderWeekView = lazy(() => import('@/sections/KalenderWeekView').then(m => ({ default: m.KalenderWeekView })));
 const FamilieOgBoern = lazy(() => import('@/sections/FamilieOgBoern').then(m => ({ default: m.FamilieOgBoern })));
 const MeetingMinutesView = lazy(() => import('@/sections/MeetingMinutesView').then(m => ({ default: m.MeetingMinutesView })));
+const ProfessionalDashboard = lazy(() => import('@/sections/ProfessionalDashboard').then(m => ({ default: m.ProfessionalDashboard })));
+const ProfessionalOverview = lazy(() => import('@/sections/ProfessionalOverview').then(m => ({ default: m.ProfessionalOverview })));
+const FlyerViewer = lazy(() => import('@/components/custom/FlyerViewer').then(m => ({ default: m.FlyerViewer })));
 
 /* ── Grouped nav items ── */
 
@@ -175,7 +180,7 @@ export function WebAppShell() {
   const {
     isAuthenticated, activeTab, setActiveTab,
     currentUser, setCurrentUser, setAuthenticated,
-    hydrateFromServer, logout,
+    hydrateFromServer, logout, isProfessionalView,
   } = useAppStore();
 
   const [isReady, setIsReady] = useState(false);
@@ -279,7 +284,22 @@ export function WebAppShell() {
     return null;
   }
 
+  const canUseProfessionalView = currentUser?.isAdmin === true || currentUser?.role === 'professional';
+  const showProfessionalView = isProfessionalView && canUseProfessionalView;
+
   const renderContent = () => {
+    // Professional view sections
+    if (showProfessionalView) {
+      switch (activeTab) {
+        case 'cases': return <WebErrorBoundary sectionName="Sager"><ProfessionalDashboard /></WebErrorBoundary>;
+        case 'meeting-minutes': return <WebErrorBoundary sectionName="Referater"><MeetingMinutesView /></WebErrorBoundary>;
+        case 'dashboard': return <WebErrorBoundary sectionName="Overblik"><ProfessionalOverview /></WebErrorBoundary>;
+        case 'kommunikation': return <WebErrorBoundary sectionName="Kommunikation"><Kommunikation /></WebErrorBoundary>;
+        case 'settings': return <WebErrorBoundary sectionName="Indstillinger"><SettingsView /></WebErrorBoundary>;
+        default: return <WebErrorBoundary sectionName="Sager"><ProfessionalDashboard /></WebErrorBoundary>;
+      }
+    }
+
     switch (activeTab) {
       case 'dashboard': return <WebErrorBoundary sectionName="Oversigt"><Dashboard /></WebErrorBoundary>;
       case 'samversplan': return <WebErrorBoundary sectionName="Samværsplan"><Samversplan /></WebErrorBoundary>;
@@ -468,15 +488,27 @@ export function WebAppShell() {
         </aside>
 
         {/* ─── Main content (col 2) ─── */}
-        <main className="flex-1 overflow-y-auto bg-[#f8f8f6]">
+        <main className="flex-1 overflow-y-auto bg-[#f8f8f6] relative">
+          {/* TopBar from mobile app — provides config triggers, side-menu openers, child selector etc. */}
+          <div className="web-topbar-wrapper sticky top-0 z-20">
+            <TopBar />
+          </div>
+
           <div className="web-app-content w-full px-4 py-5 sm:px-6 lg:px-8">
             <Suspense fallback={<SectionLoading />}>
               {renderContent()}
             </Suspense>
           </div>
+
+          {/* BottomNav from mobile app — provides "+" create buttons, section quick-access */}
+          <div className="web-bottomnav-wrapper sticky bottom-0 z-20">
+            <BottomNav />
+          </div>
         </main>
       </div>
 
+      {/* FlyerViewer portal overlay */}
+      <Suspense fallback={null}><FlyerViewer /></Suspense>
       <Toaster position="top-center" />
     </div>
   );

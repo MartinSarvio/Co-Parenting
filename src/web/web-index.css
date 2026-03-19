@@ -133,6 +133,14 @@ html {
   padding-bottom: 0 !important;
 }
 
+/* Remove mobile top/bottom padding that accounts for fixed TopBar/BottomNav */
+.web-app-content [class*="pt-\[calc"] {
+  padding-top: 0 !important;
+}
+.web-app-content [class*="pb-\[calc"] {
+  padding-bottom: 0 !important;
+}
+
 .web-app-content > div {
   width: 100%;
 }
@@ -257,6 +265,59 @@ body > [class*="fixed"][class*="z-\[9999\]"] {
     border-left: 1px solid #e5e3dc;
     box-shadow: -8px 0 30px rgba(0,0,0,0.08);
   }
+}
+
+/* ═══ TopBar & BottomNav overrides inside web shell ═══ */
+
+/* TopBar: change from fixed mobile positioning to flow inside web shell */
+.web-topbar-wrapper > div {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  padding-top: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Remove safe-area padding from TopBar */
+.web-topbar-wrapper [style*="safe-area-inset"] {
+  padding-top: 0 !important;
+}
+
+/* BottomNav: change from fixed mobile positioning to flow inside web shell */
+.web-bottomnav-wrapper > div,
+.web-bottomnav-wrapper > nav {
+  position: relative !important;
+  bottom: auto !important;
+  left: auto !important;
+  right: auto !important;
+  padding-bottom: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Remove safe-area padding from BottomNav */
+.web-bottomnav-wrapper [style*="safe-area-inset"] {
+  padding-bottom: 0 !important;
+}
+
+/* On desktop, restyle BottomNav as a horizontal toolbar */
+@media (min-width: 1024px) {
+  .web-bottomnav-wrapper {
+    border-top: 1px solid #e5e3dc;
+    background: white;
+  }
+
+  .web-bottomnav-wrapper > div,
+  .web-bottomnav-wrapper > nav {
+    max-width: 100% !important;
+  }
+}
+
+/* Remove mobile bottom padding from sections (no longer needed with inline BottomNav) */
+.web-app-content [class*="pb-\[calc"] {
+  padding-bottom: 0 !important;
 }
 
 /* Stagger delay utilities */
