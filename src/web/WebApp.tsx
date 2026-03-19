@@ -20,6 +20,7 @@ const KommunikationPage = lazy(() => import('./pages/KommunikationPage'));
 const UdgifterPage = lazy(() => import('./pages/UdgifterPage'));
 const KalenderPage = lazy(() => import('./pages/KalenderPage'));
 const AnmeldelserPage = lazy(() => import('./pages/AnmeldelserPage'));
+const WebAppShell = lazy(() => import('./components/WebAppShell').then(m => ({ default: m.WebAppShell })));
 
 function LoadingFallback() {
   return (
@@ -55,9 +56,11 @@ export function WebApp() {
   const isUdgifter = route === '#udgifter';
   const isKalender = route === '#kalender';
   const isAnmeldelser = route === '#anmeldelser';
-  const hideChrome = isAdmin || isLogin;
+  const isApp = route === '#app';
+  const hideChrome = isAdmin || isLogin || isApp;
 
   const renderPage = () => {
+    if (isApp) return <WebAppShell />;
     if (isLogin) return <WebLoginPage />;
     if (isAdmin) return <AdminPage />;
     if (isPrivacy) return <PrivacyPage />;

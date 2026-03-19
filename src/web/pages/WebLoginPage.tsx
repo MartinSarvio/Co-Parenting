@@ -32,7 +32,7 @@ export default function WebLoginPage() {
           setError(authError.message);
         }
       } else {
-        window.location.hash = '#admin';
+        window.location.hash = '#app';
       }
     } catch {
       setError('Noget gik galt. Prøv igen.');

@@ -1,0 +1,1 @@
+import{v as c}from"./mappers-D0RtqSpU.js";function f(){const{currentUser:s,users:u,children:r,custodyPlans:d,currentChildId:l}=c(),t=(l?r.find(n=>n.id===l):null)??r[0]??null,i=t?d.find(n=>n.childId===t.id)??null:null,e=u.filter(n=>n.role==="parent"),o=e.find(n=>n.id!==s?.id)??null;return{currentChild:t,custodyPlan:i,otherParent:o,parents:e}}export{f as u};
