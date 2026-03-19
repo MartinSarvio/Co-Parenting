@@ -21,6 +21,7 @@ import {
   Building2,
   Handshake,
 } from 'lucide-react';
+import { denmarkRegions } from '../assets/denmarkPaths';
 
 /* ── Intersection Observer hook ─────────────────────────────────────────── */
 
@@ -189,61 +190,33 @@ function VisionSection() {
           {/* Visual: Denmark map with dots */}
           <div className="flex justify-center order-2 md:order-1">
             <div className="relative w-[280px] h-[340px]">
-              {/* Simplified Denmark outline */}
-              <svg viewBox="0 0 280 340" className="w-full h-full" fill="none">
-                {/* Jylland simplified */}
-                <path
-                  d="M80 30 C85 25, 100 20, 110 30 C115 40, 120 60, 118 80 C116 100, 122 120, 130 140 C135 155, 140 170, 138 190 C136 210, 125 230, 115 250 C108 265, 95 270, 90 260 C85 250, 88 235, 85 220 C82 205, 75 195, 78 180 C80 165, 75 150, 72 135 C69 120, 70 100, 72 80 C74 60, 76 40, 80 30Z"
-                  fill="#1a1a1a"
-                  fillOpacity="0.06"
-                  stroke="#1a1a1a"
-                  strokeOpacity="0.15"
-                  strokeWidth="1.5"
-                />
-                {/* Fyn */}
-                <path
-                  d="M135 210 C140 205, 155 205, 160 210 C165 215, 165 225, 160 230 C155 235, 140 235, 135 230 C130 225, 130 215, 135 210Z"
-                  fill="#1a1a1a"
-                  fillOpacity="0.06"
-                  stroke="#1a1a1a"
-                  strokeOpacity="0.15"
-                  strokeWidth="1.5"
-                />
-                {/* Sjælland */}
-                <path
-                  d="M170 195 C180 185, 205 185, 215 195 C225 205, 225 225, 220 240 C215 255, 200 260, 185 255 C170 250, 165 235, 165 220 C165 205, 165 200, 170 195Z"
-                  fill="#1a1a1a"
-                  fillOpacity="0.06"
-                  stroke="#1a1a1a"
-                  strokeOpacity="0.15"
-                  strokeWidth="1.5"
-                />
-                {/* Bornholm */}
-                <ellipse
-                  cx="250"
-                  cy="200"
-                  rx="12"
-                  ry="15"
-                  fill="#1a1a1a"
-                  fillOpacity="0.06"
-                  stroke="#1a1a1a"
-                  strokeOpacity="0.15"
-                  strokeWidth="1.5"
-                />
+              {/* Realistic Denmark map from geographic SVG data */}
+              <svg viewBox="0 0 980 793" className="w-full h-full" fill="none">
+                {denmarkRegions.map((region) => (
+                  <path
+                    key={region.id}
+                    d={region.d}
+                    fill="#1a1a1a"
+                    fillOpacity="0.08"
+                    stroke="#1a1a1a"
+                    strokeOpacity="0.18"
+                    strokeWidth="1.5"
+                    strokeLinejoin="round"
+                  />
+                ))}
               </svg>
 
-              {/* City dots */}
+              {/* City dots — positioned on realistic Denmark map */}
               {[
-                { x: 90, y: 55, label: 'Aalborg', delay: '0s' },
-                { x: 95, y: 110, label: 'Aarhus', delay: '0.2s' },
-                { x: 85, y: 175, label: 'Odense', delay: '0.4s' },
-                { x: 148, y: 215, label: 'Odense', delay: '0.4s', hide: true },
-                { x: 195, y: 210, label: 'København', delay: '0.6s' },
+                { x: 30, y: 22, label: 'Aalborg', delay: '0s' },
+                { x: 35, y: 40, label: 'Aarhus', delay: '0.2s' },
+                { x: 38, y: 65, label: 'Odense', delay: '0.4s' },
+                { x: 72, y: 55, label: 'København', delay: '0.6s' },
               ].map((city, i) => (
                 <div
                   key={i}
                   className="absolute"
-                  style={{ left: city.x, top: city.y, transform: 'translate(-50%, -50%)' }}
+                  style={{ left: `${city.x}%`, top: `${city.y}%`, transform: 'translate(-50%, -50%)' }}
                 >
                   <div
                     className="w-3 h-3 rounded-full bg-[#1a1a1a] relative"
@@ -251,18 +224,16 @@ function VisionSection() {
                   >
                     <div className="absolute inset-0 rounded-full bg-[#1a1a1a]/20 animate-ping" />
                   </div>
-                  {!city.hide && (
-                    <p className="absolute top-4 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-semibold text-[#1a1a1a]">
-                      {city.label}
-                    </p>
-                  )}
+                  <p className="absolute top-4 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-semibold text-[#1a1a1a]">
+                    {city.label}
+                  </p>
                 </div>
               ))}
 
               {/* Growth indicator */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white border border-[#e5e3dc] rounded-full px-4 py-2 shadow-sm">
+              <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white border border-[#e5e3dc] rounded-full px-4 py-2 shadow-sm">
                 <TrendingUp size={14} className="text-[#1a1a1a]" />
-                <span className="text-[11px] font-bold text-[#1a1a1a]">Hele Danmark 2027</span>
+                <span className="text-[11px] font-bold text-[#1a1a1a]">Hele Danmark 2026</span>
               </div>
             </div>
           </div>
