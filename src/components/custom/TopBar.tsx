@@ -551,7 +551,7 @@ export function TopBar() {
               )}
               <span className="text-sm font-medium text-muted-foreground ml-0.5">
                 {settingsDetailView
-                  ? (activeSettingsTab === 'info' ? 'Info' : activeSettingsTab === 'notifications' ? 'Notifikationer' : 'Indstillinger')
+                  ? (activeSettingsTab === 'info' ? 'Info' : activeSettingsTab === 'notifications' ? 'Notifikationer' : activeSettingsTab === 'profile' ? 'Konto' : 'Indstillinger')
                   : activeSettingsTab === 'appearance' ? 'Visning'
                   : activeSettingsTab === 'payments' ? 'Betaling'
                   : activeSettingsTab === 'members' ? 'Medlemmer'

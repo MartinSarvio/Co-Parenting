@@ -49,7 +49,7 @@ import { getPlanFeatures, getSubscriptionPlan, normalizeSubscription } from '@/l
 import type { BillingModel, FamilyMemberRole, HouseholdMode, SubscriptionPlan } from '@/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Users, Trash2, ShieldAlert, BarChart3, Tag, Newspaper } from 'lucide-react';
+import { Users, Trash2, ShieldAlert, BarChart3, Tag, Newspaper, MapPin, Cake, Globe, Mail, Phone as PhoneIcon, ChevronLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { EU_ALLERGENS_DA } from '@/lib/allergenMatch';
 import { supabase } from '@/lib/supabase';
@@ -63,6 +63,27 @@ import { NyhederAdminView } from '@/sections/NyhederAdminView';
 const AVATAR_PRESETS = [
   'Maria', 'Anders', 'Sofie', 'Lars', 'Emma', 'Mikkel',
   'Anne', 'Thomas', 'Camilla', 'Frederik', 'Julie', 'Oliver',
+];
+
+const COUNTRIES = [
+  { code: 'DK', flag: '🇩🇰', label: 'Danmark' },
+  { code: 'SE', flag: '🇸🇪', label: 'Sverige' },
+  { code: 'NO', flag: '🇳🇴', label: 'Norge' },
+  { code: 'FI', flag: '🇫🇮', label: 'Finland' },
+  { code: 'IS', flag: '🇮🇸', label: 'Island' },
+  { code: 'DE', flag: '🇩🇪', label: 'Tyskland' },
+  { code: 'FR', flag: '🇫🇷', label: 'Frankrig' },
+  { code: 'GB', flag: '🇬🇧', label: 'Storbritannien' },
+  { code: 'US', flag: '🇺🇸', label: 'USA' },
+  { code: 'NL', flag: '🇳🇱', label: 'Holland' },
+  { code: 'PL', flag: '🇵🇱', label: 'Polen' },
+  { code: 'ES', flag: '🇪🇸', label: 'Spanien' },
+  { code: 'IT', flag: '🇮🇹', label: 'Italien' },
+  { code: 'PT', flag: '🇵🇹', label: 'Portugal' },
+  { code: 'AT', flag: '🇦🇹', label: 'Østrig' },
+  { code: 'CH', flag: '🇨🇭', label: 'Schweiz' },
+  { code: 'GR', flag: '🇬🇷', label: 'Grækenland' },
+  { code: 'TR', flag: '🇹🇷', label: 'Tyrkiet' },
 ];
 
 const familyModeLabels: Record<HouseholdMode, string> = {
@@ -221,6 +242,42 @@ const [evidenceDraft, setEvidenceDraft] = useState({
       toast.success('Profil gemt');
     } catch {
       toast.error('Kunne ikke gemme profil');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveField = (fields: (keyof typeof profileDraft)[]) => async () => {
+    if (!currentUser) return;
+    setIsSaving(true);
+    try {
+      const update: Record<string, unknown> = {};
+      for (const f of fields) {
+        const val = profileDraft[f];
+        update[f] = typeof val === 'string' ? val.trim() || undefined : val;
+      }
+      updateUser(currentUser.id, update as any);
+      await supabase.from('profiles').update(update).eq('id', currentUser.id);
+      toast.success('Gemt');
+      setSettingsDetailView(null);
+    } catch {
+      toast.error('Kunne ikke gemme');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveCountry = async (country: string) => {
+    if (!currentUser) return;
+    setProfileDraft(prev => ({ ...prev, country }));
+    setIsSaving(true);
+    try {
+      updateUser(currentUser.id, { country } as any);
+      await supabase.from('profiles').update({ country }).eq('id', currentUser.id);
+      toast.success('Land gemt');
+      setSettingsDetailView(null);
+    } catch {
+      toast.error('Kunne ikke gemme');
     } finally {
       setIsSaving(false);
     }
@@ -526,30 +583,6 @@ const [evidenceDraft, setEvidenceDraft] = useState({
       <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="space-y-2">
 
         <TabsContent value="profile" className="space-y-2">
-          {/* Avatar section */}
-          <div className="flex flex-col items-center gap-3 py-5">
-              <button
-                onClick={() => setAvatarDialogOpen(true)}
-                className="group relative"
-              >
-                <Avatar className="h-20 w-20 border-2 border-border shadow-sm">
-                  <AvatarImage src={currentUser?.avatar} />
-                  <AvatarFallback className="bg-secondary text-2xl font-semibold text-foreground">
-                    {currentUser?.name?.[0] ?? '?'}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
-                  <Camera className="h-5 w-5 text-white" />
-                </div>
-              </button>
-              <button
-                onClick={() => setAvatarDialogOpen(true)}
-                className="text-[12px] font-medium text-[#f58a2d] hover:underline"
-              >
-                Skift profilbillede
-              </button>
-          </div>
-
           {/* Avatar picker dialog */}
           <Dialog open={avatarDialogOpen} onOpenChange={setAvatarDialogOpen}>
             <DialogContent className="max-w-sm rounded-3xl border-border bg-card">
@@ -557,7 +590,6 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                 <DialogTitle className="text-[1rem] text-foreground">Vælg profilbillede</DialogTitle>
               </DialogHeader>
               <div className="space-y-2">
-                {/* Upload own photo */}
                 <button
                   onClick={() => avatarFileRef.current?.click()}
                   className="flex w-full items-center gap-3 rounded-[8px] border-2 border-dashed border-border bg-card px-4 py-3 text-left transition-colors hover:border-[#f58a2d] hover:bg-orange-tint-light"
@@ -570,15 +602,7 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                     <p className="text-[11px] text-muted-foreground">JPG eller PNG, maks 2 MB</p>
                   </div>
                 </button>
-                <input
-                  ref={avatarFileRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  className="hidden"
-                  onChange={handleAvatarUpload}
-                />
-
-                {/* Preset avatars */}
+                <input ref={avatarFileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleAvatarUpload} />
                 <div>
                   <p className="mb-2 text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground">Eller vælg en avatar</p>
                   <div className="grid grid-cols-4 gap-3">
@@ -586,20 +610,8 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                       const url = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}`;
                       const isSelected = currentUser?.avatar === url;
                       return (
-                        <button
-                          key={seed}
-                          onClick={() => handleAvatarPreset(seed)}
-                          className={cn(
-                            "flex flex-col items-center gap-1 rounded-[8px] p-2 transition-all",
-                            isSelected
-                              ? "bg-orange-tint ring-2 ring-ring"
-                              : "hover:bg-muted"
-                          )}
-                        >
-                          <Avatar className="h-12 w-12">
-                            <AvatarImage src={url} />
-                            <AvatarFallback>{seed[0]}</AvatarFallback>
-                          </Avatar>
+                        <button key={seed} onClick={() => handleAvatarPreset(seed)} className={cn("flex flex-col items-center gap-1 rounded-[8px] p-2 transition-all", isSelected ? "bg-orange-tint ring-2 ring-ring" : "hover:bg-muted")}>
+                          <Avatar className="h-12 w-12"><AvatarImage src={url} /><AvatarFallback>{seed[0]}</AvatarFallback></Avatar>
                           <span className="text-[10px] text-muted-foreground">{seed}</span>
                         </button>
                       );
@@ -610,297 +622,258 @@ const [evidenceDraft, setEvidenceDraft] = useState({
             </DialogContent>
           </Dialog>
 
-          <div className="space-y-2">
-              <div className="space-y-2">
-                <Label>Navn</Label>
-                <Input
-                  value={profileDraft.name}
-                  onChange={(e) => setProfileDraft((prev) => ({ ...prev, name: e.target.value }))}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Email</Label>
-                <Input
-                  value={profileDraft.email}
-                  onChange={(e) => setProfileDraft((prev) => ({ ...prev, email: e.target.value }))}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Telefon</Label>
-                <Input
-                  value={profileDraft.phone}
-                  onChange={(e) => setProfileDraft((prev) => ({ ...prev, phone: e.target.value }))}
-                  placeholder="+45 ..."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Fødselsdato</Label>
-                <Input
-                  type="date"
-                  value={profileDraft.birthDate}
-                  onChange={(e) => setProfileDraft((prev) => ({ ...prev, birthDate: e.target.value }))}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Alder</Label>
-                <Input
-                  readOnly
-                  disabled
-                  value={
-                    profileDraft.birthDate
-                      ? (calculateAge(profileDraft.birthDate) !== null
-                          ? `${calculateAge(profileDraft.birthDate)} år`
-                          : '')
-                      : ''
-                  }
-                  placeholder="Beregnes automatisk fra fødselsdato"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Adresse</Label>
-                <Input
-                  value={profileDraft.address}
-                  onChange={(e) => setProfileDraft((prev) => ({ ...prev, address: e.target.value }))}
-                  placeholder="Gadenavn og nr."
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label>Postnummer</Label>
-                  <Input
-                    value={profileDraft.zipCode}
-                    onChange={(e) => setProfileDraft((prev) => ({ ...prev, zipCode: e.target.value }))}
-                    placeholder="F.eks. 2100"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>By</Label>
-                  <Input
-                    value={profileDraft.city}
-                    onChange={(e) => setProfileDraft((prev) => ({ ...prev, city: e.target.value }))}
-                    placeholder="F.eks. København"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Land</Label>
-                <Input
-                  value={profileDraft.country}
-                  onChange={(e) => setProfileDraft((prev) => ({ ...prev, country: e.target.value }))}
-                  placeholder="Danmark"
-                />
-              </div>
-
-              {/* Professionelle felter: organisation og kommune */}
-              {isProfessionalView && (
-                <>
-                  <div className="space-y-2">
-                    <Label>Organisation</Label>
-                    <Input
-                      value={profileDraft.organization}
-                      onChange={(e) => setProfileDraft((prev) => ({ ...prev, organization: e.target.value }))}
-                      placeholder="F.eks. Børn- og Familieafdelingen"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Kommune-tilhørsforhold</Label>
-                    <Input
-                      value={profileDraft.municipality}
-                      onChange={(e) => setProfileDraft((prev) => ({ ...prev, municipality: e.target.value }))}
-                      placeholder="F.eks. Københavns Kommune"
-                    />
-                  </div>
-                </>
-              )}
-
-              {/* Profilsynlighed */}
-              <div className="overflow-hidden">
-                <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider px-4 pt-3 pb-1.5">Profilsynlighed</p>
-                <p className="text-[11px] text-muted-foreground px-4 pb-2">Vælg hvad andre kan se på din profil i grupper</p>
-                <div className="flex items-center justify-between px-4 py-3 border-t border-border">
-                  <span className="text-[13px] text-foreground">Vis email</span>
-                  <IOSSwitch checked={visibilityDraft.showEmail} onCheckedChange={(v) => setVisibilityDraft(prev => ({ ...prev, showEmail: v }))} />
-                </div>
-                <div className="flex items-center justify-between px-4 py-3 border-t border-border">
-                  <span className="text-[13px] text-foreground">Vis telefon</span>
-                  <IOSSwitch checked={visibilityDraft.showPhone} onCheckedChange={(v) => setVisibilityDraft(prev => ({ ...prev, showPhone: v }))} />
-                </div>
-                <div className="flex items-center justify-between px-4 py-3 border-t border-border">
-                  <span className="text-[13px] text-foreground">Vis by</span>
-                  <IOSSwitch checked={visibilityDraft.showAddress} onCheckedChange={(v) => setVisibilityDraft(prev => ({ ...prev, showAddress: v }))} />
-                </div>
-                <div className="px-4 py-3 border-t border-border">
-                  <label className="text-[13px] text-foreground block mb-1.5">Bio</label>
-                  <textarea
-                    value={visibilityDraft.bio}
-                    onChange={(e) => setVisibilityDraft(prev => ({ ...prev, bio: e.target.value }))}
-                    placeholder="Kort beskrivelse af dig selv..."
-                    className="w-full h-16 rounded-lg border border-border bg-card px-3 py-2 text-[13px] text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-1 focus:ring-ring"
-                  />
-                </div>
-              </div>
-
-              <Button onClick={handleSaveProfile} className="w-full flex items-center justify-center gap-2" disabled={isSaving}>
-                <Save className="h-4 w-4" />
-                Gem profil
-              </Button>
-
-              {/* Familiens allergener */}
-              <div className="overflow-hidden">
-                <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider px-4 pt-3 pb-1.5">Familiens allergener</p>
-                <p className="text-[11px] text-muted-foreground px-4 pb-2">Tilføj allergener for at få advarsler på indkøbsliste og køleskab</p>
-
-                {/* Current user */}
-                {currentUser && (
-                  <div className="border-t border-border px-4 py-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <User className="h-4 w-4 text-muted-foreground shrink-0" />
-                        <span className="text-[13px] font-medium text-foreground truncate">{currentUser.name}</span>
-                      </div>
-                      <button
-                        onClick={() => setAllergenEditId(allergenEditId === currentUser.id ? null : currentUser.id)}
-                        className="text-[11px] font-semibold text-[#f58a2d] shrink-0"
-                      >
-                        {allergenEditId === currentUser.id ? 'Luk' : 'Rediger'}
-                      </button>
+          <AnimatePresence mode="wait">
+            {!settingsDetailView ? (
+              <motion.div key="profile-main" initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 0, x: '-20%' }} transition={{ duration: 0.15 }}>
+                {/* Avatar */}
+                <div className="flex flex-col items-center gap-3 py-5">
+                  <button onClick={() => setAvatarDialogOpen(true)} className="group relative">
+                    <Avatar className="h-20 w-20 border-2 border-border shadow-sm">
+                      <AvatarImage src={currentUser?.avatar} />
+                      <AvatarFallback className="bg-secondary text-2xl font-semibold text-foreground">{currentUser?.name?.[0] ?? '?'}</AvatarFallback>
+                    </Avatar>
+                    <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+                      <Camera className="h-5 w-5 text-white" />
                     </div>
-                    {currentUser.allergies?.length ? (
-                      <div className="flex flex-wrap gap-1 mt-1.5">
-                        {currentUser.allergies.map(a => (
-                          <span key={a} className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">{a}</span>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-[11px] text-muted-foreground mt-1">Ingen allergener</p>
-                    )}
-                    {allergenEditId === currentUser.id && (
-                      <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-border">
-                        {EU_ALLERGENS_DA.map(allergen => {
-                          const active = currentUser.allergies?.includes(allergen);
-                          return (
-                            <button
-                              key={allergen}
-                              onClick={() => {
-                                const current = currentUser.allergies ?? [];
-                                const next = active ? current.filter(a => a !== allergen) : [...current, allergen];
-                                updateUser(currentUser.id, { allergies: next });
-                              }}
-                              className={cn(
-                                "rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors",
-                                active ? "bg-[#f58a2d] text-white" : "bg-background text-muted-foreground"
-                              )}
-                            >
-                              {allergen}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
+                  </button>
+                  <button onClick={() => setAvatarDialogOpen(true)} className="text-[12px] font-medium text-[#f58a2d] hover:underline">Skift profilbillede</button>
+                </div>
+
+                {/* ── Navigation list ── */}
+                <div className="divide-y divide-border">
+                  {[
+                    { id: 'edit-name', icon: User, label: 'Navn', value: profileDraft.name },
+                    { id: 'edit-email', icon: Mail, label: 'E-mail', value: profileDraft.email },
+                    { id: 'edit-phone', icon: PhoneIcon, label: 'Telefon', value: profileDraft.phone || 'Ikke angivet' },
+                    { id: 'edit-birthday', icon: Cake, label: 'Fødselsdag', value: profileDraft.birthDate ? `${profileDraft.birthDate}${calculateAge(profileDraft.birthDate) !== null ? ` (${calculateAge(profileDraft.birthDate)} år)` : ''}` : 'Ikke angivet' },
+                    { id: 'edit-address', icon: MapPin, label: 'Adresse', value: [profileDraft.address, profileDraft.zipCode, profileDraft.city].filter(Boolean).join(', ') || 'Ikke angivet' },
+                    { id: 'edit-country', icon: Globe, label: 'Land', value: profileDraft.country || 'Ikke angivet' },
+                  ].map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => setSettingsDetailView(item.id)}
+                        className="flex w-full items-center gap-3.5 py-3.5 px-1 text-left transition-colors active:bg-muted/50"
+                      >
+                        <div className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-background shrink-0">
+                          <Icon className="h-[18px] w-[18px] text-muted-foreground" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[15px] font-medium text-foreground">{item.label}</p>
+                          <p className="text-[13px] text-muted-foreground truncate">{item.value}</p>
+                        </div>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Professionelle felter */}
+                {isProfessionalView && (
+                  <div className="space-y-2 pt-4">
+                    <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1">Professionel</p>
+                    <div className="space-y-2">
+                      <Label>Organisation</Label>
+                      <Input value={profileDraft.organization} onChange={(e) => setProfileDraft((prev) => ({ ...prev, organization: e.target.value }))} placeholder="F.eks. Børn- og Familieafdelingen" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Kommune</Label>
+                      <Input value={profileDraft.municipality} onChange={(e) => setProfileDraft((prev) => ({ ...prev, municipality: e.target.value }))} placeholder="F.eks. Københavns Kommune" />
+                    </div>
+                    <Button onClick={handleSaveField(['organization', 'municipality'])} className="w-full" disabled={isSaving}><Save className="h-4 w-4 mr-2" />Gem</Button>
                   </div>
                 )}
 
-                {/* Children */}
-                {children.map(child => (
-                  <div key={child.id} className="border-t border-border px-4 py-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <Heart className="h-4 w-4 text-[#f58a2d] shrink-0" />
-                        <span className="text-[13px] font-medium text-foreground truncate">{child.name}</span>
+                {/* Familiens allergener */}
+                <div className="overflow-hidden mt-4">
+                  <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider px-4 pt-3 pb-1.5">Familiens allergener</p>
+                  <p className="text-[11px] text-muted-foreground px-4 pb-2">Tilføj allergener for at få advarsler på indkøbsliste og køleskab</p>
+                  {currentUser && (
+                    <div className="border-t border-border px-4 py-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                          <span className="text-[13px] font-medium text-foreground truncate">{currentUser.name}</span>
+                        </div>
+                        <button onClick={() => setAllergenEditId(allergenEditId === currentUser.id ? null : currentUser.id)} className="text-[11px] font-semibold text-[#f58a2d] shrink-0">
+                          {allergenEditId === currentUser.id ? 'Luk' : 'Rediger'}
+                        </button>
                       </div>
-                      <button
-                        onClick={() => setAllergenEditId(allergenEditId === child.id ? null : child.id)}
-                        className="text-[11px] font-semibold text-[#f58a2d] shrink-0"
-                      >
-                        {allergenEditId === child.id ? 'Luk' : 'Rediger'}
-                      </button>
+                      {currentUser.allergies?.length ? (
+                        <div className="flex flex-wrap gap-1 mt-1.5">{currentUser.allergies.map(a => (<span key={a} className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">{a}</span>))}</div>
+                      ) : (<p className="text-[11px] text-muted-foreground mt-1">Ingen allergener</p>)}
+                      {allergenEditId === currentUser.id && (
+                        <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-border">
+                          {EU_ALLERGENS_DA.map(allergen => {
+                            const active = currentUser.allergies?.includes(allergen);
+                            return (<button key={allergen} onClick={() => { const current = currentUser.allergies ?? []; const next = active ? current.filter(a => a !== allergen) : [...current, allergen]; updateUser(currentUser.id, { allergies: next }); }} className={cn("rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors", active ? "bg-[#f58a2d] text-white" : "bg-background text-muted-foreground")}>{allergen}</button>);
+                          })}
+                        </div>
+                      )}
                     </div>
-                    {child.allergies?.length ? (
-                      <div className="flex flex-wrap gap-1 mt-1.5">
-                        {child.allergies.map(a => (
-                          <span key={a} className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">{a}</span>
-                        ))}
+                  )}
+                  {children.map(child => (
+                    <div key={child.id} className="border-t border-border px-4 py-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <Heart className="h-4 w-4 text-[#f58a2d] shrink-0" />
+                          <span className="text-[13px] font-medium text-foreground truncate">{child.name}</span>
+                        </div>
+                        <button onClick={() => setAllergenEditId(allergenEditId === child.id ? null : child.id)} className="text-[11px] font-semibold text-[#f58a2d] shrink-0">
+                          {allergenEditId === child.id ? 'Luk' : 'Rediger'}
+                        </button>
                       </div>
-                    ) : (
-                      <p className="text-[11px] text-muted-foreground mt-1">Ingen allergener</p>
-                    )}
-                    {allergenEditId === child.id && (
-                      <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-border">
-                        {EU_ALLERGENS_DA.map(allergen => {
-                          const active = child.allergies?.includes(allergen);
-                          return (
-                            <button
-                              key={allergen}
-                              onClick={() => {
-                                const current = child.allergies ?? [];
-                                const next = active ? current.filter(a => a !== allergen) : [...current, allergen];
-                                updateChild(child.id, { allergies: next });
-                              }}
-                              className={cn(
-                                "rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors",
-                                active ? "bg-[#f58a2d] text-white" : "bg-background text-muted-foreground"
-                              )}
-                            >
-                              {allergen}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    )}
+                      {child.allergies?.length ? (
+                        <div className="flex flex-wrap gap-1 mt-1.5">{child.allergies.map(a => (<span key={a} className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">{a}</span>))}</div>
+                      ) : (<p className="text-[11px] text-muted-foreground mt-1">Ingen allergener</p>)}
+                      {allergenEditId === child.id && (
+                        <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-border">
+                          {EU_ALLERGENS_DA.map(allergen => {
+                            const active = child.allergies?.includes(allergen);
+                            return (<button key={allergen} onClick={() => { const current = child.allergies ?? []; const next = active ? current.filter(a => a !== allergen) : [...current, allergen]; updateChild(child.id, { allergies: next }); }} className={cn("rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors", active ? "bg-[#f58a2d] text-white" : "bg-background text-muted-foreground")}>{allergen}</button>);
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* ── Konto-handlinger ── */}
+                <div className="space-y-2 pt-4">
+                  <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1">Konto</p>
+                  <button onClick={async () => { try { const { exportAllData } = await import('@/lib/export'); await exportAllData(); toast.success('Data eksporteret'); } catch { toast.error('Kunne ikke eksportere data'); } }} className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-card">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-background"><Save className="h-[18px] w-[18px] text-muted-foreground" /></div>
+                    <div><p className="text-[14px] font-semibold text-foreground">Eksporter mine data</p><p className="text-[11px] text-muted-foreground">Download alle dine data som JSON (GDPR)</p></div>
+                  </button>
+                  <button onClick={async () => { if (!window.confirm('Er du sikker? Din konto og alle persondata slettes permanent. Denne handling kan IKKE fortrydes.')) return; if (!window.confirm('Sidste chance — bekræft at du vil slette din konto permanent.')) return; try { const { deleteAccount } = await import('@/lib/auth'); await deleteAccount(); window.location.reload(); } catch (err: unknown) { toast.error((err as Error)?.message || 'Kontosletning fejlede'); } }} className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-red-50">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-red-50"><Trash2 className="h-[18px] w-[18px] text-red-500" /></div>
+                    <div><p className="text-[14px] font-semibold text-red-600">Slet min konto</p><p className="text-[11px] text-muted-foreground">Alle persondata anonymiseres permanent</p></div>
+                  </button>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key={settingsDetailView}
+                initial={{ x: '100%', opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: '100%', opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+                className="min-h-[60vh]"
+              >
+                {/* ── edit-name ── */}
+                {settingsDetailView === 'edit-name' && (
+                  <div className="space-y-6 py-2">
+                    <h2 className="text-[1.7rem] font-semibold leading-tight tracking-[-0.02em] text-foreground">Navn</h2>
+                    <div className="space-y-2">
+                      <Label>Dit navn</Label>
+                      <Input value={profileDraft.name} onChange={(e) => setProfileDraft(prev => ({ ...prev, name: e.target.value }))} autoFocus />
+                    </div>
+                    <Button onClick={handleSaveField(['name'])} className="w-full" disabled={isSaving}><Save className="h-4 w-4 mr-2" />Gem</Button>
                   </div>
-                ))}
-              </div>
-          </div>
+                )}
 
-          {/* ── Konto-handlinger ─────────────────────────── */}
-          <div className="space-y-2 pt-2">
-            <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1">Konto</p>
+                {/* ── edit-email ── */}
+                {settingsDetailView === 'edit-email' && (
+                  <div className="space-y-6 py-2">
+                    <h2 className="text-[1.7rem] font-semibold leading-tight tracking-[-0.02em] text-foreground">E-mail</h2>
+                    <div className="space-y-2">
+                      <Label>E-mail</Label>
+                      <Input type="email" value={profileDraft.email} onChange={(e) => setProfileDraft(prev => ({ ...prev, email: e.target.value }))} autoFocus />
+                    </div>
+                    <Button onClick={handleSaveField(['email'])} className="w-full" disabled={isSaving}><Save className="h-4 w-4 mr-2" />Gem</Button>
+                  </div>
+                )}
 
-            <button
-              onClick={async () => {
-                try {
-                  const { exportAllData } = await import('@/lib/export');
-                  await exportAllData();
-                  toast.success('Data eksporteret');
-                } catch {
-                  toast.error('Kunne ikke eksportere data');
-                }
-              }}
-              className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-card"
-            >
-              <div className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-background">
-                <Save className="h-[18px] w-[18px] text-muted-foreground" />
-              </div>
-              <div>
-                <p className="text-[14px] font-semibold text-foreground">Eksporter mine data</p>
-                <p className="text-[11px] text-muted-foreground">Download alle dine data som JSON (GDPR)</p>
-              </div>
-            </button>
+                {/* ── edit-phone ── */}
+                {settingsDetailView === 'edit-phone' && (
+                  <div className="space-y-6 py-2">
+                    <h2 className="text-[1.7rem] font-semibold leading-tight tracking-[-0.02em] text-foreground">Telefon</h2>
+                    <div className="space-y-2">
+                      <Label>Mobilnummer</Label>
+                      <div className="flex gap-2">
+                        <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-[14px] text-foreground shrink-0">
+                          <span>🇩🇰</span>
+                          <span className="text-muted-foreground">+45</span>
+                        </div>
+                        <Input
+                          type="tel"
+                          value={profileDraft.phone?.replace(/^\+45\s?/, '') || ''}
+                          onChange={(e) => setProfileDraft(prev => ({ ...prev, phone: `+45 ${e.target.value.replace(/^\+45\s?/, '')}` }))}
+                          placeholder="50475531"
+                          autoFocus
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                    <Button onClick={handleSaveField(['phone'])} className="w-full" disabled={isSaving}><Save className="h-4 w-4 mr-2" />Gem</Button>
+                  </div>
+                )}
 
-            <button
-              onClick={async () => {
-                if (!window.confirm('Er du sikker? Din konto og alle persondata slettes permanent. Denne handling kan IKKE fortrydes.')) return;
-                if (!window.confirm('Sidste chance — bekræft at du vil slette din konto permanent.')) return;
-                try {
-                  const { deleteAccount } = await import('@/lib/auth');
-                  await deleteAccount();
-                  window.location.reload();
-                } catch (err: unknown) {
-                  toast.error((err as Error)?.message || 'Kontosletning fejlede');
-                }
-              }}
-              className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-red-50"
-            >
-              <div className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-red-50">
-                <Trash2 className="h-[18px] w-[18px] text-red-500" />
-              </div>
-              <div>
-                <p className="text-[14px] font-semibold text-red-600">Slet min konto</p>
-                <p className="text-[11px] text-muted-foreground">Alle persondata anonymiseres permanent</p>
-              </div>
-            </button>
-          </div>
+                {/* ── edit-birthday ── */}
+                {settingsDetailView === 'edit-birthday' && (
+                  <div className="space-y-6 py-2">
+                    <h2 className="text-[1.7rem] font-semibold leading-tight tracking-[-0.02em] text-foreground">Fødselsdag</h2>
+                    <div className="space-y-2">
+                      <Label>Fødselsdato</Label>
+                      <Input type="date" value={profileDraft.birthDate} onChange={(e) => setProfileDraft(prev => ({ ...prev, birthDate: e.target.value }))} autoFocus />
+                    </div>
+                    {profileDraft.birthDate && calculateAge(profileDraft.birthDate) !== null && (
+                      <div className="flex items-center gap-2 px-1">
+                        <Cake className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-[15px] font-medium text-foreground">{calculateAge(profileDraft.birthDate)} år</span>
+                      </div>
+                    )}
+                    <Button onClick={handleSaveField(['birthDate'])} className="w-full" disabled={isSaving}><Save className="h-4 w-4 mr-2" />Gem</Button>
+                  </div>
+                )}
 
+                {/* ── edit-address ── */}
+                {settingsDetailView === 'edit-address' && (
+                  <div className="space-y-6 py-2">
+                    <h2 className="text-[1.7rem] font-semibold leading-tight tracking-[-0.02em] text-foreground">Adresse</h2>
+                    <div className="space-y-3">
+                      <div className="space-y-2">
+                        <Label>Gadenavn og nr.</Label>
+                        <Input value={profileDraft.address} onChange={(e) => setProfileDraft(prev => ({ ...prev, address: e.target.value }))} placeholder="Gadenavn og nr." autoFocus />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                          <Label>Postnummer</Label>
+                          <Input value={profileDraft.zipCode} onChange={(e) => setProfileDraft(prev => ({ ...prev, zipCode: e.target.value }))} placeholder="2100" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>By</Label>
+                          <Input value={profileDraft.city} onChange={(e) => setProfileDraft(prev => ({ ...prev, city: e.target.value }))} placeholder="København" />
+                        </div>
+                      </div>
+                    </div>
+                    <Button onClick={handleSaveField(['address', 'zipCode', 'city'])} className="w-full" disabled={isSaving}><Save className="h-4 w-4 mr-2" />Gem</Button>
+                  </div>
+                )}
+
+                {/* ── edit-country ── */}
+                {settingsDetailView === 'edit-country' && (
+                  <div className="space-y-4 py-2">
+                    <h2 className="text-[1.7rem] font-semibold leading-tight tracking-[-0.02em] text-foreground">Land</h2>
+                    <div className="divide-y divide-border">
+                      {COUNTRIES.map((c) => (
+                        <button
+                          key={c.code}
+                          onClick={() => handleSaveCountry(c.label)}
+                          className="flex w-full items-center gap-3.5 py-3.5 px-1 text-left transition-colors active:bg-muted/50"
+                        >
+                          <span className="text-2xl">{c.flag}</span>
+                          <span className="flex-1 text-[15px] font-medium text-foreground">{c.label}</span>
+                          {profileDraft.country === c.label && <Check className="h-5 w-5 text-green-500 shrink-0" />}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </TabsContent>
 
         <TabsContent value="family" className="space-y-2">
@@ -1587,6 +1560,7 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   { id: 'notif-hjem', label: 'Hjem & Mad' },
                   { id: 'notif-dokumenter', label: 'Dokumenter & Beslutninger' },
                   { id: 'notif-dagbog', label: 'Dagbog & Trivsel' },
+                  { id: 'notif-visibility', label: 'Profilsynlighed' },
                 ].map((cat) => (
                   <button
                     key={cat.id}
@@ -1601,7 +1575,13 @@ const [evidenceDraft, setEvidenceDraft] = useState({
 
             </>
           ) : (
-            <>
+            <motion.div
+              key={settingsDetailView}
+              initial={{ x: '100%', opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: '100%', opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+            >
               {/* ─── Notifikations-undersider ─── */}
 
               {settingsDetailView === 'notif-samvaer' && (
@@ -1779,7 +1759,49 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   </div>
                 </div>
               )}
-            </>
+
+              {settingsDetailView === 'notif-visibility' && (
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-1">Profilsynlighed</p>
+                    <p className="text-[11px] text-muted-foreground px-1 pb-3">Vælg hvad andre kan se på din profil i grupper</p>
+                  </div>
+                  <div className="divide-y divide-border">
+                    <div className="flex items-center justify-between py-3 px-1">
+                      <div>
+                        <p className="text-[15px] font-medium text-foreground">Vis email</p>
+                        <p className="text-[13px] text-muted-foreground">Andre kan se din email</p>
+                      </div>
+                      <IOSSwitch checked={visibilityDraft.showEmail} onCheckedChange={(v) => setVisibilityDraft(prev => ({ ...prev, showEmail: v }))} />
+                    </div>
+                    <div className="flex items-center justify-between py-3 px-1">
+                      <div>
+                        <p className="text-[15px] font-medium text-foreground">Vis telefon</p>
+                        <p className="text-[13px] text-muted-foreground">Andre kan se dit telefonnummer</p>
+                      </div>
+                      <IOSSwitch checked={visibilityDraft.showPhone} onCheckedChange={(v) => setVisibilityDraft(prev => ({ ...prev, showPhone: v }))} />
+                    </div>
+                    <div className="flex items-center justify-between py-3 px-1">
+                      <div>
+                        <p className="text-[15px] font-medium text-foreground">Vis by</p>
+                        <p className="text-[13px] text-muted-foreground">Andre kan se din by</p>
+                      </div>
+                      <IOSSwitch checked={visibilityDraft.showAddress} onCheckedChange={(v) => setVisibilityDraft(prev => ({ ...prev, showAddress: v }))} />
+                    </div>
+                  </div>
+                  <div className="px-1">
+                    <label className="text-[13px] font-medium text-foreground block mb-1.5">Bio</label>
+                    <textarea
+                      value={visibilityDraft.bio}
+                      onChange={(e) => setVisibilityDraft(prev => ({ ...prev, bio: e.target.value }))}
+                      placeholder="Kort beskrivelse af dig selv..."
+                      className="w-full h-20 rounded-lg border border-border bg-card px-3 py-2 text-[13px] text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-1 focus:ring-ring"
+                    />
+                  </div>
+                  <Button onClick={handleSaveProfile} className="w-full" disabled={isSaving}><Save className="h-4 w-4 mr-2" />Gem</Button>
+                </div>
+              )}
+            </motion.div>
           )}
         </TabsContent>
 

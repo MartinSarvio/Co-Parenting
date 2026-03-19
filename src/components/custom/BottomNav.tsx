@@ -159,7 +159,7 @@ type NavItem = {
 };
 
 export function BottomNav() {
-  const { activeTab, setActiveTab, isProfessionalView, household, fullScreenOverlayOpen, kommunikationThreadId, currentUser, handoverAction, feedTab, activeSettingsTab, milestoneFormMode, meetingFormMode, docFormMode } = useAppStore();
+  const { activeTab, setActiveTab, isProfessionalView, household, fullScreenOverlayOpen, kommunikationThreadId, currentUser, handoverAction, feedTab, activeSettingsTab, settingsDetailView, milestoneFormMode, meetingFormMode, docFormMode } = useAppStore();
   const [moreOpen, setMoreOpen] = useState(false);
   const isFamilyMemberView = useAppStore((s) => s.isFamilyMemberView);
   const isFamilyMember = currentUser?.role === 'family_member' || (isFamilyMemberView && currentUser?.isAdmin === true);
@@ -168,7 +168,7 @@ export function BottomNav() {
   const showHandoverNav = !isTogetherFamily && !isSingleParent;
   const shouldShowProfessionalNav = isProfessionalView && (currentUser?.isAdmin === true || currentUser?.role === 'professional');
 
-  if (fullScreenOverlayOpen || kommunikationThreadId || activeTab === 'swap-request' || activeTab === 'kalender-week' || activeTab === 'group-detail' || activeTab === 'profile' || activeTab === 'create-group' || handoverAction === 'add-pakkeliste' || (activeTab === 'feed' && (feedTab === 'forum' || feedTab === 'tilbud')) || (activeTab === 'settings' && activeSettingsTab === 'info') || milestoneFormMode || meetingFormMode || docFormMode) return null;
+  if (fullScreenOverlayOpen || kommunikationThreadId || activeTab === 'swap-request' || activeTab === 'kalender-week' || activeTab === 'group-detail' || activeTab === 'profile' || activeTab === 'create-group' || handoverAction === 'add-pakkeliste' || (activeTab === 'feed' && (feedTab === 'forum' || feedTab === 'tilbud')) || (activeTab === 'settings' && activeSettingsTab === 'info') || (activeTab === 'settings' && settingsDetailView) || milestoneFormMode || meetingFormMode || docFormMode) return null;
 
   const mainNavItems: NavItem[] = isFamilyMember
     ? [
