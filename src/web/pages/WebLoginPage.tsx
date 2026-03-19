@@ -64,12 +64,7 @@ export default function WebLoginPage() {
       </div>
 
       {/* Right: Login form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center relative overflow-hidden px-4">
-        {/* Gradient background (visible on all sizes) */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#fff8f0] via-[#f2f1ed] to-[#fef0e0]">
-          <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-[#f58a2d]/10 blur-[100px] animate-[meshFloat_8s_ease-in-out_infinite]" />
-          <div className="absolute bottom-[-20%] left-[-10%] w-[400px] h-[400px] rounded-full bg-[#f7a95c]/8 blur-[80px] animate-[meshFloat_10s_ease-in-out_infinite_reverse]" />
-        </div>
+      <div className="w-full lg:w-1/2 flex items-center justify-center relative overflow-hidden px-4 bg-white">
 
         {/* Back button */}
         <a
@@ -82,14 +77,14 @@ export default function WebLoginPage() {
 
         {/* Login card */}
         <div className="relative w-full max-w-md animate-fadeIn z-10">
-          {/* Logo (mobile only) */}
-          <div className="flex items-center justify-center gap-3 mb-8 lg:hidden">
+          {/* Logo */}
+          <div className="flex items-center justify-center gap-3 mb-8">
             <img src="/huska-logo.svg" alt="Huska" className="h-12 w-12 rounded-2xl shadow-md" />
             <span className="text-2xl font-bold text-[#2f2f2f] tracking-tight">Huska</span>
           </div>
 
           {/* Card */}
-          <div className="backdrop-blur-xl bg-white/70 border border-white/40 rounded-3xl shadow-xl shadow-black/5 p-8">
+          <div className="bg-white rounded-3xl p-8">
             <div className="text-center mb-6">
               <h1 className="text-2xl font-bold text-[#2f2f2f]">Log ind</h1>
               <p className="text-sm text-[#78766d] mt-1">Velkommen tilbage til Huska</p>
