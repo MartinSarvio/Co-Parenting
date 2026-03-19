@@ -6,7 +6,6 @@
     </linearGradient>
   </defs>
 
-  <rect width="1024" height="1024" fill="#F1EEE8"/>
   <rect x="48" y="48" width="928" height="928" rx="236" fill="url(#panel)"/>
 
   <g transform="translate(0 -38)">

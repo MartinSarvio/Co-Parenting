@@ -128,16 +128,9 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-4 shrink-0">
             <a
               href="#login"
-              className="text-sm font-medium text-[#5f5d56] hover:text-[#2f2f2f] transition-colors"
+              className="text-sm font-semibold text-[#1a1a1a] hover:text-[#000] transition-colors"
             >
               Log ind
-            </a>
-            <a
-              href="#funktioner"
-              className="inline-flex items-center px-5 py-2.5 text-sm font-semibold text-white rounded-full hover:shadow-lg hover:shadow-[#f58a2d]/25 transition-shadow duration-200"
-              style={{ background: '#f58a2d' }}
-            >
-              Hent appen
             </a>
           </div>
 
@@ -194,14 +187,6 @@ export function Navbar() {
               className="block px-4 py-2.5 text-[15px] font-medium text-[#5f5d56] hover:text-[#2f2f2f] rounded-lg hover:bg-[#f2f1ed] transition-colors"
             >
               Log ind
-            </a>
-            <a
-              href="#funktioner"
-              onClick={() => setMobileOpen(false)}
-              className="block mx-3 mt-3 text-center px-5 py-3 text-[15px] font-semibold text-white rounded-full"
-              style={{ background: '#f58a2d' }}
-            >
-              Hent appen
             </a>
           </div>
         )}
