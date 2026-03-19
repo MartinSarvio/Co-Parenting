@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useState, useCallback } from 'react';
+import { Suspense, lazy, useEffect, useState, useCallback, useRef } from 'react';
 import { useAppStore } from '@/store';
 import { supabase } from '@/lib/supabase';
 import { fetchMe } from '@/lib/auth';
@@ -27,9 +27,13 @@ import {
   X,
   Clock,
   ListChecks,
+  Bell,
+  ChevronDown,
+  User,
+  FolderOpen,
 } from 'lucide-react';
 
-/* ── Lazy section imports (same as App.tsx) ── */
+/* ── Lazy section imports ── */
 
 const Dashboard = lazy(() => import('@/sections/Dashboard').then(m => ({ default: m.Dashboard })));
 const Samversplan = lazy(() => import('@/sections/Samversplan').then(m => ({ default: m.Samversplan })));
@@ -58,29 +62,95 @@ const KalenderWeekView = lazy(() => import('@/sections/KalenderWeekView').then(m
 const FamilieOgBoern = lazy(() => import('@/sections/FamilieOgBoern').then(m => ({ default: m.FamilieOgBoern })));
 const MeetingMinutesView = lazy(() => import('@/sections/MeetingMinutesView').then(m => ({ default: m.MeetingMinutesView })));
 
-/* ── Nav items ── */
+/* ── Grouped nav items ── */
 
-const navItems = [
-  { id: 'dashboard', label: 'Oversigt', icon: LayoutDashboard },
-  { id: 'samversplan', label: 'Samværsplan', icon: Repeat },
-  { id: 'kalender', label: 'Kalender', icon: CalendarDays },
-  { id: 'handover', label: 'Aflevering', icon: RefreshCw },
-  { id: 'opgaver', label: 'Opgaver', icon: CheckSquare },
-  { id: 'mad-hjem', label: 'Mad & Hjem', icon: UtensilsCrossed },
-  { id: 'kommunikation', label: 'Kommunikation', icon: MessageCircle },
-  { id: 'expenses', label: 'Udgifter', icon: Wallet },
-  { id: 'fotoalbum', label: 'Fotoalbum', icon: Camera },
-  { id: 'children', label: 'Børn', icon: Baby },
-  { id: 'borneoverblik', label: 'Børneoverblik', icon: ListChecks },
-  { id: 'dagbog', label: 'Dagbog', icon: BookOpen },
-  { id: 'rutiner', label: 'Rutiner', icon: Clock },
-  { id: 'vigtige-datoer', label: 'Vigtige datoer', icon: CalendarHeart },
-  { id: 'beslutningslog', label: 'Beslutningslog', icon: FileText },
-  { id: 'dokumenter', label: 'Dokumenter', icon: FileText },
-  { id: 'feed', label: 'Feed', icon: Rss },
-  { id: 'historik', label: 'Historik', icon: Clock },
-  { id: 'settings', label: 'Indstillinger', icon: Settings },
+const navGroups = [
+  {
+    label: 'Overblik',
+    items: [
+      { id: 'dashboard', label: 'Oversigt', icon: LayoutDashboard },
+    ],
+  },
+  {
+    label: 'Familie',
+    items: [
+      { id: 'samversplan', label: 'Samværsplan', icon: Repeat },
+      { id: 'kalender', label: 'Kalender', icon: CalendarDays },
+      { id: 'handover', label: 'Aflevering', icon: RefreshCw },
+      { id: 'opgaver', label: 'Opgaver', icon: CheckSquare },
+    ],
+  },
+  {
+    label: 'Hverdag',
+    items: [
+      { id: 'mad-hjem', label: 'Mad & Hjem', icon: UtensilsCrossed },
+      { id: 'expenses', label: 'Udgifter', icon: Wallet },
+      { id: 'rutiner', label: 'Rutiner', icon: Clock },
+    ],
+  },
+  {
+    label: 'Kommunikation',
+    items: [
+      { id: 'kommunikation', label: 'Beskeder', icon: MessageCircle },
+      { id: 'feed', label: 'Feed', icon: Rss },
+    ],
+  },
+  {
+    label: 'Børn',
+    items: [
+      { id: 'children', label: 'Børn', icon: Baby },
+      { id: 'borneoverblik', label: 'Børneoverblik', icon: ListChecks },
+      { id: 'dagbog', label: 'Dagbog', icon: BookOpen },
+      { id: 'fotoalbum', label: 'Fotoalbum', icon: Camera },
+    ],
+  },
+  {
+    label: 'Dokumentation',
+    items: [
+      { id: 'dokumenter', label: 'Dokumenter', icon: FolderOpen },
+      { id: 'beslutningslog', label: 'Beslutningslog', icon: FileText },
+      { id: 'vigtige-datoer', label: 'Vigtige datoer', icon: CalendarHeart },
+      { id: 'historik', label: 'Historik', icon: Clock },
+    ],
+  },
 ];
+
+/* ── Tab → title mapping ── */
+
+const tabTitles: Record<string, string> = {
+  dashboard: 'Oversigt',
+  samversplan: 'Samværsplan',
+  samversconfig: 'Samværskonfiguration',
+  kalender: 'Kalender',
+  'kalender-week': 'Ugevisning',
+  handover: 'Aflevering',
+  opgaver: 'Opgaver',
+  'mad-hjem': 'Mad & Hjem',
+  kommunikation: 'Beskeder',
+  borneoverblik: 'Børneoverblik',
+  milestones: 'Milepæle',
+  'meeting-minutes': 'Referater',
+  expenses: 'Udgifter',
+  balance: 'Balance',
+  'send-penge': 'Send penge',
+  budget: 'Budget',
+  gaveoenskeliste: 'Ønskeliste',
+  analyse: 'Analyse',
+  children: 'Børn',
+  settings: 'Indstillinger',
+  fotoalbum: 'Fotoalbum',
+  dagbog: 'Dagbog',
+  rutiner: 'Rutiner',
+  'vigtige-datoer': 'Vigtige datoer',
+  beslutningslog: 'Beslutningslog',
+  aarskalender: 'Årskalender',
+  feed: 'Feed',
+  dokumenter: 'Dokumenter',
+  notifikationer: 'Notifikationer',
+  'swap-request': 'Bytteanmodning',
+  historik: 'Historik',
+  'familie-og-boern': 'Familie & Børn',
+};
 
 /* ── Loading skeleton ── */
 
@@ -110,6 +180,19 @@ export function WebAppShell() {
 
   const [isReady, setIsReady] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close user menu on click outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setUserMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   // Session restore (mirrors App.tsx without Capacitor)
   const restoreSession = useCallback(async () => {
@@ -234,96 +317,159 @@ export function WebAppShell() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-[#fafaf9] flex">
-      {/* Mobile overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black/30 z-40 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+  const currentTitle = tabTitles[activeTab] || 'Oversigt';
+  const initials = currentUser?.name
+    ? currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+    : '?';
 
-      {/* Sidebar */}
-      <aside className={`
-        fixed top-0 left-0 bottom-0 w-[260px] bg-white border-r border-[#e5e3dc] z-50
-        flex flex-col overflow-y-auto
-        transition-transform duration-200
-        md:translate-x-0 md:static md:z-auto
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
-        {/* Logo */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#e5e3dc]">
-          <div className="flex items-center gap-2.5">
-            <img src="/huska-logo.svg" alt="Huska" className="h-8 w-8" />
-            <span className="text-lg font-bold text-[#2f2f2f] tracking-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Huska</span>
-          </div>
-          <button className="md:hidden p-1 text-[#78766d]" onClick={() => setSidebarOpen(false)}>
-            <X size={20} />
+  return (
+    <div className="min-h-screen bg-[#f8f8f6] flex flex-col">
+      {/* ═══ HEADER ═══ */}
+      <header className="sticky top-0 z-40 h-14 bg-white border-b border-[#e5e3dc] flex items-center px-4 lg:px-6 shrink-0">
+        {/* Left: hamburger (mobile) + logo */}
+        <div className="flex items-center gap-3 min-w-[200px]">
+          <button
+            className="lg:hidden p-1.5 -ml-1.5 rounded-lg text-[#5f5d56] hover:bg-[#f2f1ed] transition-colors"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
+          <a href="/web.html" className="flex items-center gap-2">
+            <img src="/huska-logo.svg" alt="Huska" className="h-8 w-8" />
+            <span className="text-lg font-bold text-[#2f2f2f] tracking-tight hidden sm:block" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Huska</span>
+          </a>
         </div>
 
-        {/* User info */}
-        {currentUser && (
-          <div className="px-5 py-3 border-b border-[#e5e3dc]">
-            <p className="text-sm font-semibold text-[#2f2f2f] truncate">{currentUser.name || currentUser.email}</p>
-            <p className="text-xs text-[#78766d] truncate">{currentUser.email}</p>
+        {/* Center: current section title */}
+        <div className="flex-1 flex justify-center">
+          <h1 className="text-[15px] font-semibold text-[#2f2f2f]">{currentTitle}</h1>
+        </div>
+
+        {/* Right: notifications + user menu */}
+        <div className="flex items-center gap-2 min-w-[200px] justify-end">
+          <button
+            onClick={() => handleNavClick('notifikationer')}
+            className="relative p-2 rounded-lg text-[#5f5d56] hover:bg-[#f2f1ed] transition-colors"
+          >
+            <Bell size={20} />
+          </button>
+
+          {/* User dropdown */}
+          <div ref={userMenuRef} className="relative">
+            <button
+              onClick={() => setUserMenuOpen(!userMenuOpen)}
+              className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-[#f2f1ed] transition-colors"
+            >
+              <div className="w-8 h-8 rounded-full bg-[#1a1a1a] flex items-center justify-center text-white text-xs font-bold">
+                {initials}
+              </div>
+              <span className="text-sm font-medium text-[#2f2f2f] hidden md:block max-w-[120px] truncate">
+                {currentUser?.name || currentUser?.email}
+              </span>
+              <ChevronDown size={14} className={`text-[#78766d] hidden md:block transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {userMenuOpen && (
+              <div className="absolute right-0 top-full mt-1.5 w-56 bg-white rounded-xl border border-[#e5e3dc] shadow-lg shadow-black/[0.08] py-1.5 z-50">
+                <div className="px-4 py-2.5 border-b border-[#e5e3dc]">
+                  <p className="text-sm font-semibold text-[#2f2f2f] truncate">{currentUser?.name}</p>
+                  <p className="text-xs text-[#78766d] truncate">{currentUser?.email}</p>
+                </div>
+                <button
+                  onClick={() => { handleNavClick('settings'); setUserMenuOpen(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#5f5d56] hover:bg-[#f2f1ed] transition-colors"
+                >
+                  <Settings size={16} />
+                  Indstillinger
+                </button>
+                <button
+                  onClick={() => { handleNavClick('children'); setUserMenuOpen(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#5f5d56] hover:bg-[#f2f1ed] transition-colors"
+                >
+                  <User size={16} />
+                  Profil & Familie
+                </button>
+                <div className="border-t border-[#e5e3dc] mt-1 pt-1">
+                  <button
+                    onClick={() => { handleLogout(); setUserMenuOpen(false); }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <LogOut size={16} />
+                    Log ud
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
+        </div>
+      </header>
+
+      {/* ═══ BODY: Sidebar + Content ═══ */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Mobile overlay */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/30 z-30 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
         )}
 
-        {/* Nav items */}
-        <nav className="flex-1 py-2 px-3">
-          {navItems.map((item) => {
-            const isActive = activeTab === item.id;
-            const Icon = item.icon;
-            return (
-              <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id)}
-                className={`
-                  w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-[14px] font-medium transition-colors mb-0.5
-                  ${isActive
-                    ? 'bg-[#1a1a1a] text-white'
-                    : 'text-[#5f5d56] hover:bg-[#f2f1ed] hover:text-[#2f2f2f]'
-                  }
-                `}
-              >
-                <Icon size={18} />
-                {item.label}
-              </button>
-            );
-          })}
-        </nav>
+        {/* ─── Sidebar (col 1) ─── */}
+        <aside className={`
+          fixed top-14 left-0 bottom-0 w-[240px] bg-white border-r border-[#e5e3dc] z-30
+          flex flex-col overflow-y-auto
+          transition-transform duration-200
+          lg:translate-x-0 lg:static lg:z-auto
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}>
+          <nav className="flex-1 py-3 px-2.5">
+            {navGroups.map((group) => (
+              <div key={group.label} className="mb-4">
+                <p className="text-[10px] font-bold text-[#b5b3ab] uppercase tracking-widest px-3 mb-1.5">
+                  {group.label}
+                </p>
+                {group.items.map((item) => {
+                  const isActive = activeTab === item.id;
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => handleNavClick(item.id)}
+                      className={`
+                        w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left text-[13px] font-medium transition-colors
+                        ${isActive
+                          ? 'bg-[#1a1a1a] text-white'
+                          : 'text-[#5f5d56] hover:bg-[#f2f1ed] hover:text-[#2f2f2f]'
+                        }
+                      `}
+                    >
+                      <Icon size={16} className="shrink-0" />
+                      {item.label}
+                    </button>
+                  );
+                })}
+              </div>
+            ))}
+          </nav>
 
-        {/* Logout */}
-        <div className="px-3 py-3 border-t border-[#e5e3dc]">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left text-[14px] font-medium text-red-600 hover:bg-red-50 transition-colors"
-          >
-            <LogOut size={18} />
-            Log ud
-          </button>
-        </div>
-      </aside>
-
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-h-screen">
-        {/* Top bar (mobile) */}
-        <header className="md:hidden sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-[#e5e3dc] px-4 h-14 flex items-center justify-between">
-          <button onClick={() => setSidebarOpen(true)} className="p-2 -ml-2 text-[#5f5d56]">
-            <Menu size={22} />
-          </button>
-          <div className="flex items-center gap-2">
-            <img src="/huska-logo.svg" alt="Huska" className="h-7 w-7" />
-            <span className="text-base font-bold text-[#2f2f2f]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Huska</span>
+          {/* Sidebar footer */}
+          <div className="px-2.5 py-2.5 border-t border-[#e5e3dc]">
+            <button
+              onClick={() => handleNavClick('settings')}
+              className={`
+                w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left text-[13px] font-medium transition-colors
+                ${activeTab === 'settings' ? 'bg-[#1a1a1a] text-white' : 'text-[#5f5d56] hover:bg-[#f2f1ed]'}
+              `}
+            >
+              <Settings size={16} />
+              Indstillinger
+            </button>
           </div>
-          <div className="w-10" /> {/* Spacer for centering */}
-        </header>
+        </aside>
 
-        {/* Section content */}
-        <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto w-full max-w-2xl px-3 py-4 sm:px-6">
+        {/* ─── Main content (col 2) ─── */}
+        <main className="flex-1 overflow-y-auto bg-[#f8f8f6]">
+          <div className="w-full max-w-4xl mx-auto px-4 py-5 sm:px-6 lg:px-8">
             <Suspense fallback={<SectionLoading />}>
               {renderContent()}
             </Suspense>
