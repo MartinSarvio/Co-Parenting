@@ -116,6 +116,42 @@ html {
   animation: progressFill 1.2s ease-out both;
 }
 
+/* ═══ Web App Shell — override mobile constraints ═══ */
+
+/* Remove hardcoded mobile max-width (430px) inside web app */
+.web-app-content [class*="max-w-\[430px\]"] {
+  max-width: 100% !important;
+}
+
+/* Expand max-w-lg (used by some inner panels) */
+.web-app-content [class*="max-w-lg"] {
+  max-width: 48rem !important;
+}
+
+/* Remove safe-area inset padding (only relevant on native) */
+.web-app-content [style*="safe-area-inset"] {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+/* Make grid-based sections use available space */
+.web-app-content .grid {
+  width: 100%;
+}
+
+/* Cards and panels should expand */
+.web-app-content > div {
+  width: 100%;
+}
+
+/* Better spacing for desktop */
+@media (min-width: 1024px) {
+  .web-app-content {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
 /* Stagger delay utilities */
 .delay-100 { animation-delay: 100ms; }
 .delay-200 { animation-delay: 200ms; }

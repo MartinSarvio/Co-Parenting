@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { fetchMe } from '@/lib/auth';
 import { loadInitialData } from '@/lib/dataSync';
 import { startRealtimeSync, stopRealtimeSync } from '@/lib/realtime';
-import { ErrorBoundary } from '@/components/custom/ErrorBoundary';
+import { WebErrorBoundary } from './WebErrorBoundary';
 import { Toaster } from '@/components/ui/sonner';
 import {
   LayoutDashboard,
@@ -281,39 +281,39 @@ export function WebAppShell() {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'dashboard': return <ErrorBoundary sectionName="Oversigt"><Dashboard /></ErrorBoundary>;
-      case 'samversplan': return <ErrorBoundary sectionName="Samværsplan"><Samversplan /></ErrorBoundary>;
-      case 'samversconfig': return <ErrorBoundary sectionName="Samværskonfiguration"><CustodyConfig /></ErrorBoundary>;
-      case 'kalender': return <ErrorBoundary sectionName="Kalender"><Kalender /></ErrorBoundary>;
-      case 'kalender-week': return <ErrorBoundary sectionName="Ugevisning"><KalenderWeekView /></ErrorBoundary>;
-      case 'handover': return <ErrorBoundary sectionName="Aflevering"><HandoverView /></ErrorBoundary>;
-      case 'opgaver': return <ErrorBoundary sectionName="Opgaver"><Opgaver /></ErrorBoundary>;
-      case 'mad-hjem': return <ErrorBoundary sectionName="Mad og Hjem"><MadOgHjem /></ErrorBoundary>;
-      case 'kommunikation': return <ErrorBoundary sectionName="Kommunikation"><Kommunikation /></ErrorBoundary>;
+      case 'dashboard': return <WebErrorBoundary sectionName="Oversigt"><Dashboard /></WebErrorBoundary>;
+      case 'samversplan': return <WebErrorBoundary sectionName="Samværsplan"><Samversplan /></WebErrorBoundary>;
+      case 'samversconfig': return <WebErrorBoundary sectionName="Samværskonfiguration"><CustodyConfig /></WebErrorBoundary>;
+      case 'kalender': return <WebErrorBoundary sectionName="Kalender"><Kalender /></WebErrorBoundary>;
+      case 'kalender-week': return <WebErrorBoundary sectionName="Ugevisning"><KalenderWeekView /></WebErrorBoundary>;
+      case 'handover': return <WebErrorBoundary sectionName="Aflevering"><HandoverView /></WebErrorBoundary>;
+      case 'opgaver': return <WebErrorBoundary sectionName="Opgaver"><Opgaver /></WebErrorBoundary>;
+      case 'mad-hjem': return <WebErrorBoundary sectionName="Mad og Hjem"><MadOgHjem /></WebErrorBoundary>;
+      case 'kommunikation': return <WebErrorBoundary sectionName="Kommunikation"><Kommunikation /></WebErrorBoundary>;
       case 'borneoverblik':
-      case 'milestones': return <ErrorBoundary sectionName="Børneoverblik"><Borneoverblik /></ErrorBoundary>;
-      case 'meeting-minutes': return <ErrorBoundary sectionName="Referater"><MeetingMinutesView /></ErrorBoundary>;
+      case 'milestones': return <WebErrorBoundary sectionName="Børneoverblik"><Borneoverblik /></WebErrorBoundary>;
+      case 'meeting-minutes': return <WebErrorBoundary sectionName="Referater"><MeetingMinutesView /></WebErrorBoundary>;
       case 'expenses':
       case 'balance':
       case 'send-penge':
       case 'budget':
       case 'gaveoenskeliste':
-      case 'analyse': return <ErrorBoundary sectionName="Udgifter"><Expenses /></ErrorBoundary>;
-      case 'children': return <ErrorBoundary sectionName="Børn"><ChildManagement /></ErrorBoundary>;
-      case 'settings': return <ErrorBoundary sectionName="Indstillinger"><SettingsView /></ErrorBoundary>;
-      case 'fotoalbum': return <ErrorBoundary sectionName="Fotoalbum"><Fotoalbum /></ErrorBoundary>;
-      case 'dagbog': return <ErrorBoundary sectionName="Dagbog"><Dagbog /></ErrorBoundary>;
-      case 'rutiner': return <ErrorBoundary sectionName="Rutiner"><RutinerView /></ErrorBoundary>;
-      case 'vigtige-datoer': return <ErrorBoundary sectionName="Vigtige datoer"><VigtigeDatoer /></ErrorBoundary>;
-      case 'beslutningslog': return <ErrorBoundary sectionName="Beslutningslog"><Beslutningslog /></ErrorBoundary>;
-      case 'aarskalender': return <ErrorBoundary sectionName="Årskalender"><Aarskalender /></ErrorBoundary>;
-      case 'feed': return <ErrorBoundary sectionName="Feed"><FeedView /></ErrorBoundary>;
-      case 'dokumenter': return <ErrorBoundary sectionName="Dokumenter"><Dokumenter /></ErrorBoundary>;
-      case 'notifikationer': return <ErrorBoundary sectionName="Notifikationer"><NotifikationsView /></ErrorBoundary>;
-      case 'swap-request': return <ErrorBoundary sectionName="Bytteanmodning"><SwapRequest /></ErrorBoundary>;
-      case 'historik': return <ErrorBoundary sectionName="Historik"><HistorikView /></ErrorBoundary>;
-      case 'familie-og-boern': return <ErrorBoundary sectionName="Familie & Børn"><FamilieOgBoern /></ErrorBoundary>;
-      default: return <ErrorBoundary sectionName="Oversigt"><Dashboard /></ErrorBoundary>;
+      case 'analyse': return <WebErrorBoundary sectionName="Udgifter"><Expenses /></WebErrorBoundary>;
+      case 'children': return <WebErrorBoundary sectionName="Børn"><ChildManagement /></WebErrorBoundary>;
+      case 'settings': return <WebErrorBoundary sectionName="Indstillinger"><SettingsView /></WebErrorBoundary>;
+      case 'fotoalbum': return <WebErrorBoundary sectionName="Fotoalbum"><Fotoalbum /></WebErrorBoundary>;
+      case 'dagbog': return <WebErrorBoundary sectionName="Dagbog"><Dagbog /></WebErrorBoundary>;
+      case 'rutiner': return <WebErrorBoundary sectionName="Rutiner"><RutinerView /></WebErrorBoundary>;
+      case 'vigtige-datoer': return <WebErrorBoundary sectionName="Vigtige datoer"><VigtigeDatoer /></WebErrorBoundary>;
+      case 'beslutningslog': return <WebErrorBoundary sectionName="Beslutningslog"><Beslutningslog /></WebErrorBoundary>;
+      case 'aarskalender': return <WebErrorBoundary sectionName="Årskalender"><Aarskalender /></WebErrorBoundary>;
+      case 'feed': return <WebErrorBoundary sectionName="Feed"><FeedView /></WebErrorBoundary>;
+      case 'dokumenter': return <WebErrorBoundary sectionName="Dokumenter"><Dokumenter /></WebErrorBoundary>;
+      case 'notifikationer': return <WebErrorBoundary sectionName="Notifikationer"><NotifikationsView /></WebErrorBoundary>;
+      case 'swap-request': return <WebErrorBoundary sectionName="Bytteanmodning"><SwapRequest /></WebErrorBoundary>;
+      case 'historik': return <WebErrorBoundary sectionName="Historik"><HistorikView /></WebErrorBoundary>;
+      case 'familie-og-boern': return <WebErrorBoundary sectionName="Familie & Børn"><FamilieOgBoern /></WebErrorBoundary>;
+      default: return <WebErrorBoundary sectionName="Oversigt"><Dashboard /></WebErrorBoundary>;
     }
   };
 
@@ -469,7 +469,7 @@ export function WebAppShell() {
 
         {/* ─── Main content (col 2) ─── */}
         <main className="flex-1 overflow-y-auto bg-[#f8f8f6]">
-          <div className="w-full max-w-4xl mx-auto px-4 py-5 sm:px-6 lg:px-8">
+          <div className="web-app-content w-full px-4 py-5 sm:px-6 lg:px-8">
             <Suspense fallback={<SectionLoading />}>
               {renderContent()}
             </Suspense>
