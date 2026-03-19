@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase, supabaseMissing } from '@/lib/supabase';
 import { LogIn, Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 export default function WebLoginPage() {
@@ -15,6 +15,11 @@ export default function WebLoginPage() {
     setLoading(true);
 
     try {
+      if (supabaseMissing) {
+        setError('Login er midlertidigt utilgængelig. Prøv igen senere.');
+        setLoading(false);
+        return;
+      }
       const { error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
