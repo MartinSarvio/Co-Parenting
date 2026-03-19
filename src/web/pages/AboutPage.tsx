@@ -204,31 +204,21 @@ function VisionSection() {
                     strokeLinejoin="round"
                   />
                 ))}
-              </svg>
 
-              {/* City dots — positioned on realistic Denmark map */}
-              {[
-                { x: 25, y: 14.5, label: 'Aalborg', delay: '0s' },
-                { x: 29.5, y: 33, label: 'Aarhus', delay: '0.2s' },
-                { x: 31.5, y: 50, label: 'Odense', delay: '0.4s' },
-                { x: 63, y: 45, label: 'København', delay: '0.6s' },
-              ].map((city, i) => (
-                <div
-                  key={i}
-                  className="absolute"
-                  style={{ left: `${city.x}%`, top: `${city.y}%`, transform: 'translate(-50%, -50%)' }}
-                >
-                  <div
-                    className="w-3 h-3 rounded-full bg-[#1a1a1a] relative"
-                    style={{ animation: `pulse 2s ease-in-out ${city.delay} infinite` }}
-                  >
-                    <div className="absolute inset-0 rounded-full bg-[#1a1a1a]/20 animate-ping" />
-                  </div>
-                  <p className="absolute top-4 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-semibold text-[#1a1a1a]">
-                    {city.label}
-                  </p>
-                </div>
-              ))}
+                {/* City dots — SVG coordinates from geographic data */}
+                {[
+                  { x: 256, y: 175, label: 'Aalborg' },
+                  { x: 295, y: 395, label: 'Aarhus' },
+                  { x: 320, y: 585, label: 'Odense' },
+                  { x: 622, y: 515, label: 'København' },
+                ].map((city) => (
+                  <g key={city.label}>
+                    <circle cx={city.x} cy={city.y} r={10} fill="#1a1a1a" />
+                    <circle cx={city.x} cy={city.y} r={18} fill="#1a1a1a" fillOpacity="0.15" />
+                    <text x={city.x} y={city.y + 30} textAnchor="middle" fontSize="22" fontWeight="700" fill="#1a1a1a">{city.label}</text>
+                  </g>
+                ))}
+              </svg>
 
               {/* Growth indicator */}
               <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white border border-[#e5e3dc] rounded-full px-4 py-2 shadow-sm">
