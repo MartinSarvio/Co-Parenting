@@ -694,52 +694,23 @@ const [evidenceDraft, setEvidenceDraft] = useState({
 
               <div className="border-t border-border" />
 
-              {/* ─── Familiens allergener ─── */}
-              <div className="pt-2">
-                <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1 pb-2">Familiens allergener</p>
-                <div className="divide-y divide-border">
-                  {currentUser && (
-                    <button
-                      onClick={() => setSettingsDetailView(`allergen-${currentUser.id}`)}
-                      className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <User className="h-4 w-4 text-muted-foreground shrink-0" />
-                        <div className="min-w-0">
-                          <p className="text-[15px] font-medium text-foreground truncate">{currentUser.name}</p>
-                          <p className="text-[13px] text-muted-foreground truncate">
-                            {currentUser.allergies?.length ? currentUser.allergies.join(', ') : 'Ingen allergener'}
-                          </p>
-                        </div>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
-                    </button>
-                  )}
-                  {children.map(child => (
-                    <button
-                      key={child.id}
-                      onClick={() => setSettingsDetailView(`allergen-${child.id}`)}
-                      className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <Heart className="h-4 w-4 text-[#f58a2d] shrink-0" />
-                        <div className="min-w-0">
-                          <p className="text-[15px] font-medium text-foreground truncate">{child.name}</p>
-                          <p className="text-[13px] text-muted-foreground truncate">
-                            {child.allergies?.length ? child.allergies.join(', ') : 'Ingen allergener'}
-                          </p>
-                        </div>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
-                    </button>
-                  ))}
-                </div>
+              {/* ─── Familiens allergener — single nav row ─── */}
+              <div className="divide-y divide-border">
+                <button
+                  onClick={() => setSettingsDetailView('allergen-list')}
+                  className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
+                >
+                  <div>
+                    <p className="text-[15px] font-medium text-foreground">Familiens allergener</p>
+                    <p className="text-[13px] text-muted-foreground">Administrer allergener for hele familien</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
+                </button>
               </div>
 
-              {/* ─── Konto ─── */}
-              <div className="pt-2">
-                <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1 pb-2">Konto</p>
-                <div className="divide-y divide-border">
+              <div className="border-t border-border" />
+
+              <div className="divide-y divide-border">
                   <button
                     onClick={() => setSettingsDetailView('edit-export')}
                     className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
@@ -755,12 +726,11 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                     className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
                   >
                     <div>
-                      <p className="text-[15px] font-medium text-red-600">Slet min konto</p>
+                      <p className="text-[15px] font-medium text-foreground">Slet min konto</p>
                       <p className="text-[13px] text-muted-foreground">Alle persondata anonymiseres permanent</p>
                     </div>
                     <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                   </button>
-                </div>
               </div>
 
               {/* ─── Log ud ─── */}
@@ -1092,8 +1062,67 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                 </div>
               )}
 
+              {/* ─── allergen-list: person picker ─── */}
+              {settingsDetailView === 'allergen-list' && (
+                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+                  <div className="space-y-4">
+                    <h2 className="text-[28px] font-bold text-foreground pb-2">Familiens allergener</h2>
+                    <p className="text-[13px] text-muted-foreground px-1">Vælg en person for at administrere allergener</p>
+                    <div className="divide-y divide-border">
+                      {currentUser && (
+                        <button
+                          onClick={() => setSettingsDetailView(`allergen-${currentUser.id}`)}
+                          className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                            <div className="min-w-0">
+                              <p className="text-[15px] font-medium text-foreground truncate">{currentUser.name}</p>
+                              <p className="text-[13px] text-muted-foreground truncate">
+                                {currentUser.allergies?.length ? currentUser.allergies.join(', ') : 'Ingen allergener'}
+                              </p>
+                            </div>
+                          </div>
+                          <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
+                        </button>
+                      )}
+                      {children.map(child => (
+                        <button
+                          key={child.id}
+                          onClick={() => setSettingsDetailView(`allergen-${child.id}`)}
+                          className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <Heart className="h-4 w-4 text-[#f58a2d] shrink-0" />
+                            <div className="min-w-0">
+                              <p className="text-[15px] font-medium text-foreground truncate">{child.name}</p>
+                              <p className="text-[13px] text-muted-foreground truncate">
+                                {child.allergies?.length ? child.allergies.join(', ') : 'Ingen allergener'}
+                              </p>
+                            </div>
+                          </div>
+                          <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex-1 flex items-center justify-center py-8">
+                    <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Family with allergy shield */}
+                      <circle cx="100" cy="70" r="22" fill="#FFE0B2"/>
+                      <ellipse cx="100" cy="120" rx="25" ry="30" fill="#FFE0B2"/>
+                      <circle cx="160" cy="75" r="18" fill="#FFCC80"/>
+                      <ellipse cx="160" cy="118" rx="20" ry="25" fill="#FFCC80"/>
+                      <path d="M130 140 L155 152 L155 175 C155 188 142 195 130 200 C118 195 105 188 105 175 L105 152 Z" fill="#FFF3E0" stroke="#F5A623" strokeWidth="1.5"/>
+                      <path d="M122 170 L128 176 L140 162" stroke="#F5A623" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M125 40 C125 35 130 33 132 37 C134 33 139 35 139 40 C139 47 132 50 132 50 C132 50 125 47 125 40Z" fill="#F48FB1" opacity="0.5"/>
+                    </svg>
+                  </div>
+                </div>
+              )}
+
               {/* ─── allergen sub-pages ─── */}
-              {settingsDetailView?.startsWith('allergen-') && (() => {
+              {settingsDetailView?.startsWith('allergen-') && settingsDetailView !== 'allergen-list' && (() => {
                 const targetId = settingsDetailView.replace('allergen-', '');
                 const isCurrentUser = targetId === currentUser?.id;
                 const person = isCurrentUser ? currentUser : children.find(c => c.id === targetId);
