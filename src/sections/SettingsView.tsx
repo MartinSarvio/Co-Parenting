@@ -762,27 +762,102 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   </div>
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      {/* Name tag / ID card with pencil */}
-                      <rect x="40" y="40" width="180" height="110" rx="16" fill="#FFF3E0" stroke="#F5A623" strokeWidth="2"/>
-                      <rect x="40" y="40" width="180" height="35" rx="16" fill="#F5A623"/>
-                      <rect x="40" y="59" width="180" height="16" fill="#F5A623"/>
-                      <circle cx="80" cy="110" r="20" fill="#FFCC80"/>
-                      <circle cx="80" cy="105" r="8" fill="#FFE0B2"/>
-                      <ellipse cx="80" cy="122" rx="14" ry="8" fill="#FFE0B2"/>
-                      <rect x="112" y="98" width="80" height="8" rx="4" fill="#FFD180"/>
-                      <rect x="112" y="114" width="55" height="6" rx="3" fill="#FFE0B2"/>
-                      <rect x="112" y="128" width="65" height="6" rx="3" fill="#FFE0B2"/>
-                      {/* Pencil */}
-                      <g transform="translate(195, 25) rotate(45)">
-                        <rect x="0" y="0" width="8" height="50" rx="2" fill="#42A5F5"/>
-                        <polygon points="0,50 4,62 8,50" fill="#FFD54F"/>
-                        <rect x="0" y="0" width="8" height="8" rx="1" fill="#EF5350"/>
-                      </g>
-                      {/* Decorative dots */}
-                      <circle cx="30" cy="170" r="4" fill="#FFCC80" opacity="0.5"/>
-                      <circle cx="45" cy="180" r="3" fill="#90CAF9" opacity="0.4"/>
-                      <circle cx="220" cy="170" r="5" fill="#F5A623" opacity="0.3"/>
-                      <circle cx="235" cy="185" r="3" fill="#FFCC80" opacity="0.4"/>
+                      {/* Ground shadow */}
+                      <ellipse cx="130" cy="194" rx="52" ry="5" fill="#000" opacity="0.06"/>
+                      {/* Sparkles */}
+                      <motion.circle cx="210" cy="48" r="5" fill="#F5A623" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}/>
+                      <motion.circle cx="48" cy="60" r="4" fill="#6CB4EE" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 1.1 }}/>
+                      <motion.circle cx="225" cy="140" r="3" fill="#FF8A80" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}/>
+                      {/* Floating name badge */}
+                      <motion.g animate={{ y: [0, -5, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}>
+                        <rect x="155" y="50" width="72" height="52" rx="8" fill="white" stroke="#E0E0E0" strokeWidth="1.5"/>
+                        <rect x="155" y="50" width="72" height="18" rx="8" fill="#6CB4EE"/>
+                        <rect x="155" y="60" width="72" height="8" fill="#6CB4EE"/>
+                        <circle cx="175" cy="86" r="10" fill="#F0C4A8"/>
+                        <rect x="190" y="81" width="28" height="5" rx="2.5" fill="#BDBDBD"/>
+                        <rect x="190" y="91" width="20" height="4" rx="2" fill="#E0E0E0"/>
+                        <rect x="168" y="58" width="22" height="4" rx="2" fill="white" opacity="0.7"/>
+                      </motion.g>
+                      {/* Girl character — body sway */}
+                      <motion.g animate={{ y: [0, -1.5, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}>
+                        {/* Legs */}
+                        <path d="M112 168 Q110 185 108 194" stroke="#4A3728" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        <path d="M126 168 Q128 185 130 194" stroke="#4A3728" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        {/* Shoes */}
+                        <ellipse cx="107" cy="194" rx="9" ry="4" fill="#1A1A2E"/>
+                        <ellipse cx="131" cy="194" rx="9" ry="4" fill="#1A1A2E"/>
+                        <ellipse cx="104" cy="193" rx="4" ry="2" fill="#2C2C2C" opacity="0.4"/>
+                        <ellipse cx="128" cy="193" rx="4" ry="2" fill="#2C2C2C" opacity="0.4"/>
+                        {/* Body — coral shirt */}
+                        <path d="M100 140 C98 130 97 118 100 110 L139 110 C142 118 141 130 139 140 Z" fill="#FF8A80"/>
+                        {/* Blue cardigan */}
+                        <path d="M100 140 C98 130 97 118 100 112 C104 110 110 109 112 110 L119 130 L126 110 C128 109 134 110 138 112 C141 118 140 130 139 140 Z" fill="#6CB4EE"/>
+                        {/* White collar V */}
+                        <path d="M112 110 L119 125 L126 110" stroke="white" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                        {/* Cardigan buttons */}
+                        <circle cx="114" cy="116" r="2" fill="white" opacity="0.8"/>
+                        <circle cx="113" cy="124" r="2" fill="white" opacity="0.8"/>
+                        <circle cx="112" cy="132" r="2" fill="white" opacity="0.8"/>
+                        {/* Left arm relaxed */}
+                        <path d="M100 115 C94 120 90 130 91 140" stroke="#6CB4EE" strokeWidth="9" strokeLinecap="round" fill="none"/>
+                        <path d="M91 140 C89 144 88 148 91 150" stroke="#F0C4A8" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        {/* Left hand fingers */}
+                        <path d="M89 149 L86 155" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M91 151 L89 157" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M93 151 L92 157" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        {/* Right arm reaching forward */}
+                        <path d="M139 115 C145 118 150 125 152 135" stroke="#6CB4EE" strokeWidth="9" strokeLinecap="round" fill="none"/>
+                        <path d="M152 135 C154 140 153 145 150 147" stroke="#F0C4A8" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        {/* Right hand fingers pointing */}
+                        <path d="M151 145 L155 150" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M149 147 L152 153" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M147 148 L149 154" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        {/* Neck */}
+                        <rect x="115" y="100" width="9" height="12" rx="4" fill="#E8B898"/>
+                        {/* Head */}
+                        <ellipse cx="119" cy="88" rx="22" ry="23" fill="#F0C4A8"/>
+                        {/* Ears */}
+                        <ellipse cx="97" cy="89" rx="4" ry="5" fill="#E8B898"/>
+                        <ellipse cx="97" cy="89" rx="2" ry="3" fill="#DDA68A"/>
+                        <ellipse cx="141" cy="89" rx="4" ry="5" fill="#E8B898"/>
+                        <ellipse cx="141" cy="89" rx="2" ry="3" fill="#DDA68A"/>
+                        {/* Braided hair — dark */}
+                        <path d="M97 78 C96 65 100 55 119 55 C138 55 142 65 141 78" fill="#1A1A2E"/>
+                        <path d="M97 80 C90 85 88 95 89 105 C87 108 86 115 88 120 Q92 118 94 115 C93 108 94 100 96 95 C96 87 97 80 97 80Z" fill="#1A1A2E"/>
+                        <path d="M141 80 C148 85 150 95 149 105 C151 108 152 115 150 120 Q146 118 144 115 C145 108 144 100 142 95 C142 87 141 80 141 80Z" fill="#1A1A2E"/>
+                        {/* Braid texture left */}
+                        <path d="M90 92 Q93 90 90 88" stroke="#2C2C2C" strokeWidth="1" fill="none"/>
+                        <path d="M90 98 Q93 96 90 94" stroke="#2C2C2C" strokeWidth="1" fill="none"/>
+                        <path d="M90 104 Q93 102 90 100" stroke="#2C2C2C" strokeWidth="1" fill="none"/>
+                        {/* Braid texture right */}
+                        <path d="M148 92 Q145 90 148 88" stroke="#2C2C2C" strokeWidth="1" fill="none"/>
+                        <path d="M148 98 Q145 96 148 94" stroke="#2C2C2C" strokeWidth="1" fill="none"/>
+                        <path d="M148 104 Q145 102 148 100" stroke="#2C2C2C" strokeWidth="1" fill="none"/>
+                        {/* Pink hair ties */}
+                        <ellipse cx="89" cy="117" rx="4" ry="3" fill="#FF8A80"/>
+                        <ellipse cx="149" cy="117" rx="4" ry="3" fill="#FF8A80"/>
+                        {/* Glasses — red round */}
+                        <circle cx="111" cy="89" r="8" fill="none" stroke="#C0392B" strokeWidth="2"/>
+                        <circle cx="127" cy="89" r="8" fill="none" stroke="#C0392B" strokeWidth="2"/>
+                        <path d="M119 89 L119 89" stroke="#C0392B" strokeWidth="2" strokeLinecap="round"/>
+                        <line x1="103" y1="88" x2="100" y2="87" stroke="#C0392B" strokeWidth="1.5"/>
+                        <line x1="135" y1="88" x2="138" y2="87" stroke="#C0392B" strokeWidth="1.5"/>
+                        {/* Eyebrows */}
+                        <path d="M105 82 Q111 79 117 82" stroke="#1A1A2E" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        <path d="M121 82 Q127 79 133 82" stroke="#1A1A2E" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Eyes */}
+                        <ellipse cx="111" cy="89" rx="5" ry="5" fill="white"/>
+                        <motion.ellipse cx="111" cy="89" rx="3" ry="3" fill="#1A1A2E" animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "111px", originY: "89px" }}/>
+                        <ellipse cx="127" cy="89" rx="5" ry="5" fill="white"/>
+                        <motion.ellipse cx="127" cy="89" rx="3" ry="3" fill="#1A1A2E" animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "127px", originY: "89px" }}/>
+                        {/* Nose */}
+                        <path d="M118 93 Q119 96 120 93" stroke="#DDA68A" strokeWidth="1" fill="none" strokeLinecap="round"/>
+                        {/* Mouth */}
+                        <path d="M113 99 Q119 104 125 99" stroke="#C07060" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Cheek blush */}
+                        <ellipse cx="106" cy="96" rx="6" ry="3.5" fill="#FFB4A2" opacity="0.3"/>
+                        <ellipse cx="132" cy="96" rx="6" ry="3.5" fill="#FFB4A2" opacity="0.3"/>
+                      </motion.g>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ name: profileDraft.name.trim() })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -800,33 +875,88 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   </div>
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      {/* Envelope with @ and flowers */}
-                      <rect x="45" y="55" width="170" height="105" rx="14" fill="#E3F2FD" stroke="#64B5F6" strokeWidth="2"/>
-                      <path d="M45 69 L130 120 L215 69" stroke="#64B5F6" strokeWidth="2" fill="none"/>
-                      <path d="M45 160 L100 120" stroke="#64B5F6" strokeWidth="1.5" fill="none"/>
-                      <path d="M215 160 L160 120" stroke="#64B5F6" strokeWidth="1.5" fill="none"/>
-                      {/* @ symbol */}
-                      <circle cx="130" cy="100" r="18" stroke="#42A5F5" strokeWidth="2.5" fill="none"/>
-                      <circle cx="130" cy="100" r="8" stroke="#42A5F5" strokeWidth="2" fill="none"/>
-                      <path d="M138 100 C138 90 145 88 145 100 C145 112 138 110 138 100" stroke="#42A5F5" strokeWidth="2" fill="none"/>
-                      {/* Flowers */}
-                      <g transform="translate(30, 35)">
-                        <circle cx="0" cy="0" r="6" fill="#F8BBD0"/>
-                        <circle cx="5" cy="-5" r="5" fill="#F48FB1"/>
-                        <circle cx="-5" cy="-5" r="5" fill="#F48FB1"/>
-                        <circle cx="0" cy="-8" r="4" fill="#F8BBD0"/>
-                        <circle cx="0" cy="-3" r="3" fill="#FFD54F"/>
-                      </g>
-                      <g transform="translate(235, 42)">
-                        <circle cx="0" cy="0" r="5" fill="#C5E1A5"/>
-                        <circle cx="4" cy="-4" r="4" fill="#AED581"/>
-                        <circle cx="-4" cy="-4" r="4" fill="#AED581"/>
-                        <circle cx="0" cy="-6" r="3" fill="#C5E1A5"/>
-                        <circle cx="0" cy="-2" r="2.5" fill="#FFD54F"/>
-                      </g>
-                      {/* Stars */}
-                      <circle cx="55" cy="180" r="3" fill="#64B5F6" opacity="0.4"/>
-                      <circle cx="205" cy="175" r="4" fill="#F48FB1" opacity="0.3"/>
+                      {/* Ground shadow */}
+                      <ellipse cx="130" cy="194" rx="52" ry="5" fill="#000" opacity="0.06"/>
+                      {/* Sparkles */}
+                      <motion.circle cx="52" cy="45" r="5" fill="#A5D6A7" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}/>
+                      <motion.circle cx="220" cy="80" r="4" fill="#6CB4EE" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}/>
+                      <motion.circle cx="210" cy="160" r="3" fill="#FFE082" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 1.4 }}/>
+                      {/* Floating envelope upper right */}
+                      <motion.g animate={{ y: [0, -5, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}>
+                        <rect x="168" y="38" width="60" height="42" rx="7" fill="white" stroke="#A5D6A7" strokeWidth="1.5"/>
+                        <path d="M168 45 L198 62 L228 45" stroke="#A5D6A7" strokeWidth="1.5" fill="none"/>
+                        <path d="M168 80 L188 62" stroke="#A5D6A7" strokeWidth="1" fill="none"/>
+                        <path d="M228 80 L208 62" stroke="#A5D6A7" strokeWidth="1" fill="none"/>
+                        <path d="M188 55 L192 51 L196 55 L196 59 L188 59 Z" fill="#A5D6A7" opacity="0.5"/>
+                      </motion.g>
+                      {/* Laptop surface */}
+                      <rect x="78" y="158" width="84" height="6" rx="3" fill="#BDBDBD"/>
+                      <rect x="72" y="163" width="96" height="4" rx="2" fill="#9E9E9E"/>
+                      {/* Laptop screen */}
+                      <rect x="80" y="118" width="80" height="42" rx="5" fill="#1A1A2E"/>
+                      <rect x="84" y="121" width="72" height="36" rx="3" fill="#1E3A5F"/>
+                      <rect x="88" y="125" width="64" height="28" rx="2" fill="#0D2137"/>
+                      <ellipse cx="120" cy="139" rx="20" ry="8" fill="#6CB4EE" opacity="0.2"/>
+                      <rect x="95" y="131" width="35" height="3" rx="1.5" fill="#6CB4EE" opacity="0.5"/>
+                      <rect x="95" y="137" width="25" height="3" rx="1.5" fill="#6CB4EE" opacity="0.3"/>
+                      {/* Boy character — body sway */}
+                      <motion.g animate={{ y: [0, -1.5, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}>
+                        {/* Legs */}
+                        <path d="M110 168 Q108 180 107 192" stroke="#4A3728" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        <path d="M126 168 Q128 180 129 192" stroke="#4A3728" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        {/* Shoes */}
+                        <ellipse cx="106" cy="193" rx="9" ry="4" fill="#1A1A2E"/>
+                        <ellipse cx="130" cy="193" rx="9" ry="4" fill="#1A1A2E"/>
+                        <ellipse cx="103" cy="192" rx="4" ry="2" fill="#2C2C2C" opacity="0.4"/>
+                        <ellipse cx="127" cy="192" rx="4" ry="2" fill="#2C2C2C" opacity="0.4"/>
+                        {/* Body — green sweater */}
+                        <path d="M98 140 C96 130 96 118 99 110 L137 110 C140 118 140 130 138 140 Z" fill="#A5D6A7"/>
+                        {/* Collar line */}
+                        <path d="M110 110 Q118 115 126 110" stroke="#81C784" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Left arm — resting on laptop */}
+                        <path d="M98 115 C92 120 88 130 86 140 C84 147 84 153 86 158" stroke="#A5D6A7" strokeWidth="9" strokeLinecap="round" fill="none"/>
+                        <path d="M86 158 C86 160 87 162 90 163" stroke="#F0C4A8" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        {/* Left hand on laptop */}
+                        <path d="M88 162 L85 168" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M90 163 L88 169" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M92 163 L91 169" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        {/* Right arm resting */}
+                        <path d="M138 115 C144 122 148 132 148 142" stroke="#A5D6A7" strokeWidth="9" strokeLinecap="round" fill="none"/>
+                        <path d="M148 142 C148 148 146 152 144 154" stroke="#F0C4A8" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        {/* Right hand */}
+                        <path d="M145 153 L148 158" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M143 154 L145 160" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M141 154 L142 160" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        {/* Neck */}
+                        <rect x="113" y="100" width="10" height="12" rx="4" fill="#E8B898"/>
+                        {/* Head */}
+                        <ellipse cx="118" cy="88" rx="22" ry="23" fill="#F0C4A8"/>
+                        {/* Ears */}
+                        <ellipse cx="96" cy="89" rx="4" ry="5" fill="#E8B898"/>
+                        <ellipse cx="96" cy="89" rx="2" ry="3" fill="#DDA68A"/>
+                        <ellipse cx="140" cy="89" rx="4" ry="5" fill="#E8B898"/>
+                        <ellipse cx="140" cy="89" rx="2" ry="3" fill="#DDA68A"/>
+                        {/* Short dark hair */}
+                        <path d="M96 80 C96 65 100 55 118 55 C136 55 140 65 140 80" fill="#1A1A2E"/>
+                        <path d="M96 82 C94 78 94 72 96 68 C95 66 94 64 96 63 Q97 68 98 72" fill="#1A1A2E"/>
+                        <path d="M140 82 C142 78 142 72 140 68 C141 66 142 64 140 63 Q139 68 138 72" fill="#1A1A2E"/>
+                        <path d="M98 68 C100 60 108 56 118 55 C128 56 136 60 138 68" fill="#1A1A2E"/>
+                        {/* Eyebrows */}
+                        <path d="M107 82 Q113 79 119 82" stroke="#1A1A2E" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+                        <path d="M117 82 Q123 79 129 82" stroke="#1A1A2E" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+                        {/* Eyes */}
+                        <ellipse cx="110" cy="89" rx="5.5" ry="5.5" fill="white"/>
+                        <motion.ellipse cx="110" cy="89" rx="3" ry="3" fill="#1A1A2E" animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "110px", originY: "89px" }}/>
+                        <ellipse cx="126" cy="89" rx="5.5" ry="5.5" fill="white"/>
+                        <motion.ellipse cx="126" cy="89" rx="3" ry="3" fill="#1A1A2E" animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "126px", originY: "89px" }}/>
+                        {/* Nose */}
+                        <path d="M117 93 Q118 96 119 93" stroke="#DDA68A" strokeWidth="1" fill="none" strokeLinecap="round"/>
+                        {/* Mouth */}
+                        <path d="M112 99 Q118 104 124 99" stroke="#C07060" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Cheek blush */}
+                        <ellipse cx="105" cy="96" rx="6" ry="3.5" fill="#FFB4A2" opacity="0.3"/>
+                        <ellipse cx="131" cy="96" rx="6" ry="3.5" fill="#FFB4A2" opacity="0.3"/>
+                      </motion.g>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ email: profileDraft.email.trim() })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -844,22 +974,81 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   </div>
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      {/* Smartphone with chat bubbles */}
-                      <rect x="90" y="20" width="80" height="150" rx="16" fill="#E8EAF6" stroke="#7986CB" strokeWidth="2"/>
-                      <rect x="96" y="35" width="68" height="110" rx="4" fill="white"/>
-                      <circle cx="130" cy="158" r="6" stroke="#7986CB" strokeWidth="1.5" fill="none"/>
-                      <rect x="118" y="25" width="24" height="4" rx="2" fill="#9FA8DA"/>
-                      {/* Chat bubbles */}
-                      <rect x="102" y="50" width="45" height="22" rx="11" fill="#C5CAE9"/>
-                      <rect x="120" y="80" width="38" height="22" rx="11" fill="#7986CB"/>
-                      <rect x="102" y="110" width="30" height="18" rx="9" fill="#C5CAE9"/>
-                      {/* Signal waves */}
-                      <path d="M185 45 Q195 35 205 45" stroke="#7986CB" strokeWidth="2" fill="none" opacity="0.5"/>
-                      <path d="M180 35 Q195 20 210 35" stroke="#7986CB" strokeWidth="2" fill="none" opacity="0.3"/>
-                      {/* Decorative */}
-                      <circle cx="55" cy="80" r="8" fill="#C5CAE9" opacity="0.3"/>
-                      <circle cx="45" cy="95" r="5" fill="#7986CB" opacity="0.2"/>
-                      <circle cx="210" cy="120" r="6" fill="#9FA8DA" opacity="0.3"/>
+                      {/* Ground shadow */}
+                      <ellipse cx="130" cy="194" rx="52" ry="5" fill="#000" opacity="0.06"/>
+                      {/* Sparkles */}
+                      <motion.circle cx="45" cy="55" r="5" fill="#FFE082" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}/>
+                      <motion.circle cx="215" cy="50" r="4" fill="#6CB4EE" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.9 }}/>
+                      <motion.circle cx="220" cy="150" r="3" fill="#FF8A80" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 1.6 }}/>
+                      {/* Floating chat bubbles right side */}
+                      <motion.g animate={{ y: [0, -5, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}>
+                        <rect x="172" y="55" width="55" height="22" rx="11" fill="#FFE082" stroke="#F5D060" strokeWidth="1"/>
+                        <path d="M172 70 L165 76 L176 70" fill="#FFE082"/>
+                        <rect x="178" y="86" width="44" height="18" rx="9" fill="#6CB4EE" opacity="0.7"/>
+                        <rect x="172" y="112" width="52" height="18" rx="9" fill="#FFE082" opacity="0.6"/>
+                      </motion.g>
+                      {/* Girl character — body sway */}
+                      <motion.g animate={{ y: [0, -1.5, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}>
+                        {/* Legs */}
+                        <path d="M113 168 Q111 180 110 192" stroke="#4A3728" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        <path d="M127 168 Q129 180 130 192" stroke="#4A3728" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        {/* Shoes */}
+                        <ellipse cx="109" cy="193" rx="9" ry="4" fill="#1A1A2E"/>
+                        <ellipse cx="131" cy="193" rx="9" ry="4" fill="#1A1A2E"/>
+                        <ellipse cx="106" cy="192" rx="4" ry="2" fill="#2C2C2C" opacity="0.4"/>
+                        <ellipse cx="128" cy="192" rx="4" ry="2" fill="#2C2C2C" opacity="0.4"/>
+                        {/* Body — yellow top */}
+                        <path d="M101 140 C99 130 99 118 102 110 L138 110 C141 118 141 130 139 140 Z" fill="#FFE082"/>
+                        {/* Phone held at chest */}
+                        <rect x="110" y="120" width="20" height="34" rx="4" fill="#1A1A2E"/>
+                        <rect x="112" y="123" width="16" height="27" rx="2" fill="#2A2A4A"/>
+                        <rect x="116" y="121" width="8" height="2" rx="1" fill="#3A3A5A"/>
+                        {/* Left arm holding phone */}
+                        <path d="M101 115 C97 120 95 130 98 138" stroke="#FFE082" strokeWidth="9" strokeLinecap="round" fill="none"/>
+                        <path d="M98 138 C99 142 105 145 110 144" stroke="#F0C4A8" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        {/* Left hand gripping phone left side */}
+                        <path d="M109 142 L106 148" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M110 144 L108 150" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M111 145 L110 151" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        {/* Right arm holding phone */}
+                        <path d="M138 115 C142 120 143 130 142 138" stroke="#FFE082" strokeWidth="9" strokeLinecap="round" fill="none"/>
+                        <path d="M142 138 C141 142 136 145 131 144" stroke="#F0C4A8" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        {/* Right hand gripping phone right side */}
+                        <path d="M131 142 L134 148" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M130 144 L132 150" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M129 145 L130 151" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        {/* Neck */}
+                        <rect x="115" y="100" width="10" height="12" rx="4" fill="#E8B898"/>
+                        {/* Head */}
+                        <ellipse cx="120" cy="88" rx="22" ry="23" fill="#F0C4A8"/>
+                        {/* Ears */}
+                        <ellipse cx="98" cy="89" rx="4" ry="5" fill="#E8B898"/>
+                        <ellipse cx="98" cy="89" rx="2" ry="3" fill="#DDA68A"/>
+                        <ellipse cx="142" cy="89" rx="4" ry="5" fill="#E8B898"/>
+                        <ellipse cx="142" cy="89" rx="2" ry="3" fill="#DDA68A"/>
+                        {/* Ponytail */}
+                        <path d="M138 68 C148 62 155 65 158 72 C162 80 158 90 152 94 C148 96 144 94 142 90 C146 88 148 82 146 76 C144 70 140 68 138 68Z" fill="#1A1A2E"/>
+                        <path d="M140 90 C140 98 136 108 130 114" stroke="#1A1A2E" strokeWidth="5" strokeLinecap="round" fill="none"/>
+                        {/* Hair */}
+                        <path d="M98 80 C98 65 102 55 120 55 C138 55 142 65 140 78" fill="#1A1A2E"/>
+                        {/* Ponytail tie */}
+                        <ellipse cx="140" cy="72" rx="4" ry="5" fill="#FF8A80"/>
+                        {/* Eyebrows */}
+                        <path d="M109 82 Q115 79 121 82" stroke="#1A1A2E" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+                        <path d="M119 82 Q125 79 131 82" stroke="#1A1A2E" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+                        {/* Eyes */}
+                        <ellipse cx="112" cy="89" rx="5.5" ry="5.5" fill="white"/>
+                        <motion.ellipse cx="112" cy="89" rx="3" ry="3" fill="#1A1A2E" animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "112px", originY: "89px" }}/>
+                        <ellipse cx="128" cy="89" rx="5.5" ry="5.5" fill="white"/>
+                        <motion.ellipse cx="128" cy="89" rx="3" ry="3" fill="#1A1A2E" animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "128px", originY: "89px" }}/>
+                        {/* Nose */}
+                        <path d="M119 93 Q120 96 121 93" stroke="#DDA68A" strokeWidth="1" fill="none" strokeLinecap="round"/>
+                        {/* Mouth */}
+                        <path d="M114 99 Q120 104 126 99" stroke="#C07060" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Cheek blush */}
+                        <ellipse cx="107" cy="96" rx="6" ry="3.5" fill="#FFB4A2" opacity="0.3"/>
+                        <ellipse cx="133" cy="96" rx="6" ry="3.5" fill="#FFB4A2" opacity="0.3"/>
+                      </motion.g>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ phone: profileDraft.phone.trim() || undefined })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -880,30 +1069,109 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   </div>
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      {/* Birthday cake with candles and confetti */}
-                      <ellipse cx="130" cy="160" rx="80" ry="12" fill="#FFCCBC"/>
-                      <rect x="65" y="110" width="130" height="50" rx="12" fill="#FFAB91"/>
-                      <rect x="75" y="85" width="110" height="35" rx="10" fill="#FF8A65"/>
-                      <path d="M75 110 Q130 95 185 110" fill="#FFCCBC"/>
-                      {/* Candles */}
-                      <rect x="100" y="55" width="6" height="30" rx="3" fill="#64B5F6"/>
-                      <ellipse cx="103" cy="50" rx="5" ry="7" fill="#FFD54F"/>
-                      <ellipse cx="103" cy="48" rx="2" ry="4" fill="#FFF176"/>
-                      <rect x="127" y="50" width="6" height="35" rx="3" fill="#F48FB1"/>
-                      <ellipse cx="130" cy="45" rx="5" ry="7" fill="#FFD54F"/>
-                      <ellipse cx="130" cy="43" rx="2" ry="4" fill="#FFF176"/>
-                      <rect x="154" y="55" width="6" height="30" rx="3" fill="#81C784"/>
-                      <ellipse cx="157" cy="50" rx="5" ry="7" fill="#FFD54F"/>
-                      <ellipse cx="157" cy="48" rx="2" ry="4" fill="#FFF176"/>
-                      {/* Confetti */}
-                      <rect x="40" y="30" width="8" height="4" rx="2" fill="#F48FB1" transform="rotate(-20 40 30)"/>
-                      <rect x="210" y="25" width="8" height="4" rx="2" fill="#64B5F6" transform="rotate(15 210 25)"/>
-                      <circle cx="50" cy="60" r="3" fill="#FFD54F"/>
-                      <circle cx="215" cy="55" r="3" fill="#81C784"/>
-                      <rect x="55" cy="45" width="6" height="3" rx="1.5" fill="#CE93D8" transform="rotate(-35 55 45)"/>
-                      <rect x="200" y="40" width="6" height="3" rx="1.5" fill="#FFAB91" transform="rotate(25 200 40)"/>
-                      <circle cx="35" cy="80" r="2" fill="#64B5F6" opacity="0.5"/>
-                      <circle cx="225" cy="75" r="2" fill="#F48FB1" opacity="0.5"/>
+                      {/* Ground shadow */}
+                      <ellipse cx="130" cy="194" rx="52" ry="5" fill="#000" opacity="0.06"/>
+                      {/* Sparkles / confetti */}
+                      <motion.circle cx="50" cy="45" r="5" fill="#F48FB1" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}/>
+                      <motion.circle cx="210" cy="38" r="4" fill="#FFE082" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.7 }}/>
+                      <motion.circle cx="220" cy="130" r="3" fill="#A5D6A7" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 1.3 }}/>
+                      {/* Static confetti pieces */}
+                      <rect x="38" y="55" width="8" height="4" rx="2" fill="#F48FB1" transform="rotate(-20 38 55)" opacity="0.7"/>
+                      <rect x="218" y="48" width="8" height="4" rx="2" fill="#6CB4EE" transform="rotate(15 218 48)" opacity="0.7"/>
+                      <rect x="42" y="80" width="6" height="3" rx="1.5" fill="#CE93D8" transform="rotate(-35 42 80)" opacity="0.7"/>
+                      <rect x="212" y="72" width="6" height="3" rx="1.5" fill="#FFE082" transform="rotate(25 212 72)" opacity="0.7"/>
+                      <circle cx="55" cy="70" r="3" fill="#FFE082" opacity="0.6"/>
+                      <circle cx="205" cy="65" r="3" fill="#A5D6A7" opacity="0.6"/>
+                      {/* Cake — held by right hand, floating slightly */}
+                      <motion.g animate={{ y: [0, -4, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}>
+                        {/* Tier 2 bottom */}
+                        <rect x="140" y="140" width="54" height="28" rx="6" fill="#FFAB91"/>
+                        <path d="M140 148 Q167 140 194 148" fill="#FFCCBC"/>
+                        {/* Tier 1 top */}
+                        <rect x="148" y="116" width="38" height="24" rx="5" fill="#FF8A80"/>
+                        <path d="M148 124 Q167 116 186 124" fill="#FFCCBC"/>
+                        {/* Frosting drips */}
+                        <path d="M152 116 Q154 110 156 116" fill="white"/>
+                        <path d="M160 116 Q162 110 164 116" fill="white"/>
+                        <path d="M168 116 Q170 110 172 116" fill="white"/>
+                        {/* Candles */}
+                        <rect x="154" y="100" width="5" height="16" rx="2.5" fill="#6CB4EE"/>
+                        <rect x="164" y="96" width="5" height="20" rx="2.5" fill="#F48FB1"/>
+                        <rect x="174" y="100" width="5" height="16" rx="2.5" fill="#A5D6A7"/>
+                        {/* Flames */}
+                        <ellipse cx="156" cy="98" rx="3" ry="4" fill="#FFD54F"/>
+                        <ellipse cx="156" cy="97" rx="1.5" ry="2.5" fill="#FFF176"/>
+                        <ellipse cx="166" cy="94" rx="3" ry="4" fill="#FFD54F"/>
+                        <ellipse cx="166" cy="93" rx="1.5" ry="2.5" fill="#FFF176"/>
+                        <ellipse cx="176" cy="98" rx="3" ry="4" fill="#FFD54F"/>
+                        <ellipse cx="176" cy="97" rx="1.5" ry="2.5" fill="#FFF176"/>
+                      </motion.g>
+                      {/* Boy character — body sway */}
+                      <motion.g animate={{ y: [0, -1.5, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}>
+                        {/* Legs */}
+                        <path d="M105 168 Q103 180 102 192" stroke="#4A3728" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        <path d="M119 168 Q121 180 122 192" stroke="#4A3728" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        {/* Shoes */}
+                        <ellipse cx="101" cy="193" rx="9" ry="4" fill="#1A1A2E"/>
+                        <ellipse cx="123" cy="193" rx="9" ry="4" fill="#1A1A2E"/>
+                        <ellipse cx="98" cy="192" rx="4" ry="2" fill="#2C2C2C" opacity="0.4"/>
+                        <ellipse cx="120" cy="192" rx="4" ry="2" fill="#2C2C2C" opacity="0.4"/>
+                        {/* Body — coral shirt */}
+                        <path d="M93 140 C91 130 91 118 94 110 L130 110 C133 118 133 130 131 140 Z" fill="#FF8A80"/>
+                        {/* Left arm celebratory (raised) */}
+                        <path d="M93 116 C88 108 84 100 80 92" stroke="#FF8A80" strokeWidth="9" strokeLinecap="round" fill="none"/>
+                        <path d="M80 92 C78 88 78 83 82 82" stroke="#F0C4A8" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        {/* Left hand celebrating */}
+                        <path d="M80 81 L76 76" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M82 80 L80 74" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M84 81 L84 75" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        {/* Right arm holding cake */}
+                        <path d="M130 116 C136 122 140 130 143 140" stroke="#FF8A80" strokeWidth="9" strokeLinecap="round" fill="none"/>
+                        <path d="M143 140 C144 146 142 152 140 155" stroke="#F0C4A8" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        {/* Right hand under cake */}
+                        <path d="M141 153 L145 158" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M139 154 L142 159" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M137 154 L139 159" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        {/* Neck */}
+                        <rect x="107" y="100" width="10" height="12" rx="4" fill="#E8B898"/>
+                        {/* Head */}
+                        <ellipse cx="112" cy="88" rx="22" ry="23" fill="#F0C4A8"/>
+                        {/* Ears */}
+                        <ellipse cx="90" cy="89" rx="4" ry="5" fill="#E8B898"/>
+                        <ellipse cx="90" cy="89" rx="2" ry="3" fill="#DDA68A"/>
+                        <ellipse cx="134" cy="89" rx="4" ry="5" fill="#E8B898"/>
+                        <ellipse cx="134" cy="89" rx="2" ry="3" fill="#DDA68A"/>
+                        {/* Party hat */}
+                        <path d="M112 68 L105 48 L119 48 Z" fill="#CE93D8"/>
+                        <path d="M107 60 L117 60" stroke="white" strokeWidth="1.5" opacity="0.6"/>
+                        <path d="M105.5 54 L118.5 54" stroke="white" strokeWidth="1.5" opacity="0.6"/>
+                        <circle cx="112" cy="46" r="4" fill="#FFE082"/>
+                        <circle cx="112" cy="44" r="2" fill="white" opacity="0.6"/>
+                        <path d="M105 68 L119 68" stroke="#CE93D8" strokeWidth="2"/>
+                        {/* Curly hair */}
+                        <path d="M90 82 C89 70 91 60 96 56 C96 56 94 63 96 67" fill="#1A1A2E"/>
+                        <path d="M90 80 C88 74 90 68 92 66 Q91 70 93 72" stroke="#1A1A2E" strokeWidth="3" fill="none" strokeLinecap="round"/>
+                        <path d="M134 80 C135 70 133 60 128 56 C128 56 130 63 128 67" fill="#1A1A2E"/>
+                        <path d="M134 80 C136 74 134 68 132 66 Q133 70 131 72" stroke="#1A1A2E" strokeWidth="3" fill="none" strokeLinecap="round"/>
+                        <path d="M93 58 C98 52 106 49 112 49 C118 49 126 52 131 58" fill="#1A1A2E"/>
+                        <path d="M93 62 Q95 58 98 62 Q100 58 103 62 Q105 58 108 62" stroke="#1A1A2E" strokeWidth="2" fill="none" strokeLinecap="round"/>
+                        <path d="M116 62 Q119 58 122 62 Q124 58 127 62 Q129 58 131 62" stroke="#1A1A2E" strokeWidth="2" fill="none" strokeLinecap="round"/>
+                        {/* Eyebrows */}
+                        <path d="M101 82 Q107 79 113 82" stroke="#1A1A2E" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+                        <path d="M111 82 Q117 79 123 82" stroke="#1A1A2E" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+                        {/* Eyes */}
+                        <ellipse cx="104" cy="89" rx="5.5" ry="5.5" fill="white"/>
+                        <motion.ellipse cx="104" cy="89" rx="3" ry="3" fill="#1A1A2E" animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "104px", originY: "89px" }}/>
+                        <ellipse cx="120" cy="89" rx="5.5" ry="5.5" fill="white"/>
+                        <motion.ellipse cx="120" cy="89" rx="3" ry="3" fill="#1A1A2E" animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "120px", originY: "89px" }}/>
+                        {/* Nose */}
+                        <path d="M111 93 Q112 96 113 93" stroke="#DDA68A" strokeWidth="1" fill="none" strokeLinecap="round"/>
+                        {/* Mouth — happy */}
+                        <path d="M106 100 Q112 106 118 100" stroke="#C07060" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Cheek blush */}
+                        <ellipse cx="99" cy="96" rx="6" ry="3.5" fill="#FFB4A2" opacity="0.3"/>
+                        <ellipse cx="125" cy="96" rx="6" ry="3.5" fill="#FFB4A2" opacity="0.3"/>
+                      </motion.g>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ birthDate: profileDraft.birthDate || undefined })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -936,21 +1204,127 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   </div>
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      {/* Two abstract silhouettes with hearts */}
-                      {/* Person 1 */}
-                      <circle cx="95" cy="70" r="25" fill="#90CAF9"/>
-                      <ellipse cx="95" cy="130" rx="30" ry="40" fill="#90CAF9"/>
-                      {/* Person 2 */}
-                      <circle cx="165" cy="70" r="25" fill="#F48FB1"/>
-                      <ellipse cx="165" cy="130" rx="30" ry="40" fill="#F48FB1"/>
-                      {/* Hearts between them */}
-                      <path d="M125 85 C125 78 132 75 135 80 C138 75 145 78 145 85 C145 95 135 100 135 100 C135 100 125 95 125 85Z" fill="#EF5350" opacity="0.7"/>
-                      <path d="M118 105 C118 100 123 98 125 102 C127 98 132 100 132 105 C132 112 125 115 125 115 C125 115 118 112 118 105Z" fill="#EF5350" opacity="0.4"/>
-                      {/* Decorative */}
-                      <circle cx="40" cy="60" r="4" fill="#CE93D8" opacity="0.3"/>
-                      <circle cx="220" cy="55" r="5" fill="#CE93D8" opacity="0.3"/>
-                      <circle cx="50" cy="170" r="3" fill="#90CAF9" opacity="0.4"/>
-                      <circle cx="210" cy="175" r="3" fill="#F48FB1" opacity="0.4"/>
+                      {/* Ground shadows */}
+                      <ellipse cx="88" cy="194" rx="30" ry="4" fill="#000" opacity="0.06"/>
+                      <ellipse cx="172" cy="194" rx="30" ry="4" fill="#000" opacity="0.06"/>
+                      {/* Sparkles */}
+                      <motion.circle cx="130" cy="28" r="5" fill="#EF5350" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}/>
+                      <motion.circle cx="38" cy="80" r="4" fill="#6CB4EE" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.7 }}/>
+                      <motion.circle cx="222" cy="80" r="3" fill="#FF8A80" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 1.4 }}/>
+                      {/* Floating heart between them */}
+                      <motion.g animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }} style={{ originX: "130px", originY: "52px" }}>
+                        <path d="M130 62 C130 55 123 50 120 55 C117 50 110 55 110 62 C110 72 130 80 130 80 C130 80 150 72 150 62 C150 55 143 50 140 55 C137 50 130 55 130 62Z" fill="#EF5350" opacity="0.85"/>
+                      </motion.g>
+                      {/* Both in same body sway */}
+                      <motion.g animate={{ y: [0, -1.5, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}>
+                        {/* ── LEFT PERSON: Boy in blue ── */}
+                        {/* Legs */}
+                        <path d="M78 168 Q76 180 75 192" stroke="#4A3728" strokeWidth="6" strokeLinecap="round" fill="none"/>
+                        <path d="M92 168 Q94 180 95 192" stroke="#4A3728" strokeWidth="6" strokeLinecap="round" fill="none"/>
+                        {/* Shoes */}
+                        <ellipse cx="74" cy="193" rx="8" ry="4" fill="#1A1A2E"/>
+                        <ellipse cx="96" cy="193" rx="8" ry="4" fill="#1A1A2E"/>
+                        <ellipse cx="71" cy="192" rx="3.5" ry="2" fill="#2C2C2C" opacity="0.4"/>
+                        <ellipse cx="93" cy="192" rx="3.5" ry="2" fill="#2C2C2C" opacity="0.4"/>
+                        {/* Body blue shirt */}
+                        <path d="M68 140 C66 130 66 118 69 110 L105 110 C108 118 108 130 106 140 Z" fill="#6CB4EE"/>
+                        {/* Collar */}
+                        <path d="M80 110 Q87 115 94 110" stroke="#5BA4D9" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Left arm */}
+                        <path d="M68 115 C62 122 60 132 61 142" stroke="#6CB4EE" strokeWidth="8" strokeLinecap="round" fill="none"/>
+                        <path d="M61 142 C61 146 63 149 66 150" stroke="#F0C4A8" strokeWidth="6" strokeLinecap="round" fill="none"/>
+                        <path d="M64 149 L61 154" stroke="#F0C4A8" strokeWidth="2" strokeLinecap="round"/>
+                        <path d="M66 150 L64 155" stroke="#F0C4A8" strokeWidth="2" strokeLinecap="round"/>
+                        <path d="M68 150 L67 155" stroke="#F0C4A8" strokeWidth="2" strokeLinecap="round"/>
+                        {/* Right arm slightly toward center */}
+                        <path d="M105 115 C110 120 112 128 111 138" stroke="#6CB4EE" strokeWidth="8" strokeLinecap="round" fill="none"/>
+                        <path d="M111 138 C111 143 109 146 107 147" stroke="#F0C4A8" strokeWidth="6" strokeLinecap="round" fill="none"/>
+                        <path d="M108 146 L111 151" stroke="#F0C4A8" strokeWidth="2" strokeLinecap="round"/>
+                        <path d="M106 147 L108 152" stroke="#F0C4A8" strokeWidth="2" strokeLinecap="round"/>
+                        <path d="M104 147 L105 152" stroke="#F0C4A8" strokeWidth="2" strokeLinecap="round"/>
+                        {/* Neck */}
+                        <rect x="82" y="100" width="9" height="11" rx="4" fill="#E8B898"/>
+                        {/* Head */}
+                        <ellipse cx="87" cy="88" rx="20" ry="21" fill="#F0C4A8"/>
+                        {/* Ears */}
+                        <ellipse cx="67" cy="89" rx="3.5" ry="4.5" fill="#E8B898"/>
+                        <ellipse cx="67" cy="89" rx="1.8" ry="2.5" fill="#DDA68A"/>
+                        <ellipse cx="107" cy="89" rx="3.5" ry="4.5" fill="#E8B898"/>
+                        <ellipse cx="107" cy="89" rx="1.8" ry="2.5" fill="#DDA68A"/>
+                        {/* Short dark hair */}
+                        <path d="M67 82 C67 68 71 58 87 58 C103 58 107 68 107 82" fill="#1A1A2E"/>
+                        <path d="M69 76 C68 70 70 64 72 62 Q71 67 73 70" fill="#1A1A2E"/>
+                        <path d="M105 76 C106 70 104 64 102 62 Q103 67 101 70" fill="#1A1A2E"/>
+                        {/* Eyebrows */}
+                        <path d="M77 82 Q83 79 89 82" stroke="#1A1A2E" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+                        <path d="M85 82 Q91 79 97 82" stroke="#1A1A2E" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+                        {/* Eyes */}
+                        <ellipse cx="80" cy="89" rx="5" ry="5" fill="white"/>
+                        <motion.ellipse cx="80" cy="89" rx="2.8" ry="2.8" fill="#1A1A2E" animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "80px", originY: "89px" }}/>
+                        <ellipse cx="94" cy="89" rx="5" ry="5" fill="white"/>
+                        <motion.ellipse cx="94" cy="89" rx="2.8" ry="2.8" fill="#1A1A2E" animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 4.2, ease: "easeInOut" }} style={{ originX: "94px", originY: "89px" }}/>
+                        {/* Nose */}
+                        <path d="M86 93 Q87 96 88 93" stroke="#DDA68A" strokeWidth="1" fill="none" strokeLinecap="round"/>
+                        {/* Mouth */}
+                        <path d="M81 99 Q87 104 93 99" stroke="#C07060" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+                        {/* Cheek blush */}
+                        <ellipse cx="75" cy="95" rx="5" ry="3" fill="#FFB4A2" opacity="0.3"/>
+                        <ellipse cx="99" cy="95" rx="5" ry="3" fill="#FFB4A2" opacity="0.3"/>
+
+                        {/* ── RIGHT PERSON: Girl in coral ── */}
+                        {/* Legs */}
+                        <path d="M162 168 Q160 180 159 192" stroke="#4A3728" strokeWidth="6" strokeLinecap="round" fill="none"/>
+                        <path d="M176 168 Q178 180 179 192" stroke="#4A3728" strokeWidth="6" strokeLinecap="round" fill="none"/>
+                        {/* Shoes */}
+                        <ellipse cx="158" cy="193" rx="8" ry="4" fill="#1A1A2E"/>
+                        <ellipse cx="180" cy="193" rx="8" ry="4" fill="#1A1A2E"/>
+                        <ellipse cx="155" cy="192" rx="3.5" ry="2" fill="#2C2C2C" opacity="0.4"/>
+                        <ellipse cx="177" cy="192" rx="3.5" ry="2" fill="#2C2C2C" opacity="0.4"/>
+                        {/* Body coral shirt */}
+                        <path d="M150 140 C148 130 148 118 151 110 L187 110 C190 118 190 130 188 140 Z" fill="#FF8A80"/>
+                        {/* Collar */}
+                        <path d="M162 110 Q169 115 176 110" stroke="#FF6060" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Left arm — slightly toward center */}
+                        <path d="M150 115 C145 120 143 128 144 138" stroke="#FF8A80" strokeWidth="8" strokeLinecap="round" fill="none"/>
+                        <path d="M144 138 C144 143 146 146 148 147" stroke="#F0C4A8" strokeWidth="6" strokeLinecap="round" fill="none"/>
+                        <path d="M147 146 L144 151" stroke="#F0C4A8" strokeWidth="2" strokeLinecap="round"/>
+                        <path d="M149 147 L147 152" stroke="#F0C4A8" strokeWidth="2" strokeLinecap="round"/>
+                        <path d="M151 147 L150 152" stroke="#F0C4A8" strokeWidth="2" strokeLinecap="round"/>
+                        {/* Right arm */}
+                        <path d="M187 115 C192 122 194 132 193 142" stroke="#FF8A80" strokeWidth="8" strokeLinecap="round" fill="none"/>
+                        <path d="M193 142 C193 146 191 149 188 150" stroke="#F0C4A8" strokeWidth="6" strokeLinecap="round" fill="none"/>
+                        <path d="M190 149 L193 154" stroke="#F0C4A8" strokeWidth="2" strokeLinecap="round"/>
+                        <path d="M188 150 L190 155" stroke="#F0C4A8" strokeWidth="2" strokeLinecap="round"/>
+                        <path d="M186 150 L187 155" stroke="#F0C4A8" strokeWidth="2" strokeLinecap="round"/>
+                        {/* Neck */}
+                        <rect x="164" y="100" width="9" height="11" rx="4" fill="#E8B898"/>
+                        {/* Head */}
+                        <ellipse cx="169" cy="88" rx="20" ry="21" fill="#F0C4A8"/>
+                        {/* Ears */}
+                        <ellipse cx="149" cy="89" rx="3.5" ry="4.5" fill="#E8B898"/>
+                        <ellipse cx="149" cy="89" rx="1.8" ry="2.5" fill="#DDA68A"/>
+                        <ellipse cx="189" cy="89" rx="3.5" ry="4.5" fill="#E8B898"/>
+                        <ellipse cx="189" cy="89" rx="1.8" ry="2.5" fill="#DDA68A"/>
+                        {/* Longer flowing hair */}
+                        <path d="M149 82 C149 68 153 58 169 58 C185 58 189 68 189 82" fill="#4A3728"/>
+                        <path d="M149 84 C146 90 146 102 148 114 C146 116 145 122 147 126 Q150 124 152 121 C151 114 152 105 153 98 C152 90 150 84 149 84Z" fill="#4A3728"/>
+                        <path d="M189 84 C192 90 192 102 190 114 C192 116 193 122 191 126 Q188 124 186 121 C187 114 186 105 185 98 C186 90 188 84 189 84Z" fill="#4A3728"/>
+                        {/* Eyebrows */}
+                        <path d="M159 82 Q165 79 171 82" stroke="#1A1A2E" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+                        <path d="M167 82 Q173 79 179 82" stroke="#1A1A2E" strokeWidth="1.6" fill="none" strokeLinecap="round"/>
+                        {/* Eyes */}
+                        <ellipse cx="162" cy="89" rx="5" ry="5" fill="white"/>
+                        <motion.ellipse cx="162" cy="89" rx="2.8" ry="2.8" fill="#1A1A2E" animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "162px", originY: "89px" }}/>
+                        <ellipse cx="176" cy="89" rx="5" ry="5" fill="white"/>
+                        <motion.ellipse cx="176" cy="89" rx="2.8" ry="2.8" fill="#1A1A2E" animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 4.2, ease: "easeInOut" }} style={{ originX: "176px", originY: "89px" }}/>
+                        {/* Nose */}
+                        <path d="M168 93 Q169 96 170 93" stroke="#DDA68A" strokeWidth="1" fill="none" strokeLinecap="round"/>
+                        {/* Mouth */}
+                        <path d="M163 99 Q169 104 175 99" stroke="#C07060" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+                        {/* Cheek blush */}
+                        <ellipse cx="157" cy="95" rx="5" ry="3" fill="#FFB4A2" opacity="0.3"/>
+                        <ellipse cx="181" cy="95" rx="5" ry="3" fill="#FFB4A2" opacity="0.3"/>
+                      </motion.g>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ gender: profileDraft.gender || undefined })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -983,35 +1357,93 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   </div>
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      {/* House with pin marker and trees */}
-                      {/* Ground */}
-                      <ellipse cx="130" cy="170" rx="110" ry="15" fill="#C8E6C9"/>
-                      {/* House body */}
-                      <rect x="80" y="95" width="100" height="75" rx="4" fill="#FFF3E0"/>
-                      <rect x="80" y="95" width="100" height="75" rx="4" stroke="#F5A623" strokeWidth="1.5"/>
+                      {/* Ground shadow */}
+                      <ellipse cx="130" cy="194" rx="52" ry="5" fill="#000" opacity="0.06"/>
+                      {/* Sparkles */}
+                      <motion.circle cx="42" cy="50" r="5" fill="#CE93D8" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}/>
+                      <motion.circle cx="222" cy="70" r="4" fill="#6CB4EE" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}/>
+                      <motion.circle cx="48" cy="150" r="3" fill="#FF8A80" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}/>
+                      {/* House */}
+                      <rect x="52" y="106" width="88" height="72" rx="4" fill="#FFF3E0" stroke="#E0C080" strokeWidth="1.5"/>
                       {/* Roof */}
-                      <path d="M70 100 L130 55 L190 100Z" fill="#FF8A65"/>
-                      <path d="M70 100 L130 55 L190 100" stroke="#E64A19" strokeWidth="1.5" fill="none"/>
+                      <path d="M45 110 L96 70 L147 110 Z" fill="#FF8A65"/>
+                      <path d="M45 110 L96 70 L147 110" stroke="#E05A20" strokeWidth="1.5" fill="none"/>
+                      {/* Chimney */}
+                      <rect x="118" y="72" width="12" height="22" rx="2" fill="#BDBDBD"/>
+                      <rect x="116" y="70" width="16" height="6" rx="2" fill="#9E9E9E"/>
                       {/* Door */}
-                      <rect x="115" y="130" width="30" height="40" rx="4" fill="#8D6E63"/>
-                      <circle cx="140" cy="152" r="2.5" fill="#FFD54F"/>
+                      <rect x="83" y="138" width="26" height="40" rx="4" fill="#8D6E63"/>
+                      <circle cx="105" cy="159" r="2" fill="#FFD54F"/>
                       {/* Windows */}
-                      <rect x="90" y="108" width="18" height="18" rx="3" fill="#BBDEFB" stroke="#64B5F6" strokeWidth="1"/>
-                      <rect x="152" y="108" width="18" height="18" rx="3" fill="#BBDEFB" stroke="#64B5F6" strokeWidth="1"/>
-                      <line x1="99" y1="108" x2="99" y2="126" stroke="#64B5F6" strokeWidth="0.5"/>
-                      <line x1="90" y1="117" x2="108" y2="117" stroke="#64B5F6" strokeWidth="0.5"/>
-                      <line x1="161" y1="108" x2="161" y2="126" stroke="#64B5F6" strokeWidth="0.5"/>
-                      <line x1="152" y1="117" x2="170" y2="117" stroke="#64B5F6" strokeWidth="0.5"/>
-                      {/* Pin marker */}
-                      <path d="M130 20 C118 20 108 30 108 42 C108 58 130 75 130 75 C130 75 152 58 152 42 C152 30 142 20 130 20Z" fill="#EF5350"/>
-                      <circle cx="130" cy="40" r="8" fill="white"/>
-                      {/* Trees */}
-                      <rect x="40" y="140" width="6" height="25" fill="#8D6E63"/>
-                      <circle cx="43" cy="128" r="16" fill="#81C784"/>
-                      <circle cx="38" cy="135" r="12" fill="#66BB6A"/>
-                      <rect x="214" y="142" width="5" height="22" fill="#8D6E63"/>
-                      <circle cx="216" cy="132" r="14" fill="#81C784"/>
-                      <circle cx="220" cy="138" r="10" fill="#66BB6A"/>
+                      <rect x="58" y="118" width="20" height="18" rx="3" fill="#BBDEFB" stroke="#64B5F6" strokeWidth="1"/>
+                      <line x1="68" y1="118" x2="68" y2="136" stroke="#64B5F6" strokeWidth="0.8"/>
+                      <line x1="58" y1="127" x2="78" y2="127" stroke="#64B5F6" strokeWidth="0.8"/>
+                      <rect x="114" y="118" width="20" height="18" rx="3" fill="#BBDEFB" stroke="#64B5F6" strokeWidth="1"/>
+                      <line x1="124" y1="118" x2="124" y2="136" stroke="#64B5F6" strokeWidth="0.8"/>
+                      <line x1="114" y1="127" x2="134" y2="127" stroke="#64B5F6" strokeWidth="0.8"/>
+                      {/* Walkway */}
+                      <path d="M83 178 L80 194 L112 194 L109 178 Z" fill="#E0D0C0" opacity="0.8"/>
+                      {/* Floating location pin */}
+                      <motion.g animate={{ y: [0, -5, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}>
+                        <path d="M96 28 C86 28 78 36 78 46 C78 60 96 75 96 75 C96 75 114 60 114 46 C114 36 106 28 96 28Z" fill="#EF5350"/>
+                        <circle cx="96" cy="45" r="7" fill="white"/>
+                      </motion.g>
+                      {/* Girl character — body sway */}
+                      <motion.g animate={{ y: [0, -1.5, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}>
+                        {/* Legs */}
+                        <path d="M176 168 Q174 180 173 192" stroke="#4A3728" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        <path d="M190 168 Q192 180 193 192" stroke="#4A3728" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        {/* Shoes */}
+                        <ellipse cx="172" cy="193" rx="9" ry="4" fill="#1A1A2E"/>
+                        <ellipse cx="194" cy="193" rx="9" ry="4" fill="#1A1A2E"/>
+                        <ellipse cx="169" cy="192" rx="4" ry="2" fill="#2C2C2C" opacity="0.4"/>
+                        <ellipse cx="191" cy="192" rx="4" ry="2" fill="#2C2C2C" opacity="0.4"/>
+                        {/* Body — purple top */}
+                        <path d="M165 140 C163 130 163 118 166 110 L202 110 C205 118 205 130 203 140 Z" fill="#CE93D8"/>
+                        {/* Left arm extended pointing at house */}
+                        <path d="M165 116 C158 118 148 122 140 128" stroke="#CE93D8" strokeWidth="9" strokeLinecap="round" fill="none"/>
+                        <path d="M140 128 C136 131 133 134 132 138" stroke="#F0C4A8" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        {/* Pointing finger */}
+                        <path d="M131 137 L126 134" stroke="#F0C4A8" strokeWidth="3" strokeLinecap="round"/>
+                        <path d="M131 139 L128 142" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M133 140 L131 145" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        {/* Right arm relaxed */}
+                        <path d="M202 116 C208 123 210 133 209 143" stroke="#CE93D8" strokeWidth="9" strokeLinecap="round" fill="none"/>
+                        <path d="M209 143 C209 149 207 153 205 155" stroke="#F0C4A8" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        <path d="M206 154 L209 159" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M204 155 L206 160" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M202 155 L203 160" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        {/* Neck */}
+                        <rect x="179" y="100" width="10" height="12" rx="4" fill="#E8B898"/>
+                        {/* Head */}
+                        <ellipse cx="184" cy="88" rx="22" ry="23" fill="#F0C4A8"/>
+                        {/* Ears */}
+                        <ellipse cx="162" cy="89" rx="4" ry="5" fill="#E8B898"/>
+                        <ellipse cx="162" cy="89" rx="2" ry="3" fill="#DDA68A"/>
+                        <ellipse cx="206" cy="89" rx="4" ry="5" fill="#E8B898"/>
+                        <ellipse cx="206" cy="89" rx="2" ry="3" fill="#DDA68A"/>
+                        {/* Bob haircut */}
+                        <path d="M162 82 C162 68 166 58 184 58 C202 58 206 68 206 82" fill="#4A3728"/>
+                        <path d="M162 84 C160 90 160 100 162 110 C163 114 165 116 167 116 C166 110 165 102 165 95 C164 90 163 84 162 84Z" fill="#4A3728"/>
+                        <path d="M206 84 C208 90 208 100 206 110 C205 114 203 116 201 116 C202 110 203 102 203 95 C204 90 205 84 206 84Z" fill="#4A3728"/>
+                        <path d="M162 108 Q168 114 176 115" stroke="#4A3728" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        <path d="M206 108 Q200 114 192 115" stroke="#4A3728" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Eyebrows */}
+                        <path d="M173 82 Q179 79 185 82" stroke="#1A1A2E" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+                        <path d="M183 82 Q189 79 195 82" stroke="#1A1A2E" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+                        {/* Eyes */}
+                        <ellipse cx="176" cy="89" rx="5.5" ry="5.5" fill="white"/>
+                        <motion.ellipse cx="176" cy="89" rx="3" ry="3" fill="#1A1A2E" animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "176px", originY: "89px" }}/>
+                        <ellipse cx="192" cy="89" rx="5.5" ry="5.5" fill="white"/>
+                        <motion.ellipse cx="192" cy="89" rx="3" ry="3" fill="#1A1A2E" animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "192px", originY: "89px" }}/>
+                        {/* Nose */}
+                        <path d="M183 93 Q184 96 185 93" stroke="#DDA68A" strokeWidth="1" fill="none" strokeLinecap="round"/>
+                        {/* Mouth */}
+                        <path d="M178 99 Q184 104 190 99" stroke="#C07060" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Cheek blush */}
+                        <ellipse cx="171" cy="96" rx="6" ry="3.5" fill="#FFB4A2" opacity="0.3"/>
+                        <ellipse cx="197" cy="96" rx="6" ry="3.5" fill="#FFB4A2" opacity="0.3"/>
+                      </motion.g>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ address: profileDraft.address.trim() || undefined, zipCode: profileDraft.zipCode.trim() || undefined, city: profileDraft.city.trim() || undefined })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -1029,31 +1461,83 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   </div>
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      {/* Globe with flags and airplane */}
-                      <circle cx="130" cy="100" r="65" fill="#E3F2FD" stroke="#64B5F6" strokeWidth="2"/>
-                      {/* Globe lines */}
-                      <ellipse cx="130" cy="100" rx="65" ry="25" stroke="#90CAF9" strokeWidth="1" fill="none"/>
-                      <ellipse cx="130" cy="100" rx="25" ry="65" stroke="#90CAF9" strokeWidth="1" fill="none"/>
-                      <line x1="65" y1="100" x2="195" y2="100" stroke="#90CAF9" strokeWidth="1"/>
-                      <line x1="130" y1="35" x2="130" y2="165" stroke="#90CAF9" strokeWidth="1"/>
-                      {/* Continents (abstract shapes) */}
-                      <ellipse cx="110" cy="85" rx="20" ry="15" fill="#81C784" opacity="0.6"/>
-                      <ellipse cx="155" cy="90" rx="15" ry="20" fill="#81C784" opacity="0.6"/>
-                      <ellipse cx="120" cy="115" rx="18" ry="12" fill="#81C784" opacity="0.5"/>
-                      {/* Danish flag */}
-                      <g transform="translate(185, 45)">
-                        <rect x="0" y="0" width="30" height="20" rx="2" fill="#C8102E"/>
-                        <rect x="9" y="0" width="4" height="20" fill="white"/>
-                        <rect x="0" y="8" width="30" height="4" fill="white"/>
-                      </g>
-                      {/* Airplane */}
-                      <g transform="translate(50, 35) rotate(-20)">
-                        <ellipse cx="0" cy="0" rx="12" ry="3" fill="#7986CB"/>
-                        <path d="M-5 0 L-2 -8 L2 0" fill="#9FA8DA"/>
-                        <path d="M8 0 L12 -4 L12 0" fill="#9FA8DA"/>
-                      </g>
-                      {/* Dotted flight path */}
-                      <path d="M55 40 Q90 20 130 35" stroke="#7986CB" strokeWidth="1" strokeDasharray="3 3" fill="none" opacity="0.5"/>
+                      {/* Ground shadow */}
+                      <ellipse cx="130" cy="194" rx="52" ry="5" fill="#000" opacity="0.06"/>
+                      {/* Sparkles */}
+                      <motion.circle cx="46" cy="58" r="5" fill="#A5D6A7" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}/>
+                      <motion.circle cx="218" cy="65" r="4" fill="#6CB4EE" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.9 }}/>
+                      <motion.circle cx="50" cy="150" r="3" fill="#FFE082" opacity="0.15" animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 1.6 }}/>
+                      {/* Floating globe above head */}
+                      <motion.g animate={{ x: [0, 2, 0], y: [0, -3, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}>
+                        <circle cx="130" cy="52" r="32" fill="#E3F2FD" stroke="#64B5F6" strokeWidth="1.5"/>
+                        {/* Globe latitude/longitude lines */}
+                        <ellipse cx="130" cy="52" rx="32" ry="12" stroke="#90CAF9" strokeWidth="1" fill="none"/>
+                        <ellipse cx="130" cy="52" rx="12" ry="32" stroke="#90CAF9" strokeWidth="1" fill="none"/>
+                        <line x1="98" y1="52" x2="162" y2="52" stroke="#90CAF9" strokeWidth="0.8"/>
+                        {/* Africa */}
+                        <path d="M126 44 C128 40 133 40 135 44 C138 48 138 56 136 60 C134 64 130 64 128 60 C126 56 124 48 126 44Z" fill="#81C784" opacity="0.7"/>
+                        {/* Europe */}
+                        <path d="M116 38 C118 36 122 36 122 40 C122 44 118 46 116 44 C114 42 114 40 116 38Z" fill="#81C784" opacity="0.6"/>
+                        {/* Americas hint */}
+                        <path d="M110 48 C112 44 114 46 114 50 C114 54 112 56 110 54 C108 52 108 50 110 48Z" fill="#81C784" opacity="0.5"/>
+                      </motion.g>
+                      {/* Boy character — body sway */}
+                      <motion.g animate={{ y: [0, -1.5, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}>
+                        {/* Legs */}
+                        <path d="M113 168 Q111 180 110 192" stroke="#4A3728" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        <path d="M127 168 Q129 180 130 192" stroke="#4A3728" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        {/* Shoes */}
+                        <ellipse cx="109" cy="193" rx="9" ry="4" fill="#1A1A2E"/>
+                        <ellipse cx="131" cy="193" rx="9" ry="4" fill="#1A1A2E"/>
+                        <ellipse cx="106" cy="192" rx="4" ry="2" fill="#2C2C2C" opacity="0.4"/>
+                        <ellipse cx="128" cy="192" rx="4" ry="2" fill="#2C2C2C" opacity="0.4"/>
+                        {/* Body — green shirt */}
+                        <path d="M101 140 C99 130 99 118 102 110 L138 110 C141 118 141 130 139 140 Z" fill="#A5D6A7"/>
+                        {/* Collar */}
+                        <path d="M113 110 Q120 115 127 110" stroke="#81C784" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Left arm raised holding globe */}
+                        <path d="M101 115 C96 108 93 100 95 88" stroke="#A5D6A7" strokeWidth="9" strokeLinecap="round" fill="none"/>
+                        <path d="M95 88 C95 83 97 80 100 80" stroke="#F0C4A8" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        {/* Left hand fingers under globe */}
+                        <path d="M99 79 L96 74" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M101 79 L100 73" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M103 80 L103 74" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        {/* Right arm raised holding globe */}
+                        <path d="M139 115 C144 108 147 100 145 88" stroke="#A5D6A7" strokeWidth="9" strokeLinecap="round" fill="none"/>
+                        <path d="M145 88 C145 83 143 80 140 80" stroke="#F0C4A8" strokeWidth="7" strokeLinecap="round" fill="none"/>
+                        {/* Right hand fingers under globe */}
+                        <path d="M141 79 L144 74" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M139 79 L140 73" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M137 80 L137 74" stroke="#F0C4A8" strokeWidth="2.5" strokeLinecap="round"/>
+                        {/* Neck */}
+                        <rect x="115" y="100" width="10" height="12" rx="4" fill="#E8B898"/>
+                        {/* Head */}
+                        <ellipse cx="120" cy="90" rx="20" ry="21" fill="#F0C4A8"/>
+                        {/* Ears */}
+                        <ellipse cx="100" cy="91" rx="3.5" ry="4.5" fill="#E8B898"/>
+                        <ellipse cx="100" cy="91" rx="1.8" ry="2.5" fill="#DDA68A"/>
+                        <ellipse cx="140" cy="91" rx="3.5" ry="4.5" fill="#E8B898"/>
+                        <ellipse cx="140" cy="91" rx="1.8" ry="2.5" fill="#DDA68A"/>
+                        {/* Wavy hair */}
+                        <path d="M100 84 C100 70 104 60 120 60 C136 60 140 70 140 84" fill="#1A1A2E"/>
+                        <path d="M100 72 Q104 68 108 72 Q112 68 116 72 Q120 68 124 72 Q128 68 132 72 Q136 68 140 72" stroke="#1A1A2E" strokeWidth="2" fill="none" strokeLinecap="round"/>
+                        <path d="M100 78 Q103 74 106 78 Q109 74 112 78" stroke="#1A1A2E" strokeWidth="2" fill="none" strokeLinecap="round"/>
+                        {/* Eyebrows */}
+                        <path d="M109 84 Q115 81 121 84" stroke="#1A1A2E" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+                        <path d="M119 84 Q125 81 131 84" stroke="#1A1A2E" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+                        {/* Eyes */}
+                        <ellipse cx="112" cy="91" rx="5.5" ry="5.5" fill="white"/>
+                        <motion.ellipse cx="112" cy="91" rx="3" ry="3" fill="#1A1A2E" animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "112px", originY: "91px" }}/>
+                        <ellipse cx="128" cy="91" rx="5.5" ry="5.5" fill="white"/>
+                        <motion.ellipse cx="128" cy="91" rx="3" ry="3" fill="#1A1A2E" animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "128px", originY: "91px" }}/>
+                        {/* Nose */}
+                        <path d="M119 95 Q120 98 121 95" stroke="#DDA68A" strokeWidth="1" fill="none" strokeLinecap="round"/>
+                        {/* Mouth */}
+                        <path d="M114 101 Q120 106 126 101" stroke="#C07060" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Cheek blush */}
+                        <ellipse cx="107" cy="97" rx="6" ry="3.5" fill="#FFB4A2" opacity="0.3"/>
+                        <ellipse cx="133" cy="97" rx="6" ry="3.5" fill="#FFB4A2" opacity="0.3"/>
+                      </motion.g>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ country: profileDraft.country.trim() || undefined })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -1108,14 +1592,84 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   </div>
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      {/* Family with allergy shield */}
-                      <circle cx="100" cy="70" r="22" fill="#FFE0B2"/>
-                      <ellipse cx="100" cy="120" rx="25" ry="30" fill="#FFE0B2"/>
-                      <circle cx="160" cy="75" r="18" fill="#FFCC80"/>
-                      <ellipse cx="160" cy="118" rx="20" ry="25" fill="#FFCC80"/>
-                      <path d="M130 140 L155 152 L155 175 C155 188 142 195 130 200 C118 195 105 188 105 175 L105 152 Z" fill="#FFF3E0" stroke="#F5A623" strokeWidth="1.5"/>
-                      <path d="M122 170 L128 176 L140 162" stroke="#F5A623" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M125 40 C125 35 130 33 132 37 C134 33 139 35 139 40 C139 47 132 50 132 50 C132 50 125 47 125 40Z" fill="#F48FB1" opacity="0.5"/>
+                      {/* Ground shadow */}
+                      <ellipse cx="130" cy="194" rx="52" ry="5" fill="#000" opacity="0.06"/>
+                      {/* Parent (left) head */}
+                      <ellipse cx="90" cy="70" rx="18" ry="20" fill="#F0C4A8"/>
+                      {/* Parent hair */}
+                      <path d="M72 66 C72 50 80 44 90 44 C100 44 108 50 108 66 C105 58 101 56 90 56 C79 56 75 58 72 66Z" fill="#2C2C2C"/>
+                      {/* Parent ears */}
+                      <ellipse cx="72" cy="70" rx="3.5" ry="4.5" fill="#F0C4A8"/>
+                      <ellipse cx="72.5" cy="70" rx="2" ry="3" fill="#E8B898"/>
+                      <ellipse cx="108" cy="70" rx="3.5" ry="4.5" fill="#F0C4A8"/>
+                      <ellipse cx="107.5" cy="70" rx="2" ry="3" fill="#E8B898"/>
+                      {/* Parent eyes */}
+                      <ellipse cx="84" cy="68" rx="3.5" ry="4" fill="white"/>
+                      <ellipse cx="96" cy="68" rx="3.5" ry="4" fill="white"/>
+                      <ellipse cx="84" cy="69" rx="2" ry="2.5" fill="#1A1A2E"/>
+                      <ellipse cx="96" cy="69" rx="2" ry="2.5" fill="#1A1A2E"/>
+                      {/* Parent eyebrows */}
+                      <path d="M80 62 Q84 60 88 62" stroke="#2C2C2C" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                      <path d="M92 62 Q96 60 100 62" stroke="#2C2C2C" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                      {/* Parent nose */}
+                      <path d="M89 73 Q90 76 91 73" stroke="#E8B898" strokeWidth="1" fill="none"/>
+                      {/* Parent mouth */}
+                      <path d="M84 77 Q90 81 96 77" stroke="#DDA68A" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                      {/* Parent cheeks */}
+                      <ellipse cx="80" cy="76" rx="5" ry="3" fill="#FFB4A2" opacity="0.3"/>
+                      <ellipse cx="100" cy="76" rx="5" ry="3" fill="#FFB4A2" opacity="0.3"/>
+                      {/* Parent neck */}
+                      <rect x="86" y="88" width="8" height="9" fill="#F0C4A8"/>
+                      {/* Parent body coral */}
+                      <path d="M70 97 C70 95 76 93 90 93 C104 93 110 95 110 97 L113 148 L67 148 Z" fill="#FF8A80"/>
+                      {/* Parent legs */}
+                      <path d="M78 148 L75 184 L83 184 L87 152 Z" fill="#4A3728"/>
+                      <path d="M102 148 L105 184 L97 184 L93 152 Z" fill="#4A3728"/>
+                      {/* Parent shoes */}
+                      <ellipse cx="79" cy="185" rx="7" ry="3.5" fill="#1A1A2E"/>
+                      <ellipse cx="101" cy="185" rx="7" ry="3.5" fill="#1A1A2E"/>
+                      {/* Parent arms */}
+                      <path d="M70 99 L59 117 L64 119 L74 103 Z" fill="#FF8A80"/>
+                      <path d="M110 99 L121 117 L116 119 L106 103 Z" fill="#FF8A80"/>
+                      {/* Shield between parent and child */}
+                      <path d="M126 105 L135 110 L135 128 C135 135 130 139 126 141 C122 139 117 135 117 128 L117 110 Z" fill="white" stroke="#A5D6A7" strokeWidth="2"/>
+                      {/* Checkmark in shield */}
+                      <path d="M120 124 L125 129 L132 117" stroke="#4CAF50" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      {/* Child (right, shorter) head */}
+                      <ellipse cx="170" cy="82" rx="15" ry="17" fill="#F0C4A8"/>
+                      {/* Child hair */}
+                      <path d="M155 79 C155 67 162 61 170 61 C178 61 185 67 185 79 C182 72 178 70 170 70 C162 70 158 72 155 79Z" fill="#4A3728"/>
+                      {/* Child ears */}
+                      <ellipse cx="155" cy="82" rx="3" ry="4" fill="#F0C4A8"/>
+                      <ellipse cx="185" cy="82" rx="3" ry="4" fill="#F0C4A8"/>
+                      {/* Child eyes */}
+                      <ellipse cx="165" cy="80" rx="3" ry="3.5" fill="white"/>
+                      <ellipse cx="175" cy="80" rx="3" ry="3.5" fill="white"/>
+                      <ellipse cx="165" cy="81" rx="1.8" ry="2.2" fill="#1A1A2E"/>
+                      <ellipse cx="175" cy="81" rx="1.8" ry="2.2" fill="#1A1A2E"/>
+                      {/* Child eyebrows */}
+                      <path d="M161 74 Q165 72 169 74" stroke="#4A3728" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                      <path d="M171 74 Q175 72 179 74" stroke="#4A3728" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                      {/* Child nose */}
+                      <path d="M169 85 Q170 88 171 85" stroke="#E8B898" strokeWidth="1" fill="none"/>
+                      {/* Child mouth */}
+                      <path d="M163 89 Q170 93 177 89" stroke="#DDA68A" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                      {/* Child cheeks */}
+                      <ellipse cx="161" cy="87" rx="4" ry="2.5" fill="#FFB4A2" opacity="0.3"/>
+                      <ellipse cx="179" cy="87" rx="4" ry="2.5" fill="#FFB4A2" opacity="0.3"/>
+                      {/* Child neck */}
+                      <rect x="166" y="97" width="7" height="8" fill="#F0C4A8"/>
+                      {/* Child body blue */}
+                      <path d="M155 105 C155 103 161 101 170 101 C179 101 185 103 185 105 L187 148 L153 148 Z" fill="#6CB4EE"/>
+                      {/* Child legs */}
+                      <path d="M162 148 L160 184 L167 184 L170 152 Z" fill="#4A3728"/>
+                      <path d="M178 148 L180 184 L173 184 L170 152 Z" fill="#4A3728"/>
+                      {/* Child shoes */}
+                      <ellipse cx="163" cy="185" rx="6" ry="3" fill="#1A1A2E"/>
+                      <ellipse cx="177" cy="185" rx="6" ry="3" fill="#1A1A2E"/>
+                      {/* Child arms */}
+                      <path d="M155 107 L146 122 L151 124 L160 109 Z" fill="#6CB4EE"/>
+                      <path d="M185 107 L194 122 L189 124 L180 109 Z" fill="#6CB4EE"/>
                     </svg>
                   </div>
                 </div>
@@ -1162,13 +1716,104 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                     </div>
                     <div className="flex-1 flex items-center justify-center py-8">
                       <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        {/* Shield with heart (allergy protection) */}
-                        <path d="M130 25 L185 55 L185 115 C185 145 155 170 130 180 C105 170 75 145 75 115 L75 55 Z" fill="#FFF3E0" stroke="#F5A623" strokeWidth="2"/>
-                        <path d="M130 45 L170 67 L170 112 C170 135 150 155 130 162 C110 155 90 135 90 112 L90 67 Z" fill="#FFE0B2"/>
-                        {/* Heart in shield */}
-                        <path d="M115 95 C115 82 125 78 130 86 C135 78 145 82 145 95 C145 112 130 120 130 120 C130 120 115 112 115 95Z" fill="#EF5350" opacity="0.7"/>
-                        {/* Check mark */}
-                        <path d="M120 98 L128 106 L142 88" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                        {/* Ground shadow */}
+                        <ellipse cx="130" cy="194" rx="52" ry="5" fill="#000" opacity="0.06"/>
+                        {/* Sparkle pulses */}
+                        <motion.circle animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }} cx="38" cy="45" r="5" fill="#A5D6A7"/>
+                        <motion.circle animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 1.1 }} cx="222" cy="50" r="4" fill="#6CB4EE"/>
+                        <motion.circle animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.7 }} cx="130" cy="22" r="3" fill="#FFE082"/>
+                        {/* Body sway wrapper */}
+                        <motion.g animate={{ y: [0, -1.5, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}>
+                          {/* Parent (left, coral shirt) */}
+                          {/* Parent head */}
+                          <ellipse cx="82" cy="70" rx="19" ry="21" fill="#F0C4A8"/>
+                          {/* Parent hair */}
+                          <path d="M63 66 C63 49 71 43 82 43 C93 43 101 49 101 66 C98 58 94 56 82 56 C70 56 66 58 63 66Z" fill="#2C2C2C"/>
+                          {/* Parent ears */}
+                          <ellipse cx="63" cy="70" rx="3.5" ry="4.5" fill="#F0C4A8"/>
+                          <ellipse cx="63.5" cy="70" rx="2" ry="3" fill="#E8B898"/>
+                          <ellipse cx="101" cy="70" rx="3.5" ry="4.5" fill="#F0C4A8"/>
+                          <ellipse cx="100.5" cy="70" rx="2" ry="3" fill="#E8B898"/>
+                          {/* Parent eyes */}
+                          <ellipse cx="76" cy="68" rx="4" ry="4.5" fill="white"/>
+                          <ellipse cx="88" cy="68" rx="4" ry="4.5" fill="white"/>
+                          <motion.ellipse animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "76px", originY: "69px" }} cx="76" cy="69" rx="2.5" ry="3" fill="#1A1A2E"/>
+                          <motion.ellipse animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "88px", originY: "69px" }} cx="88" cy="69" rx="2.5" ry="3" fill="#1A1A2E"/>
+                          {/* Parent eyebrows */}
+                          <path d="M71 62 Q76 59 81 62" stroke="#2C2C2C" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                          <path d="M83 62 Q88 59 93 62" stroke="#2C2C2C" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                          {/* Parent nose */}
+                          <path d="M80 74 Q82 77 84 74" stroke="#E8B898" strokeWidth="1" fill="none"/>
+                          {/* Parent mouth */}
+                          <path d="M75 80 Q82 85 89 80" stroke="#DDA68A" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                          {/* Parent cheeks */}
+                          <ellipse cx="71" cy="78" rx="5" ry="3" fill="#FFB4A2" opacity="0.3"/>
+                          <ellipse cx="93" cy="78" rx="5" ry="3" fill="#FFB4A2" opacity="0.3"/>
+                          {/* Parent neck */}
+                          <rect x="78" y="89" width="8" height="10" fill="#F0C4A8"/>
+                          {/* Parent body coral */}
+                          <path d="M61 99 C61 97 68 95 82 95 C96 95 103 97 103 99 L106 150 L58 150 Z" fill="#FF8A80"/>
+                          {/* Parent legs */}
+                          <path d="M70 150 L67 186 L75 186 L79 154 Z" fill="#4A3728"/>
+                          <path d="M94 150 L97 186 L89 186 L85 154 Z" fill="#4A3728"/>
+                          {/* Parent shoes */}
+                          <ellipse cx="71" cy="187" rx="7.5" ry="3.5" fill="#1A1A2E"/>
+                          <ellipse cx="93" cy="187" rx="7.5" ry="3.5" fill="#1A1A2E"/>
+                          {/* Parent arm reaching toward shield */}
+                          <path d="M103 101 L118 115 L113 118 L100 105 Z" fill="#FF8A80"/>
+                          {/* Parent other arm */}
+                          <path d="M61 101 L50 117 L55 120 L65 104 Z" fill="#FF8A80"/>
+                          {/* Parent fingers (reaching hand) */}
+                          <path d="M111 116 L115 113 L117 117 L113 120Z" fill="#F0C4A8"/>
+                          <path d="M114 118 L118 115 L120 119 L116 122Z" fill="#F0C4A8"/>
+                          {/* Floating shield */}
+                          <motion.g animate={{ y: [0, -5, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}>
+                            <path d="M130 85 L143 93 L143 114 C143 123 136 129 130 132 C124 129 117 123 117 114 L117 93 Z" fill="white" stroke="#A5D6A7" strokeWidth="2"/>
+                            <path d="M130 95 L140 101 L140 117 C140 124 135 128 130 130 C125 128 120 124 120 117 L120 101 Z" fill="#E8F5E9"/>
+                            <path d="M124 113 L128 118 L136 106" stroke="#4CAF50" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </motion.g>
+                          {/* Child (right, blue shirt) */}
+                          {/* Child head */}
+                          <ellipse cx="178" cy="80" rx="16" ry="18" fill="#F0C4A8"/>
+                          {/* Child hair */}
+                          <path d="M162 77 C162 65 169 59 178 59 C187 59 194 65 194 77 C191 70 187 68 178 68 C169 68 165 70 162 77Z" fill="#4A3728"/>
+                          {/* Child ears */}
+                          <ellipse cx="162" cy="80" rx="3" ry="4" fill="#F0C4A8"/>
+                          <ellipse cx="162.5" cy="80" rx="1.8" ry="2.5" fill="#E8B898"/>
+                          <ellipse cx="194" cy="80" rx="3" ry="4" fill="#F0C4A8"/>
+                          <ellipse cx="193.5" cy="80" rx="1.8" ry="2.5" fill="#E8B898"/>
+                          {/* Child eyes */}
+                          <ellipse cx="173" cy="78" rx="3.5" ry="4" fill="white"/>
+                          <ellipse cx="183" cy="78" rx="3.5" ry="4" fill="white"/>
+                          <motion.ellipse animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut", delay: 1.2 }} style={{ originX: "173px", originY: "79px" }} cx="173" cy="79" rx="2.2" ry="2.7" fill="#1A1A2E"/>
+                          <motion.ellipse animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut", delay: 1.2 }} style={{ originX: "183px", originY: "79px" }} cx="183" cy="79" rx="2.2" ry="2.7" fill="#1A1A2E"/>
+                          {/* Child eyebrows */}
+                          <path d="M168 72 Q173 70 178 72" stroke="#4A3728" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                          <path d="M178 72 Q183 70 188 72" stroke="#4A3728" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                          {/* Child nose */}
+                          <path d="M176 84 Q178 87 180 84" stroke="#E8B898" strokeWidth="1" fill="none"/>
+                          {/* Child mouth */}
+                          <path d="M171 89 Q178 93 185 89" stroke="#DDA68A" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                          {/* Child cheeks */}
+                          <ellipse cx="168" cy="87" rx="4.5" ry="2.8" fill="#FFB4A2" opacity="0.3"/>
+                          <ellipse cx="188" cy="87" rx="4.5" ry="2.8" fill="#FFB4A2" opacity="0.3"/>
+                          {/* Child neck */}
+                          <rect x="174" y="96" width="7" height="9" fill="#F0C4A8"/>
+                          {/* Child body blue */}
+                          <path d="M161 105 C161 103 167 101 178 101 C189 101 195 103 195 105 L197 150 L159 150 Z" fill="#6CB4EE"/>
+                          {/* Child legs */}
+                          <path d="M168 150 L166 186 L173 186 L176 154 Z" fill="#4A3728"/>
+                          <path d="M188 150 L190 186 L183 186 L180 154 Z" fill="#4A3728"/>
+                          {/* Child shoes */}
+                          <ellipse cx="169" cy="187" rx="6.5" ry="3" fill="#1A1A2E"/>
+                          <ellipse cx="187" cy="187" rx="6.5" ry="3" fill="#1A1A2E"/>
+                          {/* Child arms */}
+                          <path d="M161 107 L142 121 L147 124 L165 110 Z" fill="#6CB4EE"/>
+                          <path d="M195 107 L208 120 L203 123 L191 110 Z" fill="#6CB4EE"/>
+                          {/* Child fingers reaching */}
+                          <path d="M143 119 L140 115 L137 118 L140 122Z" fill="#F0C4A8"/>
+                          <path d="M141 122 L138 118 L135 121 L138 125Z" fill="#F0C4A8"/>
+                        </motion.g>
                       </svg>
                     </div>
                   </div>
@@ -1187,20 +1832,79 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   </div>
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      {/* Download / export illustration */}
-                      <rect x="80" y="30" width="100" height="120" rx="12" fill="#E8EAF6" stroke="#7986CB" strokeWidth="2"/>
-                      <rect x="95" y="55" width="70" height="6" rx="3" fill="#C5CAE9"/>
-                      <rect x="95" y="70" width="50" height="6" rx="3" fill="#C5CAE9"/>
-                      <rect x="95" y="85" width="60" height="6" rx="3" fill="#C5CAE9"/>
-                      <rect x="95" y="100" width="40" height="6" rx="3" fill="#C5CAE9"/>
-                      {/* Download arrow */}
-                      <circle cx="130" cy="160" r="22" fill="#7986CB"/>
-                      <path d="M130 148 L130 168" stroke="white" strokeWidth="3" strokeLinecap="round"/>
-                      <path d="M122 162 L130 170 L138 162" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-                      {/* Sparkles */}
-                      <circle cx="55" cy="50" r="4" fill="#FFD54F" opacity="0.5"/>
-                      <circle cx="205" cy="45" r="3" fill="#7986CB" opacity="0.4"/>
-                      <circle cx="60" cy="150" r="3" fill="#C5CAE9" opacity="0.4"/>
+                      {/* Ground shadow */}
+                      <ellipse cx="130" cy="194" rx="52" ry="5" fill="#000" opacity="0.06"/>
+                      {/* Sparkle pulses */}
+                      <motion.circle animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }} cx="38" cy="40" r="5" fill="#FFE082"/>
+                      <motion.circle animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 1.1 }} cx="222" cy="38" r="4" fill="#6CB4EE"/>
+                      <motion.circle animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.6 }} cx="38" cy="155" r="3" fill="#A5D6A7"/>
+                      {/* Body sway */}
+                      <motion.g animate={{ y: [0, -1.5, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}>
+                        {/* Clipboard prop */}
+                        <rect x="148" y="55" width="52" height="68" rx="6" fill="white" stroke="#B0BEC5" strokeWidth="1.5"/>
+                        <rect x="155" y="64" width="38" height="5" rx="2.5" fill="#CFD8DC"/>
+                        <rect x="155" y="74" width="28" height="5" rx="2.5" fill="#CFD8DC"/>
+                        <rect x="155" y="84" width="34" height="5" rx="2.5" fill="#CFD8DC"/>
+                        <rect x="155" y="94" width="22" height="5" rx="2.5" fill="#CFD8DC"/>
+                        <rect x="155" y="104" width="30" height="5" rx="2.5" fill="#CFD8DC"/>
+                        {/* Clipboard clip */}
+                        <rect x="165" y="51" width="18" height="10" rx="4" fill="#90A4AE"/>
+                        <rect x="168" y="53" width="12" height="6" rx="2" fill="#B0BEC5"/>
+                        {/* Person — head */}
+                        <ellipse cx="100" cy="68" rx="20" ry="22" fill="#F0C4A8"/>
+                        {/* Hair — neat parted */}
+                        <path d="M80 64 C80 47 88 41 100 41 C112 41 120 47 120 64 C116 53 108 50 100 50 C92 50 84 53 80 64Z" fill="#1A1A2E"/>
+                        <path d="M98 41 C98 45 99 50 100 50 C101 50 102 45 102 41" fill="#1A1A2E"/>
+                        {/* Ears */}
+                        <ellipse cx="80" cy="68" rx="4" ry="5" fill="#F0C4A8"/>
+                        <ellipse cx="80.5" cy="68" rx="2.2" ry="3" fill="#E8B898"/>
+                        <ellipse cx="120" cy="68" rx="4" ry="5" fill="#F0C4A8"/>
+                        <ellipse cx="119.5" cy="68" rx="2.2" ry="3" fill="#E8B898"/>
+                        {/* Eyes */}
+                        <ellipse cx="93" cy="66" rx="4" ry="4.5" fill="white"/>
+                        <ellipse cx="107" cy="66" rx="4" ry="4.5" fill="white"/>
+                        <motion.ellipse animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "93px", originY: "67px" }} cx="93" cy="67" rx="2.5" ry="3" fill="#1A1A2E"/>
+                        <motion.ellipse animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "107px", originY: "67px" }} cx="107" cy="67" rx="2.5" ry="3" fill="#1A1A2E"/>
+                        {/* Eyebrows */}
+                        <path d="M88 59 Q93 57 98 59" stroke="#1A1A2E" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        <path d="M102 59 Q107 57 112 59" stroke="#1A1A2E" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Nose */}
+                        <path d="M98 73 Q100 76 102 73" stroke="#E8B898" strokeWidth="1" fill="none"/>
+                        {/* Mouth */}
+                        <path d="M92 80 Q100 85 108 80" stroke="#DDA68A" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Cheeks */}
+                        <ellipse cx="87" cy="77" rx="6" ry="3.5" fill="#FFB4A2" opacity="0.3"/>
+                        <ellipse cx="113" cy="77" rx="6" ry="3.5" fill="#FFB4A2" opacity="0.3"/>
+                        {/* Neck */}
+                        <rect x="96" y="88" width="8" height="10" fill="#F0C4A8"/>
+                        {/* Body — blue shirt */}
+                        <path d="M78 98 C78 96 85 94 100 94 C115 94 122 96 122 98 L125 150 L75 150 Z" fill="#6CB4EE"/>
+                        {/* Collar detail */}
+                        <path d="M96 94 L100 100 L104 94" stroke="#5BA4D9" strokeWidth="1" fill="none"/>
+                        {/* Legs */}
+                        <path d="M87 150 L84 187 L92 187 L96 154 Z" fill="#4A3728"/>
+                        <path d="M113 150 L116 187 L108 187 L104 154 Z" fill="#4A3728"/>
+                        {/* Shoes */}
+                        <ellipse cx="88" cy="188" rx="8" ry="3.5" fill="#1A1A2E"/>
+                        <ellipse cx="112" cy="188" rx="8" ry="3.5" fill="#1A1A2E"/>
+                        {/* Right arm holding clipboard */}
+                        <path d="M122 100 L148 88 L145 82 L119 95 Z" fill="#6CB4EE"/>
+                        {/* Right hand fingers */}
+                        <path d="M145 80 C147 78 150 79 149 82 L146 83Z" fill="#F0C4A8"/>
+                        <path d="M147 83 C149 81 152 82 151 85 L148 86Z" fill="#F0C4A8"/>
+                        <path d="M146 86 C148 84 151 85 150 88 L147 89Z" fill="#F0C4A8"/>
+                        {/* Left arm */}
+                        <path d="M78 100 L63 118 L68 121 L82 104 Z" fill="#6CB4EE"/>
+                        {/* Left hand */}
+                        <path d="M61 116 C59 118 60 122 63 121 L65 119Z" fill="#F0C4A8"/>
+                        <path d="M63 120 C61 122 62 126 65 125 L67 123Z" fill="#F0C4A8"/>
+                        {/* Download arrow (bouncing) */}
+                        <motion.g animate={{ y: [0, 4, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}>
+                          <circle cx="210" cy="155" r="16" fill="#6CB4EE"/>
+                          <path d="M210 145 L210 161" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+                          <path d="M204 156 L210 163 L216 156" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </motion.g>
+                      </motion.g>
                     </svg>
                   </div>
                   <Button
@@ -1232,14 +1936,72 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   </div>
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      {/* Warning / delete illustration */}
-                      <path d="M130 30 L210 160 L50 160 Z" fill="#FFEBEE" stroke="#EF5350" strokeWidth="2"/>
-                      <path d="M130 55 L190 150 L70 150 Z" fill="#FFCDD2"/>
-                      <rect x="127" y="80" width="6" height="40" rx="3" fill="#EF5350"/>
-                      <circle cx="130" cy="132" r="4" fill="#EF5350"/>
-                      {/* Small warning signs */}
-                      <circle cx="45" cy="60" r="4" fill="#FFCDD2" opacity="0.5"/>
-                      <circle cx="215" cy="55" r="3" fill="#EF5350" opacity="0.3"/>
+                      {/* Ground shadow */}
+                      <ellipse cx="130" cy="194" rx="52" ry="5" fill="#000" opacity="0.06"/>
+                      {/* Warning triangle — pulsing */}
+                      <motion.g animate={{ scale: [1, 1.08, 1], opacity: [0.85, 1, 0.85] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}>
+                        <path d="M52 148 L78 102 L104 148 Z" fill="#FFE082" stroke="#FFB300" strokeWidth="1.5"/>
+                        <rect x="76" y="113" width="4" height="18" rx="2" fill="#795548"/>
+                        <circle cx="78" cy="140" r="2.5" fill="#795548"/>
+                      </motion.g>
+                      {/* Sparkles */}
+                      <motion.circle animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }} cx="218" cy="40" r="4" fill="#CE93D8"/>
+                      <motion.circle animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 1.0 }} cx="218" cy="155" r="3" fill="#FFE082"/>
+                      <motion.circle animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} cx="38" cy="100" r="3" fill="#FFE082"/>
+                      {/* Body sway */}
+                      <motion.g animate={{ y: [0, -1.5, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}>
+                        {/* Head */}
+                        <ellipse cx="155" cy="70" rx="20" ry="22" fill="#F0C4A8"/>
+                        {/* Hair bun */}
+                        <path d="M135 65 C135 48 143 42 155 42 C167 42 175 48 175 65 C172 57 167 54 155 54 C143 54 138 57 135 65Z" fill="#CE93D8"/>
+                        {/* Bun on top */}
+                        <path d="M148 46 C148 38 152 35 155 35 C158 35 162 38 162 46 C162 50 158 52 155 52 C152 52 148 50 148 46Z" fill="#CE93D8"/>
+                        {/* Bun shadow */}
+                        <path d="M150 46 C150 42 153 40 155 40 C157 40 160 42 160 46" stroke="#B07CC6" strokeWidth="1" fill="none"/>
+                        {/* Ears */}
+                        <ellipse cx="135" cy="70" rx="4" ry="5" fill="#F0C4A8"/>
+                        <ellipse cx="135.5" cy="70" rx="2.2" ry="3" fill="#E8B898"/>
+                        <ellipse cx="175" cy="70" rx="4" ry="5" fill="#F0C4A8"/>
+                        <ellipse cx="174.5" cy="70" rx="2.2" ry="3" fill="#E8B898"/>
+                        {/* Eyes — slightly worried */}
+                        <ellipse cx="148" cy="68" rx="4" ry="4.5" fill="white"/>
+                        <ellipse cx="162" cy="68" rx="4" ry="4.5" fill="white"/>
+                        <motion.ellipse animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "148px", originY: "69px" }} cx="148" cy="69" rx="2.5" ry="3" fill="#1A1A2E"/>
+                        <motion.ellipse animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "162px", originY: "69px" }} cx="162" cy="69" rx="2.5" ry="3" fill="#1A1A2E"/>
+                        {/* Worried eyebrows (raised inner) */}
+                        <path d="M143 61 Q148 58 153 62" stroke="#CE93D8" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+                        <path d="M157 62 Q162 58 167 61" stroke="#CE93D8" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+                        {/* Nose */}
+                        <path d="M153 75 Q155 78 157 75" stroke="#E8B898" strokeWidth="1" fill="none"/>
+                        {/* Concerned mouth (slightly down) */}
+                        <path d="M149 83 Q155 80 161 83" stroke="#DDA68A" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Sweat drop on forehead */}
+                        <path d="M170 52 C170 49 172 47 172 50 C172 52 170 53 170 52Z" fill="#90CAF9" opacity="0.7"/>
+                        {/* Cheeks */}
+                        <ellipse cx="143" cy="78" rx="6" ry="3.5" fill="#FFB4A2" opacity="0.3"/>
+                        <ellipse cx="167" cy="78" rx="6" ry="3.5" fill="#FFB4A2" opacity="0.3"/>
+                        {/* Neck */}
+                        <rect x="151" y="90" width="8" height="10" fill="#F0C4A8"/>
+                        {/* Body — light purple top */}
+                        <path d="M133 100 C133 98 140 96 155 96 C170 96 177 98 177 100 L180 152 L130 152 Z" fill="#CE93D8"/>
+                        {/* Collar */}
+                        <path d="M151 96 L155 102 L159 96" stroke="#B07CC6" strokeWidth="1" fill="none"/>
+                        {/* Legs */}
+                        <path d="M142 152 L139 188 L147 188 L151 156 Z" fill="#4A3728"/>
+                        <path d="M168 152 L171 188 L163 188 L159 156 Z" fill="#4A3728"/>
+                        {/* Shoes */}
+                        <ellipse cx="143" cy="189" rx="8" ry="3.5" fill="#1A1A2E"/>
+                        <ellipse cx="167" cy="189" rx="8" ry="3.5" fill="#1A1A2E"/>
+                        {/* Arms slightly raised in caution */}
+                        <path d="M133 102 L116 88 L119 83 L135 97 Z" fill="#CE93D8"/>
+                        <path d="M177 102 L194 88 L191 83 L175 97 Z" fill="#CE93D8"/>
+                        {/* Left hand */}
+                        <path d="M114 86 C112 83 114 80 116 82 L117 85Z" fill="#F0C4A8"/>
+                        <path d="M116 83 C114 80 116 77 118 79 L119 82Z" fill="#F0C4A8"/>
+                        {/* Right hand */}
+                        <path d="M196 86 C198 83 196 80 194 82 L193 85Z" fill="#F0C4A8"/>
+                        <path d="M194 83 C196 80 194 77 192 79 L191 82Z" fill="#F0C4A8"/>
+                      </motion.g>
                     </svg>
                   </div>
                   <Button
@@ -1876,27 +2638,120 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   </div>
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      {/* Gift card with ribbon */}
-                      <rect x="50" y="50" width="160" height="100" rx="16" fill="#FFF3E0" stroke="#F5A623" strokeWidth="2"/>
-                      <rect x="50" y="50" width="160" height="35" rx="16" fill="#FFE0B2"/>
-                      <rect x="50" y="69" width="160" height="16" fill="#FFE0B2"/>
-                      {/* Ribbon vertical */}
-                      <rect x="122" y="50" width="16" height="100" fill="#EF5350" opacity="0.7"/>
-                      {/* Ribbon horizontal */}
-                      <rect x="50" y="90" width="160" height="16" fill="#EF5350" opacity="0.7"/>
-                      {/* Bow */}
-                      <ellipse cx="120" cy="88" rx="18" ry="12" fill="#EF5350"/>
-                      <ellipse cx="140" cy="88" rx="18" ry="12" fill="#EF5350"/>
-                      <circle cx="130" cy="90" r="6" fill="#C62828"/>
-                      {/* Heart */}
-                      <path d="M115 120 C115 114 120 112 123 115 C126 112 131 114 131 120 C131 128 123 132 123 132 C123 132 115 128 115 120Z" fill="#F48FB1" opacity="0.6"/>
-                      {/* Sparkles */}
-                      <circle cx="35" cy="40" r="4" fill="#FFD54F" opacity="0.5"/>
-                      <circle cx="230" cy="35" r="3" fill="#F5A623" opacity="0.4"/>
-                      <circle cx="40" cy="165" r="3" fill="#EF5350" opacity="0.3"/>
-                      <circle cx="225" cy="170" r="4" fill="#FFD54F" opacity="0.4"/>
-                      <path d="M45 70 L50 65 L55 70 L50 75Z" fill="#FFD54F" opacity="0.4"/>
-                      <path d="M210 60 L215 55 L220 60 L215 65Z" fill="#F48FB1" opacity="0.4"/>
+                      {/* Ground shadow */}
+                      <ellipse cx="130" cy="194" rx="60" ry="5" fill="#000" opacity="0.06"/>
+                      {/* Sparkle pulses */}
+                      <motion.circle animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }} cx="130" cy="20" r="4" fill="#FFE082"/>
+                      <motion.circle animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.9 }} cx="32" cy="50" r="3" fill="#A5D6A7"/>
+                      <motion.circle animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.5 }} cx="228" cy="55" r="3" fill="#6CB4EE"/>
+                      {/* Body sway wrapper — all characters */}
+                      <motion.g animate={{ y: [0, -1.5, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}>
+                        {/* ─── Giver (left, green shirt) ─── */}
+                        {/* Head */}
+                        <ellipse cx="68" cy="76" rx="18" ry="20" fill="#F0C4A8"/>
+                        {/* Hair — wavy */}
+                        <path d="M50 72 C50 56 58 50 68 50 C78 50 86 56 86 72 C83 62 78 59 68 59 C58 59 53 62 50 72Z" fill="#4A3728"/>
+                        <path d="M50 68 C52 62 54 62 56 66 C58 62 60 62 62 66" stroke="#4A3728" strokeWidth="2" fill="none"/>
+                        {/* Ears */}
+                        <ellipse cx="50" cy="76" rx="3.5" ry="4.5" fill="#F0C4A8"/>
+                        <ellipse cx="50.5" cy="76" rx="2" ry="2.8" fill="#E8B898"/>
+                        <ellipse cx="86" cy="76" rx="3.5" ry="4.5" fill="#F0C4A8"/>
+                        <ellipse cx="85.5" cy="76" rx="2" ry="2.8" fill="#E8B898"/>
+                        {/* Eyes */}
+                        <ellipse cx="62" cy="74" rx="3.5" ry="4" fill="white"/>
+                        <ellipse cx="74" cy="74" rx="3.5" ry="4" fill="white"/>
+                        <motion.ellipse animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "62px", originY: "75px" }} cx="62" cy="75" rx="2.2" ry="2.7" fill="#1A1A2E"/>
+                        <motion.ellipse animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "74px", originY: "75px" }} cx="74" cy="75" rx="2.2" ry="2.7" fill="#1A1A2E"/>
+                        {/* Eyebrows */}
+                        <path d="M57 67 Q62 65 67 67" stroke="#4A3728" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        <path d="M69 67 Q74 65 79 67" stroke="#4A3728" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Nose */}
+                        <path d="M66 80 Q68 83 70 80" stroke="#E8B898" strokeWidth="1" fill="none"/>
+                        {/* Mouth smiling */}
+                        <path d="M61 86 Q68 91 75 86" stroke="#DDA68A" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Cheeks */}
+                        <ellipse cx="57" cy="83" rx="5" ry="3" fill="#FFB4A2" opacity="0.3"/>
+                        <ellipse cx="79" cy="83" rx="5" ry="3" fill="#FFB4A2" opacity="0.3"/>
+                        {/* Neck */}
+                        <rect x="64" y="94" width="8" height="9" fill="#F0C4A8"/>
+                        {/* Body — green shirt */}
+                        <path d="M48 103 C48 101 55 99 68 99 C81 99 88 101 88 103 L91 152 L45 152 Z" fill="#A5D6A7"/>
+                        {/* Collar */}
+                        <path d="M64 99 L68 105 L72 99" stroke="#81C784" strokeWidth="1" fill="none"/>
+                        {/* Legs */}
+                        <path d="M58 152 L55 188 L63 188 L67 156 Z" fill="#4A3728"/>
+                        <path d="M78 152 L81 188 L73 188 L69 156 Z" fill="#4A3728"/>
+                        {/* Shoes */}
+                        <ellipse cx="59" cy="189" rx="7" ry="3.5" fill="#1A1A2E"/>
+                        <ellipse cx="77" cy="189" rx="7" ry="3.5" fill="#1A1A2E"/>
+                        {/* Giver — arm extended forward holding gift */}
+                        <path d="M88 105 L115 118 L112 124 L86 111 Z" fill="#A5D6A7"/>
+                        {/* Giver hand/fingers */}
+                        <path d="M113 122 L117 118 L120 122 L116 126Z" fill="#F0C4A8"/>
+                        <path d="M116 124 L120 120 L123 124 L119 128Z" fill="#F0C4A8"/>
+                        {/* Giver other arm */}
+                        <path d="M48 105 L36 120 L41 123 L52 108 Z" fill="#A5D6A7"/>
+
+                        {/* ─── Floating gift box ─── */}
+                        <motion.g animate={{ y: [0, -5, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}>
+                          <rect x="108" y="100" width="44" height="44" rx="4" fill="#FFCCBC" stroke="#FF8A65" strokeWidth="1.5"/>
+                          {/* Gift ribbon vertical */}
+                          <rect x="127" y="100" width="6" height="44" fill="#EF5350" opacity="0.7"/>
+                          {/* Gift ribbon horizontal */}
+                          <rect x="108" y="119" width="44" height="6" fill="#EF5350" opacity="0.7"/>
+                          {/* Gift bow left */}
+                          <path d="M127 100 C120 92 112 94 114 100 C116 106 127 103 127 100Z" fill="#EF5350"/>
+                          {/* Gift bow right */}
+                          <path d="M133 100 C140 92 148 94 146 100 C144 106 133 103 133 100Z" fill="#EF5350"/>
+                          {/* Bow center */}
+                          <circle cx="130" cy="100" r="4" fill="#C62828"/>
+                        </motion.g>
+
+                        {/* ─── Receiver (right, blue shirt) ─── */}
+                        {/* Head */}
+                        <ellipse cx="192" cy="76" rx="18" ry="20" fill="#F0C4A8"/>
+                        {/* Hair — short neat */}
+                        <path d="M174 72 C174 56 182 50 192 50 C202 50 210 56 210 72 C207 62 202 59 192 59 C182 59 177 62 174 72Z" fill="#1A1A2E"/>
+                        {/* Ears */}
+                        <ellipse cx="174" cy="76" rx="3.5" ry="4.5" fill="#F0C4A8"/>
+                        <ellipse cx="174.5" cy="76" rx="2" ry="2.8" fill="#E8B898"/>
+                        <ellipse cx="210" cy="76" rx="3.5" ry="4.5" fill="#F0C4A8"/>
+                        <ellipse cx="209.5" cy="76" rx="2" ry="2.8" fill="#E8B898"/>
+                        {/* Eyes */}
+                        <ellipse cx="186" cy="74" rx="3.5" ry="4" fill="white"/>
+                        <ellipse cx="198" cy="74" rx="3.5" ry="4" fill="white"/>
+                        <motion.ellipse animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut", delay: 1.5 }} style={{ originX: "186px", originY: "75px" }} cx="186" cy="75" rx="2.2" ry="2.7" fill="#1A1A2E"/>
+                        <motion.ellipse animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut", delay: 1.5 }} style={{ originX: "198px", originY: "75px" }} cx="198" cy="75" rx="2.2" ry="2.7" fill="#1A1A2E"/>
+                        {/* Eyebrows */}
+                        <path d="M181 67 Q186 65 191 67" stroke="#1A1A2E" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        <path d="M193 67 Q198 65 203 67" stroke="#1A1A2E" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Nose */}
+                        <path d="M190 80 Q192 83 194 80" stroke="#E8B898" strokeWidth="1" fill="none"/>
+                        {/* Mouth happy */}
+                        <path d="M185 86 Q192 91 199 86" stroke="#DDA68A" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Cheeks */}
+                        <ellipse cx="181" cy="83" rx="5" ry="3" fill="#FFB4A2" opacity="0.3"/>
+                        <ellipse cx="203" cy="83" rx="5" ry="3" fill="#FFB4A2" opacity="0.3"/>
+                        {/* Neck */}
+                        <rect x="188" y="94" width="8" height="9" fill="#F0C4A8"/>
+                        {/* Body — blue shirt */}
+                        <path d="M172 103 C172 101 179 99 192 99 C205 99 212 101 212 103 L215 152 L169 152 Z" fill="#6CB4EE"/>
+                        {/* Collar */}
+                        <path d="M188 99 L192 105 L196 99" stroke="#5BA4D9" strokeWidth="1" fill="none"/>
+                        {/* Legs */}
+                        <path d="M182 152 L179 188 L187 188 L191 156 Z" fill="#4A3728"/>
+                        <path d="M202 152 L205 188 L197 188 L193 156 Z" fill="#4A3728"/>
+                        {/* Shoes */}
+                        <ellipse cx="183" cy="189" rx="7" ry="3.5" fill="#1A1A2E"/>
+                        <ellipse cx="201" cy="189" rx="7" ry="3.5" fill="#1A1A2E"/>
+                        {/* Receiver — arms reaching forward toward gift */}
+                        <path d="M172 105 L145 118 L148 124 L174 111 Z" fill="#6CB4EE"/>
+                        {/* Receiver hand/fingers */}
+                        <path d="M147 122 L143 118 L140 122 L144 126Z" fill="#F0C4A8"/>
+                        <path d="M144 124 L140 120 L137 124 L141 128Z" fill="#F0C4A8"/>
+                        {/* Receiver other arm */}
+                        <path d="M212 105 L224 120 L219 123 L208 108 Z" fill="#6CB4EE"/>
+                      </motion.g>
                     </svg>
                   </div>
                   <Button className="w-full shrink-0 rounded-[12px] py-3">
@@ -1937,27 +2792,98 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   </div>
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      {/* Coins and stars raining down */}
-                      {/* Large coin */}
-                      <circle cx="130" cy="95" r="40" fill="#FFD54F" stroke="#F9A825" strokeWidth="2"/>
-                      <circle cx="130" cy="95" r="30" stroke="#F9A825" strokeWidth="1.5" fill="none"/>
-                      <text x="130" y="102" textAnchor="middle" fontSize="24" fontWeight="bold" fill="#F57F17">kr</text>
-                      {/* Small coins */}
-                      <circle cx="65" cy="60" r="18" fill="#FFE082" stroke="#FFB300" strokeWidth="1.5"/>
-                      <circle cx="65" cy="60" r="12" stroke="#FFB300" strokeWidth="1" fill="none"/>
-                      <circle cx="200" cy="55" r="15" fill="#FFE082" stroke="#FFB300" strokeWidth="1.5"/>
-                      <circle cx="200" cy="55" r="10" stroke="#FFB300" strokeWidth="1" fill="none"/>
-                      <circle cx="185" cy="140" r="12" fill="#FFE082" stroke="#FFB300" strokeWidth="1"/>
-                      <circle cx="75" cy="145" r="10" fill="#FFE082" stroke="#FFB300" strokeWidth="1"/>
-                      {/* Stars */}
-                      <path d="M45 100 L48 92 L51 100 L45 96 L51 96Z" fill="#66BB6A" opacity="0.6"/>
-                      <path d="M215 100 L218 92 L221 100 L215 96 L221 96Z" fill="#66BB6A" opacity="0.6"/>
-                      <path d="M100 30 L103 22 L106 30 L100 26 L106 26Z" fill="#FFD54F" opacity="0.5"/>
-                      <path d="M160 25 L163 17 L166 25 L160 21 L166 21Z" fill="#FFD54F" opacity="0.5"/>
-                      {/* Sparkle dots */}
-                      <circle cx="40" cy="170" r="3" fill="#66BB6A" opacity="0.4"/>
-                      <circle cx="225" cy="168" r="3" fill="#FFD54F" opacity="0.4"/>
-                      <circle cx="130" cy="175" r="2" fill="#FFB300" opacity="0.3"/>
+                      {/* Ground shadow */}
+                      <ellipse cx="130" cy="194" rx="52" ry="5" fill="#000" opacity="0.06"/>
+                      {/* Floating gold coins with staggered animation */}
+                      <motion.g animate={{ y: [0, -6, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}>
+                        <circle cx="58" cy="75" r="16" fill="#FFE082" stroke="#FFB300" strokeWidth="1.5"/>
+                        <circle cx="58" cy="75" r="10" stroke="#FFB300" strokeWidth="1" fill="none"/>
+                        <line x1="54" y1="70" x2="54" y2="80" stroke="#FFB300" strokeWidth="1"/>
+                        <line x1="58" y1="69" x2="58" y2="79" stroke="#FFB300" strokeWidth="1"/>
+                        <line x1="62" y1="70" x2="62" y2="80" stroke="#FFB300" strokeWidth="1"/>
+                      </motion.g>
+                      <motion.g animate={{ y: [0, -6, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.4 }}>
+                        <circle cx="202" cy="65" r="14" fill="#FFE082" stroke="#FFB300" strokeWidth="1.5"/>
+                        <circle cx="202" cy="65" r="9" stroke="#FFB300" strokeWidth="1" fill="none"/>
+                        <line x1="198" y1="61" x2="198" y2="69" stroke="#FFB300" strokeWidth="1"/>
+                        <line x1="202" y1="60" x2="202" y2="70" stroke="#FFB300" strokeWidth="1"/>
+                        <line x1="206" y1="61" x2="206" y2="69" stroke="#FFB300" strokeWidth="1"/>
+                      </motion.g>
+                      <motion.g animate={{ y: [0, -6, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}>
+                        <circle cx="40" cy="135" r="11" fill="#FFE082" stroke="#FFB300" strokeWidth="1.5"/>
+                        <circle cx="40" cy="135" r="7" stroke="#FFB300" strokeWidth="1" fill="none"/>
+                        <line x1="37" y1="131" x2="37" y2="139" stroke="#FFB300" strokeWidth="1"/>
+                        <line x1="40" y1="130" x2="40" y2="140" stroke="#FFB300" strokeWidth="1"/>
+                        <line x1="43" y1="131" x2="43" y2="139" stroke="#FFB300" strokeWidth="1"/>
+                      </motion.g>
+                      <motion.g animate={{ y: [0, -6, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 1.2 }}>
+                        <circle cx="222" cy="130" r="12" fill="#FFE082" stroke="#FFB300" strokeWidth="1.5"/>
+                        <circle cx="222" cy="130" r="8" stroke="#FFB300" strokeWidth="1" fill="none"/>
+                        <line x1="218" y1="126" x2="218" y2="134" stroke="#FFB300" strokeWidth="1"/>
+                        <line x1="222" y1="125" x2="222" y2="135" stroke="#FFB300" strokeWidth="1"/>
+                        <line x1="226" y1="126" x2="226" y2="134" stroke="#FFB300" strokeWidth="1"/>
+                      </motion.g>
+                      <motion.g animate={{ y: [0, -6, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}>
+                        <circle cx="130" cy="30" r="10" fill="#FFE082" stroke="#FFB300" strokeWidth="1.5"/>
+                        <circle cx="130" cy="30" r="6" stroke="#FFB300" strokeWidth="1" fill="none"/>
+                        <line x1="127" y1="26" x2="127" y2="34" stroke="#FFB300" strokeWidth="1"/>
+                        <line x1="130" y1="25" x2="130" y2="35" stroke="#FFB300" strokeWidth="1"/>
+                        <line x1="133" y1="26" x2="133" y2="34" stroke="#FFB300" strokeWidth="1"/>
+                      </motion.g>
+                      {/* Body sway */}
+                      <motion.g animate={{ y: [0, -1.5, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}>
+                        {/* Head */}
+                        <ellipse cx="130" cy="80" rx="20" ry="22" fill="#F0C4A8"/>
+                        {/* Spiky/messy hair */}
+                        <path d="M110 76 C110 59 118 53 130 53 C142 53 150 59 150 76" fill="#2C2C2C"/>
+                        <path d="M110 68 C112 58 113 55 115 60 C117 50 119 48 121 55 C123 47 124 44 127 52 C129 44 131 42 133 50 C135 44 137 47 139 55 C141 50 143 52 145 60 C147 55 148 58 150 68" fill="#2C2C2C"/>
+                        {/* Ears */}
+                        <ellipse cx="110" cy="80" rx="4" ry="5" fill="#F0C4A8"/>
+                        <ellipse cx="110.5" cy="80" rx="2.2" ry="3" fill="#E8B898"/>
+                        <ellipse cx="150" cy="80" rx="4" ry="5" fill="#F0C4A8"/>
+                        <ellipse cx="149.5" cy="80" rx="2.2" ry="3" fill="#E8B898"/>
+                        {/* Eyes */}
+                        <ellipse cx="123" cy="78" rx="4" ry="4.5" fill="white"/>
+                        <ellipse cx="137" cy="78" rx="4" ry="4.5" fill="white"/>
+                        <motion.ellipse animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "123px", originY: "79px" }} cx="123" cy="79" rx="2.5" ry="3" fill="#1A1A2E"/>
+                        <motion.ellipse animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "137px", originY: "79px" }} cx="137" cy="79" rx="2.5" ry="3" fill="#1A1A2E"/>
+                        {/* Eyebrows */}
+                        <path d="M118 71 Q123 68 128 71" stroke="#2C2C2C" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        <path d="M132 71 Q137 68 142 71" stroke="#2C2C2C" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Nose */}
+                        <path d="M128 85 Q130 88 132 85" stroke="#E8B898" strokeWidth="1" fill="none"/>
+                        {/* Wide celebrating smile */}
+                        <path d="M120 92 Q130 100 140 92" stroke="#DDA68A" strokeWidth="2" fill="none" strokeLinecap="round"/>
+                        <path d="M122 93 Q130 99 138 93" fill="#FFCCBC" opacity="0.5"/>
+                        {/* Cheeks */}
+                        <ellipse cx="116" cy="87" rx="6.5" ry="4" fill="#FFB4A2" opacity="0.3"/>
+                        <ellipse cx="144" cy="87" rx="6.5" ry="4" fill="#FFB4A2" opacity="0.3"/>
+                        {/* Neck */}
+                        <rect x="126" y="100" width="8" height="10" fill="#F0C4A8"/>
+                        {/* Body — coral shirt */}
+                        <path d="M108 110 C108 108 115 106 130 106 C145 106 152 108 152 110 L155 158 L105 158 Z" fill="#FF8A80"/>
+                        {/* Collar */}
+                        <path d="M126 106 L130 112 L134 106" stroke="#FFAB91" strokeWidth="1" fill="none"/>
+                        {/* Legs */}
+                        <path d="M118 158 L115 188 L123 188 L127 162 Z" fill="#4A3728"/>
+                        <path d="M142 158 L145 188 L137 188 L133 162 Z" fill="#4A3728"/>
+                        {/* Shoes */}
+                        <ellipse cx="119" cy="189" rx="8" ry="3.5" fill="#1A1A2E"/>
+                        <ellipse cx="141" cy="189" rx="8" ry="3.5" fill="#1A1A2E"/>
+                        {/* Arms up in celebration */}
+                        <path d="M108 112 L90 85 L96 82 L113 108 Z" fill="#FF8A80"/>
+                        <path d="M152 112 L170 85 L164 82 L147 108 Z" fill="#FF8A80"/>
+                        {/* Left hand with spread fingers */}
+                        <path d="M88 83 C86 80 88 77 90 79 L91 82Z" fill="#F0C4A8"/>
+                        <path d="M91 80 C89 77 91 74 93 76 L94 79Z" fill="#F0C4A8"/>
+                        <path d="M94 79 C92 76 94 73 96 75 L97 78Z" fill="#F0C4A8"/>
+                        <path d="M97 80 C95 77 97 75 99 77 L100 80Z" fill="#F0C4A8"/>
+                        {/* Right hand with spread fingers */}
+                        <path d="M172 83 C174 80 172 77 170 79 L169 82Z" fill="#F0C4A8"/>
+                        <path d="M169 80 C171 77 169 74 167 76 L166 79Z" fill="#F0C4A8"/>
+                        <path d="M166 79 C168 76 166 73 164 75 L163 78Z" fill="#F0C4A8"/>
+                        <path d="M163 80 C165 77 163 75 161 77 L160 80Z" fill="#F0C4A8"/>
+                      </motion.g>
                     </svg>
                   </div>
                 </div>
@@ -1973,29 +2899,79 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   </div>
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      {/* Ticket / coupon with sparkle */}
-                      <rect x="40" y="55" width="180" height="90" rx="14" fill="#EDE7F6" stroke="#7E57C2" strokeWidth="2"/>
-                      {/* Ticket notch left */}
-                      <circle cx="40" cy="100" r="12" fill="white" stroke="#7E57C2" strokeWidth="2"/>
-                      {/* Ticket notch right */}
-                      <circle cx="220" cy="100" r="12" fill="white" stroke="#7E57C2" strokeWidth="2"/>
-                      {/* Dashed line */}
-                      <line x1="75" y1="100" x2="185" y2="100" stroke="#B39DDB" strokeWidth="1.5" strokeDasharray="6 4"/>
-                      {/* Code text */}
-                      <rect x="85" y="70" width="90" height="20" rx="6" fill="#D1C4E9"/>
-                      <rect x="95" y="110" width="70" height="16" rx="5" fill="#D1C4E9"/>
-                      {/* Sparkles */}
-                      <path d="M50 35 L55 25 L60 35 L55 30Z" fill="#FFD54F"/>
-                      <path d="M55 25 L50 35 L55 30 L60 35Z" fill="#FFD54F"/>
-                      <circle cx="55" cy="30" r="3" fill="#FFF176"/>
-                      <path d="M200 30 L205 20 L210 30 L205 25Z" fill="#7E57C2" opacity="0.5"/>
-                      <circle cx="205" cy="25" r="2" fill="#CE93D8"/>
-                      <path d="M35 160 L40 152 L45 160 L40 156Z" fill="#FFD54F" opacity="0.4"/>
-                      <circle cx="225" cy="160" r="3" fill="#7E57C2" opacity="0.3"/>
-                      {/* Stars */}
-                      <path d="M130 35 L133 27 L136 35 L130 31 L136 31Z" fill="#CE93D8" opacity="0.6"/>
-                      <circle cx="80" cy="165" r="2.5" fill="#B39DDB" opacity="0.4"/>
-                      <circle cx="180" cy="170" r="2" fill="#FFD54F" opacity="0.4"/>
+                      {/* Ground shadow */}
+                      <ellipse cx="130" cy="194" rx="52" ry="5" fill="#000" opacity="0.06"/>
+                      {/* Sparkle pulses around ticket */}
+                      <motion.circle animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }} cx="165" cy="55" r="5" fill="#FFE082"/>
+                      <motion.circle animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.7 }} cx="195" cy="80" r="4" fill="#CE93D8"/>
+                      <motion.circle animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 1.3 }} cx="170" cy="105" r="3" fill="#FFE082"/>
+                      <motion.circle animate={{ scale: [1, 1.5, 1], opacity: [0.15, 0.4, 0.15] }} transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.4 }} cx="38" cy="70" r="3" fill="#A5D6A7"/>
+                      {/* Body sway */}
+                      <motion.g animate={{ y: [0, -1.5, 0] }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}>
+                        {/* Head */}
+                        <ellipse cx="95" cy="72" rx="20" ry="22" fill="#F0C4A8"/>
+                        {/* Long straight hair */}
+                        <path d="M75 68 C75 51 83 45 95 45 C107 45 115 51 115 68 C112 58 108 55 95 55 C82 55 78 58 75 68Z" fill="#2C2C2C"/>
+                        {/* Hair flowing down sides past shoulders */}
+                        <path d="M75 68 C73 80 72 100 73 125 C74 130 77 130 78 125 C79 115 79 95 80 85" fill="#2C2C2C"/>
+                        <path d="M115 68 C117 80 118 100 117 125 C116 130 113 130 112 125 C111 115 111 95 110 85" fill="#2C2C2C"/>
+                        {/* Ears */}
+                        <ellipse cx="75" cy="72" rx="4" ry="5" fill="#F0C4A8"/>
+                        <ellipse cx="75.5" cy="72" rx="2.2" ry="3" fill="#E8B898"/>
+                        <ellipse cx="115" cy="72" rx="4" ry="5" fill="#F0C4A8"/>
+                        <ellipse cx="114.5" cy="72" rx="2.2" ry="3" fill="#E8B898"/>
+                        {/* Eyes */}
+                        <ellipse cx="88" cy="70" rx="4" ry="4.5" fill="white"/>
+                        <ellipse cx="102" cy="70" rx="4" ry="4.5" fill="white"/>
+                        <motion.ellipse animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "88px", originY: "71px" }} cx="88" cy="71" rx="2.5" ry="3" fill="#1A1A2E"/>
+                        <motion.ellipse animate={{ scaleY: [1, 0.05, 1] }} transition={{ duration: 0.15, repeat: Infinity, repeatDelay: 3.5, ease: "easeInOut" }} style={{ originX: "102px", originY: "71px" }} cx="102" cy="71" rx="2.5" ry="3" fill="#1A1A2E"/>
+                        {/* Eyebrows */}
+                        <path d="M83 63 Q88 61 93 63" stroke="#2C2C2C" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        <path d="M97 63 Q102 61 107 63" stroke="#2C2C2C" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Nose */}
+                        <path d="M93 77 Q95 80 97 77" stroke="#E8B898" strokeWidth="1" fill="none"/>
+                        {/* Mouth */}
+                        <path d="M87 83 Q95 88 103 83" stroke="#DDA68A" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Cheeks */}
+                        <ellipse cx="82" cy="80" rx="6" ry="3.5" fill="#FFB4A2" opacity="0.3"/>
+                        <ellipse cx="108" cy="80" rx="6" ry="3.5" fill="#FFB4A2" opacity="0.3"/>
+                        {/* Neck */}
+                        <rect x="91" y="92" width="8" height="10" fill="#F0C4A8"/>
+                        {/* Body — yellow top */}
+                        <path d="M73 102 C73 100 80 98 95 98 C110 98 117 100 117 102 L120 155 L70 155 Z" fill="#FFE082"/>
+                        {/* Collar detail */}
+                        <path d="M91 98 L95 104 L99 98" stroke="#FFD54F" strokeWidth="1" fill="none"/>
+                        {/* Legs */}
+                        <path d="M83 155 L80 188 L88 188 L92 159 Z" fill="#4A3728"/>
+                        <path d="M107 155 L110 188 L102 188 L98 159 Z" fill="#4A3728"/>
+                        {/* Shoes */}
+                        <ellipse cx="84" cy="189" rx="8" ry="3.5" fill="#1A1A2E"/>
+                        <ellipse cx="106" cy="189" rx="8" ry="3.5" fill="#1A1A2E"/>
+                        {/* Right arm raised holding ticket */}
+                        <path d="M117 104 L143 75 L138 70 L114 100 Z" fill="#FFE082"/>
+                        {/* Right hand */}
+                        <path d="M140 68 C138 65 140 62 142 64 L143 67Z" fill="#F0C4A8"/>
+                        <path d="M142 65 C140 62 142 59 144 61 L145 64Z" fill="#F0C4A8"/>
+                        <path d="M144 64 C142 61 144 58 146 60 L147 63Z" fill="#F0C4A8"/>
+                        {/* Left arm relaxed */}
+                        <path d="M73 104 L60 125 L65 128 L77 108 Z" fill="#FFE082"/>
+                        {/* Left hand */}
+                        <path d="M58 123 C56 126 58 129 60 127 L62 125Z" fill="#F0C4A8"/>
+                        {/* Floating ticket held up */}
+                        <motion.g animate={{ y: [0, -5, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}>
+                          {/* Ticket body */}
+                          <rect x="148" y="55" width="70" height="42" rx="6" fill="white" stroke="#CE93D8" strokeWidth="1.5"/>
+                          {/* Ticket notch left */}
+                          <path d="M148 76 C144 76 141 73 141 76 C141 79 144 76 148 76Z" fill="#F5F0FA" stroke="#CE93D8" strokeWidth="1"/>
+                          {/* Ticket notch right */}
+                          <path d="M218 76 C222 76 225 73 225 76 C225 79 222 76 218 76Z" fill="#F5F0FA" stroke="#CE93D8" strokeWidth="1"/>
+                          {/* Dashed center line */}
+                          <line x1="148" y1="76" x2="218" y2="76" stroke="#CE93D8" strokeWidth="1" strokeDasharray="5 3"/>
+                          {/* Code text representation */}
+                          <rect x="158" y="63" width="50" height="7" rx="3.5" fill="#E1BEE7"/>
+                          <rect x="163" y="80" width="40" height="6" rx="3" fill="#E1BEE7"/>
+                        </motion.g>
+                      </motion.g>
                     </svg>
                   </div>
                   <Button className="w-full shrink-0 rounded-[12px] py-3">
