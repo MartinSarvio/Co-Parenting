@@ -1947,12 +1947,7 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                     className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-[#5A78FF]">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                          <path d="M17.5 4L8 20" stroke="white" strokeWidth="3" strokeLinecap="round"/>
-                          <path d="M12 4L6 14" stroke="white" strokeWidth="3" strokeLinecap="round" opacity="0.6"/>
-                        </svg>
-                      </div>
+                      <img src="/images/Mobilepay.jpeg" alt="MobilePay" className="h-9 w-9 shrink-0 rounded-[6px] object-cover" />
                       <p className="text-[15px] font-medium text-foreground">MobilePay</p>
                     </div>
                     <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
@@ -1962,12 +1957,7 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                     className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] border border-border bg-white">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                          <path d="M13.2 3.4C12.6 2.7 11.7 2.3 10.9 2.3C10.9 3.3 10.5 4.2 9.8 4.8C9.2 5.4 8.3 5.9 7.3 5.8C7.2 4.9 7.7 3.9 8.2 3.4C8.9 2.7 9.9 2.2 10.8 2.2C10.8 2.3 13.2 3.4 13.2 3.4Z" fill="black"/>
-                          <path d="M13.5 6C12.2 6 11.3 6.7 10.7 6.7C10 6.7 9.2 6.1 8.1 6.1C6.1 6.1 4 7.8 4 11.1C4 13.1 4.8 15.2 5.8 16.6C6.6 17.8 7.4 18.8 8.5 18.8C9.5 18.8 10 18.2 11.2 18.2C12.5 18.2 12.8 18.8 14 18.8C15.1 18.8 15.9 17.7 16.7 16.6C17.1 16 17.4 15.3 17.6 14.8C15.5 13.9 15.2 10.8 17.2 9.5C16.3 8.3 15 6 13.5 6Z" fill="black"/>
-                        </svg>
-                      </div>
+                      <img src="/images/Apple pay .png" alt="Apple Pay" className="h-9 w-9 shrink-0 rounded-[6px] object-contain border border-border bg-white p-0.5" />
                       <p className="text-[15px] font-medium text-foreground">Apple Pay</p>
                     </div>
                     <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
@@ -1977,13 +1967,7 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                     className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] border border-border bg-white">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                          <path d="M15.4 5.8C15.4 3.6 13.6 2.5 11.2 2.5H6.5L4 16.5H6.8L7.6 12H9.8C12.8 12 15 10.2 15.5 7.5C15.5 7 15.4 6.4 15.4 5.8Z" fill="#003087"/>
-                          <path d="M17.4 7.5C17 10.5 14.8 12 11.8 12H10.2L9.2 17.5H6.8L7.6 12H9.8C12.8 12 15 10.2 15.5 7.5C16.5 7 17.4 7 17.4 7.5Z" fill="#0070E0"/>
-                          <path d="M8.2 8H10.5C12 8 13 7.2 13.2 6C13.4 4.8 12.6 4 11.2 4H8.8L8.2 8Z" fill="white" opacity="0.4"/>
-                        </svg>
-                      </div>
+                      <img src="/images/Paypal.png" alt="PayPal" className="h-9 w-9 shrink-0 rounded-[6px] object-contain border border-border bg-white p-0.5" />
                       <p className="text-[15px] font-medium text-foreground">PayPal</p>
                     </div>
                     <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
