@@ -708,8 +708,9 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                 </button>
               </div>
 
-              <div className="pt-2">
-                <div className="divide-y divide-border">
+              <div className="border-t border-border" />
+
+              <div className="divide-y divide-border">
                   <button
                     onClick={() => setSettingsDetailView('edit-export')}
                     className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
