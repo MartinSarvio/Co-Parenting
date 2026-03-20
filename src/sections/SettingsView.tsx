@@ -2,7 +2,7 @@ import { useMemo, useRef, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { requestNotificationPermission, scheduleAllHandoverReminders } from '@/lib/notifications';
-import { paymentAccountId, userId as generateUserId } from '@/lib/id';
+import { userId as generateUserId } from '@/lib/id';
 import {
   BadgeCheck,
   Bell,
@@ -55,6 +55,8 @@ import { EU_ALLERGENS_DA } from '@/lib/allergenMatch';
 import { supabase } from '@/lib/supabase';
 import { startCheckout, openBillingPortal, fetchStripeStatus, PLAN_PRICES } from '@/lib/stripe';
 import type { StripePlan, BillingInterval } from '@/lib/stripe';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { getStripe, createSetupIntent, listPaymentMethods, deletePaymentMethod, formatCardBrand, type SavedPaymentMethod } from '@/lib/payments';
 import { AdminPanel } from '@/sections/AdminPanel';
 import { PlatformAnalyseView } from '@/sections/PlatformAnalyseView';
 import { TilbudAdminView } from '@/sections/TilbudAdminView';
@@ -69,6 +71,282 @@ const familyModeLabels: Record<HouseholdMode, string> = {
   blended: 'Bonusfamilie',
   single_parent: 'Enlig forsørger'
 };
+
+// ─── Stripe sub-forms (bruger useStripe/useElements hooks) ──────────────────
+
+interface StripeFormProps {
+  onSuccess: () => void;
+  onCancel: () => void;
+  keyboardHeight: number;
+}
+
+function StripeCardForm({ onSuccess, onCancel, keyboardHeight }: StripeFormProps) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async () => {
+    if (!stripe || !elements) return;
+    setLoading(true);
+    setError(null);
+
+    const { error: confirmError } = await stripe.confirmSetup({
+      elements,
+      confirmParams: { return_url: window.location.href },
+      redirect: 'if_required',
+    });
+
+    if (confirmError) {
+      setError(confirmError.message || 'Kunne ikke tilføje kort');
+      setLoading(false);
+    } else {
+      onSuccess();
+    }
+  };
+
+  return (
+    <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+      <div className="space-y-5">
+        <h2 className="text-[28px] font-bold text-foreground pb-2">Tilføj kort</h2>
+        <div className="rounded-[12px] border-2 border-border bg-card p-4 space-y-3">
+          <div className="flex items-center gap-2 pb-2">
+            <Shield className="h-4 w-4 text-green-600" />
+            <p className="text-[12px] font-medium text-green-700">Sikker forbindelse — krypteret med Stripe</p>
+          </div>
+          <CardElement options={{
+            style: {
+              base: {
+                fontSize: '16px',
+                color: '#1a1a1a',
+                '::placeholder': { color: '#9ca3af' },
+                fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+              },
+              invalid: { color: '#ef4444' },
+            },
+            hidePostalCode: true,
+          }} />
+        </div>
+        {error && <p className="text-[13px] text-red-500 text-center px-4">{error}</p>}
+        <p className="text-[13px] text-muted-foreground text-center px-4">
+          Visa/Dankort, Visa Electron, MasterCard, American Express. Dine kortoplysninger opbevares sikkert af Stripe og deles aldrig med Huska.
+        </p>
+      </div>
+      <div className="flex-1" />
+      <div className="space-y-2 mt-6">
+        <button
+          onClick={handleSubmit}
+          disabled={loading || !stripe}
+          className="w-full rounded-[12px] py-3.5 bg-primary text-white text-[15px] font-semibold transition-all active:scale-[0.98] disabled:opacity-50"
+        >
+          {loading ? 'Gemmer kort...' : 'Tilføj kort'}
+        </button>
+        <button onClick={onCancel} className="w-full rounded-[12px] py-3 text-[14px] text-muted-foreground font-medium">
+          Annuller
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function StripeMobilePayForm({ onSuccess, onCancel, keyboardHeight }: StripeFormProps) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async () => {
+    if (!stripe || !elements) return;
+    setLoading(true);
+    setError(null);
+
+    const { error: confirmError } = await stripe.confirmSetup({
+      elements,
+      confirmParams: { return_url: window.location.href },
+      redirect: 'if_required',
+    });
+
+    if (confirmError) {
+      setError(confirmError.message || 'Kunne ikke tilknytte MobilePay');
+      setLoading(false);
+    } else {
+      onSuccess();
+    }
+  };
+
+  return (
+    <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+      <div className="space-y-4">
+        <h2 className="text-[28px] font-bold text-foreground pb-2">MobilePay</h2>
+        <div className="rounded-[12px] bg-[#E8EAF6] p-4 space-y-2">
+          <div className="flex items-center gap-3">
+            <img src="/images/Mobilepay.jpeg" alt="MobilePay" className="h-10 w-10 rounded-[8px] object-cover" />
+            <div>
+              <p className="text-[14px] font-medium text-foreground">Betal med MobilePay</p>
+              <p className="text-[13px] text-muted-foreground">Tilknyt din MobilePay-konto for hurtig betaling.</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 px-1">
+          <Shield className="h-4 w-4 text-green-600" />
+          <p className="text-[12px] font-medium text-green-700">Sikker forbindelse via Stripe</p>
+        </div>
+        {error && <p className="text-[13px] text-red-500 text-center px-4">{error}</p>}
+      </div>
+      <div className="flex-1" />
+      <div className="space-y-2">
+        <button
+          onClick={handleSubmit}
+          disabled={loading || !stripe}
+          className="w-full rounded-[12px] py-3.5 text-white text-[15px] font-semibold transition-all active:scale-[0.98] disabled:opacity-50"
+          style={{ background: '#5A78FF' }}
+        >
+          {loading ? 'Tilknytter...' : 'Tilknyt MobilePay'}
+        </button>
+        <button onClick={onCancel} className="w-full rounded-[12px] py-3 text-[14px] text-muted-foreground font-medium">
+          Annuller
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function StripeApplePayForm({ onSuccess, onCancel, keyboardHeight }: StripeFormProps) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async () => {
+    if (!stripe || !elements) return;
+    setLoading(true);
+    setError(null);
+
+    const { error: confirmError } = await stripe.confirmSetup({
+      elements,
+      confirmParams: { return_url: window.location.href },
+      redirect: 'if_required',
+    });
+
+    if (confirmError) {
+      setError(confirmError.message || 'Kunne ikke konfigurere Apple Pay');
+      setLoading(false);
+    } else {
+      onSuccess();
+    }
+  };
+
+  return (
+    <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+      <div className="space-y-4">
+        <h2 className="text-[28px] font-bold text-foreground pb-2">Apple Pay</h2>
+        <div className="rounded-[12px] bg-muted/50 p-4 space-y-2">
+          <div className="flex items-center gap-3">
+            <img src="/images/Apple pay .png" alt="Apple Pay" className="h-10 w-10 rounded-[8px] object-contain border border-border bg-white p-0.5" />
+            <div>
+              <p className="text-[14px] font-medium text-foreground">Betal med Apple Pay</p>
+              <p className="text-[13px] text-muted-foreground">Hurtig og sikker betaling med Face ID eller Touch ID.</p>
+            </div>
+          </div>
+        </div>
+        <div className="rounded-[12px] border-2 border-border bg-card p-4">
+          <CardElement options={{
+            style: {
+              base: {
+                fontSize: '16px',
+                color: '#1a1a1a',
+                '::placeholder': { color: '#9ca3af' },
+                fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+              },
+              invalid: { color: '#ef4444' },
+            },
+            hidePostalCode: true,
+          }} />
+        </div>
+        <div className="flex items-center gap-2 px-1">
+          <Shield className="h-4 w-4 text-green-600" />
+          <p className="text-[12px] font-medium text-green-700">Sikker forbindelse — Apple Pay via Stripe</p>
+        </div>
+        {error && <p className="text-[13px] text-red-500 text-center px-4">{error}</p>}
+      </div>
+      <div className="flex-1" />
+      <div className="space-y-2">
+        <button
+          onClick={handleSubmit}
+          disabled={loading || !stripe}
+          className="w-full rounded-[12px] py-3.5 bg-black text-white text-[15px] font-semibold transition-all active:scale-[0.98] disabled:opacity-50"
+        >
+          {loading ? 'Konfigurerer...' : 'Konfigurer Apple Pay'}
+        </button>
+        <button onClick={onCancel} className="w-full rounded-[12px] py-3 text-[14px] text-muted-foreground font-medium">
+          Annuller
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function StripePayPalForm({ onSuccess, onCancel, keyboardHeight }: StripeFormProps) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async () => {
+    if (!stripe || !elements) return;
+    setLoading(true);
+    setError(null);
+
+    const { error: confirmError } = await stripe.confirmSetup({
+      elements,
+      confirmParams: { return_url: window.location.href },
+      redirect: 'if_required',
+    });
+
+    if (confirmError) {
+      setError(confirmError.message || 'Kunne ikke tilknytte PayPal');
+      setLoading(false);
+    } else {
+      onSuccess();
+    }
+  };
+
+  return (
+    <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+      <div className="space-y-4">
+        <h2 className="text-[28px] font-bold text-foreground pb-2">PayPal</h2>
+        <div className="rounded-[12px] bg-[#FFF8E1] p-4 space-y-2">
+          <div className="flex items-center gap-3">
+            <img src="/images/Paypal.png" alt="PayPal" className="h-10 w-10 rounded-[8px] object-contain border border-border bg-white p-0.5" />
+            <div>
+              <p className="text-[14px] font-medium text-foreground">Betal med PayPal</p>
+              <p className="text-[13px] text-muted-foreground">Log ind med din PayPal-konto for at tilknytte den.</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 px-1">
+          <Shield className="h-4 w-4 text-green-600" />
+          <p className="text-[12px] font-medium text-green-700">Sikker forbindelse via Stripe + PayPal</p>
+        </div>
+        {error && <p className="text-[13px] text-red-500 text-center px-4">{error}</p>}
+      </div>
+      <div className="flex-1" />
+      <div className="space-y-2">
+        <button
+          onClick={handleSubmit}
+          disabled={loading || !stripe}
+          className="w-full rounded-[12px] py-3.5 text-white text-[15px] font-semibold transition-all active:scale-[0.98] disabled:opacity-50"
+          style={{ background: '#0070BA' }}
+        >
+          {loading ? 'Tilknytter...' : 'Log ind med PayPal'}
+        </button>
+        <button onClick={onCancel} className="w-full rounded-[12px] py-3 text-[14px] text-muted-foreground font-medium">
+          Annuller
+        </button>
+      </div>
+    </div>
+  );
+}
 
 /** Calculate age from a date string (YYYY-MM-DD) */
 function calculateAge(birthDateStr: string): number | null {
@@ -91,7 +369,6 @@ export function SettingsView() {
     users,
     children,
     household,
-    paymentAccounts,
     documents,
     events,
     isProfessionalView,
@@ -101,8 +378,6 @@ export function SettingsView() {
     updateUser,
     updateChild,
     setHousehold,
-    addPaymentAccount,
-    updatePaymentAccount,
     addFamilyMember,
     removeFamilyMember,
     sideMenuOpen,
@@ -139,11 +414,10 @@ export function SettingsView() {
   });
   const [avatarDialogOpen, setAvatarDialogOpen] = useState(false);
   const avatarFileRef = useRef<HTMLInputElement>(null);
-  const [paymentDraft, setPaymentDraft] = useState({
-    provider: 'mobilepay',
-    accountLabel: '',
-    accountHandle: ''
-  });
+  const [savedPaymentMethods, setSavedPaymentMethods] = useState<SavedPaymentMethod[]>([]);
+  const [paymentMethodsLoading, setPaymentMethodsLoading] = useState(false);
+  const [addCardLoading, setAddCardLoading] = useState(false);
+  const [stripeClientSecret, setStripeClientSecret] = useState<string | null>(null);
 const [evidenceDraft, setEvidenceDraft] = useState({
     title: '',
     url: '',
@@ -204,11 +478,34 @@ const [evidenceDraft, setEvidenceDraft] = useState({
   const isTogetherMode = currentMode === 'together';
   const allowProfessionalTools = currentUser?.isAdmin === true || currentUser?.role === 'professional';
 
-  const myPaymentAccounts = useMemo(() => {
-    if (!currentUser) return [];
-    return paymentAccounts.filter((account) => account.userId === currentUser.id);
-  }, [paymentAccounts, currentUser]);
+  // Hent gemte Stripe-betalingsmetoder
+  const fetchSavedPaymentMethods = async () => {
+    setPaymentMethodsLoading(true);
+    try {
+      const methods = await listPaymentMethods();
+      setSavedPaymentMethods(methods);
+    } catch (err) {
+      console.error('Kunne ikke hente betalingsmetoder:', err);
+    } finally {
+      setPaymentMethodsLoading(false);
+    }
+  };
 
+  useEffect(() => {
+    if (activeSettingsTab === 'betaling') {
+      fetchSavedPaymentMethods();
+    }
+  }, [activeSettingsTab]);
+
+  const handleDeletePaymentMethod = async (pmId: string) => {
+    try {
+      await deletePaymentMethod(pmId);
+      setSavedPaymentMethods((prev) => prev.filter((m) => m.id !== pmId));
+      toast.success('Betalingsmetode fjernet');
+    } catch {
+      toast.error('Kunne ikke fjerne betalingsmetode');
+    }
+  };
 
   const visibleAvatars = useMemo(() => {
     if (currentUser?.isAdmin) return [...MALE_AVATARS, ...FEMALE_AVATARS];
@@ -406,36 +703,46 @@ const [evidenceDraft, setEvidenceDraft] = useState({
     }).catch(() => { /* ignore — fallback to local state */ });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleAddPaymentAccount = () => {
-    if (!currentUser) return;
-    if (!paymentDraft.accountLabel.trim() || !paymentDraft.accountHandle.trim()) {
-      toast.error('Udfyld kontonavn og konto-oplysninger');
-      return;
+  const handleInitAddCard = async () => {
+    setAddCardLoading(true);
+    try {
+      const { clientSecret } = await createSetupIntent(['card']);
+      setStripeClientSecret(clientSecret);
+      setSettingsDetailView('payment-add-card');
+    } catch (err) {
+      toast.error('Kunne ikke starte kortregistrering');
+      console.error(err);
+    } finally {
+      setAddCardLoading(false);
     }
-    addPaymentAccount({
-      id: paymentAccountId(),
-      userId: currentUser.id,
-      provider: paymentDraft.provider as 'mobilepay' | 'bank' | 'card' | 'other',
-      accountLabel: paymentDraft.accountLabel.trim(),
-      accountHandle: paymentDraft.accountHandle.trim(),
-      isPrimary: myPaymentAccounts.length === 0,
-      createdAt: new Date().toISOString()
-    });
-    setPaymentDraft({ provider: 'mobilepay', accountLabel: '', accountHandle: '' });
-    toast.success('Betalingskonto tilføjet');
   };
 
-  const handleSetPrimaryPayment = (accountId: string) => {
-    const account = myPaymentAccounts.find((item) => item.id === accountId);
-    if (!account) return;
-    myPaymentAccounts.forEach((item) => {
-      if (item.id === account.id) {
-        updatePaymentAccount(item.id, { isPrimary: true });
-      } else if (item.userId === account.userId && item.isPrimary) {
-        updatePaymentAccount(item.id, { isPrimary: false });
-      }
-    });
-    toast.success('Primær betalingskonto opdateret');
+  const handleInitMobilePay = async () => {
+    setAddCardLoading(true);
+    try {
+      const { clientSecret } = await createSetupIntent(['mobilepay']);
+      setStripeClientSecret(clientSecret);
+      setSettingsDetailView('payment-mobilepay');
+    } catch (err) {
+      toast.error('Kunne ikke starte MobilePay-tilknytning');
+      console.error(err);
+    } finally {
+      setAddCardLoading(false);
+    }
+  };
+
+  const handleInitPayPal = async () => {
+    setAddCardLoading(true);
+    try {
+      const { clientSecret } = await createSetupIntent(['paypal']);
+      setStripeClientSecret(clientSecret);
+      setSettingsDetailView('payment-paypal');
+    } catch (err) {
+      toast.error('Kunne ikke starte PayPal-tilknytning');
+      console.error(err);
+    } finally {
+      setAddCardLoading(false);
+    }
   };
 
   const handleUpdateSingleParentSetting = (key: 'evidenceVaultEnabled' | 'autoArchiveReceipts', value: boolean) => {
@@ -1481,11 +1788,14 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                 <p className="text-[16px] font-bold text-foreground px-1 pb-2">Kredit- og debitkort</p>
                 <div className="divide-y divide-border">
                   <button
-                    onClick={() => setSettingsDetailView('payment-add-card')}
+                    onClick={handleInitAddCard}
+                    disabled={addCardLoading}
                     className="flex w-full items-center gap-3 py-3.5 px-1 text-left transition-colors hover:bg-card"
                   >
                     <span className="text-[20px] text-muted-foreground">+</span>
-                    <p className="text-[15px] font-medium text-foreground">Tilføj nyt kort</p>
+                    <p className="text-[15px] font-medium text-foreground">
+                      {addCardLoading ? 'Forbereder...' : 'Tilføj nyt kort'}
+                    </p>
                   </button>
                 </div>
               </div>
@@ -1497,7 +1807,8 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                 <p className="text-[16px] font-bold text-foreground px-1 pb-2">Andre betalingsmetoder</p>
                 <div className="divide-y divide-border">
                   <button
-                    onClick={() => setSettingsDetailView('payment-mobilepay')}
+                    onClick={handleInitMobilePay}
+                    disabled={addCardLoading}
                     className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
                   >
                     <div className="flex items-center gap-3">
@@ -1507,7 +1818,16 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                     <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                   </button>
                   <button
-                    onClick={() => setSettingsDetailView('payment-applepay')}
+                    onClick={async () => {
+                      setAddCardLoading(true);
+                      try {
+                        const { clientSecret } = await createSetupIntent(['card']);
+                        setStripeClientSecret(clientSecret);
+                        setSettingsDetailView('payment-applepay');
+                      } catch { toast.error('Kunne ikke starte Apple Pay'); }
+                      finally { setAddCardLoading(false); }
+                    }}
+                    disabled={addCardLoading}
                     className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
                   >
                     <div className="flex items-center gap-3">
@@ -1517,7 +1837,8 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                     <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                   </button>
                   <button
-                    onClick={() => setSettingsDetailView('payment-paypal')}
+                    onClick={handleInitPayPal}
+                    disabled={addCardLoading}
                     className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
                   >
                     <div className="flex items-center gap-3">
@@ -1568,88 +1889,52 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                 </button>
               </div>
 
-              {/* ─── Betalingskonti ─── */}
+              {/* ─── Gemte betalingsmetoder ─── */}
               <div className="pt-2">
-                <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1 pb-2">Betalingskonti</p>
-
-                {myPaymentAccounts.length > 0 && (
-                  <div className="space-y-2 mb-4">
-                    {myPaymentAccounts.map((account) => (
-                      <div key={account.id} className="flex items-center justify-between rounded-[8px] border-2 border-border bg-card px-4 py-3">
+                <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1 pb-2">Dine betalingsmetoder</p>
+                {paymentMethodsLoading ? (
+                  <div className="rounded-[8px] border-2 border-dashed border-border bg-card p-4 text-center">
+                    <p className="text-[12px] text-muted-foreground">Henter betalingsmetoder...</p>
+                  </div>
+                ) : savedPaymentMethods.length > 0 ? (
+                  <div className="space-y-2">
+                    {savedPaymentMethods.map((pm) => (
+                      <div key={pm.id} className="flex items-center justify-between rounded-[8px] border-2 border-border bg-card px-4 py-3">
                         <div className="flex items-center gap-3 min-w-0">
                           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] bg-background">
-                            <CreditCard className="h-4 w-4 text-muted-foreground" />
+                            {pm.type === 'mobilepay' ? (
+                              <img src="/images/Mobilepay.jpeg" alt="MobilePay" className="h-7 w-7 rounded-[4px] object-cover" />
+                            ) : pm.type === 'paypal' ? (
+                              <img src="/images/Paypal.png" alt="PayPal" className="h-7 w-7 rounded-[4px] object-contain" />
+                            ) : pm.isApplePay ? (
+                              <img src="/images/Apple pay .png" alt="Apple Pay" className="h-7 w-7 rounded-[4px] object-contain" />
+                            ) : (
+                              <CreditCard className="h-4 w-4 text-muted-foreground" />
+                            )}
                           </div>
                           <div className="min-w-0">
-                            <p className="truncate text-[13px] font-semibold text-foreground">{account.accountLabel}</p>
-                            <p className="truncate text-[11px] text-muted-foreground">{account.accountHandle}</p>
+                            <p className="truncate text-[13px] font-semibold text-foreground">
+                              {pm.isApplePay ? 'Apple Pay' : formatCardBrand(pm.brand)}
+                              {pm.last4 ? ` ····${pm.last4}` : ''}
+                            </p>
+                            {pm.expMonth && pm.expYear && (
+                              <p className="text-[11px] text-muted-foreground">Udløber {String(pm.expMonth).padStart(2, '0')}/{pm.expYear}</p>
+                            )}
                           </div>
                         </div>
-                        {account.isPrimary ? (
-                          <span className="shrink-0 rounded-[8px] bg-orange-tint border border-orange-tint px-2.5 py-1 text-[11px] font-semibold text-[#f58a2d]">Primær</span>
-                        ) : (
-                          <button
-                            onClick={() => handleSetPrimaryPayment(account.id)}
-                            className="shrink-0 rounded-[8px] border-2 border-border px-2.5 py-1 text-[11px] font-semibold text-muted-foreground transition-all active:scale-[0.96]"
-                          >
-                            Sæt primær
-                          </button>
-                        )}
+                        <button
+                          onClick={() => handleDeletePaymentMethod(pm.id)}
+                          className="shrink-0 rounded-[8px] border-2 border-border px-2.5 py-1 text-[11px] font-semibold text-muted-foreground transition-all active:scale-[0.96]"
+                        >
+                          Fjern
+                        </button>
                       </div>
                     ))}
                   </div>
-                )}
-
-                {/* Tilføj ny konto */}
-                <div className="rounded-[8px] border-2 border-border bg-card p-4 space-y-3">
-                  <p className="text-[13px] font-semibold text-foreground">Tilføj betalingskonto</p>
-                  <SelectSheet
-                    value={paymentDraft.provider}
-                    onValueChange={(value) => setPaymentDraft((prev) => ({ ...prev, provider: value }))}
-                    title="Betalingstype"
-                    options={[
-                      { value: 'mobilepay', label: 'MobilePay' },
-                      { value: 'bank', label: 'Bankkonto' },
-                      { value: 'card', label: 'Kort' },
-                      { value: 'other', label: 'Andet' },
-                    ]}
-                    className="rounded-[8px] border-border"
-                  />
-                  <Input
-                    value={paymentDraft.accountLabel}
-                    onChange={(e) => setPaymentDraft((prev) => ({ ...prev, accountLabel: e.target.value }))}
-                    placeholder="Kontonavn (fx 'Min MobilePay')"
-                    className="rounded-[8px] border-border"
-                  />
-                  <Input
-                    value={paymentDraft.accountHandle}
-                    onChange={(e) => setPaymentDraft((prev) => ({ ...prev, accountHandle: e.target.value }))}
-                    placeholder="Telefonnr. eller kontonummer"
-                    className="rounded-[8px] border-border"
-                  />
-                  <button
-                    onClick={handleAddPaymentAccount}
-                    disabled={!features.inAppPayments}
-                    className={cn(
-                      "w-full rounded-[8px] py-2.5 text-[13px] font-semibold transition-all active:scale-[0.98]",
-                      features.inAppPayments
-                        ? "bg-primary text-white"
-                        : "bg-muted text-muted-foreground"
-                    )}
-                  >
-                    Tilføj konto
-                  </button>
-                  {!features.inAppPayments && (
-                    <p className="text-[11px] text-muted-foreground text-center">
-                      Opgrader til Family Plus for betalingsfunktioner
-                    </p>
-                  )}
-                </div>
-
-                {myPaymentAccounts.length === 0 && (
-                  <div className="mt-3 rounded-[8px] border-2 border-dashed border-border bg-card p-4 text-center">
+                ) : (
+                  <div className="rounded-[8px] border-2 border-dashed border-border bg-card p-4 text-center">
                     <CreditCard className="mx-auto h-6 w-6 text-muted-foreground mb-1.5" />
-                    <p className="text-[12px] text-muted-foreground">Ingen betalingskonti tilføjet endnu</p>
+                    <p className="text-[12px] text-muted-foreground">Ingen betalingsmetoder tilføjet endnu</p>
                   </div>
                 )}
               </div>
@@ -1764,90 +2049,80 @@ const [evidenceDraft, setEvidenceDraft] = useState({
               )}
 
               {/* ─── Tilføj kort ─── */}
-              {settingsDetailView === 'payment-add-card' && (
-                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
-                  <div className="space-y-5">
-                    <h2 className="text-[28px] font-bold text-foreground pb-2">Tilføj kort</h2>
-                    <div className="rounded-[16px] p-5 space-y-4" style={{ background: 'linear-gradient(135deg, #4FC3F7 0%, #29B6F6 50%, #039BE5 100%)' }}>
-                      <div className="flex justify-end">
-                        <span className="text-[11px] font-bold text-white/80 tracking-wider">KREDIT / DEBET</span>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-[13px] font-semibold text-white">Kortnummer</p>
-                        <Input placeholder="0000 0000 0000 0000" className="rounded-[8px] bg-white/95 border-0 px-4 py-3 text-[15px] tracking-[0.05em] placeholder:text-gray-400" inputMode="numeric" />
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-1">
-                          <p className="text-[13px] font-semibold text-white">Udløbsdato</p>
-                          <Input placeholder="MM/YY" className="rounded-[8px] bg-white/95 border-0 px-4 py-3 text-[15px] placeholder:text-gray-400" inputMode="numeric" />
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-[13px] font-semibold text-white">Sikkerhedskode</p>
-                          <Input placeholder="000" className="rounded-[8px] bg-white/95 border-0 px-4 py-3 text-[15px] placeholder:text-gray-400" inputMode="numeric" type="password" />
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-[13px] text-muted-foreground text-center px-4">
-                      Du kan bruge dit debit- eller kreditkort (Visa/Dankort, Visa Electron, MasterCard, American Express) til at betale med Huska.
-                    </p>
-                  </div>
-                  <div className="flex-1" />
-                  <Button className="w-full shrink-0 rounded-[12px] py-3 mt-6">
-                    Tilføj kort
-                  </Button>
-                </div>
+              {/* ─── Tilføj kort (Stripe Elements) ─── */}
+              {settingsDetailView === 'payment-add-card' && stripeClientSecret && (
+                <Elements stripe={getStripe()} options={{ clientSecret: stripeClientSecret, appearance: { theme: 'stripe', variables: { colorPrimary: '#f58a2d', borderRadius: '8px' } } }}>
+                  <StripeCardForm
+                    onSuccess={() => {
+                      toast.success('Kort tilføjet!');
+                      setStripeClientSecret(null);
+                      setSettingsDetailView(null);
+                      fetchSavedPaymentMethods();
+                    }}
+                    onCancel={() => {
+                      setStripeClientSecret(null);
+                      setSettingsDetailView(null);
+                    }}
+                    keyboardHeight={keyboardHeight}
+                  />
+                </Elements>
               )}
 
-              {/* ─── MobilePay ─── */}
-              {settingsDetailView === 'payment-mobilepay' && (
-                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
-                  <div className="space-y-4">
-                    <h2 className="text-[28px] font-bold text-foreground pb-2">MobilePay</h2>
-                    <div className="rounded-[12px] bg-[#E8EAF6] p-4 space-y-2">
-                      <p className="text-[14px] font-medium text-foreground">Betal med MobilePay</p>
-                      <p className="text-[13px] text-muted-foreground">Tilknyt din MobilePay-konto for hurtig og nem betaling direkte fra appen.</p>
-                    </div>
-                    <Input placeholder="Telefonnummer" className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" inputMode="tel" />
-                  </div>
-                  <div className="flex-1" />
-                  <Button className="w-full shrink-0 rounded-[12px] py-3">
-                    Tilknyt MobilePay
-                  </Button>
-                </div>
+              {/* ─── MobilePay (Stripe) ─── */}
+              {settingsDetailView === 'payment-mobilepay' && stripeClientSecret && (
+                <Elements stripe={getStripe()} options={{ clientSecret: stripeClientSecret, appearance: { theme: 'stripe', variables: { colorPrimary: '#5A78FF', borderRadius: '8px' } } }}>
+                  <StripeMobilePayForm
+                    onSuccess={() => {
+                      toast.success('MobilePay tilknyttet!');
+                      setStripeClientSecret(null);
+                      setSettingsDetailView(null);
+                      fetchSavedPaymentMethods();
+                    }}
+                    onCancel={() => {
+                      setStripeClientSecret(null);
+                      setSettingsDetailView(null);
+                    }}
+                    keyboardHeight={keyboardHeight}
+                  />
+                </Elements>
               )}
 
               {/* ─── Apple Pay ─── */}
-              {settingsDetailView === 'payment-applepay' && (
-                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
-                  <div className="space-y-4">
-                    <h2 className="text-[28px] font-bold text-foreground pb-2">Apple Pay</h2>
-                    <div className="rounded-[12px] bg-muted/50 p-4 space-y-2">
-                      <p className="text-[14px] font-medium text-foreground">Betal med Apple Pay</p>
-                      <p className="text-[13px] text-muted-foreground">Brug Apple Pay til hurtig og sikker betaling med Face ID eller Touch ID.</p>
-                    </div>
-                  </div>
-                  <div className="flex-1" />
-                  <Button className="w-full shrink-0 rounded-[12px] py-3 bg-black text-white hover:bg-gray-900">
-                    Konfigurer Apple Pay
-                  </Button>
-                </div>
+              {settingsDetailView === 'payment-applepay' && stripeClientSecret && (
+                <Elements stripe={getStripe()} options={{ clientSecret: stripeClientSecret, appearance: { theme: 'stripe', variables: { colorPrimary: '#000000', borderRadius: '8px' } } }}>
+                  <StripeApplePayForm
+                    onSuccess={() => {
+                      toast.success('Apple Pay konfigureret!');
+                      setStripeClientSecret(null);
+                      setSettingsDetailView(null);
+                      fetchSavedPaymentMethods();
+                    }}
+                    onCancel={() => {
+                      setStripeClientSecret(null);
+                      setSettingsDetailView(null);
+                    }}
+                    keyboardHeight={keyboardHeight}
+                  />
+                </Elements>
               )}
 
-              {/* ─── PayPal ─── */}
-              {settingsDetailView === 'payment-paypal' && (
-                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
-                  <div className="space-y-4">
-                    <h2 className="text-[28px] font-bold text-foreground pb-2">PayPal</h2>
-                    <div className="rounded-[12px] bg-[#FFF8E1] p-4 space-y-2">
-                      <p className="text-[14px] font-medium text-foreground">Betal med PayPal</p>
-                      <p className="text-[13px] text-muted-foreground">Log ind med din PayPal-konto for at tilknytte den som betalingsmetode.</p>
-                    </div>
-                  </div>
-                  <div className="flex-1" />
-                  <Button className="w-full shrink-0 rounded-[12px] py-3" style={{ background: '#0070BA' }}>
-                    Log ind med PayPal
-                  </Button>
-                </div>
+              {/* ─── PayPal (Stripe) ─── */}
+              {settingsDetailView === 'payment-paypal' && stripeClientSecret && (
+                <Elements stripe={getStripe()} options={{ clientSecret: stripeClientSecret, appearance: { theme: 'stripe', variables: { colorPrimary: '#0070BA', borderRadius: '8px' } } }}>
+                  <StripePayPalForm
+                    onSuccess={() => {
+                      toast.success('PayPal tilknyttet!');
+                      setStripeClientSecret(null);
+                      setSettingsDetailView(null);
+                      fetchSavedPaymentMethods();
+                    }}
+                    onCancel={() => {
+                      setStripeClientSecret(null);
+                      setSettingsDetailView(null);
+                    }}
+                    keyboardHeight={keyboardHeight}
+                  />
+                </Elements>
               )}
             </motion.div>
           )}
