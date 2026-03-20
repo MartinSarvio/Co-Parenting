@@ -3,54 +3,65 @@ interface AppStateScreenProps {
   onRetry?: () => void;
 }
 
+// DiceBear avatar URLs matching app style
+const CHILD_AVATAR = 'https://api.dicebear.com/7.x/avataaars/svg?seed=Maison&gender=male';
+const ADULT_AVATAR = 'https://api.dicebear.com/7.x/avataaars/svg?seed=Anne&gender=female';
+
 // ── SVG sub-components ──────────────────────────────────────────────────────
 
 function Cloud({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 120 50" className={className} fill="currentColor">
-      <ellipse cx="60" cy="35" rx="50" ry="15" />
-      <ellipse cx="40" cy="25" rx="25" ry="15" />
-      <ellipse cx="75" cy="22" rx="20" ry="13" />
-      <ellipse cx="55" cy="18" rx="18" ry="12" />
+    <svg viewBox="0 0 200 80" className={className} fill="currentColor">
+      <ellipse cx="100" cy="55" rx="85" ry="25" />
+      <ellipse cx="65" cy="38" rx="45" ry="28" />
+      <ellipse cx="130" cy="32" rx="38" ry="24" />
+      <ellipse cx="95" cy="25" rx="35" ry="22" />
     </svg>
   );
 }
 
-function Tree({ className }: { className?: string }) {
+function Tree({ className, variant = 'large' }: { className?: string; variant?: 'large' | 'small' }) {
+  if (variant === 'small') {
+    return (
+      <svg viewBox="0 0 80 140" className={className}>
+        <rect x="35" y="85" width="10" height="55" rx="4" fill="#9B8B6E" className="dark:opacity-60" />
+        <ellipse cx="40" cy="55" rx="32" ry="45" fill="#7DD87D" className="dark:fill-emerald-500" />
+        <ellipse cx="32" cy="42" rx="22" ry="32" fill="#93E693" className="dark:fill-emerald-400" />
+      </svg>
+    );
+  }
   return (
-    <svg viewBox="0 0 60 100" className={className}>
-      <rect x="26" y="60" width="8" height="40" rx="3" fill="#8B7355" className="dark:opacity-70" />
-      <ellipse cx="30" cy="35" rx="28" ry="35" fill="#6DC56D" className="dark:fill-emerald-600" />
-      <ellipse cx="22" cy="28" rx="18" ry="24" fill="#7DD87D" className="dark:fill-emerald-500" />
+    <svg viewBox="0 0 120 200" className={className}>
+      <rect x="52" y="130" width="16" height="70" rx="6" fill="#8B7355" className="dark:opacity-60" />
+      <ellipse cx="60" cy="75" rx="55" ry="70" fill="#5EC25E" className="dark:fill-emerald-600" />
+      <ellipse cx="45" cy="58" rx="38" ry="50" fill="#6DD86D" className="dark:fill-emerald-500" />
+      <ellipse cx="72" cy="48" rx="28" ry="36" fill="#7EE87E" className="dark:fill-emerald-400" />
     </svg>
   );
 }
 
 function ProfileCard({ variant, className }: { variant: 'adult' | 'child'; className?: string }) {
   const isAdult = variant === 'adult';
-  const bgColor = isAdult ? '#2f2f2f' : '#f58a2d';
-  const cardBg = isAdult ? 'bg-[#1a1a1a]' : 'bg-[#c0491a]';
+  const bgColor = isAdult ? '#2f2f2f' : '#c0491a';
+  const avatarUrl = isAdult ? ADULT_AVATAR : CHILD_AVATAR;
 
   return (
     <div className={`relative ${className ?? ''}`}>
-      {/* Card background */}
-      <div className={`${cardBg} w-[100px] h-[110px] rounded-2xl shadow-lg flex items-center justify-center`}>
-        {/* White circle */}
-        <div className="w-[76px] h-[76px] rounded-full bg-white flex items-center justify-center">
-          {/* Person silhouette */}
-          <svg viewBox="0 0 40 40" className="w-10 h-10" fill={bgColor}>
-            {isAdult ? (
-              <>
-                <circle cx="20" cy="13" r="7" />
-                <path d="M8 36c0-6.627 5.373-12 12-12s12 5.373 12 12" />
-              </>
-            ) : (
-              <>
-                <circle cx="20" cy="15" r="6" />
-                <path d="M10 36c0-5.523 4.477-10 10-10s10 4.477 10 10" />
-              </>
-            )}
-          </svg>
+      <div
+        className="rounded-[20px] shadow-xl flex items-center justify-center"
+        style={{
+          backgroundColor: bgColor,
+          width: 150,
+          height: 170,
+        }}
+      >
+        {/* White circle with avatar */}
+        <div className="w-[115px] h-[115px] rounded-full bg-white flex items-center justify-center overflow-hidden shadow-inner">
+          <img
+            src={avatarUrl}
+            alt={isAdult ? 'Voksen' : 'Barn'}
+            className="w-[90px] h-[90px]"
+          />
         </div>
       </div>
     </div>
@@ -78,41 +89,53 @@ export function AppStateScreen({ state, onRetry }: AppStateScreenProps) {
   return (
     <div className="min-h-[100svh] flex flex-col items-center justify-center bg-background overflow-hidden relative">
       {/* Clouds */}
-      <Cloud className="absolute top-[12%] w-20 text-violet-200 dark:text-violet-900/40 animate-[cloud-drift_18s_linear_infinite]" />
-      <Cloud className="absolute top-[8%] right-0 w-16 text-violet-200/80 dark:text-violet-900/30 animate-[cloud-drift_24s_linear_infinite_3s]" />
-      <Cloud className="absolute top-[22%] w-14 text-violet-200/60 dark:text-violet-900/25 animate-[cloud-drift_20s_linear_infinite_8s]" />
+      <Cloud className="absolute top-[8%] w-36 text-violet-200/90 dark:text-violet-900/40 animate-[cloud-drift_22s_linear_infinite]" />
+      <Cloud className="absolute top-[5%] w-28 text-violet-200/70 dark:text-violet-900/30 animate-[cloud-drift_28s_linear_infinite_4s]" />
+      <Cloud className="absolute top-[18%] w-24 text-violet-200/60 dark:text-violet-900/25 animate-[cloud-drift_20s_linear_infinite_10s]" />
 
-      {/* Main illustration */}
-      <div className="relative flex items-end gap-3 mb-8 animate-[float_4s_ease-in-out_infinite]">
-        <ProfileCard variant="child" className="-rotate-6" />
-        <ProfileCard variant="adult" className="rotate-6 -ml-4" />
-      </div>
-
-      {/* Trees */}
-      <div className="absolute bottom-[8%] left-[10%] w-14 animate-[tree-sway_5s_ease-in-out_infinite]">
-        <Tree />
-      </div>
-      <div className="absolute bottom-[6%] right-[12%] w-12 animate-[tree-sway_6s_ease-in-out_infinite_1s]">
-        <Tree />
+      {/* Main illustration — overlapping rotated cards */}
+      <div className="relative flex items-center justify-center mb-10 animate-[float_4s_ease-in-out_infinite]" style={{ width: 300, height: 200 }}>
+        {/* Child card — behind, rotated left */}
+        <div className="absolute" style={{ left: 10, transform: 'rotate(-12deg)' }}>
+          <ProfileCard variant="child" />
+        </div>
+        {/* Adult card — front, rotated right */}
+        <div className="absolute" style={{ right: 10, transform: 'rotate(8deg)', zIndex: 1 }}>
+          <ProfileCard variant="adult" />
+        </div>
       </div>
 
       {/* Text */}
       <div className="text-center z-10">
-        <p className="text-[18px] font-bold text-foreground">
+        <p className="text-[22px] font-bold text-foreground">
           {title}
           {isLoading && <span className="animate-[dots_1.5s_steps(4,end)_infinite]">...</span>}
         </p>
         {subtitle && (
-          <p className="text-[14px] text-muted-foreground mt-1">{subtitle}</p>
+          <p className="text-[14px] text-muted-foreground mt-2">{subtitle}</p>
         )}
         {(state === 'error' || state === 'offline') && onRetry && (
           <button
             onClick={onRetry}
-            className="mt-5 px-6 py-2.5 rounded-full bg-[#f58a2d] text-white font-semibold text-[14px] shadow-md active:scale-95 transition-transform"
+            className="mt-6 px-8 py-3 rounded-full bg-[#f58a2d] text-white font-semibold text-[15px] shadow-lg active:scale-95 transition-transform"
           >
             Prøv igen
           </button>
         )}
+      </div>
+
+      {/* Trees — large and organic at bottom */}
+      <div className="absolute bottom-0 left-[5%] w-24 animate-[tree-sway_5s_ease-in-out_infinite]">
+        <Tree variant="large" />
+      </div>
+      <div className="absolute bottom-0 right-[8%] w-20 animate-[tree-sway_6s_ease-in-out_infinite_1.5s]">
+        <Tree variant="large" />
+      </div>
+      <div className="absolute bottom-0 left-[35%] w-14 animate-[tree-sway_7s_ease-in-out_infinite_0.5s]">
+        <Tree variant="small" />
+      </div>
+      <div className="absolute bottom-0 right-[32%] w-12 animate-[tree-sway_5.5s_ease-in-out_infinite_2s]">
+        <Tree variant="small" />
       </div>
     </div>
   );

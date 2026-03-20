@@ -20,6 +20,7 @@ export interface User {
   invitedBy?: string;
   municipality?: string; // Kommune-tilhørsforhold (professionelle)
   allergies?: string[];
+  gender?: 'male' | 'female';
   profileVisibility?: {
     showEmail?: boolean;
     showPhone?: boolean;

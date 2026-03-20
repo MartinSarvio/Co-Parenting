@@ -91,7 +91,7 @@ export function SelectSheet({
     maxHeight: openAbove
       ? triggerRect.top - GAP
       : Math.min(spaceBelow, MAX_CARD_HEIGHT),
-    zIndex: 91,
+    zIndex: 10001,
     ...(openAbove
       ? { bottom: window.innerHeight - triggerRect.top + GAP }
       : { top: triggerRect.bottom + GAP }),
@@ -131,7 +131,7 @@ export function SelectSheet({
             <>
               {/* Invisible backdrop click-catcher */}
               <motion.div
-                className="fixed inset-0 z-[90]"
+                className="fixed inset-0 z-[10000]"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}

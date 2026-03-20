@@ -14,6 +14,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
         // Cache app shell + JS/CSS/HTML
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
         // Cache DiceBear avatars and OpenFoodFacts API

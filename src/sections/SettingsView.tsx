@@ -116,6 +116,7 @@ export function SettingsView() {
   } = useAppStore();
   const { createDocument, saveNotificationPreferences } = useApiActions();
 
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [profileDraft, setProfileDraft] = useState({
     name: currentUser?.name || '',
@@ -170,6 +171,30 @@ const [evidenceDraft, setEvidenceDraft] = useState({
     if (typeof Notification !== 'undefined') {
       setNotifPermission(Notification.permission);
     }
+  }, []);
+
+  // Keyboard-aware: listen for keyboard show/hide on native
+  useEffect(() => {
+    let showListener: { remove: () => void } | undefined;
+    let hideListener: { remove: () => void } | undefined;
+    const setup = async () => {
+      try {
+        const { Keyboard } = await import('@capacitor/keyboard');
+        showListener = await Keyboard.addListener('keyboardWillShow', (info) => {
+          setKeyboardHeight(info.keyboardHeight);
+        });
+        hideListener = await Keyboard.addListener('keyboardWillHide', () => {
+          setKeyboardHeight(0);
+        });
+      } catch {
+        // Not on native — ignore
+      }
+    };
+    setup();
+    return () => {
+      showListener?.remove();
+      hideListener?.remove();
+    };
   }, []);
 
   const subscription = normalizeSubscription(household);
@@ -547,7 +572,8 @@ const [evidenceDraft, setEvidenceDraft] = useState({
       <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="space-y-2">
 
         <TabsContent value="profile" className="space-y-2">
-          {/* Avatar section */}
+          {/* Avatar section — only on main page */}
+          {!settingsDetailView && (
           <div className="flex flex-col items-center gap-3 py-5">
               <button
                 onClick={() => setAvatarDialogOpen(true)}
@@ -570,6 +596,7 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                 Skift profilbillede
               </button>
           </div>
+          )}
 
           {/* Avatar picker dialog */}
           <Dialog open={avatarDialogOpen} onOpenChange={setAvatarDialogOpen}>
@@ -665,38 +692,75 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                 ))}
               </div>
 
-              {/* ─── Familiens allergener + Konto ─── */}
-              <div className="divide-y divide-border">
-                  <button
-                    onClick={() => setSettingsDetailView('edit-allergens')}
-                    className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
-                  >
-                    <div className="min-w-0">
-                      <p className="text-[15px] font-medium text-foreground">Familiens allergener</p>
-                      <p className="text-[13px] text-muted-foreground">Administrer allergener for hele familien</p>
-                    </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
-                  </button>
+              <div className="border-t border-border" />
+
+              {/* ─── Familiens allergener ─── */}
+              <div className="pt-2">
+                <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1 pb-2">Familiens allergener</p>
+                <div className="divide-y divide-border">
+                  {currentUser && (
+                    <button
+                      onClick={() => setSettingsDetailView(`allergen-${currentUser.id}`)}
+                      className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-[15px] font-medium text-foreground truncate">{currentUser.name}</p>
+                          <p className="text-[13px] text-muted-foreground truncate">
+                            {currentUser.allergies?.length ? currentUser.allergies.join(', ') : 'Ingen allergener'}
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
+                    </button>
+                  )}
+                  {children.map(child => (
+                    <button
+                      key={child.id}
+                      onClick={() => setSettingsDetailView(`allergen-${child.id}`)}
+                      className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <Heart className="h-4 w-4 text-[#f58a2d] shrink-0" />
+                        <div className="min-w-0">
+                          <p className="text-[15px] font-medium text-foreground truncate">{child.name}</p>
+                          <p className="text-[13px] text-muted-foreground truncate">
+                            {child.allergies?.length ? child.allergies.join(', ') : 'Ingen allergener'}
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* ─── Konto ─── */}
+              <div className="pt-2">
+                <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1 pb-2">Konto</p>
+                <div className="divide-y divide-border">
                   <button
                     onClick={() => setSettingsDetailView('edit-export')}
                     className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
                   >
-                    <div className="min-w-0">
+                    <div>
                       <p className="text-[15px] font-medium text-foreground">Eksporter mine data</p>
                       <p className="text-[13px] text-muted-foreground">Download alle dine data (GDPR)</p>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                   </button>
                   <button
                     onClick={() => setSettingsDetailView('edit-delete')}
                     className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
                   >
-                    <div className="min-w-0">
+                    <div>
                       <p className="text-[15px] font-medium text-red-600">Slet min konto</p>
                       <p className="text-[13px] text-muted-foreground">Alle persondata anonymiseres permanent</p>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                   </button>
+                </div>
               </div>
 
               {/* ─── Log ud ─── */}
@@ -706,173 +770,184 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   await logoutUser();
                   window.location.reload();
                 }}
-                className="flex w-full items-center justify-center py-3.5 text-[15px] font-semibold text-red-500 transition-colors hover:bg-red-50 rounded-[12px] mt-6"
+                className="flex w-full items-center justify-center py-3.5 text-[15px] font-semibold text-red-500 transition-colors hover:bg-red-50 dark:hover:bg-red-950/20 mt-4 rounded-[8px]"
               >
                 Log ud
               </button>
             </motion.div>
           ) : (
-            <>
+            <motion.div
+              key={settingsDetailView}
+              initial={{ x: 60, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 60, opacity: 0 }}
+              transition={{ duration: 0.18 }}
+            >
               {/* ─── edit-name ─── */}
               {settingsDetailView === 'edit-name' && (
-                <motion.div key="edit-name" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="min-h-[calc(100vh-200px)] flex flex-col">
-                  <div>
-                    <h2 className="text-[28px] font-bold text-foreground pb-4">Navn</h2>
-                    <div className="space-y-1.5">
-                      <Label className="text-[13px] text-muted-foreground">Navn</Label>
-                      <Input value={profileDraft.name} onChange={(e) => setProfileDraft(prev => ({ ...prev, name: e.target.value }))} className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
-                    </div>
+                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+                  <div className="space-y-4">
+                    <h2 className="text-[28px] font-bold text-foreground pb-2">Navn</h2>
+                    <Input value={profileDraft.name} onChange={(e) => setProfileDraft(prev => ({ ...prev, name: e.target.value }))} className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
                   </div>
-                  <div className="flex-1 flex items-center justify-center py-6">
-                    <svg width="200" height="160" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="40" y="30" width="120" height="80" rx="12" fill="#E8F4FD" stroke="#B8D8E8" strokeWidth="2"/>
-                      <rect x="60" y="50" width="50" height="8" rx="4" fill="#7CB9D6"/>
-                      <rect x="60" y="65" width="80" height="6" rx="3" fill="#B8D8E8"/>
-                      <rect x="60" y="78" width="60" height="6" rx="3" fill="#B8D8E8"/>
-                      <circle cx="145" cy="15" r="12" fill="#FFD6A5"/>
-                      <path d="M140 15 L145 8 L150 15" fill="#F4A460"/>
-                      <rect x="142" y="15" width="6" height="20" rx="2" fill="#FFD6A5"/>
-                      <path d="M138 35 L152 35 L148 28 L142 28Z" fill="#F4A460"/>
-                      <circle cx="50" cy="130" r="8" fill="#FFE0B2"/>
-                      <circle cx="160" cy="140" r="6" fill="#C8E6C9"/>
-                      <circle cx="30" cy="60" r="5" fill="#F8BBD0"/>
+                  <div className="flex-1 flex items-center justify-center py-8">
+                    <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Name tag / ID card with pencil */}
+                      <rect x="40" y="40" width="180" height="110" rx="16" fill="#FFF3E0" stroke="#F5A623" strokeWidth="2"/>
+                      <rect x="40" y="40" width="180" height="35" rx="16" fill="#F5A623"/>
+                      <rect x="40" y="59" width="180" height="16" fill="#F5A623"/>
+                      <circle cx="80" cy="110" r="20" fill="#FFCC80"/>
+                      <circle cx="80" cy="105" r="8" fill="#FFE0B2"/>
+                      <ellipse cx="80" cy="122" rx="14" ry="8" fill="#FFE0B2"/>
+                      <rect x="112" y="98" width="80" height="8" rx="4" fill="#FFD180"/>
+                      <rect x="112" y="114" width="55" height="6" rx="3" fill="#FFE0B2"/>
+                      <rect x="112" y="128" width="65" height="6" rx="3" fill="#FFE0B2"/>
+                      {/* Pencil */}
+                      <g transform="translate(195, 25) rotate(45)">
+                        <rect x="0" y="0" width="8" height="50" rx="2" fill="#42A5F5"/>
+                        <polygon points="0,50 4,62 8,50" fill="#FFD54F"/>
+                        <rect x="0" y="0" width="8" height="8" rx="1" fill="#EF5350"/>
+                      </g>
+                      {/* Decorative dots */}
+                      <circle cx="30" cy="170" r="4" fill="#FFCC80" opacity="0.5"/>
+                      <circle cx="45" cy="180" r="3" fill="#90CAF9" opacity="0.4"/>
+                      <circle cx="220" cy="170" r="5" fill="#F5A623" opacity="0.3"/>
+                      <circle cx="235" cy="185" r="3" fill="#FFCC80" opacity="0.4"/>
                     </svg>
                   </div>
-                  <Button onClick={handleSaveField({ name: profileDraft.name.trim() })} className="w-full shrink-0" disabled={isSaving}>
+                  <Button onClick={handleSaveField({ name: profileDraft.name.trim() })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
                     Gem
                   </Button>
-                </motion.div>
+                </div>
               )}
 
               {/* ─── edit-email ─── */}
               {settingsDetailView === 'edit-email' && (
-                <motion.div key="edit-email" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="min-h-[calc(100vh-200px)] flex flex-col">
-                  <div>
-                    <h2 className="text-[28px] font-bold text-foreground pb-4">Email</h2>
-                    <div className="space-y-1.5">
-                      <Label className="text-[13px] text-muted-foreground">Email</Label>
-                      <Input type="email" value={profileDraft.email} onChange={(e) => setProfileDraft(prev => ({ ...prev, email: e.target.value }))} className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
-                    </div>
+                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+                  <div className="space-y-4">
+                    <h2 className="text-[28px] font-bold text-foreground pb-2">Email</h2>
+                    <Input type="email" value={profileDraft.email} onChange={(e) => setProfileDraft(prev => ({ ...prev, email: e.target.value }))} className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
                   </div>
-                  <div className="flex-1 flex items-center justify-center py-6">
-                    <svg width="220" height="180" viewBox="0 0 220 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="110" cy="60" r="22" fill="#FFD6A5"/>
-                      <path d="M95 50 C95 40, 125 40, 125 50" fill="#4A3728"/>
-                      <path d="M88 55 C85 45, 90 35, 100 38 L95 58Z" fill="#4A3728"/>
-                      <path d="M132 55 C135 45, 130 35, 120 38 L125 58Z" fill="#4A3728"/>
-                      <circle cx="103" cy="58" r="2" fill="#4A3728"/>
-                      <circle cx="117" cy="58" r="2" fill="#4A3728"/>
-                      <path d="M106 67 Q110 71 114 67" stroke="#E88B7A" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
-                      <rect x="95" y="82" width="30" height="45" rx="6" fill="#89CFF0"/>
-                      <rect x="100" y="82" width="20" height="12" rx="3" fill="#F8BBD0"/>
-                      <rect x="98" y="110" width="24" height="14" rx="4" fill="#2C2C2C"/>
-                      <rect x="100" y="112" width="20" height="10" rx="2" fill="#4FC3F7"/>
-                      <path d="M80 95 L95 100" stroke="#FFD6A5" strokeWidth="6" strokeLinecap="round"/>
-                      <path d="M140 95 L125 100" stroke="#FFD6A5" strokeWidth="6" strokeLinecap="round"/>
-                      <circle cx="40" cy="140" r="10" fill="#FFECB3"/>
-                      <circle cx="180" cy="130" r="8" fill="#C8E6C9"/>
-                      <rect x="155" y="150" width="30" height="4" rx="2" fill="#E0E0E0"/>
+                  <div className="flex-1 flex items-center justify-center py-8">
+                    <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Envelope with @ and flowers */}
+                      <rect x="45" y="55" width="170" height="105" rx="14" fill="#E3F2FD" stroke="#64B5F6" strokeWidth="2"/>
+                      <path d="M45 69 L130 120 L215 69" stroke="#64B5F6" strokeWidth="2" fill="none"/>
+                      <path d="M45 160 L100 120" stroke="#64B5F6" strokeWidth="1.5" fill="none"/>
+                      <path d="M215 160 L160 120" stroke="#64B5F6" strokeWidth="1.5" fill="none"/>
+                      {/* @ symbol */}
+                      <circle cx="130" cy="100" r="18" stroke="#42A5F5" strokeWidth="2.5" fill="none"/>
+                      <circle cx="130" cy="100" r="8" stroke="#42A5F5" strokeWidth="2" fill="none"/>
+                      <path d="M138 100 C138 90 145 88 145 100 C145 112 138 110 138 100" stroke="#42A5F5" strokeWidth="2" fill="none"/>
+                      {/* Flowers */}
+                      <g transform="translate(30, 35)">
+                        <circle cx="0" cy="0" r="6" fill="#F8BBD0"/>
+                        <circle cx="5" cy="-5" r="5" fill="#F48FB1"/>
+                        <circle cx="-5" cy="-5" r="5" fill="#F48FB1"/>
+                        <circle cx="0" cy="-8" r="4" fill="#F8BBD0"/>
+                        <circle cx="0" cy="-3" r="3" fill="#FFD54F"/>
+                      </g>
+                      <g transform="translate(235, 42)">
+                        <circle cx="0" cy="0" r="5" fill="#C5E1A5"/>
+                        <circle cx="4" cy="-4" r="4" fill="#AED581"/>
+                        <circle cx="-4" cy="-4" r="4" fill="#AED581"/>
+                        <circle cx="0" cy="-6" r="3" fill="#C5E1A5"/>
+                        <circle cx="0" cy="-2" r="2.5" fill="#FFD54F"/>
+                      </g>
+                      {/* Stars */}
+                      <circle cx="55" cy="180" r="3" fill="#64B5F6" opacity="0.4"/>
+                      <circle cx="205" cy="175" r="4" fill="#F48FB1" opacity="0.3"/>
                     </svg>
                   </div>
-                  <Button onClick={handleSaveField({ email: profileDraft.email.trim() })} className="w-full shrink-0" disabled={isSaving}>
+                  <Button onClick={handleSaveField({ email: profileDraft.email.trim() })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
                     Gem
                   </Button>
-                </motion.div>
+                </div>
               )}
 
               {/* ─── edit-phone ─── */}
               {settingsDetailView === 'edit-phone' && (
-                <motion.div key="edit-phone" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="min-h-[calc(100vh-200px)] flex flex-col">
-                  <div>
-                    <h2 className="text-[28px] font-bold text-foreground pb-4">Mobilnummer</h2>
-                    <div className="grid grid-cols-[1fr_1.5fr] gap-3">
-                      <div className="space-y-1.5">
-                        <Label className="text-[13px] text-muted-foreground">Land</Label>
-                        <div className="flex items-center gap-2 rounded-[12px] border border-border bg-card px-4 py-3">
-                          <span className="text-[15px]">🇩🇰 +45</span>
-                          <ChevronRight className="h-3 w-3 text-muted-foreground ml-auto" />
-                        </div>
-                      </div>
-                      <div className="space-y-1.5">
-                        <Label className="text-[13px] text-muted-foreground">Nummer</Label>
-                        <Input value={profileDraft.phone.replace('+45', '').trim()} onChange={(e) => setProfileDraft(prev => ({ ...prev, phone: e.target.value }))} className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
-                      </div>
-                    </div>
+                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+                  <div className="space-y-4">
+                    <h2 className="text-[28px] font-bold text-foreground pb-2">Telefon</h2>
+                    <Input value={profileDraft.phone} onChange={(e) => setProfileDraft(prev => ({ ...prev, phone: e.target.value }))} placeholder="+45 ..." className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
                   </div>
-                  <div className="flex-1 flex items-center justify-center py-6">
-                    <svg width="240" height="180" viewBox="0 0 240 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="20" y="110" width="60" height="8" rx="4" fill="#E8D5F5"/>
-                      <rect x="22" y="90" width="56" height="22" rx="4" fill="#D4A5E5" opacity="0.6"/>
-                      <rect x="30" y="80" width="40" height="35" rx="6" fill="#BA68C8"/>
-                      <circle cx="50" cy="72" r="14" fill="#FFCDD2"/>
-                      <circle cx="50" cy="68" r="6" fill="#F48FB1"/>
-                      <path d="M44 68 Q50 60 56 68" fill="#F48FB1"/>
-                      <rect x="85" y="30" width="55" height="100" rx="10" fill="#80DEEA"/>
-                      <rect x="90" y="40" width="45" height="60" rx="4" fill="#B2EBF2"/>
-                      <rect x="95" y="50" width="35" height="8" rx="2" fill="#4DD0E1"/>
-                      <rect x="95" y="62" width="35" height="8" rx="2" fill="#4DD0E1"/>
-                      <rect x="95" y="74" width="35" height="8" rx="2" fill="#4DD0E1"/>
-                      <rect x="90" y="105" width="45" height="15" rx="4" fill="#4DB6AC"/>
-                      <circle cx="112" cy="112" r="4" fill="#80DEEA"/>
-                      <rect x="93" y="34" width="10" height="3" rx="1.5" fill="#4DD0E1"/>
-                      <ellipse cx="185" cy="130" rx="30" ry="20" fill="#FFCCBC"/>
-                      <ellipse cx="185" cy="125" rx="25" ry="8" fill="#FF8A65" opacity="0.3"/>
-                      <rect x="180" y="108" width="3" height="18" rx="1" fill="#BCAAA4"/>
-                      <ellipse cx="182" cy="107" rx="6" ry="4" fill="#E0E0E0"/>
-                      <circle cx="195" cy="150" r="5" fill="#C8E6C9"/>
-                      <circle cx="165" cy="155" r="3" fill="#FFE0B2"/>
+                  <div className="flex-1 flex items-center justify-center py-8">
+                    <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Smartphone with chat bubbles */}
+                      <rect x="90" y="20" width="80" height="150" rx="16" fill="#E8EAF6" stroke="#7986CB" strokeWidth="2"/>
+                      <rect x="96" y="35" width="68" height="110" rx="4" fill="white"/>
+                      <circle cx="130" cy="158" r="6" stroke="#7986CB" strokeWidth="1.5" fill="none"/>
+                      <rect x="118" y="25" width="24" height="4" rx="2" fill="#9FA8DA"/>
+                      {/* Chat bubbles */}
+                      <rect x="102" y="50" width="45" height="22" rx="11" fill="#C5CAE9"/>
+                      <rect x="120" y="80" width="38" height="22" rx="11" fill="#7986CB"/>
+                      <rect x="102" y="110" width="30" height="18" rx="9" fill="#C5CAE9"/>
+                      {/* Signal waves */}
+                      <path d="M185 45 Q195 35 205 45" stroke="#7986CB" strokeWidth="2" fill="none" opacity="0.5"/>
+                      <path d="M180 35 Q195 20 210 35" stroke="#7986CB" strokeWidth="2" fill="none" opacity="0.3"/>
+                      {/* Decorative */}
+                      <circle cx="55" cy="80" r="8" fill="#C5CAE9" opacity="0.3"/>
+                      <circle cx="45" cy="95" r="5" fill="#7986CB" opacity="0.2"/>
+                      <circle cx="210" cy="120" r="6" fill="#9FA8DA" opacity="0.3"/>
                     </svg>
                   </div>
-                  <Button onClick={handleSaveField({ phone: profileDraft.phone.trim() || undefined })} className="w-full shrink-0" disabled={isSaving}>
+                  <Button onClick={handleSaveField({ phone: profileDraft.phone.trim() || undefined })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
                     Gem
                   </Button>
-                </motion.div>
+                </div>
               )}
 
               {/* ─── edit-birthday ─── */}
               {settingsDetailView === 'edit-birthday' && (
-                <motion.div key="edit-birthday" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="min-h-[calc(100vh-200px)] flex flex-col">
-                  <div>
-                    <h2 className="text-[28px] font-bold text-foreground pb-4">Fødselsdag</h2>
-                    <div className="space-y-1.5">
-                      <Label className="text-[13px] text-muted-foreground">Fødselsdato</Label>
-                      <Input type="date" value={profileDraft.birthDate} onChange={(e) => setProfileDraft(prev => ({ ...prev, birthDate: e.target.value }))} className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
-                    </div>
+                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+                  <div className="space-y-4">
+                    <h2 className="text-[28px] font-bold text-foreground pb-2">Fødselsdato</h2>
+                    <Input type="date" value={profileDraft.birthDate} onChange={(e) => setProfileDraft(prev => ({ ...prev, birthDate: e.target.value }))} className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
                     {profileDraft.birthDate && calculateAge(profileDraft.birthDate) !== null && (
-                      <p className="text-[13px] text-muted-foreground px-1 pt-2">{calculateAge(profileDraft.birthDate)} år</p>
+                      <p className="text-[13px] text-muted-foreground px-1">{calculateAge(profileDraft.birthDate)} år</p>
                     )}
                   </div>
-                  <div className="flex-1 flex items-center justify-center py-6">
-                    <svg width="200" height="180" viewBox="0 0 200 180" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <ellipse cx="100" cy="155" rx="60" ry="8" fill="#E0E0E0" opacity="0.5"/>
-                      <rect x="55" y="90" width="90" height="60" rx="12" fill="#FFCCBC"/>
-                      <rect x="60" y="95" width="80" height="50" rx="8" fill="#FFE0B2"/>
-                      <rect x="55" y="70" width="90" height="25" rx="8" fill="#F48FB1"/>
-                      <rect x="60" y="75" width="80" height="15" rx="4" fill="#F8BBD0"/>
-                      <rect x="75" y="50" width="8" height="25" rx="4" fill="#FFD54F"/>
-                      <ellipse cx="79" cy="45" rx="5" ry="7" fill="#FF7043" opacity="0.8"/>
-                      <rect x="96" y="45" width="8" height="30" rx="4" fill="#FFD54F"/>
-                      <ellipse cx="100" cy="40" rx="5" ry="7" fill="#FF7043" opacity="0.8"/>
-                      <rect x="117" y="50" width="8" height="25" rx="4" fill="#FFD54F"/>
-                      <ellipse cx="121" cy="45" rx="5" ry="7" fill="#FF7043" opacity="0.8"/>
-                      <circle cx="30" cy="80" r="8" fill="#CE93D8" opacity="0.6"/>
-                      <circle cx="170" cy="70" r="6" fill="#81D4FA" opacity="0.6"/>
-                      <circle cx="25" cy="130" r="5" fill="#A5D6A7" opacity="0.6"/>
-                      <path d="M160 140 L170 130 L180 140" fill="#FFE082" opacity="0.5"/>
+                  <div className="flex-1 flex items-center justify-center py-8">
+                    <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Birthday cake with candles and confetti */}
+                      <ellipse cx="130" cy="160" rx="80" ry="12" fill="#FFCCBC"/>
+                      <rect x="65" y="110" width="130" height="50" rx="12" fill="#FFAB91"/>
+                      <rect x="75" y="85" width="110" height="35" rx="10" fill="#FF8A65"/>
+                      <path d="M75 110 Q130 95 185 110" fill="#FFCCBC"/>
+                      {/* Candles */}
+                      <rect x="100" y="55" width="6" height="30" rx="3" fill="#64B5F6"/>
+                      <ellipse cx="103" cy="50" rx="5" ry="7" fill="#FFD54F"/>
+                      <ellipse cx="103" cy="48" rx="2" ry="4" fill="#FFF176"/>
+                      <rect x="127" y="50" width="6" height="35" rx="3" fill="#F48FB1"/>
+                      <ellipse cx="130" cy="45" rx="5" ry="7" fill="#FFD54F"/>
+                      <ellipse cx="130" cy="43" rx="2" ry="4" fill="#FFF176"/>
+                      <rect x="154" y="55" width="6" height="30" rx="3" fill="#81C784"/>
+                      <ellipse cx="157" cy="50" rx="5" ry="7" fill="#FFD54F"/>
+                      <ellipse cx="157" cy="48" rx="2" ry="4" fill="#FFF176"/>
+                      {/* Confetti */}
+                      <rect x="40" y="30" width="8" height="4" rx="2" fill="#F48FB1" transform="rotate(-20 40 30)"/>
+                      <rect x="210" y="25" width="8" height="4" rx="2" fill="#64B5F6" transform="rotate(15 210 25)"/>
+                      <circle cx="50" cy="60" r="3" fill="#FFD54F"/>
+                      <circle cx="215" cy="55" r="3" fill="#81C784"/>
+                      <rect x="55" cy="45" width="6" height="3" rx="1.5" fill="#CE93D8" transform="rotate(-35 55 45)"/>
+                      <rect x="200" y="40" width="6" height="3" rx="1.5" fill="#FFAB91" transform="rotate(25 200 40)"/>
+                      <circle cx="35" cy="80" r="2" fill="#64B5F6" opacity="0.5"/>
+                      <circle cx="225" cy="75" r="2" fill="#F48FB1" opacity="0.5"/>
                     </svg>
                   </div>
-                  <Button onClick={handleSaveField({ birthDate: profileDraft.birthDate || undefined })} className="w-full shrink-0" disabled={isSaving}>
+                  <Button onClick={handleSaveField({ birthDate: profileDraft.birthDate || undefined })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
                     Gem
                   </Button>
-                </motion.div>
+                </div>
               )}
 
               {/* ─── edit-gender ─── */}
               {settingsDetailView === 'edit-gender' && (
-                <motion.div key="edit-gender" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="min-h-[calc(100vh-200px)] flex flex-col">
-                  <div>
+                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+                  <div className="space-y-4">
                     <h2 className="text-[28px] font-bold text-foreground pb-2">Køn</h2>
-                    <p className="text-[13px] text-muted-foreground pb-4">Vælg dit køn — dette bestemmer hvilke avatarer du ser</p>
+                    <p className="text-[13px] text-muted-foreground px-1">Vælg dit køn — dette bestemmer hvilke avatarer du ser</p>
                     <div className="space-y-2">
                       {([{ value: 'male', label: 'Mand' }, { value: 'female', label: 'Kvinde' }] as const).map(opt => (
                         <button
@@ -889,227 +964,218 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                       ))}
                     </div>
                   </div>
-                  <div className="flex-1 flex items-center justify-center py-6">
-                    <svg width="200" height="160" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="70" cy="50" r="20" fill="#B3E5FC"/>
-                      <circle cx="70" cy="42" r="12" fill="#FFD6A5"/>
-                      <path d="M60 38 C60 30, 80 30, 80 38" fill="#795548"/>
-                      <circle cx="66" cy="42" r="1.5" fill="#4A3728"/>
-                      <circle cx="74" cy="42" r="1.5" fill="#4A3728"/>
-                      <path d="M67 47 Q70 50 73 47" stroke="#E88B7A" strokeWidth="1" fill="none"/>
-                      <rect x="60" y="58" width="20" height="30" rx="6" fill="#64B5F6"/>
-                      <circle cx="130" cy="50" r="20" fill="#F8BBD0"/>
-                      <circle cx="130" cy="42" r="12" fill="#FFD6A5"/>
-                      <path d="M120 36 C118 28, 142 28, 140 36" fill="#4A3728"/>
-                      <path d="M120 36 L118 52" stroke="#4A3728" strokeWidth="3" strokeLinecap="round"/>
-                      <path d="M140 36 L142 52" stroke="#4A3728" strokeWidth="3" strokeLinecap="round"/>
-                      <circle cx="126" cy="42" r="1.5" fill="#4A3728"/>
-                      <circle cx="134" cy="42" r="1.5" fill="#4A3728"/>
-                      <path d="M127 47 Q130 50 133 47" stroke="#E88B7A" strokeWidth="1" fill="none"/>
-                      <rect x="120" y="58" width="20" height="30" rx="6" fill="#F48FB1"/>
-                      <circle cx="100" cy="130" r="15" fill="#FFF9C4" opacity="0.6"/>
-                      <path d="M92 130 L100 120 L108 130" fill="#FFE082"/>
+                  <div className="flex-1 flex items-center justify-center py-8">
+                    <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Two abstract silhouettes with hearts */}
+                      {/* Person 1 */}
+                      <circle cx="95" cy="70" r="25" fill="#90CAF9"/>
+                      <ellipse cx="95" cy="130" rx="30" ry="40" fill="#90CAF9"/>
+                      {/* Person 2 */}
+                      <circle cx="165" cy="70" r="25" fill="#F48FB1"/>
+                      <ellipse cx="165" cy="130" rx="30" ry="40" fill="#F48FB1"/>
+                      {/* Hearts between them */}
+                      <path d="M125 85 C125 78 132 75 135 80 C138 75 145 78 145 85 C145 95 135 100 135 100 C135 100 125 95 125 85Z" fill="#EF5350" opacity="0.7"/>
+                      <path d="M118 105 C118 100 123 98 125 102 C127 98 132 100 132 105 C132 112 125 115 125 115 C125 115 118 112 118 105Z" fill="#EF5350" opacity="0.4"/>
+                      {/* Decorative */}
+                      <circle cx="40" cy="60" r="4" fill="#CE93D8" opacity="0.3"/>
+                      <circle cx="220" cy="55" r="5" fill="#CE93D8" opacity="0.3"/>
+                      <circle cx="50" cy="170" r="3" fill="#90CAF9" opacity="0.4"/>
+                      <circle cx="210" cy="175" r="3" fill="#F48FB1" opacity="0.4"/>
                     </svg>
                   </div>
-                  <Button onClick={handleSaveField({ gender: profileDraft.gender || undefined })} className="w-full shrink-0" disabled={isSaving}>
+                  <Button onClick={handleSaveField({ gender: profileDraft.gender || undefined })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
                     Gem
                   </Button>
-                </motion.div>
+                </div>
               )}
 
               {/* ─── edit-address ─── */}
               {settingsDetailView === 'edit-address' && (
-                <motion.div key="edit-address" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="min-h-[calc(100vh-200px)] flex flex-col">
-                  <div>
-                    <h2 className="text-[28px] font-bold text-foreground pb-4">Adresse</h2>
+                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+                  <div className="space-y-4">
+                    <h2 className="text-[28px] font-bold text-foreground pb-2">Adresse</h2>
                     <div className="space-y-3">
                       <div className="space-y-1.5">
-                        <Label className="text-[13px] text-muted-foreground">Gadenavn og nr.</Label>
+                        <Label className="text-[13px]">Gadenavn og nr.</Label>
                         <Input value={profileDraft.address} onChange={(e) => setProfileDraft(prev => ({ ...prev, address: e.target.value }))} placeholder="Gadenavn og nr." className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div className="space-y-1.5">
-                          <Label className="text-[13px] text-muted-foreground">Postnummer</Label>
-                          <Input value={profileDraft.zipCode} onChange={(e) => setProfileDraft(prev => ({ ...prev, zipCode: e.target.value }))} placeholder="2100" className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
+                          <Label className="text-[13px]">Postnummer</Label>
+                          <Input value={profileDraft.zipCode} onChange={(e) => setProfileDraft(prev => ({ ...prev, zipCode: e.target.value }))} placeholder="F.eks. 2100" className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
                         </div>
                         <div className="space-y-1.5">
-                          <Label className="text-[13px] text-muted-foreground">By</Label>
-                          <Input value={profileDraft.city} onChange={(e) => setProfileDraft(prev => ({ ...prev, city: e.target.value }))} placeholder="København" className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
+                          <Label className="text-[13px]">By</Label>
+                          <Input value={profileDraft.city} onChange={(e) => setProfileDraft(prev => ({ ...prev, city: e.target.value }))} placeholder="F.eks. København" className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
                         </div>
                       </div>
                     </div>
                   </div>
-                  <div className="flex-1 flex items-center justify-center py-6">
-                    <svg width="200" height="160" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="50" y="70" width="100" height="70" rx="4" fill="#FFCCBC"/>
-                      <path d="M40 75 L100 30 L160 75Z" fill="#FF8A65"/>
-                      <path d="M45 75 L100 35 L155 75Z" fill="#FFAB91"/>
-                      <rect x="85" y="100" width="30" height="40" rx="3" fill="#A1887F"/>
-                      <circle cx="108" cy="120" r="2" fill="#FFD54F"/>
-                      <rect x="60" y="85" width="18" height="18" rx="2" fill="#B3E5FC"/>
-                      <rect x="122" y="85" width="18" height="18" rx="2" fill="#B3E5FC"/>
-                      <line x1="69" y1="85" x2="69" y2="103" stroke="#81D4FA" strokeWidth="1.5"/>
-                      <line x1="60" y1="94" x2="78" y2="94" stroke="#81D4FA" strokeWidth="1.5"/>
-                      <line x1="131" y1="85" x2="131" y2="103" stroke="#81D4FA" strokeWidth="1.5"/>
-                      <line x1="122" y1="94" x2="140" y2="94" stroke="#81D4FA" strokeWidth="1.5"/>
-                      <circle cx="100" cy="15" r="10" fill="#EF5350"/>
-                      <path d="M96 15 L100 8 L104 15" fill="white" opacity="0.8"/>
-                      <line x1="100" y1="25" x2="100" y2="35" stroke="#BDBDBD" strokeWidth="2"/>
+                  <div className="flex-1 flex items-center justify-center py-8">
+                    <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* House with pin marker and trees */}
+                      {/* Ground */}
+                      <ellipse cx="130" cy="170" rx="110" ry="15" fill="#C8E6C9"/>
+                      {/* House body */}
+                      <rect x="80" y="95" width="100" height="75" rx="4" fill="#FFF3E0"/>
+                      <rect x="80" y="95" width="100" height="75" rx="4" stroke="#F5A623" strokeWidth="1.5"/>
+                      {/* Roof */}
+                      <path d="M70 100 L130 55 L190 100Z" fill="#FF8A65"/>
+                      <path d="M70 100 L130 55 L190 100" stroke="#E64A19" strokeWidth="1.5" fill="none"/>
+                      {/* Door */}
+                      <rect x="115" y="130" width="30" height="40" rx="4" fill="#8D6E63"/>
+                      <circle cx="140" cy="152" r="2.5" fill="#FFD54F"/>
+                      {/* Windows */}
+                      <rect x="90" y="108" width="18" height="18" rx="3" fill="#BBDEFB" stroke="#64B5F6" strokeWidth="1"/>
+                      <rect x="152" y="108" width="18" height="18" rx="3" fill="#BBDEFB" stroke="#64B5F6" strokeWidth="1"/>
+                      <line x1="99" y1="108" x2="99" y2="126" stroke="#64B5F6" strokeWidth="0.5"/>
+                      <line x1="90" y1="117" x2="108" y2="117" stroke="#64B5F6" strokeWidth="0.5"/>
+                      <line x1="161" y1="108" x2="161" y2="126" stroke="#64B5F6" strokeWidth="0.5"/>
+                      <line x1="152" y1="117" x2="170" y2="117" stroke="#64B5F6" strokeWidth="0.5"/>
+                      {/* Pin marker */}
+                      <path d="M130 20 C118 20 108 30 108 42 C108 58 130 75 130 75 C130 75 152 58 152 42 C152 30 142 20 130 20Z" fill="#EF5350"/>
+                      <circle cx="130" cy="40" r="8" fill="white"/>
+                      {/* Trees */}
+                      <rect x="40" y="140" width="6" height="25" fill="#8D6E63"/>
+                      <circle cx="43" cy="128" r="16" fill="#81C784"/>
+                      <circle cx="38" cy="135" r="12" fill="#66BB6A"/>
+                      <rect x="214" y="142" width="5" height="22" fill="#8D6E63"/>
+                      <circle cx="216" cy="132" r="14" fill="#81C784"/>
+                      <circle cx="220" cy="138" r="10" fill="#66BB6A"/>
                     </svg>
                   </div>
-                  <Button onClick={handleSaveField({ address: profileDraft.address.trim() || undefined, zipCode: profileDraft.zipCode.trim() || undefined, city: profileDraft.city.trim() || undefined })} className="w-full shrink-0" disabled={isSaving}>
+                  <Button onClick={handleSaveField({ address: profileDraft.address.trim() || undefined, zipCode: profileDraft.zipCode.trim() || undefined, city: profileDraft.city.trim() || undefined })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
                     Gem
                   </Button>
-                </motion.div>
+                </div>
               )}
 
               {/* ─── edit-country ─── */}
               {settingsDetailView === 'edit-country' && (
-                <motion.div key="edit-country" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="min-h-[calc(100vh-200px)] flex flex-col">
-                  <div>
-                    <h2 className="text-[28px] font-bold text-foreground pb-4">Land</h2>
-                    <div className="space-y-1.5">
-                      <Label className="text-[13px] text-muted-foreground">Land</Label>
-                      <Input value={profileDraft.country} onChange={(e) => setProfileDraft(prev => ({ ...prev, country: e.target.value }))} placeholder="Danmark" className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
-                    </div>
+                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+                  <div className="space-y-4">
+                    <h2 className="text-[28px] font-bold text-foreground pb-2">Land</h2>
+                    <Input value={profileDraft.country} onChange={(e) => setProfileDraft(prev => ({ ...prev, country: e.target.value }))} placeholder="Danmark" className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
                   </div>
-                  <div className="flex-1 flex items-center justify-center py-6">
-                    <svg width="200" height="160" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="100" cy="75" r="50" fill="#B3E5FC"/>
-                      <path d="M60 60 Q80 40 100 55 Q120 40 140 60 Q150 80 140 95 Q120 110 100 100 Q80 110 60 95 Q50 80 60 60Z" fill="#81C784"/>
-                      <path d="M85 50 Q90 45 95 55 L95 75 L85 75Z" fill="#4CAF50"/>
-                      <path d="M110 60 Q115 55 120 65 L120 85 L110 85Z" fill="#4CAF50"/>
-                      <circle cx="75" cy="70" r="3" fill="#FFF9C4"/>
-                      <circle cx="125" cy="65" r="2" fill="#FFF9C4"/>
-                      <circle cx="100" cy="85" r="2.5" fill="#FFF9C4"/>
-                      <rect x="95" y="20" width="3" height="20" rx="1.5" fill="#BDBDBD"/>
-                      <rect x="97" y="10" width="18" height="12" rx="2" fill="#EF5350"/>
-                      <line x1="97" y1="16" x2="115" y2="16" stroke="white" strokeWidth="2"/>
-                      <line x1="106" y1="10" x2="106" y2="22" stroke="white" strokeWidth="2"/>
-                      <circle cx="35" cy="40" r="4" fill="#FFE082" opacity="0.6"/>
-                      <circle cx="170" cy="110" r="5" fill="#CE93D8" opacity="0.5"/>
+                  <div className="flex-1 flex items-center justify-center py-8">
+                    <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Globe with flags and airplane */}
+                      <circle cx="130" cy="100" r="65" fill="#E3F2FD" stroke="#64B5F6" strokeWidth="2"/>
+                      {/* Globe lines */}
+                      <ellipse cx="130" cy="100" rx="65" ry="25" stroke="#90CAF9" strokeWidth="1" fill="none"/>
+                      <ellipse cx="130" cy="100" rx="25" ry="65" stroke="#90CAF9" strokeWidth="1" fill="none"/>
+                      <line x1="65" y1="100" x2="195" y2="100" stroke="#90CAF9" strokeWidth="1"/>
+                      <line x1="130" y1="35" x2="130" y2="165" stroke="#90CAF9" strokeWidth="1"/>
+                      {/* Continents (abstract shapes) */}
+                      <ellipse cx="110" cy="85" rx="20" ry="15" fill="#81C784" opacity="0.6"/>
+                      <ellipse cx="155" cy="90" rx="15" ry="20" fill="#81C784" opacity="0.6"/>
+                      <ellipse cx="120" cy="115" rx="18" ry="12" fill="#81C784" opacity="0.5"/>
+                      {/* Danish flag */}
+                      <g transform="translate(185, 45)">
+                        <rect x="0" y="0" width="30" height="20" rx="2" fill="#C8102E"/>
+                        <rect x="9" y="0" width="4" height="20" fill="white"/>
+                        <rect x="0" y="8" width="30" height="4" fill="white"/>
+                      </g>
+                      {/* Airplane */}
+                      <g transform="translate(50, 35) rotate(-20)">
+                        <ellipse cx="0" cy="0" rx="12" ry="3" fill="#7986CB"/>
+                        <path d="M-5 0 L-2 -8 L2 0" fill="#9FA8DA"/>
+                        <path d="M8 0 L12 -4 L12 0" fill="#9FA8DA"/>
+                      </g>
+                      {/* Dotted flight path */}
+                      <path d="M55 40 Q90 20 130 35" stroke="#7986CB" strokeWidth="1" strokeDasharray="3 3" fill="none" opacity="0.5"/>
                     </svg>
                   </div>
-                  <Button onClick={handleSaveField({ country: profileDraft.country.trim() || undefined })} className="w-full shrink-0" disabled={isSaving}>
+                  <Button onClick={handleSaveField({ country: profileDraft.country.trim() || undefined })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
                     Gem
                   </Button>
-                </motion.div>
+                </div>
               )}
 
-              {/* ─── edit-allergens (person list) ─── */}
-              {settingsDetailView === 'edit-allergens' && (
-                <motion.div key="edit-allergens" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="space-y-4">
-                  <h2 className="text-[28px] font-bold text-foreground">Familiens allergener</h2>
-                  <p className="text-[13px] text-muted-foreground">Vælg en person for at administrere allergener</p>
-                  <div className="divide-y divide-border">
-                    {currentUser && (
-                      <button
-                        onClick={() => setSettingsDetailView(`allergen-${currentUser.id}`)}
-                        className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
-                      >
-                        <div className="flex items-center gap-2 min-w-0">
-                          <User className="h-4 w-4 text-muted-foreground shrink-0" />
-                          <div className="min-w-0">
-                            <p className="text-[15px] font-medium text-foreground truncate">{currentUser.name}</p>
-                            <p className="text-[13px] text-muted-foreground truncate">
-                              {currentUser.allergies?.length ? currentUser.allergies.join(', ') : 'Ingen allergener'}
-                            </p>
-                          </div>
-                        </div>
-                        <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
-                      </button>
-                    )}
-                    {children.map(child => (
-                      <button
-                        key={child.id}
-                        onClick={() => setSettingsDetailView(`allergen-${child.id}`)}
-                        className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
-                      >
-                        <div className="flex items-center gap-2 min-w-0">
-                          <Heart className="h-4 w-4 text-[#f58a2d] shrink-0" />
-                          <div className="min-w-0">
-                            <p className="text-[15px] font-medium text-foreground truncate">{child.name}</p>
-                            <p className="text-[13px] text-muted-foreground truncate">
-                              {child.allergies?.length ? child.allergies.join(', ') : 'Ingen allergener'}
-                            </p>
-                          </div>
-                        </div>
-                        <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
-                      </button>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-
-              {/* ─── allergen-{id} sub-pages ─── */}
-              {settingsDetailView?.startsWith('allergen-') && settingsDetailView !== 'edit-allergens' && (() => {
+              {/* ─── allergen sub-pages ─── */}
+              {settingsDetailView?.startsWith('allergen-') && (() => {
                 const targetId = settingsDetailView.replace('allergen-', '');
                 const isCurrentUser = targetId === currentUser?.id;
                 const person = isCurrentUser ? currentUser : children.find(c => c.id === targetId);
                 if (!person) return null;
                 const allergies = person.allergies ?? [];
                 return (
-                  <motion.div key={settingsDetailView} initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="space-y-4">
-                    <h2 className="text-[28px] font-bold text-foreground">
-                      {person.name}
-                    </h2>
-                    <p className="text-[13px] text-muted-foreground">Tryk på en allergen for at tilføje/fjerne</p>
-                    <div className="flex flex-wrap gap-2">
-                      {EU_ALLERGENS_DA.map(allergen => {
-                        const active = allergies.includes(allergen);
-                        return (
-                          <button
-                            key={allergen}
-                            onClick={() => {
-                              const next = active ? allergies.filter(a => a !== allergen) : [...allergies, allergen];
-                              if (isCurrentUser) {
-                                updateUser(currentUser!.id, { allergies: next });
-                              } else {
-                                updateChild(targetId, { allergies: next });
-                              }
-                            }}
-                            className={cn(
-                              "rounded-full px-3 py-1.5 text-[13px] font-semibold transition-colors",
-                              active ? "bg-[#f58a2d] text-white" : "bg-muted text-muted-foreground"
-                            )}
-                          >
-                            {allergen}
-                          </button>
-                        );
-                      })}
+                  <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+                    <div className="space-y-4">
+                      <h2 className="text-[28px] font-bold text-foreground pb-2">
+                        Allergener — {person.name}
+                      </h2>
+                      <p className="text-[13px] text-muted-foreground px-1">Tryk på en allergen for at tilføje/fjerne</p>
+                      <div className="flex flex-wrap gap-2">
+                        {EU_ALLERGENS_DA.map(allergen => {
+                          const active = allergies.includes(allergen);
+                          return (
+                            <button
+                              key={allergen}
+                              onClick={() => {
+                                const next = active ? allergies.filter(a => a !== allergen) : [...allergies, allergen];
+                                if (isCurrentUser) {
+                                  updateUser(currentUser!.id, { allergies: next });
+                                } else {
+                                  updateChild(targetId, { allergies: next });
+                                }
+                              }}
+                              className={cn(
+                                "rounded-full px-3 py-1.5 text-[13px] font-semibold transition-colors",
+                                active ? "bg-[#f58a2d] text-white" : "bg-muted text-muted-foreground"
+                              )}
+                            >
+                              {allergen}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </motion.div>
+                    <div className="flex-1 flex items-center justify-center py-8">
+                      <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        {/* Shield with heart (allergy protection) */}
+                        <path d="M130 25 L185 55 L185 115 C185 145 155 170 130 180 C105 170 75 145 75 115 L75 55 Z" fill="#FFF3E0" stroke="#F5A623" strokeWidth="2"/>
+                        <path d="M130 45 L170 67 L170 112 C170 135 150 155 130 162 C110 155 90 135 90 112 L90 67 Z" fill="#FFE0B2"/>
+                        {/* Heart in shield */}
+                        <path d="M115 95 C115 82 125 78 130 86 C135 78 145 82 145 95 C145 112 130 120 130 120 C130 120 115 112 115 95Z" fill="#EF5350" opacity="0.7"/>
+                        {/* Check mark */}
+                        <path d="M120 98 L128 106 L142 88" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                  </div>
                 );
               })()}
 
               {/* ─── edit-export ─── */}
               {settingsDetailView === 'edit-export' && (
-                <motion.div key="edit-export" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="min-h-[calc(100vh-200px)] flex flex-col">
-                  <div>
-                    <h2 className="text-[28px] font-bold text-foreground pb-4">Eksporter mine data</h2>
+                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+                  <div className="space-y-4">
+                    <h2 className="text-[28px] font-bold text-foreground pb-2">Eksporter mine data</h2>
                     <div className="rounded-[12px] bg-muted/50 p-4 space-y-2">
                       <p className="text-[14px] font-medium text-foreground">GDPR Data-export</p>
                       <p className="text-[13px] text-muted-foreground">Du kan downloade alle dine persondata som en JSON-fil. Dette inkluderer din profil, børnedata, begivenheder, beskeder og dokumenter.</p>
                     </div>
                   </div>
-                  <div className="flex-1 flex items-center justify-center py-6">
-                    <svg width="200" height="160" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="60" y="20" width="80" height="100" rx="8" fill="#E3F2FD"/>
-                      <rect x="70" y="35" width="60" height="6" rx="3" fill="#90CAF9"/>
-                      <rect x="70" y="48" width="45" height="6" rx="3" fill="#90CAF9"/>
-                      <rect x="70" y="61" width="55" height="6" rx="3" fill="#90CAF9"/>
-                      <rect x="70" y="74" width="40" height="6" rx="3" fill="#90CAF9"/>
-                      <rect x="70" y="87" width="50" height="6" rx="3" fill="#90CAF9"/>
-                      <path d="M100 130 L100 150" stroke="#66BB6A" strokeWidth="3" strokeLinecap="round"/>
-                      <path d="M90 142 L100 152 L110 142" stroke="#66BB6A" strokeWidth="3" strokeLinecap="round" fill="none"/>
-                      <circle cx="160" cy="40" r="12" fill="#C8E6C9"/>
-                      <path d="M155 40 L159 44 L166 36" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
-                      <circle cx="40" cy="70" r="8" fill="#FFF9C4"/>
-                      <circle cx="170" cy="100" r="5" fill="#F8BBD0"/>
+                  <div className="flex-1 flex items-center justify-center py-8">
+                    <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Download / export illustration */}
+                      <rect x="80" y="30" width="100" height="120" rx="12" fill="#E8EAF6" stroke="#7986CB" strokeWidth="2"/>
+                      <rect x="95" y="55" width="70" height="6" rx="3" fill="#C5CAE9"/>
+                      <rect x="95" y="70" width="50" height="6" rx="3" fill="#C5CAE9"/>
+                      <rect x="95" y="85" width="60" height="6" rx="3" fill="#C5CAE9"/>
+                      <rect x="95" y="100" width="40" height="6" rx="3" fill="#C5CAE9"/>
+                      {/* Download arrow */}
+                      <circle cx="130" cy="160" r="22" fill="#7986CB"/>
+                      <path d="M130 148 L130 168" stroke="white" strokeWidth="3" strokeLinecap="round"/>
+                      <path d="M122 162 L130 170 L138 162" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                      {/* Sparkles */}
+                      <circle cx="55" cy="50" r="4" fill="#FFD54F" opacity="0.5"/>
+                      <circle cx="205" cy="45" r="3" fill="#7986CB" opacity="0.4"/>
+                      <circle cx="60" cy="150" r="3" fill="#C5CAE9" opacity="0.4"/>
                     </svg>
                   </div>
                   <Button
-                    className="w-full shrink-0"
+                    className="w-full shrink-0 rounded-[12px] py-3"
                     onClick={async () => {
                       try {
                         const { exportAllData } = await import('@/lib/export');
@@ -1122,36 +1188,34 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   >
                     Eksporter
                   </Button>
-                </motion.div>
+                </div>
               )}
 
               {/* ─── edit-delete ─── */}
               {settingsDetailView === 'edit-delete' && (
-                <motion.div key="edit-delete" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="min-h-[calc(100vh-200px)] flex flex-col">
-                  <div>
-                    <h2 className="text-[28px] font-bold text-foreground pb-4">Slet min konto</h2>
+                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+                  <div className="space-y-4">
+                    <h2 className="text-[28px] font-bold text-foreground pb-2">Slet min konto</h2>
                     <div className="rounded-[12px] bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 p-4 space-y-2">
                       <p className="text-[14px] font-semibold text-red-600">Advarsel</p>
                       <p className="text-[13px] text-red-600/80">Denne handling er permanent og kan IKKE fortrydes. Alle dine persondata, profil, beskeder og dokumenter vil blive slettet.</p>
                     </div>
                   </div>
-                  <div className="flex-1 flex items-center justify-center py-6">
-                    <svg width="200" height="160" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="65" y="45" width="70" height="90" rx="6" fill="#FFCDD2"/>
-                      <rect x="60" y="35" width="80" height="15" rx="4" fill="#EF9A9A"/>
-                      <rect x="90" y="25" width="20" height="12" rx="3" fill="#EF9A9A"/>
-                      <rect x="80" y="60" width="6" height="50" rx="3" fill="#E57373"/>
-                      <rect x="97" y="60" width="6" height="50" rx="3" fill="#E57373"/>
-                      <rect x="114" y="60" width="6" height="50" rx="3" fill="#E57373"/>
-                      <circle cx="40" cy="60" r="8" fill="#FFECB3" opacity="0.6"/>
-                      <circle cx="165" cy="80" r="6" fill="#C8E6C9" opacity="0.6"/>
-                      <path d="M30 130 Q35 120 40 130" stroke="#CE93D8" strokeWidth="2" fill="none" opacity="0.5"/>
-                      <path d="M160 40 Q165 30 170 40" stroke="#81D4FA" strokeWidth="2" fill="none" opacity="0.5"/>
+                  <div className="flex-1 flex items-center justify-center py-8">
+                    <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Warning / delete illustration */}
+                      <path d="M130 30 L210 160 L50 160 Z" fill="#FFEBEE" stroke="#EF5350" strokeWidth="2"/>
+                      <path d="M130 55 L190 150 L70 150 Z" fill="#FFCDD2"/>
+                      <rect x="127" y="80" width="6" height="40" rx="3" fill="#EF5350"/>
+                      <circle cx="130" cy="132" r="4" fill="#EF5350"/>
+                      {/* Small warning signs */}
+                      <circle cx="45" cy="60" r="4" fill="#FFCDD2" opacity="0.5"/>
+                      <circle cx="215" cy="55" r="3" fill="#EF5350" opacity="0.3"/>
                     </svg>
                   </div>
                   <Button
                     variant="destructive"
-                    className="w-full shrink-0"
+                    className="w-full shrink-0 rounded-[12px] py-3"
                     onClick={async () => {
                       if (!window.confirm('Er du sikker? Din konto og alle persondata slettes permanent. Denne handling kan IKKE fortrydes.')) return;
                       if (!window.confirm('Sidste chance — bekræft at du vil slette din konto permanent.')) return;
@@ -1166,9 +1230,9 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   >
                     <Trash2 className="mr-2 h-4 w-4" /> Slet min konto
                   </Button>
-                </motion.div>
+                </div>
               )}
-            </>
+            </motion.div>
           )}
           </AnimatePresence>
 
@@ -1579,87 +1643,340 @@ const [evidenceDraft, setEvidenceDraft] = useState({
         </TabsContent>
 
         <TabsContent value="payments" className="space-y-0">
-          {/* Kredit- og debitkort */}
-          <div className="pb-6">
-            <p className="text-[17px] font-bold text-foreground pb-3">Kredit- og debitkort</p>
+          <AnimatePresence mode="wait">
+          {!settingsDetailView ? (
+            <motion.div
+              key="payments-main"
+              initial={{ x: 0, opacity: 1 }}
+              exit={{ x: -60, opacity: 0 }}
+              transition={{ duration: 0.18 }}
+              className="space-y-2"
+            >
+              <div className="px-1 pt-2 pb-4">
+                <p className="text-[13px] text-muted-foreground">
+                  Administrer betalingsmetoder, gavekort og kreditter.
+                </p>
+              </div>
 
-            {/* Eksisterende kort */}
-            {myPaymentAccounts.filter(a => a.provider === 'card').map((account) => (
-              <div key={account.id} className="flex items-center justify-between py-3 border-b border-border">
-                <div className="flex items-center gap-3 min-w-0">
-                  <CreditCard className="h-5 w-5 text-muted-foreground shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-[15px] font-medium text-foreground truncate">{account.accountLabel}</p>
-                    <p className="text-[13px] text-muted-foreground truncate">{account.accountHandle}</p>
+              {/* ─── Gavekort, Kreditter, Indløs kode ─── */}
+              <div className="divide-y divide-border">
+                <button
+                  onClick={() => setSettingsDetailView('payment-giftcard')}
+                  className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] bg-orange-tint">
+                      <CreditCard className="h-[18px] w-[18px] text-[#f58a2d]" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[15px] font-medium text-foreground">Gavekort</p>
+                      <p className="text-[13px] text-muted-foreground">Giv en gave til en ven eller familiemedlem</p>
+                    </div>
                   </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
+                </button>
+                <button
+                  onClick={() => setSettingsDetailView('payment-credits')}
+                  className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] bg-[#E8F5E9]">
+                      <Star className="h-[18px] w-[18px] text-[#66BB6A]" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[15px] font-medium text-foreground">Kreditter</p>
+                      <p className="text-[13px] text-muted-foreground">Optjen kreditter ved at invitere venner</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0 ml-2">
+                    <span className="text-[13px] font-semibold text-muted-foreground">0 kr</span>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  </div>
+                </button>
+                <button
+                  onClick={() => setSettingsDetailView('payment-redeem')}
+                  className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] bg-[#EDE7F6]">
+                      <ArrowRight className="h-[18px] w-[18px] text-[#7E57C2]" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[15px] font-medium text-foreground">Indløs kode</p>
+                      <p className="text-[13px] text-muted-foreground">Indløs gavekort eller kampagnekode</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
+                </button>
+              </div>
+
+              <div className="border-t border-border" />
+
+              {/* ─── Betalingskonti ─── */}
+              <div className="pt-2">
+                <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1 pb-2">Betalingskonti</p>
+
+                {myPaymentAccounts.length > 0 && (
+                  <div className="space-y-2 mb-4">
+                    {myPaymentAccounts.map((account) => (
+                      <div key={account.id} className="flex items-center justify-between rounded-[8px] border-2 border-border bg-card px-4 py-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] bg-background">
+                            <CreditCard className="h-4 w-4 text-muted-foreground" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="truncate text-[13px] font-semibold text-foreground">{account.accountLabel}</p>
+                            <p className="truncate text-[11px] text-muted-foreground">{account.accountHandle}</p>
+                          </div>
+                        </div>
+                        {account.isPrimary ? (
+                          <span className="shrink-0 rounded-[8px] bg-orange-tint border border-orange-tint px-2.5 py-1 text-[11px] font-semibold text-[#f58a2d]">Primær</span>
+                        ) : (
+                          <button
+                            onClick={() => handleSetPrimaryPayment(account.id)}
+                            className="shrink-0 rounded-[8px] border-2 border-border px-2.5 py-1 text-[11px] font-semibold text-muted-foreground transition-all active:scale-[0.96]"
+                          >
+                            Sæt primær
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Tilføj ny konto */}
+                <div className="rounded-[8px] border-2 border-border bg-card p-4 space-y-3">
+                  <p className="text-[13px] font-semibold text-foreground">Tilføj betalingskonto</p>
+                  <SelectSheet
+                    value={paymentDraft.provider}
+                    onValueChange={(value) => setPaymentDraft((prev) => ({ ...prev, provider: value }))}
+                    title="Betalingstype"
+                    options={[
+                      { value: 'mobilepay', label: 'MobilePay' },
+                      { value: 'bank', label: 'Bankkonto' },
+                      { value: 'card', label: 'Kort' },
+                      { value: 'other', label: 'Andet' },
+                    ]}
+                    className="rounded-[8px] border-border"
+                  />
+                  <Input
+                    value={paymentDraft.accountLabel}
+                    onChange={(e) => setPaymentDraft((prev) => ({ ...prev, accountLabel: e.target.value }))}
+                    placeholder="Kontonavn (fx 'Min MobilePay')"
+                    className="rounded-[8px] border-border"
+                  />
+                  <Input
+                    value={paymentDraft.accountHandle}
+                    onChange={(e) => setPaymentDraft((prev) => ({ ...prev, accountHandle: e.target.value }))}
+                    placeholder="Telefonnr. eller kontonummer"
+                    className="rounded-[8px] border-border"
+                  />
+                  <button
+                    onClick={handleAddPaymentAccount}
+                    disabled={!features.inAppPayments}
+                    className={cn(
+                      "w-full rounded-[8px] py-2.5 text-[13px] font-semibold transition-all active:scale-[0.98]",
+                      features.inAppPayments
+                        ? "bg-primary text-white"
+                        : "bg-muted text-muted-foreground"
+                    )}
+                  >
+                    Tilføj konto
+                  </button>
+                  {!features.inAppPayments && (
+                    <p className="text-[11px] text-muted-foreground text-center">
+                      Opgrader til Family Plus for betalingsfunktioner
+                    </p>
+                  )}
                 </div>
-                {account.isPrimary && (
-                  <span className="shrink-0 text-[12px] font-semibold text-[#f58a2d]">Primær</span>
+
+                {myPaymentAccounts.length === 0 && (
+                  <div className="mt-3 rounded-[8px] border-2 border-dashed border-border bg-card p-4 text-center">
+                    <CreditCard className="mx-auto h-6 w-6 text-muted-foreground mb-1.5" />
+                    <p className="text-[12px] text-muted-foreground">Ingen betalingskonti tilføjet endnu</p>
+                  </div>
                 )}
               </div>
-            ))}
 
-            <button
-              onClick={() => {
-                setPaymentDraft(prev => ({ ...prev, provider: 'card' }));
-                // Open add card flow
-              }}
-              className="flex w-full items-center gap-3 py-3.5 text-left transition-colors hover:bg-card border-b border-border"
-            >
-              <div className="flex h-8 w-8 items-center justify-center text-muted-foreground">
-                <span className="text-[20px] font-light">+</span>
+              {/* Abonnementsmodel info */}
+              <div className="mt-4 rounded-[8px] border-2 border-border bg-card px-4 py-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[13px] font-semibold text-foreground">Abonnementsmodel</p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                      {isTogetherMode
+                        ? 'Samboende: abonnement deles automatisk'
+                        : 'Skilt/co-parenting: separat abonnement pr. bruger'}
+                    </p>
+                  </div>
+                  <span className="shrink-0 rounded-[8px] bg-background px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+                    {isTogetherMode ? 'Delt' : 'Separat'}
+                  </span>
+                </div>
               </div>
-              <p className="text-[15px] font-medium text-foreground">Tilføj nyt kort</p>
-            </button>
-          </div>
-
-          {/* Andre betalingsmetoder */}
-          <div>
-            <p className="text-[17px] font-bold text-foreground pb-3">Andre betalingsmetoder</p>
-            <div className="divide-y divide-border">
-              {/* MobilePay */}
-              <button
-                onClick={() => {
-                  setPaymentDraft(prev => ({ ...prev, provider: 'mobilepay' }));
-                }}
-                className="flex w-full items-center justify-between py-3.5 text-left transition-colors hover:bg-card"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-[8px] bg-[#5A78FF]">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M14 4L8 16M6 4L12 16" stroke="white" strokeWidth="2.5" strokeLinecap="round"/></svg>
+            </motion.div>
+          ) : (
+            <motion.div
+              key={settingsDetailView}
+              initial={{ x: 60, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 60, opacity: 0 }}
+              transition={{ duration: 0.18 }}
+            >
+              {/* ─── Gavekort ─── */}
+              {settingsDetailView === 'payment-giftcard' && (
+                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+                  <div className="space-y-4">
+                    <h2 className="text-[28px] font-bold text-foreground pb-2">Gavekort</h2>
+                    <p className="text-[13px] text-muted-foreground">Vælg et beløb og send et gavekort til en ven eller familiemedlem.</p>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[50, 100, 200, 500].map(amount => (
+                        <button
+                          key={amount}
+                          className="rounded-[12px] border-2 border-border bg-card px-4 py-4 text-center transition-all hover:border-[#f58a2d] hover:bg-orange-tint-light active:scale-[0.97]"
+                        >
+                          <p className="text-[20px] font-bold text-foreground">{amount} kr</p>
+                          <p className="text-[12px] text-muted-foreground mt-1">Gavekort</p>
+                        </button>
+                      ))}
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-[13px]">Personlig besked (valgfrit)</Label>
+                      <Input placeholder="Tillykke med fødselsdagen!" className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
+                    </div>
                   </div>
-                  <p className="text-[15px] font-medium text-foreground">MobilePay</p>
-                </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </button>
-
-              {/* Apple Pay */}
-              <button
-                className="flex w-full items-center justify-between py-3.5 text-left transition-colors hover:bg-card"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-[8px] border border-border bg-card">
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M14.5 3.5C13.8 2.7 12.8 2.3 11.9 2.3c-1.1 0-1.8.6-2.4.6-.6 0-1.5-.6-2.5-.6C5.7 2.4 4 3.7 4 6.2c0 1.5.6 3.1 1.3 4.1.6.9 1.2 1.6 2 1.6.8 0 1.1-.5 2.2-.5 1.1 0 1.3.5 2.1.5.8 0 1.4-.8 2-1.6.4-.6.7-1.1.8-1.5-1.1-.5-1.9-1.6-1.9-3 0-1.2.7-2.3 1.8-2.8-.7-.9-1.6-1.4-2.6-1.5z" fill="currentColor"/><path d="M11.5 1c.1-.8-.2-1.6-.6-2.1-.5-.5-1.2-.9-1.9-.9-.1.8.2 1.6.6 2.1.5.5 1.2.9 1.9.9z" fill="currentColor" transform="translate(0,2)"/></svg>
+                  <div className="flex-1 flex items-center justify-center py-8">
+                    <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Gift card with ribbon */}
+                      <rect x="50" y="50" width="160" height="100" rx="16" fill="#FFF3E0" stroke="#F5A623" strokeWidth="2"/>
+                      <rect x="50" y="50" width="160" height="35" rx="16" fill="#FFE0B2"/>
+                      <rect x="50" y="69" width="160" height="16" fill="#FFE0B2"/>
+                      {/* Ribbon vertical */}
+                      <rect x="122" y="50" width="16" height="100" fill="#EF5350" opacity="0.7"/>
+                      {/* Ribbon horizontal */}
+                      <rect x="50" y="90" width="160" height="16" fill="#EF5350" opacity="0.7"/>
+                      {/* Bow */}
+                      <ellipse cx="120" cy="88" rx="18" ry="12" fill="#EF5350"/>
+                      <ellipse cx="140" cy="88" rx="18" ry="12" fill="#EF5350"/>
+                      <circle cx="130" cy="90" r="6" fill="#C62828"/>
+                      {/* Heart */}
+                      <path d="M115 120 C115 114 120 112 123 115 C126 112 131 114 131 120 C131 128 123 132 123 132 C123 132 115 128 115 120Z" fill="#F48FB1" opacity="0.6"/>
+                      {/* Sparkles */}
+                      <circle cx="35" cy="40" r="4" fill="#FFD54F" opacity="0.5"/>
+                      <circle cx="230" cy="35" r="3" fill="#F5A623" opacity="0.4"/>
+                      <circle cx="40" cy="165" r="3" fill="#EF5350" opacity="0.3"/>
+                      <circle cx="225" cy="170" r="4" fill="#FFD54F" opacity="0.4"/>
+                      <path d="M45 70 L50 65 L55 70 L50 75Z" fill="#FFD54F" opacity="0.4"/>
+                      <path d="M210 60 L215 55 L220 60 L215 65Z" fill="#F48FB1" opacity="0.4"/>
+                    </svg>
                   </div>
-                  <p className="text-[15px] font-medium text-foreground">Apple Pay</p>
+                  <Button className="w-full shrink-0 rounded-[12px] py-3">
+                    Køb gavekort
+                  </Button>
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </button>
+              )}
 
-              {/* PayPal */}
-              <button
-                className="flex w-full items-center justify-between py-3.5 text-left transition-colors hover:bg-card"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-[8px] border border-border bg-card">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7.02 21L8.56 12.26H12.15C15.81 12.26 18.15 9.93 18.65 6.71 19.18 3.28 16.81 1 13.17 1H6.31L3 21H7.02Z" fill="#002C8A"/><path d="M8.8 14.26L10.34 5.52H13.93C17.59 5.52 18.93 7.28 18.43 10.51 17.93 13.73 15.59 14.26 12.93 14.26H8.8Z" fill="#009CDE"/></svg>
+              {/* ─── Kreditter ─── */}
+              {settingsDetailView === 'payment-credits' && (
+                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+                  <div className="space-y-4">
+                    <h2 className="text-[28px] font-bold text-foreground pb-2">Kreditter</h2>
+                    <div className="rounded-[12px] bg-[#E8F5E9] p-4 text-center">
+                      <p className="text-[32px] font-bold text-[#2E7D32]">0 kr</p>
+                      <p className="text-[13px] text-[#4CAF50] mt-1">Din nuværende saldo</p>
+                    </div>
+                    <div className="rounded-[12px] bg-muted/50 p-4 space-y-2">
+                      <p className="text-[14px] font-medium text-foreground">Inviter venner & optjen kreditter</p>
+                      <p className="text-[13px] text-muted-foreground">For hver ven eller familiemedlem der tilmelder sig via dit link, optjener du 25 kr i kreditter.</p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="w-full rounded-[12px] py-3 border-[#f58a2d] text-[#f58a2d]"
+                      onClick={() => {
+                        navigator.clipboard?.writeText('https://huska.dk/invite/demo');
+                        toast.success('Link kopieret!');
+                      }}
+                    >
+                      <Send className="mr-2 h-4 w-4" /> Del invitationslink
+                    </Button>
+                    <div className="pt-2">
+                      <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1 pb-2">Historik</p>
+                      <div className="rounded-[12px] border border-dashed border-border bg-card p-4 text-center">
+                        <p className="text-[13px] text-muted-foreground">Ingen kreditter optjent endnu</p>
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-[15px] font-medium text-foreground">PayPal</p>
+                  <div className="flex-1 flex items-center justify-center py-8">
+                    <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Coins and stars raining down */}
+                      {/* Large coin */}
+                      <circle cx="130" cy="95" r="40" fill="#FFD54F" stroke="#F9A825" strokeWidth="2"/>
+                      <circle cx="130" cy="95" r="30" stroke="#F9A825" strokeWidth="1.5" fill="none"/>
+                      <text x="130" y="102" textAnchor="middle" fontSize="24" fontWeight="bold" fill="#F57F17">kr</text>
+                      {/* Small coins */}
+                      <circle cx="65" cy="60" r="18" fill="#FFE082" stroke="#FFB300" strokeWidth="1.5"/>
+                      <circle cx="65" cy="60" r="12" stroke="#FFB300" strokeWidth="1" fill="none"/>
+                      <circle cx="200" cy="55" r="15" fill="#FFE082" stroke="#FFB300" strokeWidth="1.5"/>
+                      <circle cx="200" cy="55" r="10" stroke="#FFB300" strokeWidth="1" fill="none"/>
+                      <circle cx="185" cy="140" r="12" fill="#FFE082" stroke="#FFB300" strokeWidth="1"/>
+                      <circle cx="75" cy="145" r="10" fill="#FFE082" stroke="#FFB300" strokeWidth="1"/>
+                      {/* Stars */}
+                      <path d="M45 100 L48 92 L51 100 L45 96 L51 96Z" fill="#66BB6A" opacity="0.6"/>
+                      <path d="M215 100 L218 92 L221 100 L215 96 L221 96Z" fill="#66BB6A" opacity="0.6"/>
+                      <path d="M100 30 L103 22 L106 30 L100 26 L106 26Z" fill="#FFD54F" opacity="0.5"/>
+                      <path d="M160 25 L163 17 L166 25 L160 21 L166 21Z" fill="#FFD54F" opacity="0.5"/>
+                      {/* Sparkle dots */}
+                      <circle cx="40" cy="170" r="3" fill="#66BB6A" opacity="0.4"/>
+                      <circle cx="225" cy="168" r="3" fill="#FFD54F" opacity="0.4"/>
+                      <circle cx="130" cy="175" r="2" fill="#FFB300" opacity="0.3"/>
+                    </svg>
+                  </div>
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              </button>
-            </div>
-          </div>
+              )}
+
+              {/* ─── Indløs kode ─── */}
+              {settingsDetailView === 'payment-redeem' && (
+                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+                  <div className="space-y-4">
+                    <h2 className="text-[28px] font-bold text-foreground pb-2">Indløs kode</h2>
+                    <p className="text-[13px] text-muted-foreground">Indtast en gavekort-, kampagne- eller henvisningskode for at indløse den.</p>
+                    <Input placeholder="Indtast kode" className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px] text-center tracking-[0.15em] uppercase" />
+                  </div>
+                  <div className="flex-1 flex items-center justify-center py-8">
+                    <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      {/* Ticket / coupon with sparkle */}
+                      <rect x="40" y="55" width="180" height="90" rx="14" fill="#EDE7F6" stroke="#7E57C2" strokeWidth="2"/>
+                      {/* Ticket notch left */}
+                      <circle cx="40" cy="100" r="12" fill="white" stroke="#7E57C2" strokeWidth="2"/>
+                      {/* Ticket notch right */}
+                      <circle cx="220" cy="100" r="12" fill="white" stroke="#7E57C2" strokeWidth="2"/>
+                      {/* Dashed line */}
+                      <line x1="75" y1="100" x2="185" y2="100" stroke="#B39DDB" strokeWidth="1.5" strokeDasharray="6 4"/>
+                      {/* Code text */}
+                      <rect x="85" y="70" width="90" height="20" rx="6" fill="#D1C4E9"/>
+                      <rect x="95" y="110" width="70" height="16" rx="5" fill="#D1C4E9"/>
+                      {/* Sparkles */}
+                      <path d="M50 35 L55 25 L60 35 L55 30Z" fill="#FFD54F"/>
+                      <path d="M55 25 L50 35 L55 30 L60 35Z" fill="#FFD54F"/>
+                      <circle cx="55" cy="30" r="3" fill="#FFF176"/>
+                      <path d="M200 30 L205 20 L210 30 L205 25Z" fill="#7E57C2" opacity="0.5"/>
+                      <circle cx="205" cy="25" r="2" fill="#CE93D8"/>
+                      <path d="M35 160 L40 152 L45 160 L40 156Z" fill="#FFD54F" opacity="0.4"/>
+                      <circle cx="225" cy="160" r="3" fill="#7E57C2" opacity="0.3"/>
+                      {/* Stars */}
+                      <path d="M130 35 L133 27 L136 35 L130 31 L136 31Z" fill="#CE93D8" opacity="0.6"/>
+                      <circle cx="80" cy="165" r="2.5" fill="#B39DDB" opacity="0.4"/>
+                      <circle cx="180" cy="170" r="2" fill="#FFD54F" opacity="0.4"/>
+                    </svg>
+                  </div>
+                  <Button className="w-full shrink-0 rounded-[12px] py-3">
+                    Indløs
+                  </Button>
+                </div>
+              )}
+            </motion.div>
+          )}
+          </AnimatePresence>
         </TabsContent>
 
         {currentUser?.isAdmin && (
