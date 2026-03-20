@@ -1476,26 +1476,70 @@ const [evidenceDraft, setEvidenceDraft] = useState({
               transition={{ duration: 0.18 }}
               className="space-y-2"
             >
-              <div className="px-1 pt-2 pb-4">
-                <p className="text-[13px] text-muted-foreground">
-                  Administrer betalingsmetoder, gavekort og kreditter.
-                </p>
+              {/* ─── Kredit- og debitkort ─── */}
+              <div className="pt-2">
+                <p className="text-[16px] font-bold text-foreground px-1 pb-2">Kredit- og debitkort</p>
+                <div className="divide-y divide-border">
+                  <button
+                    onClick={() => setSettingsDetailView('payment-add-card')}
+                    className="flex w-full items-center gap-3 py-3.5 px-1 text-left transition-colors hover:bg-card"
+                  >
+                    <span className="text-[20px] text-muted-foreground">+</span>
+                    <p className="text-[15px] font-medium text-foreground">Tilføj nyt kort</p>
+                  </button>
+                </div>
               </div>
 
+              <div className="border-t border-border mt-2" />
+
+              {/* ─── Andre betalingsmetoder ─── */}
+              <div className="pt-3">
+                <p className="text-[16px] font-bold text-foreground px-1 pb-2">Andre betalingsmetoder</p>
+                <div className="divide-y divide-border">
+                  <button
+                    onClick={() => setSettingsDetailView('payment-mobilepay')}
+                    className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
+                  >
+                    <div className="flex items-center gap-3">
+                      <img src="/images/Mobilepay.jpeg" alt="MobilePay" className="h-9 w-9 shrink-0 rounded-[6px] object-cover" />
+                      <p className="text-[15px] font-medium text-foreground">MobilePay</p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                  </button>
+                  <button
+                    onClick={() => setSettingsDetailView('payment-applepay')}
+                    className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
+                  >
+                    <div className="flex items-center gap-3">
+                      <img src="/images/Apple pay .png" alt="Apple Pay" className="h-9 w-9 shrink-0 rounded-[6px] object-contain border border-border bg-white p-0.5" />
+                      <p className="text-[15px] font-medium text-foreground">Apple Pay</p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                  </button>
+                  <button
+                    onClick={() => setSettingsDetailView('payment-paypal')}
+                    className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
+                  >
+                    <div className="flex items-center gap-3">
+                      <img src="/images/Paypal.png" alt="PayPal" className="h-9 w-9 shrink-0 rounded-[6px] object-contain border border-border bg-white p-0.5" />
+                      <p className="text-[15px] font-medium text-foreground">PayPal</p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="border-t border-border mt-2" />
+
               {/* ─── Gavekort, Kreditter, Indløs kode ─── */}
-              <div className="divide-y divide-border">
+              <div className="divide-y divide-border pt-2">
                 <button
                   onClick={() => setSettingsDetailView('payment-giftcard')}
                   className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] bg-orange-tint">
-                      <CreditCard className="h-[18px] w-[18px] text-[#f58a2d]" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[15px] font-medium text-foreground">Gavekort</p>
-                      <p className="text-[13px] text-muted-foreground">Giv en gave til en ven eller familiemedlem</p>
-                    </div>
+                  <div>
+                    <p className="text-[15px] font-medium text-foreground">Gavekort</p>
+                    <p className="text-[13px] text-muted-foreground">Giv en gave til en ven eller familiemedlem</p>
                   </div>
                   <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
                 </button>
@@ -1503,14 +1547,9 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   onClick={() => setSettingsDetailView('payment-credits')}
                   className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] bg-[#E8F5E9]">
-                      <Star className="h-[18px] w-[18px] text-[#66BB6A]" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[15px] font-medium text-foreground">Kreditter</p>
-                      <p className="text-[13px] text-muted-foreground">Optjen kreditter ved at invitere venner</p>
-                    </div>
+                  <div>
+                    <p className="text-[15px] font-medium text-foreground">Kreditter</p>
+                    <p className="text-[13px] text-muted-foreground">Optjen kreditter ved at invitere venner</p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0 ml-2">
                     <span className="text-[13px] font-semibold text-muted-foreground">0 kr</span>
@@ -1521,20 +1560,13 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   onClick={() => setSettingsDetailView('payment-redeem')}
                   className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
                 >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] bg-[#EDE7F6]">
-                      <ArrowRight className="h-[18px] w-[18px] text-[#7E57C2]" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[15px] font-medium text-foreground">Indløs kode</p>
-                      <p className="text-[13px] text-muted-foreground">Indløs gavekort eller kampagnekode</p>
-                    </div>
+                  <div>
+                    <p className="text-[15px] font-medium text-foreground">Indløs kode</p>
+                    <p className="text-[13px] text-muted-foreground">Indløs gavekort eller kampagnekode</p>
                   </div>
                   <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
                 </button>
               </div>
-
-              <div className="border-t border-border" />
 
               {/* ─── Betalingskonti ─── */}
               <div className="pt-2">
@@ -1727,6 +1759,93 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   </div>
                   <Button className="w-full shrink-0 rounded-[12px] py-3">
                     Indløs
+                  </Button>
+                </div>
+              )}
+
+              {/* ─── Tilføj kort ─── */}
+              {settingsDetailView === 'payment-add-card' && (
+                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+                  <div className="space-y-5">
+                    <h2 className="text-[28px] font-bold text-foreground pb-2">Tilføj kort</h2>
+                    <div className="rounded-[16px] p-5 space-y-4" style={{ background: 'linear-gradient(135deg, #4FC3F7 0%, #29B6F6 50%, #039BE5 100%)' }}>
+                      <div className="flex justify-end">
+                        <span className="text-[11px] font-bold text-white/80 tracking-wider">KREDIT / DEBET</span>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[13px] font-semibold text-white">Kortnummer</p>
+                        <Input placeholder="0000 0000 0000 0000" className="rounded-[8px] bg-white/95 border-0 px-4 py-3 text-[15px] tracking-[0.05em] placeholder:text-gray-400" inputMode="numeric" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <p className="text-[13px] font-semibold text-white">Udløbsdato</p>
+                          <Input placeholder="MM/YY" className="rounded-[8px] bg-white/95 border-0 px-4 py-3 text-[15px] placeholder:text-gray-400" inputMode="numeric" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-[13px] font-semibold text-white">Sikkerhedskode</p>
+                          <Input placeholder="000" className="rounded-[8px] bg-white/95 border-0 px-4 py-3 text-[15px] placeholder:text-gray-400" inputMode="numeric" type="password" />
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-[13px] text-muted-foreground text-center px-4">
+                      Du kan bruge dit debit- eller kreditkort (Visa/Dankort, Visa Electron, MasterCard, American Express) til at betale med Huska.
+                    </p>
+                  </div>
+                  <div className="flex-1" />
+                  <Button className="w-full shrink-0 rounded-[12px] py-3 mt-6">
+                    Tilføj kort
+                  </Button>
+                </div>
+              )}
+
+              {/* ─── MobilePay ─── */}
+              {settingsDetailView === 'payment-mobilepay' && (
+                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+                  <div className="space-y-4">
+                    <h2 className="text-[28px] font-bold text-foreground pb-2">MobilePay</h2>
+                    <div className="rounded-[12px] bg-[#E8EAF6] p-4 space-y-2">
+                      <p className="text-[14px] font-medium text-foreground">Betal med MobilePay</p>
+                      <p className="text-[13px] text-muted-foreground">Tilknyt din MobilePay-konto for hurtig og nem betaling direkte fra appen.</p>
+                    </div>
+                    <Input placeholder="Telefonnummer" className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" inputMode="tel" />
+                  </div>
+                  <div className="flex-1" />
+                  <Button className="w-full shrink-0 rounded-[12px] py-3">
+                    Tilknyt MobilePay
+                  </Button>
+                </div>
+              )}
+
+              {/* ─── Apple Pay ─── */}
+              {settingsDetailView === 'payment-applepay' && (
+                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+                  <div className="space-y-4">
+                    <h2 className="text-[28px] font-bold text-foreground pb-2">Apple Pay</h2>
+                    <div className="rounded-[12px] bg-muted/50 p-4 space-y-2">
+                      <p className="text-[14px] font-medium text-foreground">Betal med Apple Pay</p>
+                      <p className="text-[13px] text-muted-foreground">Brug Apple Pay til hurtig og sikker betaling med Face ID eller Touch ID.</p>
+                    </div>
+                  </div>
+                  <div className="flex-1" />
+                  <Button className="w-full shrink-0 rounded-[12px] py-3 bg-black text-white hover:bg-gray-900">
+                    Konfigurer Apple Pay
+                  </Button>
+                </div>
+              )}
+
+              {/* ─── PayPal ─── */}
+              {settingsDetailView === 'payment-paypal' && (
+                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+                  <div className="space-y-4">
+                    <h2 className="text-[28px] font-bold text-foreground pb-2">PayPal</h2>
+                    <div className="rounded-[12px] bg-[#FFF8E1] p-4 space-y-2">
+                      <p className="text-[14px] font-medium text-foreground">Betal med PayPal</p>
+                      <p className="text-[13px] text-muted-foreground">Log ind med din PayPal-konto for at tilknytte den som betalingsmetode.</p>
+                    </div>
+                  </div>
+                  <div className="flex-1" />
+                  <Button className="w-full shrink-0 rounded-[12px] py-3" style={{ background: '#0070BA' }}>
+                    Log ind med PayPal
                   </Button>
                 </div>
               )}
