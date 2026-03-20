@@ -736,9 +736,7 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                 </div>
               </div>
 
-              {/* ─── Konto ─── */}
               <div className="pt-2">
-                <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1 pb-2">Konto</p>
                 <div className="divide-y divide-border">
                   <button
                     onClick={() => setSettingsDetailView('edit-export')}
