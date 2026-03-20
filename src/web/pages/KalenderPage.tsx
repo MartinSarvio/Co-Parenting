@@ -88,6 +88,8 @@ export default function KalenderPage() {
       ctaSubtitle="Opret din familiekalender i dag. Helt gratis."
       ctaButtonLabel="Prøv gratis"
       ctaButtonHref="#funktioner"
+      variant="photo-hero"
+      heroPhotoSrc="/images/kalender-photo.jpg"
     />
   );
 }

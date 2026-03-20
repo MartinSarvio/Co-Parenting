@@ -185,7 +185,8 @@ export default function MadHjemPage() {
       ctaSubtitle="Opret din første madplan på under et minut. Helt gratis."
       ctaButtonLabel="Prøv gratis"
       ctaButtonHref="#funktioner"
-      heroVisual={<HeroMealPlan />}
+      variant="split-photo"
+      heroPhotoSrc="/images/udgifter-photo.jpg"
     />
   );
 }

@@ -68,6 +68,8 @@ export default function SamvaerPage() {
       ctaSubtitle="Opret din første samværsplan på under 2 minutter. Helt gratis."
       ctaButtonLabel="Prøv gratis"
       ctaButtonHref="#funktioner"
+      variant="photo-hero"
+      heroPhotoSrc="/images/kalender-photo.jpg"
     />
   );
 }

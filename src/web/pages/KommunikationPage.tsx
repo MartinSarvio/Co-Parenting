@@ -76,6 +76,7 @@ export default function KommunikationPage() {
       ctaSubtitle="Start med strukturerede samtaler i dag. Helt gratis."
       ctaButtonLabel="Prøv gratis"
       ctaButtonHref="#funktioner"
+      featurePhotoSrc="/images/kommunikation-photo.jpg"
     />
   );
 }

@@ -181,7 +181,8 @@ export default function UdgifterPage() {
       ctaSubtitle="Start med at dele udgifter i dag. Helt gratis."
       ctaButtonLabel="Prøv gratis"
       ctaButtonHref="#funktioner"
-      heroVisual={<HeroDashboard />}
+      variant="split-photo"
+      heroPhotoSrc="/images/udgifter-photo.jpg"
     />
   );
 }

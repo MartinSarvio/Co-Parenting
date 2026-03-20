@@ -109,7 +109,7 @@ function MissionSection() {
 
           {/* Visual: Two houses connected */}
           <div className="flex justify-center">
-            <div className="relative w-full max-w-[340px] h-[280px]">
+            <div className="relative w-full max-w-[380px] h-[300px]">
               {/* House A */}
               <div className="absolute left-0 top-8 w-[120px]">
                 <div className="bg-[#fafaf9] border border-[#e5e3dc] rounded-2xl p-4 text-center">
@@ -133,7 +133,7 @@ function MissionSection() {
               </div>
 
               {/* Connection arrows */}
-              <div className="absolute top-[52px] left-[130px] right-[130px] flex flex-col items-center gap-2">
+              <div className="absolute top-[52px] left-[140px] right-[140px] flex flex-col items-center gap-2">
                 <div className="flex items-center gap-1.5 bg-white border border-[#e5e3dc] rounded-full px-3 py-1.5 shadow-sm">
                   <Calendar size={11} className="text-[#1a1a1a]" />
                   <span className="text-[10px] font-semibold text-[#1a1a1a]">Kalender</span>
@@ -151,13 +151,15 @@ function MissionSection() {
               </div>
 
               {/* Dashed connector lines */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 340 280">
-                <line x1="120" y1="60" x2="140" y2="60" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
-                <line x1="200" y1="60" x2="220" y2="60" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
-                <line x1="120" y1="95" x2="140" y2="95" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
-                <line x1="200" y1="95" x2="220" y2="95" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
-                <line x1="120" y1="130" x2="140" y2="130" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
-                <line x1="200" y1="130" x2="220" y2="130" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
+              <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 380 300">
+                {/* Left lines: House A edge → pill start */}
+                <line x1="125" y1="68" x2="148" y2="68" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
+                <line x1="125" y1="100" x2="148" y2="100" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
+                <line x1="125" y1="132" x2="148" y2="132" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
+                {/* Right lines: pill end → House B edge */}
+                <line x1="232" y1="68" x2="255" y2="68" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
+                <line x1="232" y1="100" x2="255" y2="100" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
+                <line x1="232" y1="132" x2="255" y2="132" stroke="#e5e3dc" strokeWidth="1.5" strokeDasharray="4 3" />
               </svg>
 
               {/* Huska badge in center bottom */}
@@ -188,7 +190,7 @@ function VisionSection() {
         <div className="grid md:grid-cols-2 gap-16 items-center">
           {/* Visual: Denmark map with dots */}
           <div className="flex justify-center order-2 md:order-1">
-            <div className="relative w-[280px] h-[340px]">
+            <div className="relative w-[336px] h-[408px]">
               {/* Simplified Denmark outline */}
               <svg viewBox="0 0 280 340" className="w-full h-full" fill="none">
                 {/* Jylland simplified */}
@@ -234,11 +236,11 @@ function VisionSection() {
 
               {/* City dots */}
               {[
-                { x: 90, y: 55, label: 'Aalborg', delay: '0s' },
-                { x: 95, y: 110, label: 'Aarhus', delay: '0.2s' },
-                { x: 85, y: 175, label: 'Odense', delay: '0.4s' },
-                { x: 148, y: 215, label: 'Odense', delay: '0.4s', hide: true },
-                { x: 195, y: 210, label: 'København', delay: '0.6s' },
+                { x: 108, y: 66, label: 'Aalborg', delay: '0s' },
+                { x: 114, y: 132, label: 'Aarhus', delay: '0.2s' },
+                { x: 102, y: 210, label: 'Odense', delay: '0.4s' },
+                { x: 178, y: 258, label: 'Odense', delay: '0.4s', hide: true },
+                { x: 234, y: 252, label: 'København', delay: '0.6s' },
               ].map((city, i) => (
                 <div
                   key={i}
@@ -260,7 +262,7 @@ function VisionSection() {
               ))}
 
               {/* Growth indicator */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white border border-[#e5e3dc] rounded-full px-4 py-2 shadow-sm">
+              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-white border border-[#e5e3dc] rounded-full px-4 py-2 shadow-sm">
                 <TrendingUp size={14} className="text-[#1a1a1a]" />
                 <span className="text-[11px] font-bold text-[#1a1a1a]">Hele Danmark 2027</span>
               </div>
