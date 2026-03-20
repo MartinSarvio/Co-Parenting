@@ -763,46 +763,94 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="n-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFDDAA"/><stop offset="100%" stopColor="#FFBB77"/></linearGradient>
-                        <linearGradient id="n-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#5D4037"/><stop offset="100%" stopColor="#8D6E63"/></linearGradient>
-                        <linearGradient id="n-shirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#F5A623"/><stop offset="100%" stopColor="#E8951F"/></linearGradient>
-                        <linearGradient id="n-badge" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFFFFF"/><stop offset="100%" stopColor="#FFF8EC"/></linearGradient>
-                        <filter id="n-shadow"><feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.12"/></filter>
+                        <linearGradient id="n-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="n-skin2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="n-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#8D6E63"/><stop offset="1" stopColor="#5D4037"/></linearGradient>
+                        <linearGradient id="n-shirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFB74D"/><stop offset="0.5" stopColor="#F5A623"/><stop offset="1" stopColor="#E8841A"/></linearGradient>
+                        <linearGradient id="n-pants" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#5C6BC0"/><stop offset="1" stopColor="#3949AB"/></linearGradient>
+                        <linearGradient id="n-badge" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFFFFF"/><stop offset="1" stopColor="#FFF3E0"/></linearGradient>
+                        <linearGradient id="n-badgeTop" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFB74D"/><stop offset="1" stopColor="#F5A623"/></linearGradient>
+                        <filter id="n-shadow"><feDropShadow dx="0" dy="5" stdDeviation="7" floodOpacity="0.15"/></filter>
+                        <filter id="n-softshadow"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.1"/></filter>
                       </defs>
+                      {/* Background sparkles */}
+                      <rect x="30" y="40" width="7" height="7" rx="1" fill="#FFB74D" opacity="0.25" transform="rotate(45 33 43)"/>
+                      <circle cx="220" cy="55" r="4" fill="#F5A623" opacity="0.2"/>
+                      <rect x="200" y="160" width="6" height="6" rx="1" fill="#FFB74D" opacity="0.2" transform="rotate(45 203 163)"/>
+                      <circle cx="40" cy="150" r="3" fill="#FFA726" opacity="0.2"/>
+                      <rect x="215" y="110" width="5" height="5" rx="1" fill="#F5A623" opacity="0.18" transform="rotate(45 217 112)"/>
                       {/* Ground shadow */}
-                      <ellipse cx="130" cy="188" rx="55" ry="8" fill="#333" opacity="0.08"/>
-                      {/* Body */}
-                      <rect x="100" y="118" width="48" height="52" rx="14" fill="url(#n-shirt)" filter="url(#n-shadow)"/>
-                      {/* Legs */}
-                      <rect x="107" y="162" width="13" height="22" rx="6" fill="#4E342E"/>
-                      <rect x="128" y="162" width="13" height="22" rx="6" fill="#4E342E"/>
-                      {/* Shoes */}
-                      <rect x="104" y="180" width="18" height="8" rx="4" fill="#2E2E2E"/>
-                      <rect x="125" y="180" width="18" height="8" rx="4" fill="#2E2E2E"/>
-                      {/* Left arm (holding badge) */}
-                      <path d="M100 130 Q78 138 72 155" stroke="url(#n-skin)" strokeWidth="12" strokeLinecap="round" fill="none"/>
-                      {/* Right arm */}
-                      <path d="M148 130 Q168 138 172 150" stroke="url(#n-skin)" strokeWidth="12" strokeLinecap="round" fill="none"/>
+                      <ellipse cx="128" cy="191" rx="58" ry="7" fill="#000" opacity="0.08"/>
+                      {/* Left arm (behind body, holding badge) */}
+                      <path d="M103 132 Q82 142 70 158" stroke="url(#n-skin2)" strokeWidth="13" strokeLinecap="round" fill="none"/>
                       {/* Name badge held in left hand */}
-                      <rect x="52" y="148" width="52" height="38" rx="8" fill="url(#n-badge)" stroke="#F5A623" strokeWidth="2" filter="url(#n-shadow)"/>
-                      <rect x="52" y="148" width="52" height="12" rx="8" fill="#F5A623"/>
-                      <rect x="52" y="156" width="52" height="4" fill="#F5A623"/>
-                      <rect x="58" y="168" width="30" height="4" rx="2" fill="#F5A623" opacity="0.6"/>
-                      <rect x="58" y="176" width="20" height="3" rx="1.5" fill="#FFE0B2"/>
+                      <rect x="40" y="148" width="58" height="44" rx="9" fill="url(#n-badge)" stroke="#F5A623" strokeWidth="2" filter="url(#n-softshadow)"/>
+                      <rect x="40" y="148" width="58" height="14" rx="9" fill="url(#n-badgeTop)"/>
+                      <rect x="40" y="157" width="58" height="5" fill="url(#n-badgeTop)"/>
+                      {/* Badge lanyard hole */}
+                      <circle cx="69" cy="148" r="4" fill="white" stroke="#F5A623" strokeWidth="1.5"/>
+                      {/* Badge lines */}
+                      <rect x="48" y="172" width="34" height="5" rx="2.5" fill="#FFB74D" opacity="0.7"/>
+                      <rect x="48" y="181" width="24" height="4" rx="2" fill="#FFE0B2" opacity="0.8"/>
+                      {/* Badge shine */}
+                      <rect x="44" y="150" width="12" height="5" rx="2" fill="white" opacity="0.25"/>
+                      {/* Pants */}
+                      <rect x="104" y="160" width="16" height="26" rx="8" fill="url(#n-pants)"/>
+                      <rect x="126" y="160" width="16" height="26" rx="8" fill="url(#n-pants)"/>
+                      <rect x="104" y="160" width="38" height="6" rx="3" fill="#3949AB" opacity="0.5"/>
+                      {/* Shoes */}
+                      <rect x="101" y="182" width="22" height="9" rx="5" fill="#212121"/>
+                      <rect x="123" y="182" width="22" height="9" rx="5" fill="#212121"/>
+                      <rect x="103" y="182" width="14" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      <rect x="125" y="182" width="14" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      {/* Body/shirt */}
+                      <rect x="100" y="120" width="56" height="46" rx="16" fill="url(#n-shirt)" filter="url(#n-shadow)"/>
+                      {/* Shirt collar */}
+                      <path d="M118 120 L128 132 L138 120" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.4"/>
+                      {/* Shirt sleeve folds */}
+                      <path d="M100 135 Q96 138 95 143" stroke="#E8841A" strokeWidth="1.5" fill="none" opacity="0.5"/>
+                      <path d="M156 135 Q160 138 161 143" stroke="#E8841A" strokeWidth="1.5" fill="none" opacity="0.5"/>
+                      {/* Shirt shine */}
+                      <ellipse cx="115" cy="128" rx="8" ry="5" fill="white" opacity="0.12"/>
+                      {/* Right arm */}
+                      <path d="M154 132 Q172 140 178 152" stroke="url(#n-skin2)" strokeWidth="13" strokeLinecap="round" fill="none"/>
+                      {/* Right hand */}
+                      <circle cx="178" cy="154" r="7" fill="url(#n-skin)"/>
+                      {/* Left hand */}
+                      <circle cx="70" cy="160" r="7" fill="url(#n-skin)"/>
+                      {/* Neck */}
+                      <rect x="120" y="114" width="16" height="10" rx="4" fill="url(#n-skin)"/>
+                      {/* Ears */}
+                      <ellipse cx="103" cy="100" rx="5" ry="7" fill="#FFCC88"/>
+                      <ellipse cx="149" cy="100" rx="5" ry="7" fill="#FFCC88"/>
+                      <ellipse cx="103" cy="100" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
+                      <ellipse cx="149" cy="100" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
                       {/* Head */}
-                      <circle cx="124" cy="98" r="24" fill="url(#n-skin)" filter="url(#n-shadow)"/>
-                      <circle cx="116" cy="90" r="9" fill="white" opacity="0.15"/>
-                      {/* Hair */}
-                      <ellipse cx="124" cy="80" rx="22" ry="10" fill="url(#n-hair)"/>
-                      <rect x="102" y="80" width="10" height="14" rx="5" fill="url(#n-hair)"/>
-                      <rect x="136" y="80" width="10" height="14" rx="5" fill="url(#n-hair)"/>
+                      <circle cx="126" cy="98" r="26" fill="url(#n-skin)" filter="url(#n-shadow)"/>
+                      {/* Head highlight */}
+                      <circle cx="118" cy="89" r="8" fill="white" opacity="0.18"/>
+                      {/* Hair — back layer */}
+                      <ellipse cx="126" cy="76" rx="24" ry="12" fill="#5D4037"/>
+                      {/* Hair — main */}
+                      <ellipse cx="126" cy="75" rx="23" ry="11" fill="url(#n-hair)"/>
+                      <rect x="103" y="75" width="12" height="18" rx="6" fill="url(#n-hair)"/>
+                      <rect x="137" y="75" width="12" height="18" rx="6" fill="url(#n-hair)"/>
+                      {/* Hair highlight stripe */}
+                      <path d="M115 68 Q124 64 133 68" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.15"/>
+                      {/* Eyebrows */}
+                      <path d="M114 91 Q117 88 120 91" stroke="#5D4037" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      <path d="M132 91 Q135 88 138 91" stroke="#5D4037" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
                       {/* Eyes */}
-                      <circle cx="117" cy="98" r="3.5" fill="#3E2723"/>
-                      <circle cx="131" cy="98" r="3.5" fill="#3E2723"/>
-                      <circle cx="118" cy="96.5" r="1" fill="white"/>
-                      <circle cx="132" cy="96.5" r="1" fill="white"/>
-                      {/* Smile */}
-                      <path d="M118 107 Q124 113 130 107" stroke="#C67B3A" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      <circle cx="117" cy="97" r="4" fill="#2C1810"/>
+                      <circle cx="135" cy="97" r="4" fill="#2C1810"/>
+                      <circle cx="119" cy="95" r="1.5" fill="white" opacity="0.9"/>
+                      <circle cx="137" cy="95" r="1.5" fill="white" opacity="0.9"/>
+                      {/* Mouth — teeth hint behind smile */}
+                      <path d="M119 108 Q126 114 133 108" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.5"/>
+                      <path d="M119 108 Q126 115 133 108" stroke="#C67B3A" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                      {/* Cheeks */}
+                      <ellipse cx="111" cy="104" rx="5" ry="3" fill="#FFB0A0" opacity="0.35"/>
+                      <ellipse cx="141" cy="104" rx="5" ry="3" fill="#FFB0A0" opacity="0.35"/>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ name: profileDraft.name.trim() })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -821,51 +869,95 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="em-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFDDAA"/><stop offset="100%" stopColor="#FFBB77"/></linearGradient>
-                        <linearGradient id="em-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#5D4037"/><stop offset="100%" stopColor="#8D6E63"/></linearGradient>
-                        <linearGradient id="em-shirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#42A5F5"/><stop offset="100%" stopColor="#1E88E5"/></linearGradient>
-                        <linearGradient id="em-env" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#E3F2FD"/><stop offset="100%" stopColor="#BBDEFB"/></linearGradient>
-                        <filter id="em-shadow"><feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.12"/></filter>
+                        <linearGradient id="em-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="em-skin2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="em-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#8D6E63"/><stop offset="1" stopColor="#5D4037"/></linearGradient>
+                        <linearGradient id="em-shirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#64B5F6"/><stop offset="0.5" stopColor="#42A5F5"/><stop offset="1" stopColor="#1565C0"/></linearGradient>
+                        <linearGradient id="em-pants" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#37474F"/><stop offset="1" stopColor="#263238"/></linearGradient>
+                        <linearGradient id="em-env" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#E3F2FD"/><stop offset="1" stopColor="#BBDEFB"/></linearGradient>
+                        <filter id="em-shadow"><feDropShadow dx="0" dy="5" stdDeviation="7" floodOpacity="0.15"/></filter>
+                        <filter id="em-softshadow"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.1"/></filter>
                       </defs>
+                      {/* Background sparkles */}
+                      <rect x="28" y="50" width="7" height="7" rx="1" fill="#42A5F5" opacity="0.2" transform="rotate(45 31 53)"/>
+                      <circle cx="225" cy="65" r="4" fill="#64B5F6" opacity="0.25"/>
+                      <rect x="210" y="155" width="6" height="6" rx="1" fill="#1E88E5" opacity="0.2" transform="rotate(45 213 158)"/>
+                      <circle cx="32" cy="148" r="3" fill="#42A5F5" opacity="0.2"/>
                       {/* Ground shadow */}
-                      <ellipse cx="108" cy="188" rx="50" ry="7" fill="#333" opacity="0.08"/>
-                      {/* Body */}
-                      <rect x="80" y="118" width="46" height="50" rx="13" fill="url(#em-shirt)" filter="url(#em-shadow)"/>
-                      {/* Legs */}
-                      <rect x="86" y="160" width="12" height="22" rx="6" fill="#4E342E"/>
-                      <rect x="106" y="160" width="12" height="22" rx="6" fill="#4E342E"/>
-                      {/* Shoes */}
-                      <rect x="83" y="178" width="17" height="8" rx="4" fill="#2E2E2E"/>
-                      <rect x="104" y="178" width="17" height="8" rx="4" fill="#2E2E2E"/>
-                      {/* Right arm reaching forward */}
-                      <path d="M126 126 Q148 122 162 128" stroke="url(#em-skin)" strokeWidth="11" strokeLinecap="round" fill="none"/>
+                      <ellipse cx="107" cy="191" rx="54" ry="7" fill="#000" opacity="0.08"/>
                       {/* Left arm down */}
-                      <path d="M80 128 Q64 138 62 152" stroke="url(#em-skin)" strokeWidth="11" strokeLinecap="round" fill="none"/>
-                      {/* Flying envelope */}
-                      <rect x="148" y="100" width="70" height="50" rx="8" fill="url(#em-env)" stroke="#64B5F6" strokeWidth="2" filter="url(#em-shadow)"/>
-                      <path d="M148 108 L183 128 L218 108" stroke="#64B5F6" strokeWidth="2" fill="none"/>
-                      <path d="M148 150 L170 132" stroke="#64B5F6" strokeWidth="1.5" fill="none"/>
-                      <path d="M218 150 L196 132" stroke="#64B5F6" strokeWidth="1.5" fill="none"/>
-                      {/* @ on envelope */}
-                      <circle cx="183" cy="125" r="9" stroke="#42A5F5" strokeWidth="1.5" fill="none"/>
-                      <circle cx="183" cy="125" r="4" stroke="#42A5F5" strokeWidth="1.5" fill="none"/>
+                      <path d="M83 132 Q66 142 62 156" stroke="url(#em-skin2)" strokeWidth="13" strokeLinecap="round" fill="none"/>
+                      {/* Pants */}
+                      <rect x="86" y="160" width="15" height="26" rx="8" fill="url(#em-pants)"/>
+                      <rect x="106" y="160" width="15" height="26" rx="8" fill="url(#em-pants)"/>
+                      <rect x="86" y="160" width="35" height="6" rx="3" fill="#1A2327" opacity="0.5"/>
+                      {/* Shoes */}
+                      <rect x="83" y="181" width="21" height="9" rx="5" fill="#111"/>
+                      <rect x="104" y="181" width="21" height="9" rx="5" fill="#111"/>
+                      <rect x="85" y="181" width="13" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      <rect x="106" y="181" width="13" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      {/* Body/shirt */}
+                      <rect x="80" y="120" width="54" height="46" rx="16" fill="url(#em-shirt)" filter="url(#em-shadow)"/>
+                      {/* Collar */}
+                      <path d="M97 120 L107 131 L117 120" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.35"/>
+                      {/* Shirt shine */}
+                      <ellipse cx="94" cy="130" rx="7" ry="4" fill="white" opacity="0.12"/>
+                      {/* Sleeve folds */}
+                      <path d="M80 137 Q76 141 76 146" stroke="#1565C0" strokeWidth="1.5" fill="none" opacity="0.45"/>
+                      {/* Right arm reaching toward envelope */}
+                      <path d="M132 127 Q152 121 165 126" stroke="url(#em-skin2)" strokeWidth="13" strokeLinecap="round" fill="none"/>
+                      {/* Right hand */}
+                      <circle cx="165" cy="128" r="7" fill="url(#em-skin)"/>
+                      {/* Left hand */}
+                      <circle cx="62" cy="157" r="7" fill="url(#em-skin)"/>
+                      {/* Flying envelope — 3D */}
+                      <rect x="148" y="96" width="76" height="54" rx="10" fill="url(#em-env)" stroke="#64B5F6" strokeWidth="2" filter="url(#em-softshadow)"/>
+                      {/* Envelope flap */}
+                      <path d="M148 106 L186 129 L224 106" stroke="#64B5F6" strokeWidth="2.5" fill="none"/>
+                      <path d="M148 150 L172 133" stroke="#90CAF9" strokeWidth="1.8" fill="none"/>
+                      <path d="M224 150 L200 133" stroke="#90CAF9" strokeWidth="1.8" fill="none"/>
+                      {/* Envelope shine */}
+                      <rect x="152" y="99" width="20" height="6" rx="3" fill="white" opacity="0.3"/>
+                      {/* @ symbol on envelope */}
+                      <circle cx="186" cy="122" r="10" stroke="#42A5F5" strokeWidth="2" fill="none"/>
+                      <circle cx="186" cy="122" r="4.5" fill="#42A5F5" opacity="0.3"/>
+                      <path d="M190 118 L191 126" stroke="#42A5F5" strokeWidth="2" strokeLinecap="round"/>
                       {/* Motion lines */}
-                      <path d="M140 112 L148 112" stroke="#42A5F5" strokeWidth="1.5" strokeDasharray="3 2" opacity="0.5"/>
-                      <path d="M138 120 L148 120" stroke="#42A5F5" strokeWidth="1.5" strokeDasharray="3 2" opacity="0.4"/>
+                      <path d="M137 108 L147 108" stroke="#42A5F5" strokeWidth="2" strokeDasharray="3 2" opacity="0.5"/>
+                      <path d="M135 118 L147 118" stroke="#42A5F5" strokeWidth="2" strokeDasharray="3 2" opacity="0.35"/>
+                      <path d="M138 128 L147 128" stroke="#42A5F5" strokeWidth="2" strokeDasharray="3 2" opacity="0.25"/>
+                      {/* Neck */}
+                      <rect x="99" y="114" width="16" height="10" rx="4" fill="url(#em-skin)"/>
+                      {/* Ears */}
+                      <ellipse cx="82" cy="99" rx="5" ry="7" fill="#FFCC88"/>
+                      <ellipse cx="128" cy="99" rx="5" ry="7" fill="#FFCC88"/>
+                      <ellipse cx="82" cy="99" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
+                      <ellipse cx="128" cy="99" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
                       {/* Head */}
-                      <circle cx="103" cy="97" r="24" fill="url(#em-skin)" filter="url(#em-shadow)"/>
-                      <circle cx="95" cy="89" r="9" fill="white" opacity="0.15"/>
-                      {/* Hair */}
-                      <ellipse cx="103" cy="79" rx="22" ry="10" fill="url(#em-hair)"/>
-                      <rect x="81" y="79" width="10" height="14" rx="5" fill="url(#em-hair)"/>
-                      <rect x="115" y="79" width="10" height="14" rx="5" fill="url(#em-hair)"/>
+                      <circle cx="105" cy="97" r="26" fill="url(#em-skin)" filter="url(#em-shadow)"/>
+                      <circle cx="97" cy="88" r="9" fill="white" opacity="0.18"/>
+                      {/* Hair — back */}
+                      <ellipse cx="105" cy="75" rx="24" ry="12" fill="#5D4037"/>
+                      {/* Hair — main */}
+                      <ellipse cx="105" cy="74" rx="23" ry="11" fill="url(#em-hair)"/>
+                      <rect x="82" y="74" width="12" height="18" rx="6" fill="url(#em-hair)"/>
+                      <rect x="117" y="74" width="12" height="18" rx="6" fill="url(#em-hair)"/>
+                      {/* Hair highlight */}
+                      <path d="M94 67 Q103 63 112 67" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.15"/>
+                      {/* Eyebrows */}
+                      <path d="M93 90 Q96 87 99 90" stroke="#5D4037" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      <path d="M111 90 Q114 87 117 90" stroke="#5D4037" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
                       {/* Eyes */}
-                      <circle cx="96" cy="97" r="3.5" fill="#3E2723"/>
-                      <circle cx="110" cy="97" r="3.5" fill="#3E2723"/>
-                      <circle cx="97" cy="95.5" r="1" fill="white"/>
-                      <circle cx="111" cy="95.5" r="1" fill="white"/>
-                      {/* Smile */}
-                      <path d="M97 106 Q103 112 109 106" stroke="#C67B3A" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      <circle cx="96" cy="96" r="4" fill="#2C1810"/>
+                      <circle cx="114" cy="96" r="4" fill="#2C1810"/>
+                      <circle cx="98" cy="94" r="1.5" fill="white" opacity="0.9"/>
+                      <circle cx="116" cy="94" r="1.5" fill="white" opacity="0.9"/>
+                      {/* Mouth */}
+                      <path d="M98 107 Q105 113 112 107" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.4"/>
+                      <path d="M98 107 Q105 114 112 107" stroke="#C67B3A" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                      {/* Cheeks */}
+                      <ellipse cx="90" cy="103" rx="5" ry="3" fill="#FFB0A0" opacity="0.35"/>
+                      <ellipse cx="120" cy="103" rx="5" ry="3" fill="#FFB0A0" opacity="0.35"/>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ email: profileDraft.email.trim() })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -884,52 +976,106 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="ph-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFDDAA"/><stop offset="100%" stopColor="#FFBB77"/></linearGradient>
-                        <linearGradient id="ph-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#5D4037"/><stop offset="100%" stopColor="#8D6E63"/></linearGradient>
-                        <linearGradient id="ph-shirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#7986CB"/><stop offset="100%" stopColor="#5C6BC0"/></linearGradient>
-                        <linearGradient id="ph-phone" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#E8EAF6"/><stop offset="100%" stopColor="#C5CAE9"/></linearGradient>
-                        <filter id="ph-shadow"><feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.12"/></filter>
+                        <linearGradient id="ph-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="ph-skin2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="ph-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#8D6E63"/><stop offset="1" stopColor="#5D4037"/></linearGradient>
+                        <linearGradient id="ph-shirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#9FA8DA"/><stop offset="0.5" stopColor="#7986CB"/><stop offset="1" stopColor="#3F51B5"/></linearGradient>
+                        <linearGradient id="ph-pants" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#4A148C"/><stop offset="1" stopColor="#311B92"/></linearGradient>
+                        <linearGradient id="ph-phone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#ECEFF1"/><stop offset="1" stopColor="#B0BEC5"/></linearGradient>
+                        <linearGradient id="ph-screen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#E8EAF6"/><stop offset="1" stopColor="#C5CAE9"/></linearGradient>
+                        <filter id="ph-shadow"><feDropShadow dx="0" dy="5" stdDeviation="7" floodOpacity="0.15"/></filter>
+                        <filter id="ph-softshadow"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.1"/></filter>
                       </defs>
+                      {/* Background sparkles */}
+                      <rect x="32" y="42" width="7" height="7" rx="1" fill="#7986CB" opacity="0.22" transform="rotate(45 35 45)"/>
+                      <circle cx="226" cy="72" r="4" fill="#5C6BC0" opacity="0.2"/>
+                      <rect x="28" y="148" width="6" height="6" rx="1" fill="#9FA8DA" opacity="0.22" transform="rotate(45 31 151)"/>
+                      <circle cx="218" cy="160" r="3" fill="#7986CB" opacity="0.2"/>
+                      <rect x="215" y="48" width="5" height="5" rx="1" fill="#5C6BC0" opacity="0.18" transform="rotate(45 217 50)"/>
                       {/* Ground shadow */}
-                      <ellipse cx="118" cy="188" rx="52" ry="7" fill="#333" opacity="0.08"/>
-                      {/* Body */}
-                      <rect x="90" y="118" width="48" height="52" rx="14" fill="url(#ph-shirt)" filter="url(#ph-shadow)"/>
-                      {/* Legs */}
-                      <rect x="96" y="162" width="13" height="22" rx="6" fill="#4E342E"/>
-                      <rect x="117" y="162" width="13" height="22" rx="6" fill="#4E342E"/>
+                      <ellipse cx="115" cy="191" rx="56" ry="7" fill="#000" opacity="0.08"/>
+                      {/* Left arm down */}
+                      <path d="M92 132 Q74 142 70 156" stroke="url(#ph-skin2)" strokeWidth="13" strokeLinecap="round" fill="none"/>
+                      {/* Left hand */}
+                      <circle cx="70" cy="157" r="7" fill="url(#ph-skin)"/>
+                      {/* Pants */}
+                      <rect x="96" y="161" width="16" height="26" rx="8" fill="url(#ph-pants)"/>
+                      <rect x="117" y="161" width="16" height="26" rx="8" fill="url(#ph-pants)"/>
+                      <rect x="96" y="161" width="37" height="6" rx="3" fill="#1A0050" opacity="0.5"/>
                       {/* Shoes */}
-                      <rect x="93" y="180" width="18" height="8" rx="4" fill="#2E2E2E"/>
-                      <rect x="114" y="180" width="18" height="8" rx="4" fill="#2E2E2E"/>
-                      {/* Right arm holding phone up */}
-                      <path d="M138 124 Q158 115 162 105" stroke="url(#ph-skin)" strokeWidth="12" strokeLinecap="round" fill="none"/>
-                      {/* Left arm */}
-                      <path d="M90 128 Q72 138 68 152" stroke="url(#ph-skin)" strokeWidth="12" strokeLinecap="round" fill="none"/>
-                      {/* Big smartphone */}
-                      <rect x="148" y="58" width="54" height="90" rx="12" fill="url(#ph-phone)" stroke="#7986CB" strokeWidth="2" filter="url(#ph-shadow)"/>
-                      <rect x="154" y="70" width="42" height="64" rx="4" fill="white"/>
-                      <circle cx="175" cy="160" r="4" stroke="#7986CB" strokeWidth="1.5" fill="none"/>
-                      <rect x="166" y="63" width="18" height="3" rx="1.5" fill="#9FA8DA"/>
-                      {/* Chat bubbles on phone screen */}
-                      <rect x="157" y="75" width="28" height="14" rx="7" fill="#C5CAE9"/>
-                      <rect x="162" y="96" width="24" height="14" rx="7" fill="#7986CB"/>
-                      <rect x="157" y="116" width="20" height="12" rx="6" fill="#C5CAE9"/>
+                      <rect x="93" y="182" width="22" height="9" rx="5" fill="#111"/>
+                      <rect x="114" y="182" width="22" height="9" rx="5" fill="#111"/>
+                      <rect x="95" y="182" width="14" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      <rect x="116" y="182" width="14" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      {/* Body/shirt */}
+                      <rect x="88" y="120" width="56" height="47" rx="16" fill="url(#ph-shirt)" filter="url(#ph-shadow)"/>
+                      {/* Collar V */}
+                      <path d="M106 120 L116 132 L126 120" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.35"/>
+                      {/* Shirt shine */}
+                      <ellipse cx="102" cy="130" rx="7" ry="4" fill="white" opacity="0.12"/>
+                      {/* Sleeve fold */}
+                      <path d="M88 138 Q84 142 84 147" stroke="#3F51B5" strokeWidth="1.5" fill="none" opacity="0.45"/>
+                      {/* Right arm raised holding phone */}
+                      <path d="M142 126 Q162 117 166 106" stroke="url(#ph-skin2)" strokeWidth="13" strokeLinecap="round" fill="none"/>
+                      {/* Right hand */}
+                      <circle cx="166" cy="104" r="7" fill="url(#ph-skin)"/>
+                      {/* Smartphone — 3D body */}
+                      <rect x="149" y="52" width="58" height="96" rx="13" fill="url(#ph-phone)" stroke="#7986CB" strokeWidth="2" filter="url(#ph-softshadow)"/>
+                      {/* Phone side highlight */}
+                      <rect x="149" y="55" width="5" height="90" rx="3" fill="white" opacity="0.15"/>
+                      {/* Phone notch / camera bar */}
+                      <rect x="167" y="57" width="22" height="4" rx="2" fill="#9FA8DA"/>
+                      <circle cx="176" cy="59" r="2" fill="#7986CB"/>
+                      {/* Phone screen */}
+                      <rect x="155" y="67" width="46" height="68" rx="5" fill="url(#ph-screen)"/>
+                      {/* Screen shine */}
+                      <rect x="157" y="69" width="16" height="4" rx="2" fill="white" opacity="0.3"/>
+                      {/* Home button */}
+                      <circle cx="178" cy="148" r="5" stroke="#7986CB" strokeWidth="2" fill="none"/>
+                      {/* Chat bubbles on screen */}
+                      <rect x="158" y="73" width="30" height="15" rx="7.5" fill="#7986CB"/>
+                      <circle cx="159" cy="88" r="4" fill="#7986CB"/>
+                      <rect x="163" y="96" width="26" height="14" rx="7" fill="white" stroke="#C5CAE9" strokeWidth="1"/>
+                      <circle cx="188" cy="110" r="4" fill="white" stroke="#C5CAE9" strokeWidth="1"/>
+                      <rect x="158" y="117" width="22" height="12" rx="6" fill="#7986CB" opacity="0.7"/>
+                      {/* Chat text lines */}
+                      <rect x="162" y="77" width="18" height="2.5" rx="1.25" fill="white" opacity="0.6"/>
+                      <rect x="162" y="82" width="12" height="2.5" rx="1.25" fill="white" opacity="0.4"/>
                       {/* Signal arcs */}
-                      <path d="M208 65 Q216 58 224 65" stroke="#7986CB" strokeWidth="2" fill="none" opacity="0.5"/>
-                      <path d="M205 57 Q216 47 227 57" stroke="#7986CB" strokeWidth="2" fill="none" opacity="0.3"/>
+                      <path d="M210 62 Q219 54 228 62" stroke="#7986CB" strokeWidth="2" fill="none" opacity="0.5"/>
+                      <path d="M207 54 Q219 43 231 54" stroke="#7986CB" strokeWidth="2" fill="none" opacity="0.3"/>
+                      {/* Neck */}
+                      <rect x="107" y="114" width="16" height="10" rx="4" fill="url(#ph-skin)"/>
+                      {/* Ears */}
+                      <ellipse cx="89" cy="99" rx="5" ry="7" fill="#FFCC88"/>
+                      <ellipse cx="141" cy="99" rx="5" ry="7" fill="#FFCC88"/>
+                      <ellipse cx="89" cy="99" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
+                      <ellipse cx="141" cy="99" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
                       {/* Head */}
-                      <circle cx="114" cy="97" r="24" fill="url(#ph-skin)" filter="url(#ph-shadow)"/>
-                      <circle cx="106" cy="89" r="9" fill="white" opacity="0.15"/>
-                      {/* Hair */}
-                      <ellipse cx="114" cy="79" rx="22" ry="10" fill="url(#ph-hair)"/>
-                      <rect x="92" y="79" width="10" height="14" rx="5" fill="url(#ph-hair)"/>
-                      <rect x="126" y="79" width="10" height="14" rx="5" fill="url(#ph-hair)"/>
+                      <circle cx="115" cy="97" r="26" fill="url(#ph-skin)" filter="url(#ph-shadow)"/>
+                      <circle cx="107" cy="88" r="9" fill="white" opacity="0.18"/>
+                      {/* Hair back */}
+                      <ellipse cx="115" cy="75" rx="24" ry="12" fill="#5D4037"/>
+                      {/* Hair main */}
+                      <ellipse cx="115" cy="74" rx="23" ry="11" fill="url(#ph-hair)"/>
+                      <rect x="92" y="74" width="12" height="18" rx="6" fill="url(#ph-hair)"/>
+                      <rect x="127" y="74" width="12" height="18" rx="6" fill="url(#ph-hair)"/>
+                      {/* Hair highlight */}
+                      <path d="M104 67 Q113 63 122 67" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.15"/>
+                      {/* Eyebrows */}
+                      <path d="M103 90 Q106 87 109 90" stroke="#5D4037" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      <path d="M121 90 Q124 87 127 90" stroke="#5D4037" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
                       {/* Eyes */}
-                      <circle cx="107" cy="97" r="3.5" fill="#3E2723"/>
-                      <circle cx="121" cy="97" r="3.5" fill="#3E2723"/>
-                      <circle cx="108" cy="95.5" r="1" fill="white"/>
-                      <circle cx="122" cy="95.5" r="1" fill="white"/>
-                      {/* Smile */}
-                      <path d="M108 106 Q114 112 120 106" stroke="#C67B3A" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      <circle cx="106" cy="96" r="4" fill="#2C1810"/>
+                      <circle cx="124" cy="96" r="4" fill="#2C1810"/>
+                      <circle cx="108" cy="94" r="1.5" fill="white" opacity="0.9"/>
+                      <circle cx="126" cy="94" r="1.5" fill="white" opacity="0.9"/>
+                      {/* Mouth */}
+                      <path d="M108 107 Q115 113 122 107" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.4"/>
+                      <path d="M108 107 Q115 114 122 107" stroke="#C67B3A" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                      {/* Cheeks */}
+                      <ellipse cx="100" cy="103" rx="5" ry="3" fill="#FFB0A0" opacity="0.35"/>
+                      <ellipse cx="130" cy="103" rx="5" ry="3" fill="#FFB0A0" opacity="0.35"/>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ phone: profileDraft.phone.trim() || undefined })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -951,67 +1097,115 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="bd-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFDDAA"/><stop offset="100%" stopColor="#FFBB77"/></linearGradient>
-                        <linearGradient id="bd-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#5D4037"/><stop offset="100%" stopColor="#8D6E63"/></linearGradient>
-                        <linearGradient id="bd-shirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#F48FB1"/><stop offset="100%" stopColor="#E91E8C"/></linearGradient>
-                        <linearGradient id="bd-cake1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFCCBC"/><stop offset="100%" stopColor="#FFAB91"/></linearGradient>
-                        <linearGradient id="bd-cake2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FF8A65"/><stop offset="100%" stopColor="#FF5722"/></linearGradient>
-                        <filter id="bd-shadow"><feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.12"/></filter>
+                        <linearGradient id="bd-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="bd-skin2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="bd-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#8D6E63"/><stop offset="1" stopColor="#5D4037"/></linearGradient>
+                        <linearGradient id="bd-shirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#F48FB1"/><stop offset="0.5" stopColor="#EC407A"/><stop offset="1" stopColor="#C2185B"/></linearGradient>
+                        <linearGradient id="bd-pants" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#880E4F"/><stop offset="1" stopColor="#4A0030"/></linearGradient>
+                        <linearGradient id="bd-cake1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFE0C8"/><stop offset="1" stopColor="#FFAB91"/></linearGradient>
+                        <linearGradient id="bd-cake2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FF8A65"/><stop offset="1" stopColor="#E64A19"/></linearGradient>
+                        <linearGradient id="bd-cake3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#F06292"/><stop offset="1" stopColor="#E91E63"/></linearGradient>
+                        <filter id="bd-shadow"><feDropShadow dx="0" dy="5" stdDeviation="7" floodOpacity="0.15"/></filter>
+                        <filter id="bd-softshadow"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.1"/></filter>
                       </defs>
+                      {/* Confetti / sparkles */}
+                      <rect x="30" y="50" width="8" height="4" rx="2" fill="#F48FB1" opacity="0.7" transform="rotate(-20 30 50)"/>
+                      <rect x="212" y="45" width="8" height="4" rx="2" fill="#64B5F6" opacity="0.7" transform="rotate(18 212 45)"/>
+                      <circle cx="40" cy="90" r="4" fill="#FFD54F" opacity="0.6"/>
+                      <circle cx="222" cy="82" r="4" fill="#81C784" opacity="0.55"/>
+                      <rect x="32" y="140" width="6" height="3" rx="1.5" fill="#CE93D8" opacity="0.6" transform="rotate(30 32 140)"/>
+                      <rect x="215" y="148" width="6" height="3" rx="1.5" fill="#EF5350" opacity="0.5" transform="rotate(-25 215 148)"/>
                       {/* Ground shadow */}
-                      <ellipse cx="130" cy="190" rx="58" ry="7" fill="#333" opacity="0.08"/>
-                      {/* Body */}
-                      <rect x="100" y="118" width="48" height="52" rx="14" fill="url(#bd-shirt)" filter="url(#bd-shadow)"/>
-                      {/* Legs */}
-                      <rect x="106" y="162" width="13" height="22" rx="6" fill="#4E342E"/>
-                      <rect x="127" y="162" width="13" height="22" rx="6" fill="#4E342E"/>
-                      {/* Shoes */}
-                      <rect x="103" y="180" width="18" height="8" rx="4" fill="#2E2E2E"/>
-                      <rect x="124" y="180" width="18" height="8" rx="4" fill="#2E2E2E"/>
-                      {/* Left arm holding cake tray */}
-                      <path d="M100 126 Q80 132 68 142" stroke="url(#bd-skin)" strokeWidth="12" strokeLinecap="round" fill="none"/>
-                      {/* Right arm holding cake tray */}
-                      <path d="M148 126 Q168 132 178 142" stroke="url(#bd-skin)" strokeWidth="12" strokeLinecap="round" fill="none"/>
-                      {/* Cake bottom tier */}
-                      <rect x="68" y="142" width="110" height="30" rx="8" fill="url(#bd-cake1)" filter="url(#bd-shadow)"/>
-                      {/* Cake middle tier */}
-                      <rect x="80" y="118" width="86" height="26" rx="7" fill="url(#bd-cake2)"/>
-                      {/* Frosting drips */}
-                      <path d="M80 118 Q90 112 100 118 Q110 112 120 118 Q130 112 140 118 Q150 112 160 118 Q165 112 166 118" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none"/>
+                      <ellipse cx="124" cy="191" rx="62" ry="7" fill="#000" opacity="0.08"/>
+                      {/* Left arm out */}
+                      <path d="M103 128 Q84 134 72 144" stroke="url(#bd-skin2)" strokeWidth="13" strokeLinecap="round" fill="none"/>
+                      {/* Right arm out */}
+                      <path d="M151 128 Q170 134 180 144" stroke="url(#bd-skin2)" strokeWidth="13" strokeLinecap="round" fill="none"/>
+                      {/* Left hand */}
+                      <circle cx="72" cy="145" r="7" fill="url(#bd-skin)"/>
+                      {/* Right hand */}
+                      <circle cx="180" cy="145" r="7" fill="url(#bd-skin)"/>
+                      {/* Cake — bottom tier */}
+                      <rect x="66" y="144" width="116" height="34" rx="10" fill="url(#bd-cake1)" filter="url(#bd-softshadow)"/>
+                      <rect x="66" y="144" width="116" height="8" rx="10" fill="white" opacity="0.25"/>
+                      {/* Cake — middle tier */}
+                      <rect x="80" y="116" width="88" height="30" rx="8" fill="url(#bd-cake2)" filter="url(#bd-softshadow)"/>
+                      {/* Frosting drips on middle */}
+                      <path d="M80 116 Q88 109 96 116 Q104 109 112 116 Q120 109 128 116 Q136 109 144 116 Q152 109 160 116 Q164 110 168 116" stroke="white" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.85"/>
+                      {/* Cake — top tier */}
+                      <rect x="96" y="96" width="56" height="22" rx="7" fill="url(#bd-cake3)"/>
+                      {/* Frosting drips on top */}
+                      <path d="M96 96 Q102 90 108 96 Q114 90 120 96 Q126 90 132 96 Q138 90 144 96 Q148 91 152 96" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.7"/>
+                      {/* Cake shine */}
+                      <rect x="70" y="146" width="24" height="5" rx="2.5" fill="white" opacity="0.2"/>
+                      <rect x="84" y="118" width="18" height="4" rx="2" fill="white" opacity="0.2"/>
                       {/* Candles */}
-                      <rect x="98" y="100" width="7" height="20" rx="3.5" fill="#64B5F6"/>
-                      <ellipse cx="101.5" cy="98" rx="4" ry="5" fill="#FFD54F"/>
-                      <ellipse cx="101.5" cy="96" rx="1.5" ry="3" fill="#FFF176"/>
-                      <rect x="120" y="95" width="7" height="25" rx="3.5" fill="#F48FB1"/>
-                      <ellipse cx="123.5" cy="93" rx="4" ry="5" fill="#FFD54F"/>
-                      <ellipse cx="123.5" cy="91" rx="1.5" ry="3" fill="#FFF176"/>
-                      <rect x="142" y="100" width="7" height="20" rx="3.5" fill="#81C784"/>
-                      <ellipse cx="145.5" cy="98" rx="4" ry="5" fill="#FFD54F"/>
-                      <ellipse cx="145.5" cy="96" rx="1.5" ry="3" fill="#FFF176"/>
+                      <rect x="101" y="76" width="8" height="22" rx="4" fill="#64B5F6"/>
+                      <rect x="103" y="76" width="3" height="10" rx="1.5" fill="white" opacity="0.2"/>
+                      <ellipse cx="105" cy="74" rx="5" ry="6" fill="#FFD54F"/>
+                      <ellipse cx="105" cy="71" rx="2" ry="4" fill="#FFF59D"/>
+                      <rect x="120" y="70" width="8" height="28" rx="4" fill="#F48FB1"/>
+                      <rect x="122" y="70" width="3" height="12" rx="1.5" fill="white" opacity="0.2"/>
+                      <ellipse cx="124" cy="68" rx="5" ry="6" fill="#FFD54F"/>
+                      <ellipse cx="124" cy="65" rx="2" ry="4" fill="#FFF59D"/>
+                      <rect x="139" y="76" width="8" height="22" rx="4" fill="#81C784"/>
+                      <rect x="141" y="76" width="3" height="10" rx="1.5" fill="white" opacity="0.2"/>
+                      <ellipse cx="143" cy="74" rx="5" ry="6" fill="#FFD54F"/>
+                      <ellipse cx="143" cy="71" rx="2" ry="4" fill="#FFF59D"/>
                       {/* Party hat */}
-                      <path d="M116 72 L124 45 L132 72Z" fill="#F48FB1"/>
-                      <path d="M116 72 L124 45 L132 72Z" fill="#EF5350" opacity="0.4"/>
-                      <circle cx="124" cy="43" r="4" fill="#FFD54F"/>
-                      <rect x="116" y="70" width="16" height="5" rx="2.5" fill="#CE93D8"/>
-                      {/* Confetti */}
-                      <rect x="38" y="55" width="8" height="4" rx="2" fill="#F48FB1" transform="rotate(-20 38 55)"/>
-                      <rect x="210" y="50" width="8" height="4" rx="2" fill="#64B5F6" transform="rotate(15 210 50)"/>
-                      <circle cx="45" cy="85" r="3" fill="#FFD54F"/>
-                      <circle cx="218" cy="80" r="3" fill="#81C784"/>
+                      <path d="M114 72 L124 40 L134 72Z" fill="#F48FB1"/>
+                      <path d="M118 68 L124 48 L130 68Z" fill="#EC407A" opacity="0.5"/>
+                      <path d="M114 68 Q124 72 134 68" stroke="white" strokeWidth="1" fill="none" opacity="0.4"/>
+                      <circle cx="124" cy="38" r="5" fill="#FFD54F"/>
+                      <rect x="113" y="69" width="22" height="6" rx="3" fill="#CE93D8"/>
+                      {/* Pants */}
+                      <rect x="106" y="162" width="15" height="26" rx="8" fill="url(#bd-pants)"/>
+                      <rect x="128" y="162" width="15" height="26" rx="8" fill="url(#bd-pants)"/>
+                      <rect x="106" y="162" width="37" height="6" rx="3" fill="#2E0020" opacity="0.5"/>
+                      {/* Shoes */}
+                      <rect x="103" y="182" width="21" height="9" rx="5" fill="#111"/>
+                      <rect x="125" y="182" width="21" height="9" rx="5" fill="#111"/>
+                      <rect x="105" y="182" width="13" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      <rect x="127" y="182" width="13" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      {/* Body/shirt */}
+                      <rect x="100" y="120" width="56" height="48" rx="16" fill="url(#bd-shirt)" filter="url(#bd-shadow)"/>
+                      {/* Collar */}
+                      <path d="M118 120 L128 131 L138 120" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.35"/>
+                      {/* Shirt shine */}
+                      <ellipse cx="113" cy="130" rx="7" ry="4" fill="white" opacity="0.14"/>
+                      {/* Neck */}
+                      <rect x="120" y="112" width="16" height="12" rx="4" fill="url(#bd-skin)"/>
+                      {/* Ears */}
+                      <ellipse cx="101" cy="90" rx="5" ry="7" fill="#FFCC88"/>
+                      <ellipse cx="147" cy="90" rx="5" ry="7" fill="#FFCC88"/>
+                      <ellipse cx="101" cy="90" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
+                      <ellipse cx="147" cy="90" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
                       {/* Head */}
-                      <circle cx="124" cy="88" r="22" fill="url(#bd-skin)" filter="url(#bd-shadow)"/>
-                      <circle cx="116" cy="80" r="8" fill="white" opacity="0.15"/>
-                      {/* Hair */}
-                      <ellipse cx="124" cy="71" rx="20" ry="9" fill="url(#bd-hair)"/>
-                      <rect x="104" y="71" width="9" height="12" rx="4.5" fill="url(#bd-hair)"/>
-                      <rect x="135" y="71" width="9" height="12" rx="4.5" fill="url(#bd-hair)"/>
-                      {/* Eyes */}
-                      <circle cx="117" cy="88" r="3.2" fill="#3E2723"/>
-                      <circle cx="131" cy="88" r="3.2" fill="#3E2723"/>
-                      <circle cx="118" cy="86.5" r="1" fill="white"/>
-                      <circle cx="132" cy="86.5" r="1" fill="white"/>
-                      {/* Smile */}
-                      <path d="M118 96 Q124 103 130 96" stroke="#C67B3A" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      <circle cx="124" cy="88" r="26" fill="url(#bd-skin)" filter="url(#bd-shadow)"/>
+                      <circle cx="116" cy="78" r="9" fill="white" opacity="0.18"/>
+                      {/* Hair back */}
+                      <ellipse cx="124" cy="65" rx="23" ry="12" fill="#5D4037"/>
+                      {/* Hair main */}
+                      <ellipse cx="124" cy="64" rx="22" ry="11" fill="url(#bd-hair)"/>
+                      <rect x="102" y="64" width="12" height="18" rx="6" fill="url(#bd-hair)"/>
+                      <rect x="136" y="64" width="12" height="18" rx="6" fill="url(#bd-hair)"/>
+                      {/* Hair highlight */}
+                      <path d="M113 57 Q122 53 131 57" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.15"/>
+                      {/* Eyebrows */}
+                      <path d="M112 82 Q115 79 118 82" stroke="#5D4037" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      <path d="M130 82 Q133 79 136 82" stroke="#5D4037" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      {/* Eyes — happy squint */}
+                      <path d="M112 88 Q115 85 118 88" stroke="#2C1810" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+                      <path d="M130 88 Q133 85 136 88" stroke="#2C1810" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+                      {/* Eye highlights */}
+                      <circle cx="115" cy="87" r="1.5" fill="white" opacity="0.8"/>
+                      <circle cx="133" cy="87" r="1.5" fill="white" opacity="0.8"/>
+                      {/* Big smile */}
+                      <path d="M116 98 Q124 107 132 98" stroke="white" strokeWidth="3.5" strokeLinecap="round" fill="none" opacity="0.4"/>
+                      <path d="M116 98 Q124 108 132 98" stroke="#C67B3A" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+                      {/* Cheeks */}
+                      <ellipse cx="110" cy="96" rx="6" ry="4" fill="#FFB0A0" opacity="0.45"/>
+                      <ellipse cx="138" cy="96" rx="6" ry="4" fill="#FFB0A0" opacity="0.45"/>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ birthDate: profileDraft.birthDate || undefined })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -1045,66 +1239,141 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="gn-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFDDAA"/><stop offset="100%" stopColor="#FFBB77"/></linearGradient>
-                        <linearGradient id="gn-hairB" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#1565C0"/><stop offset="100%" stopColor="#1E88E5"/></linearGradient>
-                        <linearGradient id="gn-hairP" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#880E4F"/><stop offset="100%" stopColor="#E91E8C"/></linearGradient>
-                        <linearGradient id="gn-shirtB" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#42A5F5"/><stop offset="100%" stopColor="#1E88E5"/></linearGradient>
-                        <linearGradient id="gn-shirtP" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#F48FB1"/><stop offset="100%" stopColor="#E91E8C"/></linearGradient>
-                        <filter id="gn-shadow"><feDropShadow dx="0" dy="4" stdDeviation="5" floodOpacity="0.12"/></filter>
+                        <linearGradient id="gn-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="gn-skin2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="gn-hairB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#1E88E5"/><stop offset="1" stopColor="#0D47A1"/></linearGradient>
+                        <linearGradient id="gn-hairP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#E91E8C"/><stop offset="1" stopColor="#880E4F"/></linearGradient>
+                        <linearGradient id="gn-shirtB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#64B5F6"/><stop offset="0.5" stopColor="#42A5F5"/><stop offset="1" stopColor="#1565C0"/></linearGradient>
+                        <linearGradient id="gn-shirtP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#F48FB1"/><stop offset="0.5" stopColor="#EC407A"/><stop offset="1" stopColor="#AD1457"/></linearGradient>
+                        <linearGradient id="gn-pantsB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#1A237E"/><stop offset="1" stopColor="#0D1457"/></linearGradient>
+                        <linearGradient id="gn-pantsP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#4A148C"/><stop offset="1" stopColor="#2E0060"/></linearGradient>
+                        <linearGradient id="gn-heart" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#EF5350"/><stop offset="1" stopColor="#B71C1C"/></linearGradient>
+                        <filter id="gn-shadow"><feDropShadow dx="0" dy="5" stdDeviation="6" floodOpacity="0.15"/></filter>
+                        <filter id="gn-softshadow"><feDropShadow dx="0" dy="3" stdDeviation="3" floodOpacity="0.1"/></filter>
                       </defs>
+                      {/* Background sparkles */}
+                      <rect x="20" y="80" width="6" height="6" rx="1" fill="#42A5F5" opacity="0.22" transform="rotate(45 23 83)"/>
+                      <rect x="234" y="78" width="6" height="6" rx="1" fill="#EC407A" opacity="0.22" transform="rotate(45 237 81)"/>
+                      <circle cx="128" cy="22" r="4" fill="#EF5350" opacity="0.3"/>
+                      <rect x="125" y="18" width="6" height="6" rx="1" fill="#EF5350" opacity="0.15" transform="rotate(45 128 21)"/>
                       {/* Ground shadows */}
-                      <ellipse cx="88" cy="188" rx="40" ry="6" fill="#333" opacity="0.08"/>
-                      <ellipse cx="172" cy="188" rx="40" ry="6" fill="#333" opacity="0.08"/>
+                      <ellipse cx="87" cy="191" rx="44" ry="6" fill="#000" opacity="0.08"/>
+                      <ellipse cx="173" cy="191" rx="44" ry="6" fill="#000" opacity="0.08"/>
                       {/* ── Blue person (left) ── */}
-                      <rect x="62" y="122" width="40" height="46" rx="12" fill="url(#gn-shirtB)" filter="url(#gn-shadow)"/>
-                      <rect x="67" y="160" width="11" height="22" rx="5.5" fill="#1A237E"/>
-                      <rect x="84" y="160" width="11" height="22" rx="5.5" fill="#1A237E"/>
-                      <rect x="64" y="178" width="16" height="7" rx="3.5" fill="#111"/>
-                      <rect x="81" y="178" width="16" height="7" rx="3.5" fill="#111"/>
-                      {/* Blue person right arm toward heart */}
-                      <path d="M102 130 Q116 128 120 136" stroke="url(#gn-skin)" strokeWidth="10" strokeLinecap="round" fill="none"/>
-                      {/* Blue person left arm */}
-                      <path d="M62 130 Q48 138 44 150" stroke="url(#gn-skin)" strokeWidth="10" strokeLinecap="round" fill="none"/>
+                      {/* Blue left arm */}
+                      <path d="M65 133 Q52 141 47 153" stroke="url(#gn-skin2)" strokeWidth="11" strokeLinecap="round" fill="none"/>
+                      {/* Blue left hand */}
+                      <circle cx="47" cy="154" r="6" fill="url(#gn-skin)"/>
+                      {/* Blue pants */}
+                      <rect x="67" y="161" width="13" height="25" rx="7" fill="url(#gn-pantsB)"/>
+                      <rect x="84" y="161" width="13" height="25" rx="7" fill="url(#gn-pantsB)"/>
+                      <rect x="67" y="161" width="30" height="6" rx="3" fill="#060B28" opacity="0.5"/>
+                      {/* Blue shoes */}
+                      <rect x="64" y="181" width="19" height="8" rx="4" fill="#111"/>
+                      <rect x="82" y="181" width="19" height="8" rx="4" fill="#111"/>
+                      <rect x="66" y="181" width="11" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      <rect x="84" y="181" width="11" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      {/* Blue shirt body */}
+                      <rect x="62" y="123" width="50" height="44" rx="14" fill="url(#gn-shirtB)" filter="url(#gn-shadow)"/>
+                      {/* Blue collar */}
+                      <path d="M79 123 L87 133 L95 123" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.35"/>
+                      {/* Blue shirt shine */}
+                      <ellipse cx="75" cy="131" rx="6" ry="3.5" fill="white" opacity="0.12"/>
+                      {/* Blue right arm toward heart */}
+                      <path d="M112 131 Q120 128 124 136" stroke="url(#gn-skin2)" strokeWidth="11" strokeLinecap="round" fill="none"/>
+                      <circle cx="124" cy="137" r="6" fill="url(#gn-skin)"/>
+                      {/* Blue neck */}
+                      <rect x="80" y="116" width="14" height="10" rx="4" fill="url(#gn-skin)"/>
+                      {/* Blue ears */}
+                      <ellipse cx="63" cy="103" rx="4.5" ry="6.5" fill="#FFCC88"/>
+                      <ellipse cx="63" cy="103" rx="2.5" ry="4.5" fill="#FFB870" opacity="0.6"/>
+                      <ellipse cx="101" cy="103" rx="4.5" ry="6.5" fill="#FFCC88"/>
+                      <ellipse cx="101" cy="103" rx="2.5" ry="4.5" fill="#FFB870" opacity="0.6"/>
                       {/* Blue head */}
-                      <circle cx="82" cy="102" r="21" fill="url(#gn-skin)" filter="url(#gn-shadow)"/>
-                      <circle cx="75" cy="94" r="8" fill="white" opacity="0.15"/>
-                      {/* Blue hair */}
-                      <ellipse cx="82" cy="85" rx="19" ry="9" fill="url(#gn-hairB)"/>
-                      <rect x="63" y="85" width="8" height="12" rx="4" fill="url(#gn-hairB)"/>
-                      <rect x="93" y="85" width="8" height="12" rx="4" fill="url(#gn-hairB)"/>
+                      <circle cx="82" cy="102" r="23" fill="url(#gn-skin)" filter="url(#gn-shadow)"/>
+                      <circle cx="75" cy="93" r="8" fill="white" opacity="0.18"/>
+                      {/* Blue hair back */}
+                      <ellipse cx="82" cy="82" rx="21" ry="11" fill="#0D47A1"/>
+                      {/* Blue hair main */}
+                      <ellipse cx="82" cy="81" rx="20" ry="10" fill="url(#gn-hairB)"/>
+                      <rect x="63" y="81" width="10" height="14" rx="5" fill="url(#gn-hairB)"/>
+                      <rect x="93" y="81" width="10" height="14" rx="5" fill="url(#gn-hairB)"/>
+                      {/* Blue hair highlight */}
+                      <path d="M73 74 Q81 70 89 74" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.15"/>
+                      {/* Blue eyebrows */}
+                      <path d="M71 95 Q74 92 77 95" stroke="#5D4037" strokeWidth="1.6" strokeLinecap="round" fill="none"/>
+                      <path d="M87 95 Q90 92 93 95" stroke="#5D4037" strokeWidth="1.6" strokeLinecap="round" fill="none"/>
                       {/* Blue eyes */}
-                      <circle cx="76" cy="102" r="3" fill="#3E2723"/>
-                      <circle cx="88" cy="102" r="3" fill="#3E2723"/>
-                      <circle cx="77" cy="100.5" r="0.9" fill="white"/>
-                      <circle cx="89" cy="100.5" r="0.9" fill="white"/>
-                      <path d="M77 109 Q82 115 87 109" stroke="#C67B3A" strokeWidth="1.6" strokeLinecap="round" fill="none"/>
+                      <circle cx="75" cy="101" r="3.5" fill="#2C1810"/>
+                      <circle cx="89" cy="101" r="3.5" fill="#2C1810"/>
+                      <circle cx="77" cy="99" r="1.2" fill="white" opacity="0.9"/>
+                      <circle cx="91" cy="99" r="1.2" fill="white" opacity="0.9"/>
+                      {/* Blue smile */}
+                      <path d="M77 109 Q82 115 87 109" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.4"/>
+                      <path d="M77 109 Q82 116 87 109" stroke="#C67B3A" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      {/* Blue cheeks */}
+                      <ellipse cx="70" cy="106" rx="4.5" ry="3" fill="#FFB0A0" opacity="0.35"/>
+                      <ellipse cx="94" cy="106" rx="4.5" ry="3" fill="#FFB0A0" opacity="0.35"/>
                       {/* ── Heart in center ── */}
-                      <path d="M120 118 C120 108 130 104 133 112 C136 104 146 108 146 118 C146 132 133 140 133 140 C133 140 120 132 120 118Z" fill="#EF5350" filter="url(#gn-shadow)"/>
-                      <circle cx="133" cy="115" r="3" fill="white" opacity="0.3"/>
+                      <path d="M118 118 C118 107 129 102 132 111 C135 102 146 107 146 118 C146 133 132 142 132 142 C132 142 118 133 118 118Z" fill="url(#gn-heart)" filter="url(#gn-softshadow)"/>
+                      <ellipse cx="127" cy="112" rx="5" ry="3" fill="white" opacity="0.25"/>
+                      <circle cx="132" cy="113" r="4" fill="white" opacity="0.12"/>
                       {/* ── Pink person (right) ── */}
-                      <rect x="158" y="122" width="40" height="46" rx="12" fill="url(#gn-shirtP)" filter="url(#gn-shadow)"/>
-                      <rect x="163" y="160" width="11" height="22" rx="5.5" fill="#4A148C"/>
-                      <rect x="180" y="160" width="11" height="22" rx="5.5" fill="#4A148C"/>
-                      <rect x="160" y="178" width="16" height="7" rx="3.5" fill="#111"/>
-                      <rect x="177" y="178" width="16" height="7" rx="3.5" fill="#111"/>
-                      {/* Pink person left arm toward heart */}
-                      <path d="M158 130 Q146 128 142 136" stroke="url(#gn-skin)" strokeWidth="10" strokeLinecap="round" fill="none"/>
-                      {/* Pink person right arm */}
-                      <path d="M198 130 Q212 138 216 150" stroke="url(#gn-skin)" strokeWidth="10" strokeLinecap="round" fill="none"/>
+                      {/* Pink right arm */}
+                      <path d="M195 133 Q208 141 213 153" stroke="url(#gn-skin2)" strokeWidth="11" strokeLinecap="round" fill="none"/>
+                      <circle cx="213" cy="154" r="6" fill="url(#gn-skin)"/>
+                      {/* Pink pants */}
+                      <rect x="163" y="161" width="13" height="25" rx="7" fill="url(#gn-pantsP)"/>
+                      <rect x="180" y="161" width="13" height="25" rx="7" fill="url(#gn-pantsP)"/>
+                      <rect x="163" y="161" width="30" height="6" rx="3" fill="#1A0040" opacity="0.5"/>
+                      {/* Pink shoes */}
+                      <rect x="160" y="181" width="19" height="8" rx="4" fill="#111"/>
+                      <rect x="178" y="181" width="19" height="8" rx="4" fill="#111"/>
+                      <rect x="162" y="181" width="11" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      <rect x="180" y="181" width="11" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      {/* Pink shirt body */}
+                      <rect x="158" y="123" width="50" height="44" rx="14" fill="url(#gn-shirtP)" filter="url(#gn-shadow)"/>
+                      {/* Pink collar */}
+                      <path d="M175 123 L183 133 L191 123" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.35"/>
+                      {/* Pink shirt shine */}
+                      <ellipse cx="171" cy="131" rx="6" ry="3.5" fill="white" opacity="0.12"/>
+                      {/* Pink left arm toward heart */}
+                      <path d="M158 131 Q148 128 144 136" stroke="url(#gn-skin2)" strokeWidth="11" strokeLinecap="round" fill="none"/>
+                      <circle cx="143" cy="137" r="6" fill="url(#gn-skin)"/>
+                      {/* Pink neck */}
+                      <rect x="176" y="116" width="14" height="10" rx="4" fill="url(#gn-skin)"/>
+                      {/* Pink ears */}
+                      <ellipse cx="159" cy="103" rx="4.5" ry="6.5" fill="#FFCC88"/>
+                      <ellipse cx="159" cy="103" rx="2.5" ry="4.5" fill="#FFB870" opacity="0.6"/>
+                      <ellipse cx="197" cy="103" rx="4.5" ry="6.5" fill="#FFCC88"/>
+                      <ellipse cx="197" cy="103" rx="2.5" ry="4.5" fill="#FFB870" opacity="0.6"/>
                       {/* Pink head */}
-                      <circle cx="178" cy="102" r="21" fill="url(#gn-skin)" filter="url(#gn-shadow)"/>
-                      <circle cx="170" cy="94" r="8" fill="white" opacity="0.15"/>
-                      {/* Pink hair (longer) */}
-                      <ellipse cx="178" cy="83" rx="19" ry="10" fill="url(#gn-hairP)"/>
-                      <rect x="159" y="83" width="8" height="20" rx="4" fill="url(#gn-hairP)"/>
-                      <rect x="191" y="83" width="8" height="20" rx="4" fill="url(#gn-hairP)"/>
-                      <ellipse cx="178" cy="100" rx="19" ry="5" fill="url(#gn-hairP)" opacity="0.3"/>
+                      <circle cx="178" cy="102" r="23" fill="url(#gn-skin)" filter="url(#gn-shadow)"/>
+                      <circle cx="170" cy="93" r="8" fill="white" opacity="0.18"/>
+                      {/* Pink hair back (longer) */}
+                      <ellipse cx="178" cy="80" rx="21" ry="12" fill="#880E4F"/>
+                      <rect x="157" y="80" width="10" height="24" rx="5" fill="#880E4F"/>
+                      <rect x="191" y="80" width="10" height="24" rx="5" fill="#880E4F"/>
+                      {/* Pink hair main */}
+                      <ellipse cx="178" cy="79" rx="20" ry="11" fill="url(#gn-hairP)"/>
+                      <rect x="158" y="79" width="9" height="22" rx="4.5" fill="url(#gn-hairP)"/>
+                      <rect x="193" y="79" width="9" height="22" rx="4.5" fill="url(#gn-hairP)"/>
+                      {/* Pink hair highlight */}
+                      <path d="M169 72 Q177 68 185 72" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.15"/>
+                      {/* Pink eyebrows */}
+                      <path d="M167 95 Q170 92 173 95" stroke="#5D4037" strokeWidth="1.6" strokeLinecap="round" fill="none"/>
+                      <path d="M183 95 Q186 92 189 95" stroke="#5D4037" strokeWidth="1.6" strokeLinecap="round" fill="none"/>
                       {/* Pink eyes */}
-                      <circle cx="172" cy="102" r="3" fill="#3E2723"/>
-                      <circle cx="184" cy="102" r="3" fill="#3E2723"/>
-                      <circle cx="173" cy="100.5" r="0.9" fill="white"/>
-                      <circle cx="185" cy="100.5" r="0.9" fill="white"/>
-                      <path d="M173 109 Q178 115 183 109" stroke="#C67B3A" strokeWidth="1.6" strokeLinecap="round" fill="none"/>
+                      <circle cx="171" cy="101" r="3.5" fill="#2C1810"/>
+                      <circle cx="185" cy="101" r="3.5" fill="#2C1810"/>
+                      <circle cx="173" cy="99" r="1.2" fill="white" opacity="0.9"/>
+                      <circle cx="187" cy="99" r="1.2" fill="white" opacity="0.9"/>
+                      {/* Pink smile */}
+                      <path d="M173 109 Q178 115 183 109" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.4"/>
+                      <path d="M173 109 Q178 116 183 109" stroke="#C67B3A" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      {/* Pink cheeks */}
+                      <ellipse cx="166" cy="106" rx="4.5" ry="3" fill="#FFB0A0" opacity="0.4"/>
+                      <ellipse cx="190" cy="106" rx="4.5" ry="3" fill="#FFB0A0" opacity="0.4"/>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ gender: profileDraft.gender || undefined })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -1138,51 +1407,105 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="ad-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFDDAA"/><stop offset="100%" stopColor="#FFBB77"/></linearGradient>
-                        <linearGradient id="ad-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#5D4037"/><stop offset="100%" stopColor="#8D6E63"/></linearGradient>
-                        <linearGradient id="ad-shirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#81C784"/><stop offset="100%" stopColor="#4CAF50"/></linearGradient>
-                        <linearGradient id="ad-house" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFF3E0"/><stop offset="100%" stopColor="#FFE0B2"/></linearGradient>
-                        <filter id="ad-shadow"><feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.12"/></filter>
+                        <linearGradient id="ad-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="ad-skin2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="ad-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#8D6E63"/><stop offset="1" stopColor="#5D4037"/></linearGradient>
+                        <linearGradient id="ad-shirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#A5D6A7"/><stop offset="0.5" stopColor="#66BB6A"/><stop offset="1" stopColor="#2E7D32"/></linearGradient>
+                        <linearGradient id="ad-pants" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#4E342E"/><stop offset="1" stopColor="#2C1810"/></linearGradient>
+                        <linearGradient id="ad-house" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFF8F0"/><stop offset="1" stopColor="#FFE0B2"/></linearGradient>
+                        <linearGradient id="ad-roof" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FF8A65"/><stop offset="1" stopColor="#E64A19"/></linearGradient>
+                        <linearGradient id="ad-door" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#A1887F"/><stop offset="1" stopColor="#6D4C41"/></linearGradient>
+                        <linearGradient id="ad-pin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#EF5350"/><stop offset="1" stopColor="#B71C1C"/></linearGradient>
+                        <filter id="ad-shadow"><feDropShadow dx="0" dy="5" stdDeviation="7" floodOpacity="0.15"/></filter>
+                        <filter id="ad-softshadow"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.1"/></filter>
                       </defs>
-                      {/* Ground */}
-                      <ellipse cx="130" cy="188" rx="105" ry="10" fill="#C8E6C9" opacity="0.6"/>
-                      <ellipse cx="130" cy="188" rx="55" ry="7" fill="#333" opacity="0.07"/>
-                      {/* House (smaller, right side) */}
-                      <rect x="148" y="108" width="72" height="60" rx="4" fill="url(#ad-house)" stroke="#F5A623" strokeWidth="1.5" filter="url(#ad-shadow)"/>
-                      <path d="M142 114 L184 78 L226 114Z" fill="#FF8A65"/>
-                      <rect x="166" y="136" width="20" height="32" rx="3" fill="#8D6E63"/>
-                      <circle cx="181" cy="154" r="2" fill="#FFD54F"/>
-                      <rect x="153" y="118" width="13" height="13" rx="2" fill="#BBDEFB" stroke="#64B5F6" strokeWidth="0.8"/>
-                      <rect x="202" y="118" width="13" height="13" rx="2" fill="#BBDEFB" stroke="#64B5F6" strokeWidth="0.8"/>
-                      {/* Location pin above house */}
-                      <path d="M184 42 C174 42 166 50 166 60 C166 74 184 88 184 88 C184 88 202 74 202 60 C202 50 194 42 184 42Z" fill="#EF5350" filter="url(#ad-shadow)"/>
-                      <circle cx="184" cy="59" r="7" fill="white"/>
-                      {/* Body */}
-                      <rect x="72" y="120" width="46" height="50" rx="13" fill="url(#ad-shirt)" filter="url(#ad-shadow)"/>
-                      {/* Legs */}
-                      <rect x="78" y="162" width="12" height="22" rx="6" fill="#4E342E"/>
-                      <rect x="97" y="162" width="12" height="22" rx="6" fill="#4E342E"/>
-                      {/* Shoes */}
-                      <rect x="75" y="180" width="17" height="8" rx="4" fill="#2E2E2E"/>
-                      <rect x="95" y="180" width="17" height="8" rx="4" fill="#2E2E2E"/>
-                      {/* Right arm pointing at house */}
-                      <path d="M118 128 Q138 118 148 120" stroke="url(#ad-skin)" strokeWidth="11" strokeLinecap="round" fill="none"/>
+                      {/* Background sparkles */}
+                      <rect x="28" y="55" width="7" height="7" rx="1" fill="#66BB6A" opacity="0.22" transform="rotate(45 31 58)"/>
+                      <circle cx="225" cy="150" r="4" fill="#4CAF50" opacity="0.2"/>
+                      <circle cx="30" cy="145" r="3" fill="#81C784" opacity="0.22"/>
+                      <rect x="210" y="50" width="5" height="5" rx="1" fill="#EF5350" opacity="0.2" transform="rotate(45 212 52)"/>
+                      {/* Ground — green grass hint */}
+                      <ellipse cx="128" cy="191" rx="108" ry="10" fill="#C8E6C9" opacity="0.5"/>
+                      <ellipse cx="128" cy="191" rx="58" ry="7" fill="#000" opacity="0.07"/>
+                      {/* House body */}
+                      <rect x="148" y="108" width="78" height="66" rx="5" fill="url(#ad-house)" stroke="#F5A623" strokeWidth="1.5" filter="url(#ad-softshadow)"/>
+                      {/* House shine */}
+                      <rect x="152" y="111" width="18" height="5" rx="2.5" fill="white" opacity="0.3"/>
+                      {/* Roof */}
+                      <path d="M140 115 L187 74 L234 115Z" fill="url(#ad-roof)" filter="url(#ad-softshadow)"/>
+                      {/* Roof ridge shine */}
+                      <path d="M167 96 L187 77 L207 96" stroke="white" strokeWidth="1.5" fill="none" opacity="0.2"/>
+                      {/* Door */}
+                      <rect x="172" y="137" width="22" height="37" rx="4" fill="url(#ad-door)"/>
+                      <circle cx="191" cy="157" r="2.5" fill="#FFD54F"/>
+                      {/* Door shine */}
+                      <rect x="174" y="139" width="5" height="14" rx="2.5" fill="white" opacity="0.15"/>
+                      {/* Windows */}
+                      <rect x="151" y="118" width="15" height="15" rx="3" fill="#BBDEFB" stroke="#64B5F6" strokeWidth="1"/>
+                      <line x1="158.5" y1="118" x2="158.5" y2="133" stroke="#90CAF9" strokeWidth="1"/>
+                      <line x1="151" y1="125.5" x2="166" y2="125.5" stroke="#90CAF9" strokeWidth="1"/>
+                      <rect x="203" y="118" width="15" height="15" rx="3" fill="#BBDEFB" stroke="#64B5F6" strokeWidth="1"/>
+                      <line x1="210.5" y1="118" x2="210.5" y2="133" stroke="#90CAF9" strokeWidth="1"/>
+                      <line x1="203" y1="125.5" x2="218" y2="125.5" stroke="#90CAF9" strokeWidth="1"/>
+                      {/* Location pin */}
+                      <path d="M187 34 C175 34 166 43 166 54 C166 69 187 88 187 88 C187 88 208 69 208 54 C208 43 199 34 187 34Z" fill="url(#ad-pin)" filter="url(#ad-softshadow)"/>
+                      <circle cx="187" cy="53" r="9" fill="white"/>
+                      <circle cx="187" cy="53" r="5" fill="#EF5350" opacity="0.4"/>
+                      {/* Pin shine */}
+                      <ellipse cx="182" cy="42" rx="5" ry="3" fill="white" opacity="0.25"/>
                       {/* Left arm */}
-                      <path d="M72 130 Q56 140 52 154" stroke="url(#ad-skin)" strokeWidth="11" strokeLinecap="round" fill="none"/>
+                      <path d="M74 132 Q58 142 53 156" stroke="url(#ad-skin2)" strokeWidth="13" strokeLinecap="round" fill="none"/>
+                      <circle cx="53" cy="157" r="7" fill="url(#ad-skin)"/>
+                      {/* Pants */}
+                      <rect x="79" y="163" width="14" height="26" rx="8" fill="url(#ad-pants)"/>
+                      <rect x="98" y="163" width="14" height="26" rx="8" fill="url(#ad-pants)"/>
+                      <rect x="79" y="163" width="33" height="6" rx="3" fill="#1A0B08" opacity="0.5"/>
+                      {/* Shoes */}
+                      <rect x="76" y="183" width="20" height="8" rx="5" fill="#111"/>
+                      <rect x="96" y="183" width="20" height="8" rx="5" fill="#111"/>
+                      <rect x="78" y="183" width="12" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      <rect x="98" y="183" width="12" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      {/* Body/shirt */}
+                      <rect x="72" y="122" width="54" height="47" rx="16" fill="url(#ad-shirt)" filter="url(#ad-shadow)"/>
+                      {/* Collar */}
+                      <path d="M89 122 L99 133 L109 122" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.35"/>
+                      {/* Shirt shine */}
+                      <ellipse cx="85" cy="131" rx="7" ry="4" fill="white" opacity="0.12"/>
+                      {/* Right arm pointing */}
+                      <path d="M124 129 Q144 119 150 122" stroke="url(#ad-skin2)" strokeWidth="13" strokeLinecap="round" fill="none"/>
+                      <circle cx="150" cy="123" r="7" fill="url(#ad-skin)"/>
+                      {/* Neck */}
+                      <rect x="91" y="115" width="16" height="11" rx="4" fill="url(#ad-skin)"/>
+                      {/* Ears */}
+                      <ellipse cx="73" cy="101" rx="5" ry="7" fill="#FFCC88"/>
+                      <ellipse cx="73" cy="101" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
+                      <ellipse cx="117" cy="101" rx="5" ry="7" fill="#FFCC88"/>
+                      <ellipse cx="117" cy="101" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
                       {/* Head */}
-                      <circle cx="95" cy="99" r="23" fill="url(#ad-skin)" filter="url(#ad-shadow)"/>
-                      <circle cx="87" cy="91" r="9" fill="white" opacity="0.15"/>
-                      {/* Hair */}
-                      <ellipse cx="95" cy="81" rx="21" ry="10" fill="url(#ad-hair)"/>
-                      <rect x="74" y="81" width="9" height="14" rx="4.5" fill="url(#ad-hair)"/>
-                      <rect x="106" y="81" width="9" height="14" rx="4.5" fill="url(#ad-hair)"/>
+                      <circle cx="95" cy="99" r="25" fill="url(#ad-skin)" filter="url(#ad-shadow)"/>
+                      <circle cx="87" cy="90" r="9" fill="white" opacity="0.18"/>
+                      {/* Hair back */}
+                      <ellipse cx="95" cy="77" rx="23" ry="12" fill="#5D4037"/>
+                      {/* Hair main */}
+                      <ellipse cx="95" cy="76" rx="22" ry="11" fill="url(#ad-hair)"/>
+                      <rect x="73" y="76" width="11" height="17" rx="5.5" fill="url(#ad-hair)"/>
+                      <rect x="106" y="76" width="11" height="17" rx="5.5" fill="url(#ad-hair)"/>
+                      {/* Hair highlight */}
+                      <path d="M84 69 Q93 65 102 69" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.15"/>
+                      {/* Eyebrows */}
+                      <path d="M83 92 Q86 89 89 92" stroke="#5D4037" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      <path d="M101 92 Q104 89 107 92" stroke="#5D4037" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
                       {/* Eyes */}
-                      <circle cx="88" cy="99" r="3.2" fill="#3E2723"/>
-                      <circle cx="102" cy="99" r="3.2" fill="#3E2723"/>
-                      <circle cx="89" cy="97.5" r="1" fill="white"/>
-                      <circle cx="103" cy="97.5" r="1" fill="white"/>
-                      {/* Smile */}
-                      <path d="M89 107 Q95 114 101 107" stroke="#C67B3A" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      <circle cx="86" cy="98" r="3.8" fill="#2C1810"/>
+                      <circle cx="104" cy="98" r="3.8" fill="#2C1810"/>
+                      <circle cx="88" cy="96" r="1.4" fill="white" opacity="0.9"/>
+                      <circle cx="106" cy="96" r="1.4" fill="white" opacity="0.9"/>
+                      {/* Mouth */}
+                      <path d="M88 108 Q95 115 102 108" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.4"/>
+                      <path d="M88 108 Q95 116 102 108" stroke="#C67B3A" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                      {/* Cheeks */}
+                      <ellipse cx="80" cy="105" rx="5" ry="3" fill="#FFB0A0" opacity="0.35"/>
+                      <ellipse cx="110" cy="105" rx="5" ry="3" fill="#FFB0A0" opacity="0.35"/>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ address: profileDraft.address.trim() || undefined, zipCode: profileDraft.zipCode.trim() || undefined, city: profileDraft.city.trim() || undefined })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -1201,50 +1524,97 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="co-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFDDAA"/><stop offset="100%" stopColor="#FFBB77"/></linearGradient>
-                        <linearGradient id="co-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#5D4037"/><stop offset="100%" stopColor="#8D6E63"/></linearGradient>
-                        <linearGradient id="co-shirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#42A5F5"/><stop offset="100%" stopColor="#1E88E5"/></linearGradient>
-                        <linearGradient id="co-globe" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#E3F2FD"/><stop offset="100%" stopColor="#90CAF9"/></linearGradient>
-                        <filter id="co-shadow"><feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.12"/></filter>
+                        <linearGradient id="co-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="co-skin2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="co-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#8D6E63"/><stop offset="1" stopColor="#5D4037"/></linearGradient>
+                        <linearGradient id="co-shirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#64B5F6"/><stop offset="0.5" stopColor="#42A5F5"/><stop offset="1" stopColor="#1565C0"/></linearGradient>
+                        <linearGradient id="co-pants" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#455A64"/><stop offset="1" stopColor="#263238"/></linearGradient>
+                        <linearGradient id="co-globe" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#E3F2FD"/><stop offset="0.5" stopColor="#90CAF9"/><stop offset="1" stopColor="#42A5F5"/></linearGradient>
+                        <filter id="co-shadow"><feDropShadow dx="0" dy="5" stdDeviation="7" floodOpacity="0.15"/></filter>
+                        <filter id="co-softshadow"><feDropShadow dx="0" dy="3" stdDeviation="5" floodOpacity="0.12"/></filter>
                       </defs>
+                      {/* Background sparkles */}
+                      <rect x="28" y="46" width="7" height="7" rx="1" fill="#42A5F5" opacity="0.22" transform="rotate(45 31 49)"/>
+                      <circle cx="222" cy="58" r="4" fill="#90CAF9" opacity="0.25"/>
+                      <rect x="210" y="155" width="6" height="6" rx="1" fill="#1E88E5" opacity="0.2" transform="rotate(45 213 158)"/>
+                      <circle cx="30" cy="160" r="3" fill="#81C784" opacity="0.25"/>
+                      <rect x="215" y="105" width="5" height="5" rx="1" fill="#64B5F6" opacity="0.18" transform="rotate(45 217 107)"/>
                       {/* Ground shadow */}
-                      <ellipse cx="118" cy="190" rx="54" ry="7" fill="#333" opacity="0.08"/>
-                      {/* Body */}
-                      <rect x="90" y="118" width="48" height="52" rx="14" fill="url(#co-shirt)" filter="url(#co-shadow)"/>
-                      {/* Legs */}
-                      <rect x="96" y="162" width="13" height="22" rx="6" fill="#4E342E"/>
-                      <rect x="117" y="162" width="13" height="22" rx="6" fill="#4E342E"/>
+                      <ellipse cx="114" cy="191" rx="58" ry="7" fill="#000" opacity="0.08"/>
+                      {/* Left arm raised holding globe */}
+                      <path d="M91 130 Q74 122 63 115" stroke="url(#co-skin2)" strokeWidth="13" strokeLinecap="round" fill="none"/>
+                      <circle cx="62" cy="114" r="7" fill="url(#co-skin)"/>
+                      {/* Right arm raised holding globe */}
+                      <path d="M139 130 Q156 122 167 115" stroke="url(#co-skin2)" strokeWidth="13" strokeLinecap="round" fill="none"/>
+                      <circle cx="168" cy="114" r="7" fill="url(#co-skin)"/>
+                      {/* Pants */}
+                      <rect x="95" y="162" width="15" height="27" rx="8" fill="url(#co-pants)"/>
+                      <rect x="116" y="162" width="15" height="27" rx="8" fill="url(#co-pants)"/>
+                      <rect x="95" y="162" width="36" height="6" rx="3" fill="#151F24" opacity="0.5"/>
                       {/* Shoes */}
-                      <rect x="93" y="180" width="18" height="8" rx="4" fill="#2E2E2E"/>
-                      <rect x="114" y="180" width="18" height="8" rx="4" fill="#2E2E2E"/>
-                      {/* Arms holding globe */}
-                      <path d="M90 126 Q72 118 62 112" stroke="url(#co-skin)" strokeWidth="12" strokeLinecap="round" fill="none"/>
-                      <path d="M138 126 Q156 118 166 112" stroke="url(#co-skin)" strokeWidth="12" strokeLinecap="round" fill="none"/>
-                      {/* Globe */}
-                      <circle cx="114" cy="85" r="42" fill="url(#co-globe)" stroke="#64B5F6" strokeWidth="2" filter="url(#co-shadow)"/>
-                      {/* Globe grid lines */}
-                      <ellipse cx="114" cy="85" rx="42" ry="16" stroke="#90CAF9" strokeWidth="1" fill="none"/>
-                      <ellipse cx="114" cy="85" rx="16" ry="42" stroke="#90CAF9" strokeWidth="1" fill="none"/>
-                      <line x1="72" y1="85" x2="156" y2="85" stroke="#90CAF9" strokeWidth="1"/>
-                      <line x1="114" y1="43" x2="114" y2="127" stroke="#90CAF9" strokeWidth="1"/>
+                      <rect x="92" y="183" width="21" height="9" rx="5" fill="#111"/>
+                      <rect x="113" y="183" width="21" height="9" rx="5" fill="#111"/>
+                      <rect x="94" y="183" width="13" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      <rect x="115" y="183" width="13" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      {/* Body/shirt */}
+                      <rect x="88" y="120" width="56" height="48" rx="16" fill="url(#co-shirt)" filter="url(#co-shadow)"/>
+                      {/* Collar */}
+                      <path d="M105 120 L116 132 L127 120" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.35"/>
+                      {/* Shirt shine */}
+                      <ellipse cx="101" cy="130" rx="7" ry="4" fill="white" opacity="0.12"/>
+                      {/* Globe — 3D sphere */}
+                      <circle cx="115" cy="82" r="45" fill="url(#co-globe)" stroke="#64B5F6" strokeWidth="2" filter="url(#co-softshadow)"/>
+                      {/* Globe rim light */}
+                      <circle cx="115" cy="82" r="45" fill="none" stroke="white" strokeWidth="6" opacity="0.08"/>
+                      {/* Globe grid — equator */}
+                      <ellipse cx="115" cy="82" rx="45" ry="17" stroke="#90CAF9" strokeWidth="1.2" fill="none" opacity="0.7"/>
+                      {/* Globe grid — tropic lines */}
+                      <ellipse cx="115" cy="65" rx="38" ry="8" stroke="#90CAF9" strokeWidth="1" fill="none" opacity="0.4"/>
+                      <ellipse cx="115" cy="99" rx="38" ry="8" stroke="#90CAF9" strokeWidth="1" fill="none" opacity="0.4"/>
+                      {/* Globe grid — meridians */}
+                      <ellipse cx="115" cy="82" rx="18" ry="45" stroke="#90CAF9" strokeWidth="1" fill="none" opacity="0.5"/>
+                      <line x1="70" y1="82" x2="160" y2="82" stroke="#90CAF9" strokeWidth="1" opacity="0.6"/>
+                      <line x1="115" y1="37" x2="115" y2="127" stroke="#90CAF9" strokeWidth="1" opacity="0.6"/>
                       {/* Continents */}
-                      <ellipse cx="100" cy="72" rx="14" ry="10" fill="#81C784" opacity="0.7"/>
-                      <ellipse cx="132" cy="76" rx="11" ry="14" fill="#81C784" opacity="0.7"/>
-                      <ellipse cx="105" cy="96" rx="12" ry="8" fill="#81C784" opacity="0.6"/>
-                      {/* Head */}
-                      <circle cx="114" cy="140" r="22" fill="url(#co-skin)" filter="url(#co-shadow)"/>
-                      <circle cx="106" cy="132" r="8" fill="white" opacity="0.15"/>
-                      {/* Hair */}
-                      <ellipse cx="114" cy="122" rx="20" ry="9" fill="url(#co-hair)"/>
-                      <rect x="94" y="122" width="8" height="12" rx="4" fill="url(#co-hair)"/>
-                      <rect x="126" y="122" width="8" height="12" rx="4" fill="url(#co-hair)"/>
+                      <ellipse cx="99" cy="68" rx="16" ry="11" fill="#81C784" opacity="0.75"/>
+                      <ellipse cx="133" cy="74" rx="12" ry="16" fill="#81C784" opacity="0.75"/>
+                      <ellipse cx="104" cy="95" rx="13" ry="9" fill="#81C784" opacity="0.65"/>
+                      <ellipse cx="130" cy="95" rx="6" ry="5" fill="#81C784" opacity="0.5"/>
+                      {/* Globe shine */}
+                      <circle cx="96" cy="59" r="14" fill="white" opacity="0.12"/>
+                      <ellipse cx="90" cy="54" rx="8" ry="5" fill="white" opacity="0.1"/>
+                      {/* Neck */}
+                      <rect x="107" y="117" width="16" height="7" rx="4" fill="url(#co-skin)"/>
+                      {/* Ears */}
+                      <ellipse cx="90" cy="142" rx="5" ry="7" fill="#FFCC88"/>
+                      <ellipse cx="90" cy="142" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
+                      <ellipse cx="138" cy="142" rx="5" ry="7" fill="#FFCC88"/>
+                      <ellipse cx="138" cy="142" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
+                      {/* Head — below globe, peeking out */}
+                      <circle cx="114" cy="140" r="25" fill="url(#co-skin)" filter="url(#co-shadow)"/>
+                      <circle cx="106" cy="131" r="9" fill="white" opacity="0.18"/>
+                      {/* Hair back */}
+                      <ellipse cx="114" cy="118" rx="23" ry="12" fill="#5D4037"/>
+                      {/* Hair main */}
+                      <ellipse cx="114" cy="117" rx="22" ry="11" fill="url(#co-hair)"/>
+                      <rect x="92" y="117" width="11" height="16" rx="5.5" fill="url(#co-hair)"/>
+                      <rect x="125" y="117" width="11" height="16" rx="5.5" fill="url(#co-hair)"/>
+                      {/* Hair highlight */}
+                      <path d="M103 110 Q112 106 121 110" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.15"/>
+                      {/* Eyebrows */}
+                      <path d="M102 133 Q105 130 108 133" stroke="#5D4037" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      <path d="M120 133 Q123 130 126 133" stroke="#5D4037" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
                       {/* Eyes */}
-                      <circle cx="107" cy="140" r="3.2" fill="#3E2723"/>
-                      <circle cx="121" cy="140" r="3.2" fill="#3E2723"/>
-                      <circle cx="108" cy="138.5" r="1" fill="white"/>
-                      <circle cx="122" cy="138.5" r="1" fill="white"/>
-                      {/* Smile */}
-                      <path d="M108 149 Q114 155 120 149" stroke="#C67B3A" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      <circle cx="105" cy="139" r="4" fill="#2C1810"/>
+                      <circle cx="123" cy="139" r="4" fill="#2C1810"/>
+                      <circle cx="107" cy="137" r="1.5" fill="white" opacity="0.9"/>
+                      <circle cx="125" cy="137" r="1.5" fill="white" opacity="0.9"/>
+                      {/* Mouth */}
+                      <path d="M107 149 Q114 156 121 149" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.4"/>
+                      <path d="M107 149 Q114 157 121 149" stroke="#C67B3A" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                      {/* Cheeks */}
+                      <ellipse cx="99" cy="145" rx="5" ry="3" fill="#FFB0A0" opacity="0.35"/>
+                      <ellipse cx="129" cy="145" rx="5" ry="3" fill="#FFB0A0" opacity="0.35"/>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ country: profileDraft.country.trim() || undefined })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -1295,56 +1665,133 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                     <div className="flex-1 flex items-center justify-center py-8">
                       <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <defs>
-                          <linearGradient id="al-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFDDAA"/><stop offset="100%" stopColor="#FFBB77"/></linearGradient>
-                          <linearGradient id="al-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#5D4037"/><stop offset="100%" stopColor="#8D6E63"/></linearGradient>
-                          <linearGradient id="al-shirtA" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#F5A623"/><stop offset="100%" stopColor="#E8951F"/></linearGradient>
-                          <linearGradient id="al-shirtB" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#42A5F5"/><stop offset="100%" stopColor="#1E88E5"/></linearGradient>
-                          <linearGradient id="al-shield" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFF3E0"/><stop offset="100%" stopColor="#FFE0B2"/></linearGradient>
-                          <filter id="al-shadow"><feDropShadow dx="0" dy="4" stdDeviation="5" floodOpacity="0.12"/></filter>
+                          <linearGradient id="al-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                          <linearGradient id="al-skin2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                          <linearGradient id="al-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#8D6E63"/><stop offset="1" stopColor="#5D4037"/></linearGradient>
+                          <linearGradient id="al-shirtA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFB74D"/><stop offset="0.5" stopColor="#F5A623"/><stop offset="1" stopColor="#E65100"/></linearGradient>
+                          <linearGradient id="al-shirtB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#64B5F6"/><stop offset="0.5" stopColor="#42A5F5"/><stop offset="1" stopColor="#1565C0"/></linearGradient>
+                          <linearGradient id="al-pantsA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#4E342E"/><stop offset="1" stopColor="#2C1810"/></linearGradient>
+                          <linearGradient id="al-shield" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFF8F0"/><stop offset="0.5" stopColor="#FFE0B2"/><stop offset="1" stopColor="#FFB74D"/></linearGradient>
+                          <filter id="al-shadow"><feDropShadow dx="0" dy="5" stdDeviation="6" floodOpacity="0.15"/></filter>
+                          <filter id="al-softshadow"><feDropShadow dx="0" dy="3" stdDeviation="3" floodOpacity="0.1"/></filter>
                         </defs>
+                        {/* Background sparkles */}
+                        <rect x="22" y="55" width="7" height="7" rx="1" fill="#F5A623" opacity="0.22" transform="rotate(45 25 58)"/>
+                        <circle cx="228" cy="62" r="4" fill="#4CAF50" opacity="0.22"/>
+                        <rect x="220" y="152" width="6" height="6" rx="1" fill="#42A5F5" opacity="0.2" transform="rotate(45 223 155)"/>
+                        <circle cx="24" cy="155" r="3" fill="#FFD54F" opacity="0.3"/>
                         {/* Ground shadows */}
-                        <ellipse cx="82" cy="190" rx="38" ry="6" fill="#333" opacity="0.07"/>
-                        <ellipse cx="168" cy="190" rx="30" ry="5" fill="#333" opacity="0.07"/>
+                        <ellipse cx="82" cy="191" rx="44" ry="6" fill="#000" opacity="0.07"/>
+                        <ellipse cx="172" cy="191" rx="34" ry="5" fill="#000" opacity="0.07"/>
                         {/* ── Parent (left, bigger) ── */}
-                        <rect x="56" y="122" width="46" height="50" rx="13" fill="url(#al-shirtA)" filter="url(#al-shadow)"/>
-                        <rect x="62" y="164" width="12" height="22" rx="6" fill="#4E342E"/>
-                        <rect x="80" y="164" width="12" height="22" rx="6" fill="#4E342E"/>
-                        <rect x="59" y="182" width="17" height="7" rx="3.5" fill="#111"/>
-                        <rect x="78" y="182" width="17" height="7" rx="3.5" fill="#111"/>
+                        {/* Parent left arm */}
+                        <path d="M58 134 Q46 140 43 151" stroke="url(#al-skin2)" strokeWidth="12" strokeLinecap="round" fill="none"/>
+                        <circle cx="43" cy="152" r="7" fill="url(#al-skin)"/>
+                        {/* Parent pants */}
+                        <rect x="62" y="165" width="13" height="24" rx="7" fill="url(#al-pantsA)"/>
+                        <rect x="80" y="165" width="13" height="24" rx="7" fill="url(#al-pantsA)"/>
+                        <rect x="62" y="165" width="31" height="6" rx="3" fill="#1A0B08" opacity="0.5"/>
+                        {/* Parent shoes */}
+                        <rect x="59" y="183" width="19" height="8" rx="4" fill="#111"/>
+                        <rect x="78" y="183" width="19" height="8" rx="4" fill="#111"/>
+                        <rect x="61" y="183" width="11" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                        <rect x="80" y="183" width="11" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                        {/* Parent shirt */}
+                        <rect x="55" y="123" width="52" height="48" rx="15" fill="url(#al-shirtA)" filter="url(#al-shadow)"/>
+                        {/* Parent collar */}
+                        <path d="M72 123 L81 133 L90 123" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.35"/>
+                        {/* Parent shirt shine */}
+                        <ellipse cx="68" cy="131" rx="7" ry="4" fill="white" opacity="0.12"/>
                         {/* Parent right arm toward shield */}
-                        <path d="M102 130 Q122 124 130 118" stroke="url(#al-skin)" strokeWidth="11" strokeLinecap="round" fill="none"/>
-                        {/* Parent left arm holding child */}
-                        <path d="M56 132 Q44 138 42 148" stroke="url(#al-skin)" strokeWidth="11" strokeLinecap="round" fill="none"/>
+                        <path d="M107 131 Q120 125 128 119" stroke="url(#al-skin2)" strokeWidth="12" strokeLinecap="round" fill="none"/>
+                        <circle cx="129" cy="118" r="7" fill="url(#al-skin)"/>
+                        {/* Parent neck */}
+                        <rect x="73" y="117" width="14" height="10" rx="4" fill="url(#al-skin)"/>
+                        {/* Parent ears */}
+                        <ellipse cx="58" cy="103" rx="5" ry="7" fill="#FFCC88"/>
+                        <ellipse cx="58" cy="103" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
+                        <ellipse cx="100" cy="103" rx="5" ry="7" fill="#FFCC88"/>
+                        <ellipse cx="100" cy="103" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
                         {/* Parent head */}
-                        <circle cx="79" cy="101" r="22" fill="url(#al-skin)" filter="url(#al-shadow)"/>
-                        <circle cx="71" cy="93" r="8" fill="white" opacity="0.15"/>
-                        <ellipse cx="79" cy="83" rx="20" ry="9" fill="url(#al-hair)"/>
-                        <rect x="59" y="83" width="8" height="13" rx="4" fill="url(#al-hair)"/>
-                        <rect x="91" y="83" width="8" height="13" rx="4" fill="url(#al-hair)"/>
-                        <circle cx="72" cy="101" r="3" fill="#3E2723"/>
-                        <circle cx="86" cy="101" r="3" fill="#3E2723"/>
-                        <circle cx="73" cy="99.5" r="0.9" fill="white"/>
-                        <circle cx="87" cy="99.5" r="0.9" fill="white"/>
-                        <path d="M73 108 Q79 114 85 108" stroke="#C67B3A" strokeWidth="1.6" strokeLinecap="round" fill="none"/>
+                        <circle cx="79" cy="101" r="24" fill="url(#al-skin)" filter="url(#al-shadow)"/>
+                        <circle cx="71" cy="92" r="9" fill="white" opacity="0.18"/>
+                        {/* Parent hair back */}
+                        <ellipse cx="79" cy="80" rx="22" ry="11" fill="#5D4037"/>
+                        {/* Parent hair main */}
+                        <ellipse cx="79" cy="79" rx="21" ry="10" fill="url(#al-hair)"/>
+                        <rect x="59" y="79" width="10" height="16" rx="5" fill="url(#al-hair)"/>
+                        <rect x="90" y="79" width="10" height="16" rx="5" fill="url(#al-hair)"/>
+                        {/* Parent hair highlight */}
+                        <path d="M69 72 Q78 68 87 72" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.15"/>
+                        {/* Parent eyebrows */}
+                        <path d="M68 94 Q71 91 74 94" stroke="#5D4037" strokeWidth="1.7" strokeLinecap="round" fill="none"/>
+                        <path d="M84 94 Q87 91 90 94" stroke="#5D4037" strokeWidth="1.7" strokeLinecap="round" fill="none"/>
+                        {/* Parent eyes */}
+                        <circle cx="71" cy="100" r="3.5" fill="#2C1810"/>
+                        <circle cx="87" cy="100" r="3.5" fill="#2C1810"/>
+                        <circle cx="73" cy="98" r="1.3" fill="white" opacity="0.9"/>
+                        <circle cx="89" cy="98" r="1.3" fill="white" opacity="0.9"/>
+                        {/* Parent smile */}
+                        <path d="M73 108 Q79 114 85 108" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.4"/>
+                        <path d="M73 108 Q79 115 85 108" stroke="#C67B3A" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                        {/* Parent cheeks */}
+                        <ellipse cx="65" cy="105" rx="5" ry="3" fill="#FFB0A0" opacity="0.35"/>
+                        <ellipse cx="93" cy="105" rx="5" ry="3" fill="#FFB0A0" opacity="0.35"/>
                         {/* ── Child (right, smaller) ── */}
-                        <rect x="148" y="138" width="36" height="38" rx="10" fill="url(#al-shirtB)" filter="url(#al-shadow)"/>
-                        <rect x="153" y="168" width="10" height="18" rx="5" fill="#4E342E"/>
-                        <rect x="168" y="168" width="10" height="18" rx="5" fill="#4E342E"/>
-                        <rect x="150" y="182" width="14" height="6" rx="3" fill="#111"/>
-                        <rect x="166" y="182" width="14" height="6" rx="3" fill="#111"/>
-                        <circle cx="166" cy="122" r="18" fill="url(#al-skin)" filter="url(#al-shadow)"/>
-                        <circle cx="159" cy="115" r="7" fill="white" opacity="0.15"/>
-                        <ellipse cx="166" cy="107" rx="16" ry="7" fill="url(#al-hair)"/>
-                        <rect x="150" y="107" width="7" height="11" rx="3.5" fill="url(#al-hair)"/>
-                        <rect x="179" y="107" width="7" height="11" rx="3.5" fill="url(#al-hair)"/>
-                        <circle cx="160" cy="122" r="2.5" fill="#3E2723"/>
-                        <circle cx="172" cy="122" r="2.5" fill="#3E2723"/>
-                        <path d="M161 129 Q166 134 171 129" stroke="#C67B3A" strokeWidth="1.4" strokeLinecap="round" fill="none"/>
+                        {/* Child pants */}
+                        <rect x="153" y="168" width="11" height="21" rx="6" fill="#1A237E"/>
+                        <rect x="169" y="168" width="11" height="21" rx="6" fill="#1A237E"/>
+                        <rect x="153" y="168" width="27" height="5" rx="2.5" fill="#0D1457" opacity="0.5"/>
+                        {/* Child shoes */}
+                        <rect x="150" y="184" width="16" height="7" rx="3.5" fill="#111"/>
+                        <rect x="167" y="184" width="16" height="7" rx="3.5" fill="#111"/>
+                        {/* Child shirt */}
+                        <rect x="148" y="138" width="42" height="36" rx="12" fill="url(#al-shirtB)" filter="url(#al-softshadow)"/>
+                        {/* Child collar */}
+                        <path d="M161 138 L169 147 L177 138" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.3"/>
+                        {/* Child shirt shine */}
+                        <ellipse cx="156" cy="145" rx="5" ry="3" fill="white" opacity="0.12"/>
+                        {/* Child neck */}
+                        <rect x="162" y="133" width="12" height="9" rx="4" fill="url(#al-skin)"/>
+                        {/* Child ears */}
+                        <ellipse cx="149" cy="124" rx="4" ry="5.5" fill="#FFCC88"/>
+                        <ellipse cx="149" cy="124" rx="2.5" ry="4" fill="#FFB870" opacity="0.6"/>
+                        <ellipse cx="183" cy="124" rx="4" ry="5.5" fill="#FFCC88"/>
+                        <ellipse cx="183" cy="124" rx="2.5" ry="4" fill="#FFB870" opacity="0.6"/>
+                        {/* Child head */}
+                        <circle cx="166" cy="122" r="20" fill="url(#al-skin)" filter="url(#al-softshadow)"/>
+                        <circle cx="159" cy="114" r="7" fill="white" opacity="0.18"/>
+                        {/* Child hair back */}
+                        <ellipse cx="166" cy="104" rx="18" ry="9" fill="#5D4037"/>
+                        {/* Child hair main */}
+                        <ellipse cx="166" cy="103" rx="17" ry="8" fill="url(#al-hair)"/>
+                        <rect x="149" y="103" width="8" height="13" rx="4" fill="url(#al-hair)"/>
+                        <rect x="181" y="103" width="8" height="13" rx="4" fill="url(#al-hair)"/>
+                        {/* Child hair highlight */}
+                        <path d="M158 97 Q165 94 172 97" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.15"/>
+                        {/* Child eyebrows */}
+                        <path d="M157 117 Q160 114 163 117" stroke="#5D4037" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+                        <path d="M169 117 Q172 114 175 117" stroke="#5D4037" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+                        {/* Child eyes */}
+                        <circle cx="160" cy="122" r="3" fill="#2C1810"/>
+                        <circle cx="172" cy="122" r="3" fill="#2C1810"/>
+                        <circle cx="161.5" cy="120.5" r="1.1" fill="white" opacity="0.9"/>
+                        <circle cx="173.5" cy="120.5" r="1.1" fill="white" opacity="0.9"/>
+                        {/* Child smile */}
+                        <path d="M161 129 Q166 135 171 129" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none" opacity="0.4"/>
+                        <path d="M161 129 Q166 135 171 129" stroke="#C67B3A" strokeWidth="1.6" strokeLinecap="round" fill="none"/>
+                        {/* Child cheeks */}
+                        <ellipse cx="155" cy="126" rx="4" ry="2.5" fill="#FFB0A0" opacity="0.4"/>
+                        <ellipse cx="177" cy="126" rx="4" ry="2.5" fill="#FFB0A0" opacity="0.4"/>
                         {/* ── Shield in center ── */}
-                        <path d="M130 60 L155 75 L155 105 C155 122 142 134 130 140 C118 134 105 122 105 105 L105 75 Z" fill="url(#al-shield)" stroke="#F5A623" strokeWidth="2" filter="url(#al-shadow)"/>
-                        <path d="M130 72 L148 83 L148 106 C148 120 138 130 130 135 C122 130 112 120 112 106 L112 83 Z" fill="#FFE0B2"/>
+                        <path d="M130 55 L157 71 L157 104 C157 124 142 137 130 144 C118 137 103 124 103 104 L103 71 Z" fill="url(#al-shield)" stroke="#F5A623" strokeWidth="2.5" filter="url(#al-shadow)"/>
+                        {/* Shield inner */}
+                        <path d="M130 67 L150 80 L150 105 C150 121 139 132 130 137 C121 132 110 121 110 105 L110 80 Z" fill="#FFE0B2" opacity="0.7"/>
+                        {/* Shield shine */}
+                        <ellipse cx="121" cy="68" rx="10" ry="5" fill="white" opacity="0.25"/>
                         {/* Check mark on shield */}
-                        <path d="M119 102 L127 110 L142 92" stroke="#4CAF50" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M118 103 L127 112 L144 91" stroke="#4CAF50" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M119 103 L127 111 L143 92" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.3"/>
                       </svg>
                     </div>
                   </div>
@@ -1364,53 +1811,97 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="ex-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFDDAA"/><stop offset="100%" stopColor="#FFBB77"/></linearGradient>
-                        <linearGradient id="ex-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#5D4037"/><stop offset="100%" stopColor="#8D6E63"/></linearGradient>
-                        <linearGradient id="ex-shirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#7986CB"/><stop offset="100%" stopColor="#5C6BC0"/></linearGradient>
-                        <linearGradient id="ex-box" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#E8EAF6"/><stop offset="100%" stopColor="#C5CAE9"/></linearGradient>
-                        <filter id="ex-shadow"><feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.12"/></filter>
+                        <linearGradient id="ex-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="ex-skin2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="ex-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#8D6E63"/><stop offset="1" stopColor="#5D4037"/></linearGradient>
+                        <linearGradient id="ex-shirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#9FA8DA"/><stop offset="0.5" stopColor="#7986CB"/><stop offset="1" stopColor="#3F51B5"/></linearGradient>
+                        <linearGradient id="ex-pants" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#37474F"/><stop offset="1" stopColor="#263238"/></linearGradient>
+                        <linearGradient id="ex-box" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#ECEFF1"/><stop offset="0.5" stopColor="#E8EAF6"/><stop offset="1" stopColor="#C5CAE9"/></linearGradient>
+                        <linearGradient id="ex-btn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#9FA8DA"/><stop offset="1" stopColor="#5C6BC0"/></linearGradient>
+                        <filter id="ex-shadow"><feDropShadow dx="0" dy="5" stdDeviation="7" floodOpacity="0.15"/></filter>
+                        <filter id="ex-softshadow"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.1"/></filter>
                       </defs>
+                      {/* Background sparkles */}
+                      <circle cx="36" cy="38" r="5" fill="#FFD54F" opacity="0.45"/>
+                      <rect x="33" y="35" width="6" height="6" rx="1" fill="#FFD54F" opacity="0.2" transform="rotate(45 36 38)"/>
+                      <circle cx="192" cy="34" r="4" fill="#7986CB" opacity="0.35"/>
+                      <circle cx="192" cy="118" r="4" fill="#C5CAE9" opacity="0.35"/>
+                      <rect x="210" y="155" width="6" height="6" rx="1" fill="#9FA8DA" opacity="0.2" transform="rotate(45 213 158)"/>
                       {/* Ground shadow */}
-                      <ellipse cx="120" cy="190" rx="55" ry="7" fill="#333" opacity="0.08"/>
-                      {/* Body */}
-                      <rect x="90" y="120" width="48" height="50" rx="14" fill="url(#ex-shirt)" filter="url(#ex-shadow)"/>
-                      {/* Legs */}
-                      <rect x="96" y="162" width="13" height="22" rx="6" fill="#4E342E"/>
-                      <rect x="117" y="162" width="13" height="22" rx="6" fill="#4E342E"/>
+                      <ellipse cx="116" cy="191" rx="58" ry="7" fill="#000" opacity="0.08"/>
+                      {/* Arms raised holding box */}
+                      <path d="M91 130 Q74 120 65 110" stroke="url(#ex-skin2)" strokeWidth="13" strokeLinecap="round" fill="none"/>
+                      <circle cx="64" cy="109" r="7" fill="url(#ex-skin)"/>
+                      <path d="M141 130 Q158 120 165 110" stroke="url(#ex-skin2)" strokeWidth="13" strokeLinecap="round" fill="none"/>
+                      <circle cx="166" cy="109" r="7" fill="url(#ex-skin)"/>
+                      {/* Download box — 3D */}
+                      <rect x="58" y="44" width="108" height="68" rx="12" fill="url(#ex-box)" stroke="#7986CB" strokeWidth="2" filter="url(#ex-softshadow)"/>
+                      {/* Box shine */}
+                      <rect x="62" y="47" width="26" height="6" rx="3" fill="white" opacity="0.3"/>
+                      {/* Box side face (3D depth) */}
+                      <path d="M166 44 L176 52 L176 120 L166 112 Z" fill="#B0BEC5" opacity="0.35"/>
+                      <path d="M58 44 L68 52 L176 52 L166 44 Z" fill="white" opacity="0.2"/>
+                      {/* Document icon inside box */}
+                      <rect x="78" y="60" width="70" height="8" rx="4" fill="#9FA8DA"/>
+                      <rect x="78" y="74" width="52" height="7" rx="3.5" fill="#9FA8DA"/>
+                      <rect x="78" y="88" width="60" height="7" rx="3.5" fill="#9FA8DA"/>
+                      {/* Doc icon line highlights */}
+                      <rect x="80" y="62" width="14" height="2" rx="1" fill="white" opacity="0.3"/>
+                      <rect x="80" y="76" width="10" height="2" rx="1" fill="white" opacity="0.3"/>
+                      {/* Download arrow circle */}
+                      <circle cx="114" cy="130" r="20" fill="url(#ex-btn)" filter="url(#ex-softshadow)"/>
+                      <circle cx="114" cy="130" r="20" fill="none" stroke="white" strokeWidth="1" opacity="0.2"/>
+                      <path d="M114 119 L114 139" stroke="white" strokeWidth="3" strokeLinecap="round"/>
+                      <path d="M107 133 L114 140 L121 133" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                      {/* Arrow shine */}
+                      <ellipse cx="109" cy="122" rx="5" ry="3" fill="white" opacity="0.2"/>
+                      {/* Pants */}
+                      <rect x="96" y="163" width="15" height="26" rx="8" fill="url(#ex-pants)"/>
+                      <rect x="117" y="163" width="15" height="26" rx="8" fill="url(#ex-pants)"/>
+                      <rect x="96" y="163" width="36" height="6" rx="3" fill="#151F24" opacity="0.5"/>
                       {/* Shoes */}
-                      <rect x="93" y="180" width="18" height="8" rx="4" fill="#2E2E2E"/>
-                      <rect x="114" y="180" width="18" height="8" rx="4" fill="#2E2E2E"/>
-                      {/* Arms holding box up */}
-                      <path d="M90 128 Q72 118 64 108" stroke="url(#ex-skin)" strokeWidth="12" strokeLinecap="round" fill="none"/>
-                      <path d="M138 128 Q156 118 162 108" stroke="url(#ex-skin)" strokeWidth="12" strokeLinecap="round" fill="none"/>
-                      {/* Download box */}
-                      <rect x="62" y="50" width="100" height="62" rx="10" fill="url(#ex-box)" stroke="#7986CB" strokeWidth="2" filter="url(#ex-shadow)"/>
-                      {/* Document lines inside box */}
-                      <rect x="75" y="65" width="60" height="5" rx="2.5" fill="#9FA8DA"/>
-                      <rect x="75" y="77" width="44" height="5" rx="2.5" fill="#9FA8DA"/>
-                      <rect x="75" y="89" width="52" height="5" rx="2.5" fill="#9FA8DA"/>
-                      {/* Download arrow circle on box */}
-                      <circle cx="112" cy="128" r="18" fill="#7986CB" filter="url(#ex-shadow)"/>
-                      <path d="M112 118 L112 136" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
-                      <path d="M106 130 L112 136 L118 130" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      {/* Sparkles */}
-                      <circle cx="42" cy="42" r="4" fill="#FFD54F" opacity="0.5"/>
-                      <circle cx="185" cy="38" r="3" fill="#7986CB" opacity="0.4"/>
-                      <circle cx="185" cy="120" r="3" fill="#C5CAE9" opacity="0.4"/>
+                      <rect x="93" y="183" width="21" height="9" rx="5" fill="#111"/>
+                      <rect x="114" y="183" width="21" height="9" rx="5" fill="#111"/>
+                      <rect x="95" y="183" width="13" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      <rect x="116" y="183" width="13" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      {/* Body/shirt */}
+                      <rect x="89" y="121" width="56" height="48" rx="16" fill="url(#ex-shirt)" filter="url(#ex-shadow)"/>
+                      {/* Collar */}
+                      <path d="M106 121 L117 133 L128 121" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.35"/>
+                      {/* Shirt shine */}
+                      <ellipse cx="102" cy="131" rx="7" ry="4" fill="white" opacity="0.12"/>
+                      {/* Neck */}
+                      <rect x="109" y="115" width="16" height="10" rx="4" fill="url(#ex-skin)"/>
+                      {/* Ears */}
+                      <ellipse cx="91" cy="100" rx="5" ry="7" fill="#FFCC88"/>
+                      <ellipse cx="91" cy="100" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
+                      <ellipse cx="139" cy="100" rx="5" ry="7" fill="#FFCC88"/>
+                      <ellipse cx="139" cy="100" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
                       {/* Head */}
-                      <circle cx="114" cy="98" r="24" fill="url(#ex-skin)" filter="url(#ex-shadow)"/>
-                      <circle cx="106" cy="90" r="9" fill="white" opacity="0.15"/>
-                      {/* Hair */}
-                      <ellipse cx="114" cy="80" rx="22" ry="10" fill="url(#ex-hair)"/>
-                      <rect x="92" y="80" width="10" height="14" rx="5" fill="url(#ex-hair)"/>
-                      <rect x="126" y="80" width="10" height="14" rx="5" fill="url(#ex-hair)"/>
+                      <circle cx="115" cy="98" r="26" fill="url(#ex-skin)" filter="url(#ex-shadow)"/>
+                      <circle cx="107" cy="89" r="9" fill="white" opacity="0.18"/>
+                      {/* Hair back */}
+                      <ellipse cx="115" cy="76" rx="24" ry="12" fill="#5D4037"/>
+                      {/* Hair main */}
+                      <ellipse cx="115" cy="75" rx="23" ry="11" fill="url(#ex-hair)"/>
+                      <rect x="92" y="75" width="11" height="17" rx="5.5" fill="url(#ex-hair)"/>
+                      <rect x="126" y="75" width="11" height="17" rx="5.5" fill="url(#ex-hair)"/>
+                      {/* Hair highlight */}
+                      <path d="M104 68 Q113 64 122 68" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.15"/>
+                      {/* Eyebrows */}
+                      <path d="M103 91 Q106 88 109 91" stroke="#5D4037" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      <path d="M121 91 Q124 88 127 91" stroke="#5D4037" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
                       {/* Eyes */}
-                      <circle cx="107" cy="98" r="3.5" fill="#3E2723"/>
-                      <circle cx="121" cy="98" r="3.5" fill="#3E2723"/>
-                      <circle cx="108" cy="96.5" r="1" fill="white"/>
-                      <circle cx="122" cy="96.5" r="1" fill="white"/>
-                      {/* Smile */}
-                      <path d="M108 107 Q114 113 120 107" stroke="#C67B3A" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      <circle cx="106" cy="97" r="4" fill="#2C1810"/>
+                      <circle cx="124" cy="97" r="4" fill="#2C1810"/>
+                      <circle cx="108" cy="95" r="1.5" fill="white" opacity="0.9"/>
+                      <circle cx="126" cy="95" r="1.5" fill="white" opacity="0.9"/>
+                      {/* Mouth */}
+                      <path d="M108 107 Q115 113 122 107" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.4"/>
+                      <path d="M108 107 Q115 114 122 107" stroke="#C67B3A" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                      {/* Cheeks */}
+                      <ellipse cx="100" cy="103" rx="5" ry="3" fill="#FFB0A0" opacity="0.35"/>
+                      <ellipse cx="130" cy="103" rx="5" ry="3" fill="#FFB0A0" opacity="0.35"/>
                     </svg>
                   </div>
                   <Button
@@ -1443,47 +1934,93 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="dl-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFDDAA"/><stop offset="100%" stopColor="#FFBB77"/></linearGradient>
-                        <linearGradient id="dl-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#5D4037"/><stop offset="100%" stopColor="#8D6E63"/></linearGradient>
-                        <linearGradient id="dl-shirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#EF9A9A"/><stop offset="100%" stopColor="#E57373"/></linearGradient>
-                        <linearGradient id="dl-sign" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFEBEE"/><stop offset="100%" stopColor="#FFCDD2"/></linearGradient>
-                        <filter id="dl-shadow"><feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.12"/></filter>
+                        <linearGradient id="dl-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="dl-skin2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="dl-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#8D6E63"/><stop offset="1" stopColor="#5D4037"/></linearGradient>
+                        <linearGradient id="dl-shirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFCDD2"/><stop offset="0.5" stopColor="#EF9A9A"/><stop offset="1" stopColor="#C62828"/></linearGradient>
+                        <linearGradient id="dl-pants" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#4A148C"/><stop offset="1" stopColor="#2E0060"/></linearGradient>
+                        <linearGradient id="dl-sign" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFF8F8"/><stop offset="1" stopColor="#FFCDD2"/></linearGradient>
+                        <filter id="dl-shadow"><feDropShadow dx="0" dy="5" stdDeviation="7" floodOpacity="0.15"/></filter>
+                        <filter id="dl-softshadow"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.1"/></filter>
                       </defs>
+                      {/* Background sparkles */}
+                      <rect x="26" y="48" width="7" height="7" rx="1" fill="#EF5350" opacity="0.22" transform="rotate(45 29 51)"/>
+                      <circle cx="220" cy="55" r="4" fill="#EF9A9A" opacity="0.25"/>
+                      <rect x="210" y="158" width="6" height="6" rx="1" fill="#E57373" opacity="0.2" transform="rotate(45 213 161)"/>
+                      <circle cx="28" cy="155" r="3" fill="#EF5350" opacity="0.2"/>
                       {/* Ground shadow */}
-                      <ellipse cx="118" cy="190" rx="55" ry="7" fill="#333" opacity="0.08"/>
-                      {/* Body */}
-                      <rect x="90" y="122" width="48" height="50" rx="14" fill="url(#dl-shirt)" filter="url(#dl-shadow)"/>
-                      {/* Legs */}
-                      <rect x="96" y="164" width="13" height="22" rx="6" fill="#4E342E"/>
-                      <rect x="117" y="164" width="13" height="22" rx="6" fill="#4E342E"/>
-                      {/* Shoes */}
-                      <rect x="93" y="182" width="18" height="8" rx="4" fill="#2E2E2E"/>
-                      <rect x="114" y="182" width="18" height="8" rx="4" fill="#2E2E2E"/>
-                      {/* Left arm raised, palm out (cautious) */}
-                      <path d="M90 130 Q70 118 62 106" stroke="url(#dl-skin)" strokeWidth="12" strokeLinecap="round" fill="none"/>
+                      <ellipse cx="115" cy="191" rx="58" ry="7" fill="#000" opacity="0.08"/>
+                      {/* Left arm raised — stop gesture */}
+                      <path d="M91 130 Q72 119 62 108" stroke="url(#dl-skin2)" strokeWidth="13" strokeLinecap="round" fill="none"/>
+                      {/* Stop hand — palm facing out */}
+                      <ellipse cx="60" cy="106" rx="9" ry="10" fill="url(#dl-skin)" stroke="#FFBB77" strokeWidth="1"/>
+                      {/* Fingers on palm */}
+                      <rect x="56" y="97" width="4" height="9" rx="2" fill="url(#dl-skin)"/>
+                      <rect x="62" y="95" width="4" height="11" rx="2" fill="url(#dl-skin)"/>
+                      <rect x="68" y="97" width="4" height="9" rx="2" fill="url(#dl-skin)"/>
                       {/* Right arm down */}
-                      <path d="M138 132 Q156 140 160 154" stroke="url(#dl-skin)" strokeWidth="12" strokeLinecap="round" fill="none"/>
-                      {/* Warning sign */}
-                      <path d="M148 28 L196 110 L100 110 Z" fill="url(#dl-sign)" stroke="#EF5350" strokeWidth="2.5" filter="url(#dl-shadow)"/>
-                      <rect x="145" y="55" width="7" height="30" rx="3.5" fill="#EF5350"/>
-                      <circle cx="148.5" cy="96" r="4.5" fill="#EF5350"/>
+                      <path d="M142 133 Q160 141 164 156" stroke="url(#dl-skin2)" strokeWidth="13" strokeLinecap="round" fill="none"/>
+                      <circle cx="164" cy="157" r="7" fill="url(#dl-skin)"/>
+                      {/* Warning sign — 3D triangle */}
+                      <path d="M150 22 L202 115 L98 115 Z" fill="url(#dl-sign)" stroke="#EF5350" strokeWidth="3" filter="url(#dl-softshadow)"/>
+                      {/* Sign side (3D depth) */}
+                      <path d="M202 115 L210 121 L106 121 L98 115 Z" fill="#FFCDD2" opacity="0.6"/>
+                      {/* Sign shine */}
+                      <path d="M138 35 L152 25 L166 46" stroke="white" strokeWidth="2" fill="none" opacity="0.25"/>
+                      {/* Exclamation mark */}
+                      <rect x="146" y="52" width="8" height="34" rx="4" fill="#EF5350"/>
+                      <rect x="147" y="52" width="3" height="16" rx="1.5" fill="white" opacity="0.2"/>
+                      <circle cx="150" cy="99" r="5.5" fill="#EF5350"/>
+                      <circle cx="151" cy="97" r="2" fill="white" opacity="0.25"/>
+                      {/* Pants */}
+                      <rect x="96" y="165" width="15" height="26" rx="8" fill="url(#dl-pants)"/>
+                      <rect x="117" y="165" width="15" height="26" rx="8" fill="url(#dl-pants)"/>
+                      <rect x="96" y="165" width="36" height="6" rx="3" fill="#1A0040" opacity="0.5"/>
+                      {/* Shoes */}
+                      <rect x="93" y="185" width="21" height="9" rx="5" fill="#111"/>
+                      <rect x="114" y="185" width="21" height="9" rx="5" fill="#111"/>
+                      <rect x="95" y="185" width="13" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      <rect x="116" y="185" width="13" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      {/* Body/shirt */}
+                      <rect x="90" y="123" width="56" height="48" rx="16" fill="url(#dl-shirt)" filter="url(#dl-shadow)"/>
+                      {/* Collar */}
+                      <path d="M107 123 L118 134 L129 123" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.35"/>
+                      {/* Shirt shine */}
+                      <ellipse cx="103" cy="132" rx="7" ry="4" fill="white" opacity="0.12"/>
+                      {/* Neck */}
+                      <rect x="110" y="117" width="16" height="10" rx="4" fill="url(#dl-skin)"/>
+                      {/* Ears */}
+                      <ellipse cx="91" cy="102" rx="5" ry="7" fill="#FFCC88"/>
+                      <ellipse cx="91" cy="102" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
+                      <ellipse cx="139" cy="102" rx="5" ry="7" fill="#FFCC88"/>
+                      <ellipse cx="139" cy="102" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
                       {/* Head */}
-                      <circle cx="114" cy="100" r="24" fill="url(#dl-skin)" filter="url(#dl-shadow)"/>
-                      <circle cx="106" cy="92" r="9" fill="white" opacity="0.15"/>
-                      {/* Hair */}
-                      <ellipse cx="114" cy="82" rx="22" ry="10" fill="url(#dl-hair)"/>
-                      <rect x="92" y="82" width="10" height="14" rx="5" fill="url(#dl-hair)"/>
-                      <rect x="126" y="82" width="10" height="14" rx="5" fill="url(#dl-hair)"/>
-                      {/* Eyes (worried) */}
-                      <circle cx="107" cy="100" r="3.5" fill="#3E2723"/>
-                      <circle cx="121" cy="100" r="3.5" fill="#3E2723"/>
-                      <circle cx="108" cy="98.5" r="1" fill="white"/>
-                      <circle cx="122" cy="98.5" r="1" fill="white"/>
-                      {/* Worried brows */}
-                      <path d="M104 94 Q107 91 110 94" stroke="#8D6E63" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
-                      <path d="M118 94 Q121 91 124 94" stroke="#8D6E63" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
-                      {/* Worried mouth */}
-                      <path d="M109 109 Q114 105 119 109" stroke="#C67B3A" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      <circle cx="115" cy="100" r="26" fill="url(#dl-skin)" filter="url(#dl-shadow)"/>
+                      <circle cx="107" cy="91" r="9" fill="white" opacity="0.18"/>
+                      {/* Hair back */}
+                      <ellipse cx="115" cy="78" rx="24" ry="12" fill="#5D4037"/>
+                      {/* Hair main */}
+                      <ellipse cx="115" cy="77" rx="23" ry="11" fill="url(#dl-hair)"/>
+                      <rect x="92" y="77" width="11" height="17" rx="5.5" fill="url(#dl-hair)"/>
+                      <rect x="126" y="77" width="11" height="17" rx="5.5" fill="url(#dl-hair)"/>
+                      {/* Hair highlight */}
+                      <path d="M104 70 Q113 66 122 70" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.15"/>
+                      {/* Eyebrows — worried / inner-up */}
+                      <path d="M104 93 Q107 90 110 93" stroke="#8D6E63" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                      <path d="M120 93 Q123 90 126 93" stroke="#8D6E63" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                      {/* Eyes — worried wide */}
+                      <circle cx="107" cy="100" r="4.2" fill="#2C1810"/>
+                      <circle cx="123" cy="100" r="4.2" fill="#2C1810"/>
+                      <circle cx="109" cy="98" r="1.5" fill="white" opacity="0.9"/>
+                      <circle cx="125" cy="98" r="1.5" fill="white" opacity="0.9"/>
+                      {/* Worried mouth — frown */}
+                      <path d="M109 111 Q116 106 123 111" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.4"/>
+                      <path d="M109 111 Q116 107 123 111" stroke="#C67B3A" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                      {/* Sweat drop */}
+                      <path d="M131 90 Q134 85 137 90 Q137 94 134 94 Q131 94 131 90Z" fill="#90CAF9" opacity="0.6"/>
+                      {/* Cheeks — stressed pink */}
+                      <ellipse cx="100" cy="106" rx="5.5" ry="3.5" fill="#FFB0A0" opacity="0.45"/>
+                      <ellipse cx="130" cy="106" rx="5.5" ry="3.5" fill="#FFB0A0" opacity="0.45"/>
                     </svg>
                   </div>
                   <Button
@@ -2121,66 +2658,151 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="gc-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFDDAA"/><stop offset="100%" stopColor="#FFBB77"/></linearGradient>
-                        <linearGradient id="gc-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#5D4037"/><stop offset="100%" stopColor="#8D6E63"/></linearGradient>
-                        <linearGradient id="gc-shirtA" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#F5A623"/><stop offset="100%" stopColor="#E8951F"/></linearGradient>
-                        <linearGradient id="gc-shirtB" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#81C784"/><stop offset="100%" stopColor="#4CAF50"/></linearGradient>
-                        <linearGradient id="gc-box" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFF3E0"/><stop offset="100%" stopColor="#FFE0B2"/></linearGradient>
-                        <filter id="gc-shadow"><feDropShadow dx="0" dy="4" stdDeviation="5" floodOpacity="0.12"/></filter>
+                        <linearGradient id="gc-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="gc-skin2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="gc-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#8D6E63"/><stop offset="1" stopColor="#5D4037"/></linearGradient>
+                        <linearGradient id="gc-hairR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#E91E8C"/><stop offset="1" stopColor="#880E4F"/></linearGradient>
+                        <linearGradient id="gc-shirtA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFB74D"/><stop offset="0.5" stopColor="#F5A623"/><stop offset="1" stopColor="#E65100"/></linearGradient>
+                        <linearGradient id="gc-shirtB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#A5D6A7"/><stop offset="0.5" stopColor="#66BB6A"/><stop offset="1" stopColor="#2E7D32"/></linearGradient>
+                        <linearGradient id="gc-pantsA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#4E342E"/><stop offset="1" stopColor="#2C1810"/></linearGradient>
+                        <linearGradient id="gc-pantsB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#1A237E"/><stop offset="1" stopColor="#0D1457"/></linearGradient>
+                        <linearGradient id="gc-box" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFF8F0"/><stop offset="0.6" stopColor="#FFE0B2"/><stop offset="1" stopColor="#FFCC80"/></linearGradient>
+                        <linearGradient id="gc-ribbon" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#EF5350"/><stop offset="1" stopColor="#B71C1C"/></linearGradient>
+                        <filter id="gc-shadow"><feDropShadow dx="0" dy="5" stdDeviation="6" floodOpacity="0.15"/></filter>
+                        <filter id="gc-softshadow"><feDropShadow dx="0" dy="3" stdDeviation="3" floodOpacity="0.1"/></filter>
                       </defs>
+                      {/* Background sparkles */}
+                      <rect x="18" y="70" width="7" height="7" rx="1" fill="#F5A623" opacity="0.2" transform="rotate(45 21 73)"/>
+                      <rect x="230" y="68" width="7" height="7" rx="1" fill="#66BB6A" opacity="0.2" transform="rotate(45 233 71)"/>
+                      <circle cx="130" cy="18" r="5" fill="#EF5350" opacity="0.3"/>
+                      <circle cx="22" cy="160" r="3" fill="#FFD54F" opacity="0.3"/>
+                      <circle cx="237" cy="160" r="3" fill="#81C784" opacity="0.3"/>
                       {/* Ground shadows */}
-                      <ellipse cx="78" cy="190" rx="38" ry="6" fill="#333" opacity="0.07"/>
-                      <ellipse cx="182" cy="190" rx="38" ry="6" fill="#333" opacity="0.07"/>
+                      <ellipse cx="75" cy="191" rx="44" ry="6" fill="#000" opacity="0.07"/>
+                      <ellipse cx="185" cy="191" rx="44" ry="6" fill="#000" opacity="0.07"/>
                       {/* ── Giver (left) ── */}
-                      <rect x="48" y="126" width="44" height="46" rx="13" fill="url(#gc-shirtA)" filter="url(#gc-shadow)"/>
-                      <rect x="54" y="164" width="12" height="20" rx="6" fill="#4E342E"/>
-                      <rect x="72" y="164" width="12" height="20" rx="6" fill="#4E342E"/>
-                      <rect x="51" y="180" width="17" height="7" rx="3.5" fill="#111"/>
-                      <rect x="70" y="180" width="17" height="7" rx="3.5" fill="#111"/>
-                      {/* Giver right arm extending gift */}
-                      <path d="M92 132 Q116 122 124 116" stroke="url(#gc-skin)" strokeWidth="11" strokeLinecap="round" fill="none"/>
                       {/* Giver left arm */}
-                      <path d="M48 134 Q34 142 30 154" stroke="url(#gc-skin)" strokeWidth="11" strokeLinecap="round" fill="none"/>
+                      <path d="M48 136 Q34 143 30 155" stroke="url(#gc-skin2)" strokeWidth="12" strokeLinecap="round" fill="none"/>
+                      <circle cx="30" cy="156" r="7" fill="url(#gc-skin)"/>
+                      {/* Giver pants */}
+                      <rect x="53" y="165" width="13" height="22" rx="7" fill="url(#gc-pantsA)"/>
+                      <rect x="71" y="165" width="13" height="22" rx="7" fill="url(#gc-pantsA)"/>
+                      <rect x="53" y="165" width="31" height="6" rx="3" fill="#1A0B08" opacity="0.5"/>
+                      {/* Giver shoes */}
+                      <rect x="50" y="181" width="19" height="8" rx="4" fill="#111"/>
+                      <rect x="69" y="181" width="19" height="8" rx="4" fill="#111"/>
+                      <rect x="52" y="181" width="11" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      <rect x="71" y="181" width="11" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      {/* Giver shirt */}
+                      <rect x="46" y="127" width="52" height="44" rx="14" fill="url(#gc-shirtA)" filter="url(#gc-shadow)"/>
+                      {/* Giver collar */}
+                      <path d="M63 127 L72 137 L81 127" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.35"/>
+                      <ellipse cx="59" cy="135" rx="6" ry="3.5" fill="white" opacity="0.12"/>
+                      {/* Giver right arm extending gift */}
+                      <path d="M98 133 Q116 123 124 117" stroke="url(#gc-skin2)" strokeWidth="12" strokeLinecap="round" fill="none"/>
+                      <circle cx="125" cy="116" r="7" fill="url(#gc-skin)"/>
+                      {/* Giver neck */}
+                      <rect x="65" y="120" width="14" height="10" rx="4" fill="url(#gc-skin)"/>
+                      {/* Giver ears */}
+                      <ellipse cx="49" cy="107" rx="4.5" ry="6.5" fill="#FFCC88"/>
+                      <ellipse cx="49" cy="107" rx="2.5" ry="4.5" fill="#FFB870" opacity="0.6"/>
+                      <ellipse cx="91" cy="107" rx="4.5" ry="6.5" fill="#FFCC88"/>
+                      <ellipse cx="91" cy="107" rx="2.5" ry="4.5" fill="#FFB870" opacity="0.6"/>
                       {/* Giver head */}
-                      <circle cx="70" cy="105" r="22" fill="url(#gc-skin)" filter="url(#gc-shadow)"/>
-                      <circle cx="62" cy="97" r="8" fill="white" opacity="0.15"/>
-                      <ellipse cx="70" cy="87" rx="20" ry="9" fill="url(#gc-hair)"/>
-                      <rect x="50" y="87" width="8" height="13" rx="4" fill="url(#gc-hair)"/>
-                      <rect x="82" y="87" width="8" height="13" rx="4" fill="url(#gc-hair)"/>
-                      <circle cx="63" cy="105" r="3" fill="#3E2723"/>
-                      <circle cx="77" cy="105" r="3" fill="#3E2723"/>
-                      <circle cx="64" cy="103.5" r="0.9" fill="white"/>
-                      <circle cx="78" cy="103.5" r="0.9" fill="white"/>
-                      <path d="M64 112 Q70 118 76 112" stroke="#C67B3A" strokeWidth="1.6" strokeLinecap="round" fill="none"/>
-                      {/* ── Gift box ── */}
-                      <rect x="112" y="104" width="48" height="36" rx="7" fill="url(#gc-box)" stroke="#F5A623" strokeWidth="2" filter="url(#gc-shadow)"/>
-                      <rect x="112" y="104" width="48" height="14" rx="7" fill="#FFE0B2"/>
-                      <rect x="112" y="112" width="48" height="6" fill="#FFE0B2"/>
-                      <rect x="133" y="104" width="6" height="36" fill="#EF5350" opacity="0.6"/>
-                      <ellipse cx="131" cy="102" rx="10" ry="7" fill="#EF5350"/>
-                      <ellipse cx="141" cy="102" rx="10" ry="7" fill="#EF5350"/>
-                      <circle cx="136" cy="104" r="4" fill="#C62828"/>
+                      <circle cx="70" cy="105" r="24" fill="url(#gc-skin)" filter="url(#gc-shadow)"/>
+                      <circle cx="62" cy="96" r="9" fill="white" opacity="0.18"/>
+                      {/* Giver hair back */}
+                      <ellipse cx="70" cy="83" rx="22" ry="11" fill="#5D4037"/>
+                      {/* Giver hair main */}
+                      <ellipse cx="70" cy="82" rx="21" ry="10" fill="url(#gc-hair)"/>
+                      <rect x="49" y="82" width="10" height="15" rx="5" fill="url(#gc-hair)"/>
+                      <rect x="81" y="82" width="10" height="15" rx="5" fill="url(#gc-hair)"/>
+                      <path d="M60 75 Q69 71 78 75" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.15"/>
+                      {/* Giver eyebrows */}
+                      <path d="M59 98 Q62 95 65 98" stroke="#5D4037" strokeWidth="1.7" strokeLinecap="round" fill="none"/>
+                      <path d="M75 98 Q78 95 81 98" stroke="#5D4037" strokeWidth="1.7" strokeLinecap="round" fill="none"/>
+                      {/* Giver eyes */}
+                      <circle cx="62" cy="104" r="3.5" fill="#2C1810"/>
+                      <circle cx="78" cy="104" r="3.5" fill="#2C1810"/>
+                      <circle cx="64" cy="102" r="1.3" fill="white" opacity="0.9"/>
+                      <circle cx="80" cy="102" r="1.3" fill="white" opacity="0.9"/>
+                      {/* Giver smile */}
+                      <path d="M64 112 Q70 118 76 112" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.4"/>
+                      <path d="M64 112 Q70 119 76 112" stroke="#C67B3A" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      <ellipse cx="57" cy="109" rx="4.5" ry="3" fill="#FFB0A0" opacity="0.35"/>
+                      <ellipse cx="83" cy="109" rx="4.5" ry="3" fill="#FFB0A0" opacity="0.35"/>
+                      {/* ── Gift box — 3D ── */}
+                      <rect x="110" y="100" width="52" height="40" rx="9" fill="url(#gc-box)" stroke="#F5A623" strokeWidth="2" filter="url(#gc-softshadow)"/>
+                      {/* Box lid */}
+                      <rect x="110" y="100" width="52" height="15" rx="9" fill="#FFE0B2"/>
+                      <rect x="110" y="109" width="52" height="6" fill="#FFE0B2"/>
+                      {/* Box side (3D depth) */}
+                      <path d="M162 100 L170 107 L170 147 L162 140 Z" fill="#FFCC80" opacity="0.5"/>
+                      <path d="M110 100 L118 107 L170 107 L162 100 Z" fill="white" opacity="0.2"/>
+                      {/* Box shine */}
+                      <rect x="114" y="102" width="16" height="4" rx="2" fill="white" opacity="0.3"/>
+                      {/* Ribbon vertical */}
+                      <rect x="132" y="100" width="7" height="40" fill="url(#gc-ribbon)" opacity="0.7"/>
+                      {/* Ribbon horizontal on lid */}
+                      <rect x="110" y="107" width="52" height="7" fill="url(#gc-ribbon)" opacity="0.5"/>
+                      {/* Bow loops */}
+                      <ellipse cx="129" cy="98" rx="11" ry="8" fill="url(#gc-ribbon)"/>
+                      <ellipse cx="141" cy="98" rx="11" ry="8" fill="url(#gc-ribbon)"/>
+                      <circle cx="135" cy="100" r="5" fill="#C62828"/>
+                      <circle cx="132" cy="96" r="3" fill="white" opacity="0.2"/>
                       {/* ── Receiver (right) ── */}
-                      <rect x="168" y="126" width="44" height="46" rx="13" fill="url(#gc-shirtB)" filter="url(#gc-shadow)"/>
-                      <rect x="174" y="164" width="12" height="20" rx="6" fill="#4E342E"/>
-                      <rect x="192" y="164" width="12" height="20" rx="6" fill="#4E342E"/>
-                      <rect x="171" y="180" width="17" height="7" rx="3.5" fill="#111"/>
-                      <rect x="190" y="180" width="17" height="7" rx="3.5" fill="#111"/>
-                      {/* Receiver left arm reaching */}
-                      <path d="M168 132 Q150 122 144 116" stroke="url(#gc-skin)" strokeWidth="11" strokeLinecap="round" fill="none"/>
                       {/* Receiver right arm */}
-                      <path d="M212 134 Q226 142 230 154" stroke="url(#gc-skin)" strokeWidth="11" strokeLinecap="round" fill="none"/>
+                      <path d="M212 135 Q226 143 230 155" stroke="url(#gc-skin2)" strokeWidth="12" strokeLinecap="round" fill="none"/>
+                      <circle cx="230" cy="156" r="7" fill="url(#gc-skin)"/>
+                      {/* Receiver pants */}
+                      <rect x="173" y="165" width="13" height="22" rx="7" fill="url(#gc-pantsB)"/>
+                      <rect x="191" y="165" width="13" height="22" rx="7" fill="url(#gc-pantsB)"/>
+                      <rect x="173" y="165" width="31" height="6" rx="3" fill="#060B28" opacity="0.5"/>
+                      {/* Receiver shoes */}
+                      <rect x="170" y="181" width="19" height="8" rx="4" fill="#111"/>
+                      <rect x="189" y="181" width="19" height="8" rx="4" fill="#111"/>
+                      <rect x="172" y="181" width="11" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      <rect x="191" y="181" width="11" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      {/* Receiver shirt */}
+                      <rect x="168" y="127" width="52" height="44" rx="14" fill="url(#gc-shirtB)" filter="url(#gc-shadow)"/>
+                      {/* Receiver collar */}
+                      <path d="M185 127 L194 137 L203 127" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.35"/>
+                      <ellipse cx="180" cy="135" rx="6" ry="3.5" fill="white" opacity="0.12"/>
+                      {/* Receiver left arm reaching */}
+                      <path d="M168 133 Q151 123 144 117" stroke="url(#gc-skin2)" strokeWidth="12" strokeLinecap="round" fill="none"/>
+                      <circle cx="143" cy="116" r="7" fill="url(#gc-skin)"/>
+                      {/* Receiver neck */}
+                      <rect x="187" y="120" width="14" height="10" rx="4" fill="url(#gc-skin)"/>
+                      {/* Receiver ears */}
+                      <ellipse cx="169" cy="107" rx="4.5" ry="6.5" fill="#FFCC88"/>
+                      <ellipse cx="169" cy="107" rx="2.5" ry="4.5" fill="#FFB870" opacity="0.6"/>
+                      <ellipse cx="211" cy="107" rx="4.5" ry="6.5" fill="#FFCC88"/>
+                      <ellipse cx="211" cy="107" rx="2.5" ry="4.5" fill="#FFB870" opacity="0.6"/>
                       {/* Receiver head */}
-                      <circle cx="190" cy="105" r="22" fill="url(#gc-skin)" filter="url(#gc-shadow)"/>
-                      <circle cx="182" cy="97" r="8" fill="white" opacity="0.15"/>
-                      <ellipse cx="190" cy="87" rx="20" ry="9" fill="url(#gc-hair)"/>
-                      <rect x="170" y="87" width="8" height="20" rx="4" fill="url(#gc-hair)"/>
-                      <rect x="202" y="87" width="8" height="20" rx="4" fill="url(#gc-hair)"/>
-                      <circle cx="183" cy="105" r="3" fill="#3E2723"/>
-                      <circle cx="197" cy="105" r="3" fill="#3E2723"/>
-                      <circle cx="184" cy="103.5" r="0.9" fill="white"/>
-                      <circle cx="198" cy="103.5" r="0.9" fill="white"/>
-                      <path d="M184 112 Q190 119 196 112" stroke="#C67B3A" strokeWidth="1.6" strokeLinecap="round" fill="none"/>
+                      <circle cx="190" cy="105" r="24" fill="url(#gc-skin)" filter="url(#gc-shadow)"/>
+                      <circle cx="182" cy="96" r="9" fill="white" opacity="0.18"/>
+                      {/* Receiver hair back (longer, different color) */}
+                      <ellipse cx="190" cy="83" rx="22" ry="12" fill="#880E4F"/>
+                      <rect x="168" y="83" width="10" height="22" rx="5" fill="#880E4F"/>
+                      <rect x="202" y="83" width="10" height="22" rx="5" fill="#880E4F"/>
+                      {/* Receiver hair main */}
+                      <ellipse cx="190" cy="82" rx="21" ry="11" fill="url(#gc-hairR)"/>
+                      <rect x="169" y="82" width="9" height="20" rx="4.5" fill="url(#gc-hairR)"/>
+                      <rect x="203" y="82" width="9" height="20" rx="4.5" fill="url(#gc-hairR)"/>
+                      <path d="M181 75 Q189 71 197 75" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.15"/>
+                      {/* Receiver eyebrows */}
+                      <path d="M179 98 Q182 95 185 98" stroke="#5D4037" strokeWidth="1.7" strokeLinecap="round" fill="none"/>
+                      <path d="M195 98 Q198 95 201 98" stroke="#5D4037" strokeWidth="1.7" strokeLinecap="round" fill="none"/>
+                      {/* Receiver eyes */}
+                      <circle cx="182" cy="104" r="3.5" fill="#2C1810"/>
+                      <circle cx="198" cy="104" r="3.5" fill="#2C1810"/>
+                      <circle cx="184" cy="102" r="1.3" fill="white" opacity="0.9"/>
+                      <circle cx="200" cy="102" r="1.3" fill="white" opacity="0.9"/>
+                      {/* Receiver big smile */}
+                      <path d="M184 112 Q190 120 196 112" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.4"/>
+                      <path d="M184 112 Q190 121 196 112" stroke="#C67B3A" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                      <ellipse cx="177" cy="109" rx="4.5" ry="3" fill="#FFB0A0" opacity="0.4"/>
+                      <ellipse cx="203" cy="109" rx="4.5" ry="3" fill="#FFB0A0" opacity="0.4"/>
                     </svg>
                   </div>
                   <Button className="w-full shrink-0 rounded-[12px] py-3">
@@ -2222,55 +2844,97 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="cr-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFDDAA"/><stop offset="100%" stopColor="#FFBB77"/></linearGradient>
-                        <linearGradient id="cr-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#5D4037"/><stop offset="100%" stopColor="#8D6E63"/></linearGradient>
-                        <linearGradient id="cr-shirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#81C784"/><stop offset="100%" stopColor="#4CAF50"/></linearGradient>
-                        <linearGradient id="cr-coin" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#FFE082"/><stop offset="100%" stopColor="#FFD54F"/></linearGradient>
-                        <filter id="cr-shadow"><feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.12"/></filter>
+                        <linearGradient id="cr-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="cr-skin2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="cr-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#8D6E63"/><stop offset="1" stopColor="#5D4037"/></linearGradient>
+                        <linearGradient id="cr-shirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#A5D6A7"/><stop offset="0.5" stopColor="#66BB6A"/><stop offset="1" stopColor="#1B5E20"/></linearGradient>
+                        <linearGradient id="cr-pants" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#37474F"/><stop offset="1" stopColor="#1C313A"/></linearGradient>
+                        <linearGradient id="cr-coin" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#FFEE58"/><stop offset="0.5" stopColor="#FFD54F"/><stop offset="1" stopColor="#F9A825"/></linearGradient>
+                        <filter id="cr-shadow"><feDropShadow dx="0" dy="5" stdDeviation="7" floodOpacity="0.15"/></filter>
+                        <filter id="cr-coinshadow"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.18"/></filter>
                       </defs>
+                      {/* Star sparkles */}
+                      <path d="M36 56 L39 47 L42 56 L36 52 L42 52Z" fill="#66BB6A" opacity="0.6"/>
+                      <path d="M213 50 L216 41 L219 50 L213 46 L219 46Z" fill="#66BB6A" opacity="0.6"/>
+                      <rect x="28" y="150" width="6" height="6" rx="1" fill="#FFD54F" opacity="0.3" transform="rotate(45 31 153)"/>
+                      <rect x="220" y="148" width="6" height="6" rx="1" fill="#FFD54F" opacity="0.3" transform="rotate(45 223 151)"/>
                       {/* Ground shadow */}
-                      <ellipse cx="124" cy="190" rx="54" ry="7" fill="#333" opacity="0.08"/>
-                      {/* Body */}
-                      <rect x="96" y="124" width="48" height="50" rx="14" fill="url(#cr-shirt)" filter="url(#cr-shadow)"/>
-                      {/* Legs */}
-                      <rect x="102" y="166" width="13" height="22" rx="6" fill="#4E342E"/>
-                      <rect x="123" y="166" width="13" height="22" rx="6" fill="#4E342E"/>
+                      <ellipse cx="121" cy="191" rx="58" ry="7" fill="#000" opacity="0.08"/>
+                      {/* Arms raised catching coins */}
+                      <path d="M97 132 Q78 120 69 106" stroke="url(#cr-skin2)" strokeWidth="13" strokeLinecap="round" fill="none"/>
+                      <circle cx="68" cy="104" r="7" fill="url(#cr-skin)"/>
+                      <path d="M145 132 Q163 120 172 106" stroke="url(#cr-skin2)" strokeWidth="13" strokeLinecap="round" fill="none"/>
+                      <circle cx="173" cy="104" r="7" fill="url(#cr-skin)"/>
+                      {/* Falling coins — 3D with depth lines */}
+                      {/* Big center coin */}
+                      <circle cx="121" cy="44" r="20" fill="url(#cr-coin)" stroke="#F9A825" strokeWidth="2" filter="url(#cr-coinshadow)"/>
+                      <circle cx="121" cy="44" r="14" stroke="#FFB300" strokeWidth="1.5" fill="none"/>
+                      <circle cx="115" cy="37" r="6" fill="white" opacity="0.2"/>
+                      {/* Small text on coin */}
+                      <path d="M116 44 Q121 40 126 44 Q121 48 116 44Z" fill="#F9A825" opacity="0.6"/>
+                      {/* Left coin */}
+                      <circle cx="65" cy="68" r="15" fill="url(#cr-coin)" stroke="#F9A825" strokeWidth="2" filter="url(#cr-coinshadow)"/>
+                      <circle cx="65" cy="68" r="10" stroke="#FFB300" strokeWidth="1.2" fill="none"/>
+                      <circle cx="60" cy="62" r="5" fill="white" opacity="0.18"/>
+                      {/* Right coin */}
+                      <circle cx="177" cy="60" r="17" fill="url(#cr-coin)" stroke="#F9A825" strokeWidth="2" filter="url(#cr-coinshadow)"/>
+                      <circle cx="177" cy="60" r="11" stroke="#FFB300" strokeWidth="1.2" fill="none"/>
+                      <circle cx="171" cy="53" r="6" fill="white" opacity="0.18"/>
+                      {/* Small coins */}
+                      <circle cx="146" cy="88" r="11" fill="url(#cr-coin)" stroke="#F9A825" strokeWidth="1.5"/>
+                      <circle cx="146" cy="88" r="7" stroke="#FFB300" strokeWidth="1" fill="none"/>
+                      <circle cx="96" cy="94" r="10" fill="url(#cr-coin)" stroke="#F9A825" strokeWidth="1.5"/>
+                      <circle cx="96" cy="94" r="6.5" stroke="#FFB300" strokeWidth="1" fill="none"/>
+                      {/* Motion dashes */}
+                      <path d="M121 24 L121 32" stroke="#FFB300" strokeWidth="2" strokeDasharray="2 2" opacity="0.6"/>
+                      <path d="M65 50 L65 57" stroke="#FFB300" strokeWidth="1.5" strokeDasharray="2 2" opacity="0.6"/>
+                      <path d="M177 41 L177 48" stroke="#FFB300" strokeWidth="1.5" strokeDasharray="2 2" opacity="0.6"/>
+                      {/* Pants */}
+                      <rect x="101" y="167" width="15" height="26" rx="8" fill="url(#cr-pants)"/>
+                      <rect x="122" y="167" width="15" height="26" rx="8" fill="url(#cr-pants)"/>
+                      <rect x="101" y="167" width="36" height="6" rx="3" fill="#0E1B20" opacity="0.5"/>
                       {/* Shoes */}
-                      <rect x="99" y="184" width="18" height="8" rx="4" fill="#2E2E2E"/>
-                      <rect x="120" y="184" width="18" height="8" rx="4" fill="#2E2E2E"/>
-                      {/* Arms raised up catching coins */}
-                      <path d="M96 130 Q76 118 68 104" stroke="url(#cr-skin)" strokeWidth="12" strokeLinecap="round" fill="none"/>
-                      <path d="M144 130 Q162 118 170 104" stroke="url(#cr-skin)" strokeWidth="12" strokeLinecap="round" fill="none"/>
-                      {/* Falling coins */}
-                      <circle cx="120" cy="48" r="18" fill="url(#cr-coin)" stroke="#F9A825" strokeWidth="2" filter="url(#cr-shadow)"/>
-                      <circle cx="120" cy="48" r="12" stroke="#FFB300" strokeWidth="1.5" fill="none"/>
-                      <circle cx="68" cy="72" r="13" fill="url(#cr-coin)" stroke="#F9A825" strokeWidth="1.5" filter="url(#cr-shadow)"/>
-                      <circle cx="68" cy="72" r="8" stroke="#FFB300" strokeWidth="1" fill="none"/>
-                      <circle cx="172" cy="65" r="15" fill="url(#cr-coin)" stroke="#F9A825" strokeWidth="1.5" filter="url(#cr-shadow)"/>
-                      <circle cx="172" cy="65" r="10" stroke="#FFB300" strokeWidth="1" fill="none"/>
-                      <circle cx="145" cy="90" r="10" fill="url(#cr-coin)" stroke="#F9A825" strokeWidth="1.5"/>
-                      <circle cx="95" cy="96" r="9" fill="url(#cr-coin)" stroke="#F9A825" strokeWidth="1.5"/>
-                      {/* Motion dashes on coins */}
-                      <path d="M120 30 L120 36" stroke="#FFB300" strokeWidth="1.5" strokeDasharray="2 2" opacity="0.6"/>
-                      <path d="M68 54 L68 60" stroke="#FFB300" strokeWidth="1.5" strokeDasharray="2 2" opacity="0.6"/>
-                      <path d="M172 47 L172 53" stroke="#FFB300" strokeWidth="1.5" strokeDasharray="2 2" opacity="0.6"/>
-                      {/* Stars */}
-                      <path d="M40 60 L43 52 L46 60 L40 56 L46 56Z" fill="#66BB6A" opacity="0.6"/>
-                      <path d="M210 55 L213 47 L216 55 L210 51 L216 51Z" fill="#66BB6A" opacity="0.6"/>
+                      <rect x="98" y="187" width="21" height="9" rx="5" fill="#111"/>
+                      <rect x="119" y="187" width="21" height="9" rx="5" fill="#111"/>
+                      <rect x="100" y="187" width="13" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      <rect x="121" y="187" width="13" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      {/* Body/shirt */}
+                      <rect x="95" y="124" width="56" height="49" rx="16" fill="url(#cr-shirt)" filter="url(#cr-shadow)"/>
+                      {/* Collar */}
+                      <path d="M112 124 L123 136 L134 124" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.35"/>
+                      {/* Shirt shine */}
+                      <ellipse cx="108" cy="133" rx="7" ry="4" fill="white" opacity="0.12"/>
+                      {/* Neck */}
+                      <rect x="115" y="118" width="16" height="10" rx="4" fill="url(#cr-skin)"/>
+                      {/* Ears */}
+                      <ellipse cx="97" cy="104" rx="5" ry="7" fill="#FFCC88"/>
+                      <ellipse cx="97" cy="104" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
+                      <ellipse cx="145" cy="104" rx="5" ry="7" fill="#FFCC88"/>
+                      <ellipse cx="145" cy="104" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
                       {/* Head */}
-                      <circle cx="120" cy="102" r="24" fill="url(#cr-skin)" filter="url(#cr-shadow)"/>
-                      <circle cx="112" cy="94" r="9" fill="white" opacity="0.15"/>
-                      {/* Hair */}
-                      <ellipse cx="120" cy="84" rx="22" ry="10" fill="url(#cr-hair)"/>
-                      <rect x="98" y="84" width="10" height="14" rx="5" fill="url(#cr-hair)"/>
-                      <rect x="132" y="84" width="10" height="14" rx="5" fill="url(#cr-hair)"/>
-                      {/* Eyes */}
-                      <circle cx="113" cy="102" r="3.5" fill="#3E2723"/>
-                      <circle cx="127" cy="102" r="3.5" fill="#3E2723"/>
-                      <circle cx="114" cy="100.5" r="1" fill="white"/>
-                      <circle cx="128" cy="100.5" r="1" fill="white"/>
-                      {/* Big smile */}
-                      <path d="M113 111 Q120 118 127 111" stroke="#C67B3A" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                      <circle cx="121" cy="102" r="26" fill="url(#cr-skin)" filter="url(#cr-shadow)"/>
+                      <circle cx="113" cy="93" r="9" fill="white" opacity="0.18"/>
+                      {/* Hair back */}
+                      <ellipse cx="121" cy="80" rx="24" ry="12" fill="#5D4037"/>
+                      {/* Hair main */}
+                      <ellipse cx="121" cy="79" rx="23" ry="11" fill="url(#cr-hair)"/>
+                      <rect x="98" y="79" width="11" height="17" rx="5.5" fill="url(#cr-hair)"/>
+                      <rect x="132" y="79" width="11" height="17" rx="5.5" fill="url(#cr-hair)"/>
+                      <path d="M110 72 Q119 68 128 72" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.15"/>
+                      {/* Eyebrows — happy raised */}
+                      <path d="M109 95 Q112 92 115 95" stroke="#5D4037" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      <path d="M127 95 Q130 92 133 95" stroke="#5D4037" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      {/* Eyes — wide excited */}
+                      <circle cx="112" cy="101" r="4.5" fill="#2C1810"/>
+                      <circle cx="130" cy="101" r="4.5" fill="#2C1810"/>
+                      <circle cx="114" cy="99" r="1.7" fill="white" opacity="0.9"/>
+                      <circle cx="132" cy="99" r="1.7" fill="white" opacity="0.9"/>
+                      {/* Big excited smile */}
+                      <path d="M112 111 Q121 120 130 111" stroke="white" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.4"/>
+                      <path d="M112 111 Q121 121 130 111" stroke="#C67B3A" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+                      {/* Cheeks — excited */}
+                      <ellipse cx="105" cy="108" rx="6" ry="4" fill="#FFB0A0" opacity="0.45"/>
+                      <ellipse cx="137" cy="108" rx="6" ry="4" fill="#FFB0A0" opacity="0.45"/>
                     </svg>
                   </div>
                 </div>
@@ -2287,57 +2951,102 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="rd-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#FFDDAA"/><stop offset="100%" stopColor="#FFBB77"/></linearGradient>
-                        <linearGradient id="rd-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#5D4037"/><stop offset="100%" stopColor="#8D6E63"/></linearGradient>
-                        <linearGradient id="rd-shirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#CE93D8"/><stop offset="100%" stopColor="#9C27B0"/></linearGradient>
-                        <linearGradient id="rd-ticket" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#EDE7F6"/><stop offset="100%" stopColor="#D1C4E9"/></linearGradient>
-                        <filter id="rd-shadow"><feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.12"/></filter>
+                        <linearGradient id="rd-skin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="rd-skin2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#FFDDAA"/><stop offset="1" stopColor="#FFBB77"/></linearGradient>
+                        <linearGradient id="rd-hair" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#8D6E63"/><stop offset="1" stopColor="#5D4037"/></linearGradient>
+                        <linearGradient id="rd-shirt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#CE93D8"/><stop offset="0.5" stopColor="#AB47BC"/><stop offset="1" stopColor="#6A1B9A"/></linearGradient>
+                        <linearGradient id="rd-pants" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#4A148C"/><stop offset="1" stopColor="#2E0060"/></linearGradient>
+                        <linearGradient id="rd-ticket" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#F3E5F5"/><stop offset="0.5" stopColor="#E1BEE7"/><stop offset="1" stopColor="#CE93D8"/></linearGradient>
+                        <filter id="rd-shadow"><feDropShadow dx="0" dy="5" stdDeviation="7" floodOpacity="0.15"/></filter>
+                        <filter id="rd-softshadow"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.1"/></filter>
                       </defs>
+                      {/* Sparkles */}
+                      <path d="M185 46 L189 36 L193 46 L187 42 L193 42Z" fill="#FFD54F" opacity="0.9"/>
+                      <circle cx="189" cy="41" r="3.5" fill="#FFF176" opacity="0.8"/>
+                      <path d="M33 52 L37 44 L41 52 L35 48 L41 48Z" fill="#CE93D8" opacity="0.7"/>
+                      <circle cx="220" cy="70" r="5" fill="#7E57C2" opacity="0.28"/>
+                      <circle cx="34" cy="148" r="4" fill="#FFD54F" opacity="0.35"/>
+                      <circle cx="188" cy="140" r="4" fill="#CE93D8" opacity="0.35"/>
                       {/* Ground shadow */}
-                      <ellipse cx="118" cy="190" rx="54" ry="7" fill="#333" opacity="0.08"/>
-                      {/* Body */}
-                      <rect x="90" y="124" width="48" height="50" rx="14" fill="url(#rd-shirt)" filter="url(#rd-shadow)"/>
-                      {/* Legs */}
-                      <rect x="96" y="166" width="13" height="22" rx="6" fill="#4E342E"/>
-                      <rect x="117" y="166" width="13" height="22" rx="6" fill="#4E342E"/>
-                      {/* Shoes */}
-                      <rect x="93" y="184" width="18" height="8" rx="4" fill="#2E2E2E"/>
-                      <rect x="114" y="184" width="18" height="8" rx="4" fill="#2E2E2E"/>
+                      <ellipse cx="115" cy="191" rx="58" ry="7" fill="#000" opacity="0.08"/>
                       {/* Arms holding ticket up */}
-                      <path d="M90 130 Q72 120 62 110" stroke="url(#rd-skin)" strokeWidth="12" strokeLinecap="round" fill="none"/>
-                      <path d="M138 130 Q156 120 166 110" stroke="url(#rd-skin)" strokeWidth="12" strokeLinecap="round" fill="none"/>
-                      {/* Ticket */}
-                      <rect x="52" y="68" width="124" height="58" rx="10" fill="url(#rd-ticket)" stroke="#7E57C2" strokeWidth="2" filter="url(#rd-shadow)"/>
+                      <path d="M91 133 Q74 123 63 112" stroke="url(#rd-skin2)" strokeWidth="13" strokeLinecap="round" fill="none"/>
+                      <circle cx="62" cy="111" r="7" fill="url(#rd-skin)"/>
+                      <path d="M141 133 Q158 123 167 112" stroke="url(#rd-skin2)" strokeWidth="13" strokeLinecap="round" fill="none"/>
+                      <circle cx="168" cy="111" r="7" fill="url(#rd-skin)"/>
+                      {/* Ticket — 3D */}
+                      <rect x="48" y="62" width="134" height="64" rx="12" fill="url(#rd-ticket)" stroke="#7E57C2" strokeWidth="2.5" filter="url(#rd-softshadow)"/>
+                      {/* Ticket 3D depth */}
+                      <path d="M182 62 L192 70 L192 134 L182 126 Z" fill="#B39DDB" opacity="0.35"/>
+                      <path d="M48 62 L58 70 L192 70 L182 62 Z" fill="white" opacity="0.18"/>
+                      {/* Ticket shine */}
+                      <rect x="52" y="65" width="28" height="5" rx="2.5" fill="white" opacity="0.3"/>
                       {/* Notch left */}
-                      <circle cx="52" cy="97" r="9" fill="white" stroke="#7E57C2" strokeWidth="2"/>
+                      <circle cx="48" cy="94" r="11" fill="white" stroke="#7E57C2" strokeWidth="2.5"/>
                       {/* Notch right */}
-                      <circle cx="176" cy="97" r="9" fill="white" stroke="#7E57C2" strokeWidth="2"/>
-                      {/* Dashed center line */}
-                      <line x1="74" y1="97" x2="154" y2="97" stroke="#B39DDB" strokeWidth="1.5" strokeDasharray="5 3"/>
-                      {/* Code bar on ticket */}
-                      <rect x="68" y="76" width="88" height="14" rx="5" fill="#B39DDB"/>
-                      <rect x="76" y="106" width="60" height="12" rx="4" fill="#B39DDB"/>
-                      {/* Sparkles around ticket */}
-                      <path d="M182 52 L186 42 L190 52 L184 48 L190 48Z" fill="#FFD54F"/>
-                      <circle cx="186" cy="47" r="3" fill="#FFF176"/>
-                      <path d="M36 58 L40 50 L44 58 L38 54 L44 54Z" fill="#CE93D8" opacity="0.7"/>
-                      <circle cx="218" cy="75" r="4" fill="#7E57C2" opacity="0.3"/>
-                      <circle cx="38" cy="140" r="3" fill="#FFD54F" opacity="0.4"/>
-                      <circle cx="186" cy="138" r="4" fill="#CE93D8" opacity="0.4"/>
+                      <circle cx="182" cy="94" r="11" fill="white" stroke="#7E57C2" strokeWidth="2.5"/>
+                      {/* Dashed center divider */}
+                      <line x1="72" y1="94" x2="158" y2="94" stroke="#B39DDB" strokeWidth="1.8" strokeDasharray="6 3"/>
+                      {/* Barcode bars on ticket (top half) */}
+                      <rect x="65" y="70" width="4" height="18" rx="2" fill="#9C27B0" opacity="0.5"/>
+                      <rect x="72" y="70" width="7" height="18" rx="2" fill="#9C27B0" opacity="0.5"/>
+                      <rect x="82" y="70" width="3" height="18" rx="1.5" fill="#9C27B0" opacity="0.5"/>
+                      <rect x="88" y="70" width="6" height="18" rx="2" fill="#9C27B0" opacity="0.5"/>
+                      <rect x="97" y="70" width="4" height="18" rx="2" fill="#9C27B0" opacity="0.5"/>
+                      <rect x="104" y="70" width="8" height="18" rx="2" fill="#9C27B0" opacity="0.5"/>
+                      <rect x="115" y="70" width="3" height="18" rx="1.5" fill="#9C27B0" opacity="0.5"/>
+                      <rect x="121" y="70" width="5" height="18" rx="2" fill="#9C27B0" opacity="0.5"/>
+                      <rect x="129" y="70" width="4" height="18" rx="2" fill="#9C27B0" opacity="0.5"/>
+                      <rect x="136" y="70" width="7" height="18" rx="2" fill="#9C27B0" opacity="0.5"/>
+                      {/* Code text on bottom half */}
+                      <rect x="72" y="104" width="66" height="13" rx="5" fill="#B39DDB"/>
+                      <rect x="74" y="106" width="20" height="3" rx="1.5" fill="white" opacity="0.3"/>
+                      {/* Pants */}
+                      <rect x="96" y="167" width="15" height="26" rx="8" fill="url(#rd-pants)"/>
+                      <rect x="117" y="167" width="15" height="26" rx="8" fill="url(#rd-pants)"/>
+                      <rect x="96" y="167" width="36" height="6" rx="3" fill="#1A0040" opacity="0.5"/>
+                      {/* Shoes */}
+                      <rect x="93" y="187" width="21" height="9" rx="5" fill="#111"/>
+                      <rect x="114" y="187" width="21" height="9" rx="5" fill="#111"/>
+                      <rect x="95" y="187" width="13" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      <rect x="116" y="187" width="13" height="3" rx="1.5" fill="white" opacity="0.12"/>
+                      {/* Body/shirt */}
+                      <rect x="89" y="125" width="56" height="48" rx="16" fill="url(#rd-shirt)" filter="url(#rd-shadow)"/>
+                      {/* Collar */}
+                      <path d="M106 125 L117 136 L128 125" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.35"/>
+                      {/* Shirt shine */}
+                      <ellipse cx="102" cy="134" rx="7" ry="4" fill="white" opacity="0.12"/>
+                      {/* Neck */}
+                      <rect x="109" y="119" width="16" height="10" rx="4" fill="url(#rd-skin)"/>
+                      {/* Ears */}
+                      <ellipse cx="91" cy="104" rx="5" ry="7" fill="#FFCC88"/>
+                      <ellipse cx="91" cy="104" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
+                      <ellipse cx="139" cy="104" rx="5" ry="7" fill="#FFCC88"/>
+                      <ellipse cx="139" cy="104" rx="3" ry="5" fill="#FFB870" opacity="0.6"/>
                       {/* Head */}
-                      <circle cx="114" cy="102" r="24" fill="url(#rd-skin)" filter="url(#rd-shadow)"/>
-                      <circle cx="106" cy="94" r="9" fill="white" opacity="0.15"/>
-                      {/* Hair */}
-                      <ellipse cx="114" cy="84" rx="22" ry="10" fill="url(#rd-hair)"/>
-                      <rect x="92" y="84" width="10" height="14" rx="5" fill="url(#rd-hair)"/>
-                      <rect x="126" y="84" width="10" height="14" rx="5" fill="url(#rd-hair)"/>
+                      <circle cx="115" cy="102" r="26" fill="url(#rd-skin)" filter="url(#rd-shadow)"/>
+                      <circle cx="107" cy="93" r="9" fill="white" opacity="0.18"/>
+                      {/* Hair back */}
+                      <ellipse cx="115" cy="80" rx="24" ry="12" fill="#5D4037"/>
+                      {/* Hair main */}
+                      <ellipse cx="115" cy="79" rx="23" ry="11" fill="url(#rd-hair)"/>
+                      <rect x="92" y="79" width="11" height="17" rx="5.5" fill="url(#rd-hair)"/>
+                      <rect x="126" y="79" width="11" height="17" rx="5.5" fill="url(#rd-hair)"/>
+                      <path d="M104 72 Q113 68 122 72" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.15"/>
+                      {/* Eyebrows */}
+                      <path d="M103 95 Q106 92 109 95" stroke="#5D4037" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      <path d="M121 95 Q124 92 127 95" stroke="#5D4037" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
                       {/* Eyes */}
-                      <circle cx="107" cy="102" r="3.5" fill="#3E2723"/>
-                      <circle cx="121" cy="102" r="3.5" fill="#3E2723"/>
-                      <circle cx="108" cy="100.5" r="1" fill="white"/>
-                      <circle cx="122" cy="100.5" r="1" fill="white"/>
+                      <circle cx="106" cy="101" r="4" fill="#2C1810"/>
+                      <circle cx="124" cy="101" r="4" fill="#2C1810"/>
+                      <circle cx="108" cy="99" r="1.5" fill="white" opacity="0.9"/>
+                      <circle cx="126" cy="99" r="1.5" fill="white" opacity="0.9"/>
                       {/* Smile */}
-                      <path d="M108 111 Q114 117 120 111" stroke="#C67B3A" strokeWidth="1.8" strokeLinecap="round" fill="none"/>
+                      <path d="M108 111 Q115 118 122 111" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.4"/>
+                      <path d="M108 111 Q115 119 122 111" stroke="#C67B3A" strokeWidth="2" strokeLinecap="round" fill="none"/>
+                      {/* Cheeks */}
+                      <ellipse cx="100" cy="108" rx="5" ry="3" fill="#FFB0A0" opacity="0.35"/>
+                      <ellipse cx="130" cy="108" rx="5" ry="3" fill="#FFB0A0" opacity="0.35"/>
                     </svg>
                   </div>
                   <Button className="w-full shrink-0 rounded-[12px] py-3">
