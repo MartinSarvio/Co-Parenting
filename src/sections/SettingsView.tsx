@@ -694,52 +694,23 @@ const [evidenceDraft, setEvidenceDraft] = useState({
 
               <div className="border-t border-border" />
 
-              {/* ─── Familiens allergener ─── */}
-              <div className="pt-2">
-                <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1 pb-2">Familiens allergener</p>
-                <div className="divide-y divide-border">
-                  {currentUser && (
-                    <button
-                      onClick={() => setSettingsDetailView(`allergen-${currentUser.id}`)}
-                      className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <User className="h-4 w-4 text-muted-foreground shrink-0" />
-                        <div className="min-w-0">
-                          <p className="text-[15px] font-medium text-foreground truncate">{currentUser.name}</p>
-                          <p className="text-[13px] text-muted-foreground truncate">
-                            {currentUser.allergies?.length ? currentUser.allergies.join(', ') : 'Ingen allergener'}
-                          </p>
-                        </div>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
-                    </button>
-                  )}
-                  {children.map(child => (
-                    <button
-                      key={child.id}
-                      onClick={() => setSettingsDetailView(`allergen-${child.id}`)}
-                      className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
-                    >
-                      <div className="flex items-center gap-2 min-w-0">
-                        <Heart className="h-4 w-4 text-[#f58a2d] shrink-0" />
-                        <div className="min-w-0">
-                          <p className="text-[15px] font-medium text-foreground truncate">{child.name}</p>
-                          <p className="text-[13px] text-muted-foreground truncate">
-                            {child.allergies?.length ? child.allergies.join(', ') : 'Ingen allergener'}
-                          </p>
-                        </div>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
-                    </button>
-                  ))}
-                </div>
+              {/* ─── Familiens allergener — single nav row ─── */}
+              <div className="divide-y divide-border">
+                <button
+                  onClick={() => setSettingsDetailView('allergen-list')}
+                  className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
+                >
+                  <div>
+                    <p className="text-[15px] font-medium text-foreground">Familiens allergener</p>
+                    <p className="text-[13px] text-muted-foreground">Administrer allergener for hele familien</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
+                </button>
               </div>
 
-              {/* ─── Konto ─── */}
-              <div className="pt-2">
-                <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1 pb-2">Konto</p>
-                <div className="divide-y divide-border">
+              <div className="border-t border-border" />
+
+              <div className="divide-y divide-border">
                   <button
                     onClick={() => setSettingsDetailView('edit-export')}
                     className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
@@ -755,12 +726,11 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                     className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
                   >
                     <div>
-                      <p className="text-[15px] font-medium text-red-600">Slet min konto</p>
+                      <p className="text-[15px] font-medium text-foreground">Slet min konto</p>
                       <p className="text-[13px] text-muted-foreground">Alle persondata anonymiseres permanent</p>
                     </div>
                     <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                   </button>
-                </div>
               </div>
 
               {/* ─── Log ud ─── */}
