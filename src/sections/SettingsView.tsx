@@ -666,62 +666,79 @@ const [evidenceDraft, setEvidenceDraft] = useState({
               </div>
 
               {/* ─── Familiens allergener + Konto ─── */}
-              <div className="pt-2 divide-y divide-border">
+              <div className="divide-y divide-border">
                   <button
                     onClick={() => setSettingsDetailView('edit-allergens')}
                     className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-background">
-                        <Tag className="h-[18px] w-[18px] text-muted-foreground" />
-                      </div>
-                      <div>
-                        <p className="text-[15px] font-medium text-foreground">Familiens allergener</p>
-                        <p className="text-[13px] text-muted-foreground">Administrer allergener for hele familien</p>
-                      </div>
+                    <div className="min-w-0">
+                      <p className="text-[15px] font-medium text-foreground">Familiens allergener</p>
+                      <p className="text-[13px] text-muted-foreground">Administrer allergener for hele familien</p>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
                   </button>
                   <button
                     onClick={() => setSettingsDetailView('edit-export')}
                     className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-background">
-                        <Save className="h-[18px] w-[18px] text-muted-foreground" />
-                      </div>
-                      <div>
-                        <p className="text-[15px] font-medium text-foreground">Eksporter mine data</p>
-                        <p className="text-[13px] text-muted-foreground">Download alle dine data (GDPR)</p>
-                      </div>
+                    <div className="min-w-0">
+                      <p className="text-[15px] font-medium text-foreground">Eksporter mine data</p>
+                      <p className="text-[13px] text-muted-foreground">Download alle dine data (GDPR)</p>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
                   </button>
                   <button
                     onClick={() => setSettingsDetailView('edit-delete')}
                     className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-[8px] bg-red-50">
-                        <Trash2 className="h-[18px] w-[18px] text-red-500" />
-                      </div>
-                      <div>
-                        <p className="text-[15px] font-medium text-red-600">Slet min konto</p>
-                        <p className="text-[13px] text-muted-foreground">Alle persondata anonymiseres permanent</p>
-                      </div>
+                    <div className="min-w-0">
+                      <p className="text-[15px] font-medium text-red-600">Slet min konto</p>
+                      <p className="text-[13px] text-muted-foreground">Alle persondata anonymiseres permanent</p>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
                   </button>
               </div>
+
+              {/* ─── Log ud ─── */}
+              <button
+                onClick={async () => {
+                  const { logoutUser } = await import('@/lib/auth');
+                  await logoutUser();
+                  window.location.reload();
+                }}
+                className="flex w-full items-center justify-center py-3.5 text-[15px] font-semibold text-red-500 transition-colors hover:bg-red-50 rounded-[12px] mt-6"
+              >
+                Log ud
+              </button>
             </motion.div>
           ) : (
             <>
               {/* ─── edit-name ─── */}
               {settingsDetailView === 'edit-name' && (
-                <motion.div key="edit-name" initial={{ x: 80, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 80, opacity: 0 }} transition={{ duration: 0.22, ease: 'easeOut' }} className="space-y-4">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-1">Navn</p>
-                  <Input value={profileDraft.name} onChange={(e) => setProfileDraft(prev => ({ ...prev, name: e.target.value }))} />
-                  <Button onClick={handleSaveField({ name: profileDraft.name.trim() })} className="w-full" disabled={isSaving}>
+                <motion.div key="edit-name" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="min-h-[calc(100vh-200px)] flex flex-col">
+                  <div>
+                    <h2 className="text-[28px] font-bold text-foreground pb-4">Navn</h2>
+                    <div className="space-y-1.5">
+                      <Label className="text-[13px] text-muted-foreground">Navn</Label>
+                      <Input value={profileDraft.name} onChange={(e) => setProfileDraft(prev => ({ ...prev, name: e.target.value }))} className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
+                    </div>
+                  </div>
+                  <div className="flex-1 flex items-center justify-center py-6">
+                    <svg width="200" height="160" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="40" y="30" width="120" height="80" rx="12" fill="#E8F4FD" stroke="#B8D8E8" strokeWidth="2"/>
+                      <rect x="60" y="50" width="50" height="8" rx="4" fill="#7CB9D6"/>
+                      <rect x="60" y="65" width="80" height="6" rx="3" fill="#B8D8E8"/>
+                      <rect x="60" y="78" width="60" height="6" rx="3" fill="#B8D8E8"/>
+                      <circle cx="145" cy="15" r="12" fill="#FFD6A5"/>
+                      <path d="M140 15 L145 8 L150 15" fill="#F4A460"/>
+                      <rect x="142" y="15" width="6" height="20" rx="2" fill="#FFD6A5"/>
+                      <path d="M138 35 L152 35 L148 28 L142 28Z" fill="#F4A460"/>
+                      <circle cx="50" cy="130" r="8" fill="#FFE0B2"/>
+                      <circle cx="160" cy="140" r="6" fill="#C8E6C9"/>
+                      <circle cx="30" cy="60" r="5" fill="#F8BBD0"/>
+                    </svg>
+                  </div>
+                  <Button onClick={handleSaveField({ name: profileDraft.name.trim() })} className="w-full shrink-0" disabled={isSaving}>
                     Gem
                   </Button>
                 </motion.div>
@@ -729,10 +746,35 @@ const [evidenceDraft, setEvidenceDraft] = useState({
 
               {/* ─── edit-email ─── */}
               {settingsDetailView === 'edit-email' && (
-                <motion.div key="edit-email" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="space-y-4">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-1">Email</p>
-                  <Input type="email" value={profileDraft.email} onChange={(e) => setProfileDraft(prev => ({ ...prev, email: e.target.value }))} />
-                  <Button onClick={handleSaveField({ email: profileDraft.email.trim() })} className="w-full" disabled={isSaving}>
+                <motion.div key="edit-email" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="min-h-[calc(100vh-200px)] flex flex-col">
+                  <div>
+                    <h2 className="text-[28px] font-bold text-foreground pb-4">Email</h2>
+                    <div className="space-y-1.5">
+                      <Label className="text-[13px] text-muted-foreground">Email</Label>
+                      <Input type="email" value={profileDraft.email} onChange={(e) => setProfileDraft(prev => ({ ...prev, email: e.target.value }))} className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
+                    </div>
+                  </div>
+                  <div className="flex-1 flex items-center justify-center py-6">
+                    <svg width="220" height="180" viewBox="0 0 220 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="110" cy="60" r="22" fill="#FFD6A5"/>
+                      <path d="M95 50 C95 40, 125 40, 125 50" fill="#4A3728"/>
+                      <path d="M88 55 C85 45, 90 35, 100 38 L95 58Z" fill="#4A3728"/>
+                      <path d="M132 55 C135 45, 130 35, 120 38 L125 58Z" fill="#4A3728"/>
+                      <circle cx="103" cy="58" r="2" fill="#4A3728"/>
+                      <circle cx="117" cy="58" r="2" fill="#4A3728"/>
+                      <path d="M106 67 Q110 71 114 67" stroke="#E88B7A" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                      <rect x="95" y="82" width="30" height="45" rx="6" fill="#89CFF0"/>
+                      <rect x="100" y="82" width="20" height="12" rx="3" fill="#F8BBD0"/>
+                      <rect x="98" y="110" width="24" height="14" rx="4" fill="#2C2C2C"/>
+                      <rect x="100" y="112" width="20" height="10" rx="2" fill="#4FC3F7"/>
+                      <path d="M80 95 L95 100" stroke="#FFD6A5" strokeWidth="6" strokeLinecap="round"/>
+                      <path d="M140 95 L125 100" stroke="#FFD6A5" strokeWidth="6" strokeLinecap="round"/>
+                      <circle cx="40" cy="140" r="10" fill="#FFECB3"/>
+                      <circle cx="180" cy="130" r="8" fill="#C8E6C9"/>
+                      <rect x="155" y="150" width="30" height="4" rx="2" fill="#E0E0E0"/>
+                    </svg>
+                  </div>
+                  <Button onClick={handleSaveField({ email: profileDraft.email.trim() })} className="w-full shrink-0" disabled={isSaving}>
                     Gem
                   </Button>
                 </motion.div>
@@ -740,10 +782,48 @@ const [evidenceDraft, setEvidenceDraft] = useState({
 
               {/* ─── edit-phone ─── */}
               {settingsDetailView === 'edit-phone' && (
-                <motion.div key="edit-phone" initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 40, opacity: 0 }} transition={{ duration: 0.22, ease: 'easeOut' }} className="space-y-4">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-1">Telefon</p>
-                  <Input value={profileDraft.phone} onChange={(e) => setProfileDraft(prev => ({ ...prev, phone: e.target.value }))} placeholder="+45 ..." />
-                  <Button onClick={handleSaveField({ phone: profileDraft.phone.trim() || undefined })} className="w-full" disabled={isSaving}>
+                <motion.div key="edit-phone" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="min-h-[calc(100vh-200px)] flex flex-col">
+                  <div>
+                    <h2 className="text-[28px] font-bold text-foreground pb-4">Mobilnummer</h2>
+                    <div className="grid grid-cols-[1fr_1.5fr] gap-3">
+                      <div className="space-y-1.5">
+                        <Label className="text-[13px] text-muted-foreground">Land</Label>
+                        <div className="flex items-center gap-2 rounded-[12px] border border-border bg-card px-4 py-3">
+                          <span className="text-[15px]">🇩🇰 +45</span>
+                          <ChevronRight className="h-3 w-3 text-muted-foreground ml-auto" />
+                        </div>
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-[13px] text-muted-foreground">Nummer</Label>
+                        <Input value={profileDraft.phone.replace('+45', '').trim()} onChange={(e) => setProfileDraft(prev => ({ ...prev, phone: e.target.value }))} className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex-1 flex items-center justify-center py-6">
+                    <svg width="240" height="180" viewBox="0 0 240 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="20" y="110" width="60" height="8" rx="4" fill="#E8D5F5"/>
+                      <rect x="22" y="90" width="56" height="22" rx="4" fill="#D4A5E5" opacity="0.6"/>
+                      <rect x="30" y="80" width="40" height="35" rx="6" fill="#BA68C8"/>
+                      <circle cx="50" cy="72" r="14" fill="#FFCDD2"/>
+                      <circle cx="50" cy="68" r="6" fill="#F48FB1"/>
+                      <path d="M44 68 Q50 60 56 68" fill="#F48FB1"/>
+                      <rect x="85" y="30" width="55" height="100" rx="10" fill="#80DEEA"/>
+                      <rect x="90" y="40" width="45" height="60" rx="4" fill="#B2EBF2"/>
+                      <rect x="95" y="50" width="35" height="8" rx="2" fill="#4DD0E1"/>
+                      <rect x="95" y="62" width="35" height="8" rx="2" fill="#4DD0E1"/>
+                      <rect x="95" y="74" width="35" height="8" rx="2" fill="#4DD0E1"/>
+                      <rect x="90" y="105" width="45" height="15" rx="4" fill="#4DB6AC"/>
+                      <circle cx="112" cy="112" r="4" fill="#80DEEA"/>
+                      <rect x="93" y="34" width="10" height="3" rx="1.5" fill="#4DD0E1"/>
+                      <ellipse cx="185" cy="130" rx="30" ry="20" fill="#FFCCBC"/>
+                      <ellipse cx="185" cy="125" rx="25" ry="8" fill="#FF8A65" opacity="0.3"/>
+                      <rect x="180" y="108" width="3" height="18" rx="1" fill="#BCAAA4"/>
+                      <ellipse cx="182" cy="107" rx="6" ry="4" fill="#E0E0E0"/>
+                      <circle cx="195" cy="150" r="5" fill="#C8E6C9"/>
+                      <circle cx="165" cy="155" r="3" fill="#FFE0B2"/>
+                    </svg>
+                  </div>
+                  <Button onClick={handleSaveField({ phone: profileDraft.phone.trim() || undefined })} className="w-full shrink-0" disabled={isSaving}>
                     Gem
                   </Button>
                 </motion.div>
@@ -751,13 +831,37 @@ const [evidenceDraft, setEvidenceDraft] = useState({
 
               {/* ─── edit-birthday ─── */}
               {settingsDetailView === 'edit-birthday' && (
-                <motion.div key="edit-birthday" initial={{ x: -60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: -60, opacity: 0 }} transition={{ duration: 0.22, ease: 'easeOut' }} className="space-y-4">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-1">Fødselsdato</p>
-                  <Input type="date" value={profileDraft.birthDate} onChange={(e) => setProfileDraft(prev => ({ ...prev, birthDate: e.target.value }))} />
-                  {profileDraft.birthDate && calculateAge(profileDraft.birthDate) !== null && (
-                    <p className="text-[13px] text-muted-foreground px-1">{calculateAge(profileDraft.birthDate)} år</p>
-                  )}
-                  <Button onClick={handleSaveField({ birthDate: profileDraft.birthDate || undefined })} className="w-full" disabled={isSaving}>
+                <motion.div key="edit-birthday" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="min-h-[calc(100vh-200px)] flex flex-col">
+                  <div>
+                    <h2 className="text-[28px] font-bold text-foreground pb-4">Fødselsdag</h2>
+                    <div className="space-y-1.5">
+                      <Label className="text-[13px] text-muted-foreground">Fødselsdato</Label>
+                      <Input type="date" value={profileDraft.birthDate} onChange={(e) => setProfileDraft(prev => ({ ...prev, birthDate: e.target.value }))} className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
+                    </div>
+                    {profileDraft.birthDate && calculateAge(profileDraft.birthDate) !== null && (
+                      <p className="text-[13px] text-muted-foreground px-1 pt-2">{calculateAge(profileDraft.birthDate)} år</p>
+                    )}
+                  </div>
+                  <div className="flex-1 flex items-center justify-center py-6">
+                    <svg width="200" height="180" viewBox="0 0 200 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <ellipse cx="100" cy="155" rx="60" ry="8" fill="#E0E0E0" opacity="0.5"/>
+                      <rect x="55" y="90" width="90" height="60" rx="12" fill="#FFCCBC"/>
+                      <rect x="60" y="95" width="80" height="50" rx="8" fill="#FFE0B2"/>
+                      <rect x="55" y="70" width="90" height="25" rx="8" fill="#F48FB1"/>
+                      <rect x="60" y="75" width="80" height="15" rx="4" fill="#F8BBD0"/>
+                      <rect x="75" y="50" width="8" height="25" rx="4" fill="#FFD54F"/>
+                      <ellipse cx="79" cy="45" rx="5" ry="7" fill="#FF7043" opacity="0.8"/>
+                      <rect x="96" y="45" width="8" height="30" rx="4" fill="#FFD54F"/>
+                      <ellipse cx="100" cy="40" rx="5" ry="7" fill="#FF7043" opacity="0.8"/>
+                      <rect x="117" y="50" width="8" height="25" rx="4" fill="#FFD54F"/>
+                      <ellipse cx="121" cy="45" rx="5" ry="7" fill="#FF7043" opacity="0.8"/>
+                      <circle cx="30" cy="80" r="8" fill="#CE93D8" opacity="0.6"/>
+                      <circle cx="170" cy="70" r="6" fill="#81D4FA" opacity="0.6"/>
+                      <circle cx="25" cy="130" r="5" fill="#A5D6A7" opacity="0.6"/>
+                      <path d="M160 140 L170 130 L180 140" fill="#FFE082" opacity="0.5"/>
+                    </svg>
+                  </div>
+                  <Button onClick={handleSaveField({ birthDate: profileDraft.birthDate || undefined })} className="w-full shrink-0" disabled={isSaving}>
                     Gem
                   </Button>
                 </motion.div>
@@ -765,25 +869,49 @@ const [evidenceDraft, setEvidenceDraft] = useState({
 
               {/* ─── edit-gender ─── */}
               {settingsDetailView === 'edit-gender' && (
-                <motion.div key="edit-gender" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} transition={{ duration: 0.25, ease: [0.34, 1.56, 0.64, 1] }} className="space-y-4">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-1">Køn</p>
-                  <p className="text-[13px] text-muted-foreground px-1">Vælg dit køn — dette bestemmer hvilke avatarer du ser</p>
-                  <div className="space-y-2">
-                    {([{ value: 'male', label: 'Mand' }, { value: 'female', label: 'Kvinde' }] as const).map(opt => (
-                      <button
-                        key={opt.value}
-                        onClick={() => setProfileDraft(prev => ({ ...prev, gender: opt.value }))}
-                        className={cn(
-                          "flex w-full items-center justify-between rounded-[12px] border-2 px-4 py-3.5 text-left transition-all",
-                          profileDraft.gender === opt.value ? "border-[#f58a2d] bg-orange-tint-light" : "border-border bg-card"
-                        )}
-                      >
-                        <span className="text-[15px] font-medium text-foreground">{opt.label}</span>
-                        {profileDraft.gender === opt.value && <Check className="h-5 w-5 text-[#f58a2d]" />}
-                      </button>
-                    ))}
+                <motion.div key="edit-gender" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="min-h-[calc(100vh-200px)] flex flex-col">
+                  <div>
+                    <h2 className="text-[28px] font-bold text-foreground pb-2">Køn</h2>
+                    <p className="text-[13px] text-muted-foreground pb-4">Vælg dit køn — dette bestemmer hvilke avatarer du ser</p>
+                    <div className="space-y-2">
+                      {([{ value: 'male', label: 'Mand' }, { value: 'female', label: 'Kvinde' }] as const).map(opt => (
+                        <button
+                          key={opt.value}
+                          onClick={() => setProfileDraft(prev => ({ ...prev, gender: opt.value }))}
+                          className={cn(
+                            "flex w-full items-center justify-between rounded-[12px] border-2 px-4 py-3.5 text-left transition-all",
+                            profileDraft.gender === opt.value ? "border-[#f58a2d] bg-orange-tint-light" : "border-border bg-card"
+                          )}
+                        >
+                          <span className="text-[15px] font-medium text-foreground">{opt.label}</span>
+                          {profileDraft.gender === opt.value && <Check className="h-5 w-5 text-[#f58a2d]" />}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  <Button onClick={handleSaveField({ gender: profileDraft.gender || undefined })} className="w-full" disabled={isSaving}>
+                  <div className="flex-1 flex items-center justify-center py-6">
+                    <svg width="200" height="160" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="70" cy="50" r="20" fill="#B3E5FC"/>
+                      <circle cx="70" cy="42" r="12" fill="#FFD6A5"/>
+                      <path d="M60 38 C60 30, 80 30, 80 38" fill="#795548"/>
+                      <circle cx="66" cy="42" r="1.5" fill="#4A3728"/>
+                      <circle cx="74" cy="42" r="1.5" fill="#4A3728"/>
+                      <path d="M67 47 Q70 50 73 47" stroke="#E88B7A" strokeWidth="1" fill="none"/>
+                      <rect x="60" y="58" width="20" height="30" rx="6" fill="#64B5F6"/>
+                      <circle cx="130" cy="50" r="20" fill="#F8BBD0"/>
+                      <circle cx="130" cy="42" r="12" fill="#FFD6A5"/>
+                      <path d="M120 36 C118 28, 142 28, 140 36" fill="#4A3728"/>
+                      <path d="M120 36 L118 52" stroke="#4A3728" strokeWidth="3" strokeLinecap="round"/>
+                      <path d="M140 36 L142 52" stroke="#4A3728" strokeWidth="3" strokeLinecap="round"/>
+                      <circle cx="126" cy="42" r="1.5" fill="#4A3728"/>
+                      <circle cx="134" cy="42" r="1.5" fill="#4A3728"/>
+                      <path d="M127 47 Q130 50 133 47" stroke="#E88B7A" strokeWidth="1" fill="none"/>
+                      <rect x="120" y="58" width="20" height="30" rx="6" fill="#F48FB1"/>
+                      <circle cx="100" cy="130" r="15" fill="#FFF9C4" opacity="0.6"/>
+                      <path d="M92 130 L100 120 L108 130" fill="#FFE082"/>
+                    </svg>
+                  </div>
+                  <Button onClick={handleSaveField({ gender: profileDraft.gender || undefined })} className="w-full shrink-0" disabled={isSaving}>
                     Gem
                   </Button>
                 </motion.div>
@@ -791,25 +919,45 @@ const [evidenceDraft, setEvidenceDraft] = useState({
 
               {/* ─── edit-address ─── */}
               {settingsDetailView === 'edit-address' && (
-                <motion.div key="edit-address" initial={{ y: -40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -40, opacity: 0 }} transition={{ duration: 0.22, ease: 'easeOut' }} className="space-y-4">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-1">Adresse</p>
-                  <div className="space-y-3">
-                    <div className="space-y-1.5">
-                      <Label className="text-[13px]">Gadenavn og nr.</Label>
-                      <Input value={profileDraft.address} onChange={(e) => setProfileDraft(prev => ({ ...prev, address: e.target.value }))} placeholder="Gadenavn og nr." />
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
+                <motion.div key="edit-address" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="min-h-[calc(100vh-200px)] flex flex-col">
+                  <div>
+                    <h2 className="text-[28px] font-bold text-foreground pb-4">Adresse</h2>
+                    <div className="space-y-3">
                       <div className="space-y-1.5">
-                        <Label className="text-[13px]">Postnummer</Label>
-                        <Input value={profileDraft.zipCode} onChange={(e) => setProfileDraft(prev => ({ ...prev, zipCode: e.target.value }))} placeholder="F.eks. 2100" />
+                        <Label className="text-[13px] text-muted-foreground">Gadenavn og nr.</Label>
+                        <Input value={profileDraft.address} onChange={(e) => setProfileDraft(prev => ({ ...prev, address: e.target.value }))} placeholder="Gadenavn og nr." className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
                       </div>
-                      <div className="space-y-1.5">
-                        <Label className="text-[13px]">By</Label>
-                        <Input value={profileDraft.city} onChange={(e) => setProfileDraft(prev => ({ ...prev, city: e.target.value }))} placeholder="F.eks. København" />
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1.5">
+                          <Label className="text-[13px] text-muted-foreground">Postnummer</Label>
+                          <Input value={profileDraft.zipCode} onChange={(e) => setProfileDraft(prev => ({ ...prev, zipCode: e.target.value }))} placeholder="2100" className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-[13px] text-muted-foreground">By</Label>
+                          <Input value={profileDraft.city} onChange={(e) => setProfileDraft(prev => ({ ...prev, city: e.target.value }))} placeholder="København" className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <Button onClick={handleSaveField({ address: profileDraft.address.trim() || undefined, zipCode: profileDraft.zipCode.trim() || undefined, city: profileDraft.city.trim() || undefined })} className="w-full" disabled={isSaving}>
+                  <div className="flex-1 flex items-center justify-center py-6">
+                    <svg width="200" height="160" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="50" y="70" width="100" height="70" rx="4" fill="#FFCCBC"/>
+                      <path d="M40 75 L100 30 L160 75Z" fill="#FF8A65"/>
+                      <path d="M45 75 L100 35 L155 75Z" fill="#FFAB91"/>
+                      <rect x="85" y="100" width="30" height="40" rx="3" fill="#A1887F"/>
+                      <circle cx="108" cy="120" r="2" fill="#FFD54F"/>
+                      <rect x="60" y="85" width="18" height="18" rx="2" fill="#B3E5FC"/>
+                      <rect x="122" y="85" width="18" height="18" rx="2" fill="#B3E5FC"/>
+                      <line x1="69" y1="85" x2="69" y2="103" stroke="#81D4FA" strokeWidth="1.5"/>
+                      <line x1="60" y1="94" x2="78" y2="94" stroke="#81D4FA" strokeWidth="1.5"/>
+                      <line x1="131" y1="85" x2="131" y2="103" stroke="#81D4FA" strokeWidth="1.5"/>
+                      <line x1="122" y1="94" x2="140" y2="94" stroke="#81D4FA" strokeWidth="1.5"/>
+                      <circle cx="100" cy="15" r="10" fill="#EF5350"/>
+                      <path d="M96 15 L100 8 L104 15" fill="white" opacity="0.8"/>
+                      <line x1="100" y1="25" x2="100" y2="35" stroke="#BDBDBD" strokeWidth="2"/>
+                    </svg>
+                  </div>
+                  <Button onClick={handleSaveField({ address: profileDraft.address.trim() || undefined, zipCode: profileDraft.zipCode.trim() || undefined, city: profileDraft.city.trim() || undefined })} className="w-full shrink-0" disabled={isSaving}>
                     Gem
                   </Button>
                 </motion.div>
@@ -817,10 +965,32 @@ const [evidenceDraft, setEvidenceDraft] = useState({
 
               {/* ─── edit-country ─── */}
               {settingsDetailView === 'edit-country' && (
-                <motion.div key="edit-country" initial={{ rotateX: 8, opacity: 0 }} animate={{ rotateX: 0, opacity: 1 }} exit={{ rotateX: 8, opacity: 0 }} transition={{ duration: 0.25, ease: 'easeOut' }} style={{ perspective: 800 }} className="space-y-4">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-1">Land</p>
-                  <Input value={profileDraft.country} onChange={(e) => setProfileDraft(prev => ({ ...prev, country: e.target.value }))} placeholder="Danmark" />
-                  <Button onClick={handleSaveField({ country: profileDraft.country.trim() || undefined })} className="w-full" disabled={isSaving}>
+                <motion.div key="edit-country" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="min-h-[calc(100vh-200px)] flex flex-col">
+                  <div>
+                    <h2 className="text-[28px] font-bold text-foreground pb-4">Land</h2>
+                    <div className="space-y-1.5">
+                      <Label className="text-[13px] text-muted-foreground">Land</Label>
+                      <Input value={profileDraft.country} onChange={(e) => setProfileDraft(prev => ({ ...prev, country: e.target.value }))} placeholder="Danmark" className="rounded-[12px] border-border bg-card px-4 py-3 text-[15px]" />
+                    </div>
+                  </div>
+                  <div className="flex-1 flex items-center justify-center py-6">
+                    <svg width="200" height="160" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="100" cy="75" r="50" fill="#B3E5FC"/>
+                      <path d="M60 60 Q80 40 100 55 Q120 40 140 60 Q150 80 140 95 Q120 110 100 100 Q80 110 60 95 Q50 80 60 60Z" fill="#81C784"/>
+                      <path d="M85 50 Q90 45 95 55 L95 75 L85 75Z" fill="#4CAF50"/>
+                      <path d="M110 60 Q115 55 120 65 L120 85 L110 85Z" fill="#4CAF50"/>
+                      <circle cx="75" cy="70" r="3" fill="#FFF9C4"/>
+                      <circle cx="125" cy="65" r="2" fill="#FFF9C4"/>
+                      <circle cx="100" cy="85" r="2.5" fill="#FFF9C4"/>
+                      <rect x="95" y="20" width="3" height="20" rx="1.5" fill="#BDBDBD"/>
+                      <rect x="97" y="10" width="18" height="12" rx="2" fill="#EF5350"/>
+                      <line x1="97" y1="16" x2="115" y2="16" stroke="white" strokeWidth="2"/>
+                      <line x1="106" y1="10" x2="106" y2="22" stroke="white" strokeWidth="2"/>
+                      <circle cx="35" cy="40" r="4" fill="#FFE082" opacity="0.6"/>
+                      <circle cx="170" cy="110" r="5" fill="#CE93D8" opacity="0.5"/>
+                    </svg>
+                  </div>
+                  <Button onClick={handleSaveField({ country: profileDraft.country.trim() || undefined })} className="w-full shrink-0" disabled={isSaving}>
                     Gem
                   </Button>
                 </motion.div>
@@ -829,8 +999,8 @@ const [evidenceDraft, setEvidenceDraft] = useState({
               {/* ─── edit-allergens (person list) ─── */}
               {settingsDetailView === 'edit-allergens' && (
                 <motion.div key="edit-allergens" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="space-y-4">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-1">Familiens allergener</p>
-                  <p className="text-[13px] text-muted-foreground px-1">Vælg en person for at administrere allergener</p>
+                  <h2 className="text-[28px] font-bold text-foreground">Familiens allergener</h2>
+                  <p className="text-[13px] text-muted-foreground">Vælg en person for at administrere allergener</p>
                   <div className="divide-y divide-border">
                     {currentUser && (
                       <button
@@ -879,11 +1049,11 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                 if (!person) return null;
                 const allergies = person.allergies ?? [];
                 return (
-                  <motion.div key={settingsDetailView} initial={{ x: 100, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 100, opacity: 0 }} transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }} className="space-y-4">
-                    <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-1">
-                      Allergener — {person.name}
-                    </p>
-                    <p className="text-[13px] text-muted-foreground px-1">Tryk på en allergen for at tilføje/fjerne</p>
+                  <motion.div key={settingsDetailView} initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="space-y-4">
+                    <h2 className="text-[28px] font-bold text-foreground">
+                      {person.name}
+                    </h2>
+                    <p className="text-[13px] text-muted-foreground">Tryk på en allergen for at tilføje/fjerne</p>
                     <div className="flex flex-wrap gap-2">
                       {EU_ALLERGENS_DA.map(allergen => {
                         const active = allergies.includes(allergen);
@@ -914,14 +1084,32 @@ const [evidenceDraft, setEvidenceDraft] = useState({
 
               {/* ─── edit-export ─── */}
               {settingsDetailView === 'edit-export' && (
-                <motion.div key="edit-export" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3, ease: 'easeInOut' }} className="space-y-4">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-1">Eksporter mine data</p>
-                  <div className="rounded-[12px] bg-muted/50 p-4 space-y-2">
-                    <p className="text-[14px] font-medium text-foreground">GDPR Data-export</p>
-                    <p className="text-[13px] text-muted-foreground">Du kan downloade alle dine persondata som en JSON-fil. Dette inkluderer din profil, børnedata, begivenheder, beskeder og dokumenter.</p>
+                <motion.div key="edit-export" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="min-h-[calc(100vh-200px)] flex flex-col">
+                  <div>
+                    <h2 className="text-[28px] font-bold text-foreground pb-4">Eksporter mine data</h2>
+                    <div className="rounded-[12px] bg-muted/50 p-4 space-y-2">
+                      <p className="text-[14px] font-medium text-foreground">GDPR Data-export</p>
+                      <p className="text-[13px] text-muted-foreground">Du kan downloade alle dine persondata som en JSON-fil. Dette inkluderer din profil, børnedata, begivenheder, beskeder og dokumenter.</p>
+                    </div>
+                  </div>
+                  <div className="flex-1 flex items-center justify-center py-6">
+                    <svg width="200" height="160" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="60" y="20" width="80" height="100" rx="8" fill="#E3F2FD"/>
+                      <rect x="70" y="35" width="60" height="6" rx="3" fill="#90CAF9"/>
+                      <rect x="70" y="48" width="45" height="6" rx="3" fill="#90CAF9"/>
+                      <rect x="70" y="61" width="55" height="6" rx="3" fill="#90CAF9"/>
+                      <rect x="70" y="74" width="40" height="6" rx="3" fill="#90CAF9"/>
+                      <rect x="70" y="87" width="50" height="6" rx="3" fill="#90CAF9"/>
+                      <path d="M100 130 L100 150" stroke="#66BB6A" strokeWidth="3" strokeLinecap="round"/>
+                      <path d="M90 142 L100 152 L110 142" stroke="#66BB6A" strokeWidth="3" strokeLinecap="round" fill="none"/>
+                      <circle cx="160" cy="40" r="12" fill="#C8E6C9"/>
+                      <path d="M155 40 L159 44 L166 36" stroke="white" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+                      <circle cx="40" cy="70" r="8" fill="#FFF9C4"/>
+                      <circle cx="170" cy="100" r="5" fill="#F8BBD0"/>
+                    </svg>
                   </div>
                   <Button
-                    className="w-full"
+                    className="w-full shrink-0"
                     onClick={async () => {
                       try {
                         const { exportAllData } = await import('@/lib/export');
@@ -939,15 +1127,31 @@ const [evidenceDraft, setEvidenceDraft] = useState({
 
               {/* ─── edit-delete ─── */}
               {settingsDetailView === 'edit-delete' && (
-                <motion.div key="edit-delete" initial={{ scale: 0.92, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.92, opacity: 0 }} transition={{ duration: 0.22, ease: [0.36, 0.66, 0.04, 1] }} className="space-y-4">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-muted-foreground px-1 pb-1">Slet min konto</p>
-                  <div className="rounded-[12px] bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 p-4 space-y-2">
-                    <p className="text-[14px] font-semibold text-red-600">Advarsel</p>
-                    <p className="text-[13px] text-red-600/80">Denne handling er permanent og kan IKKE fortrydes. Alle dine persondata, profil, beskeder og dokumenter vil blive slettet.</p>
+                <motion.div key="edit-delete" initial={{ x: 60, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 60, opacity: 0 }} transition={{ duration: 0.2, ease: 'easeOut' }} className="min-h-[calc(100vh-200px)] flex flex-col">
+                  <div>
+                    <h2 className="text-[28px] font-bold text-foreground pb-4">Slet min konto</h2>
+                    <div className="rounded-[12px] bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 p-4 space-y-2">
+                      <p className="text-[14px] font-semibold text-red-600">Advarsel</p>
+                      <p className="text-[13px] text-red-600/80">Denne handling er permanent og kan IKKE fortrydes. Alle dine persondata, profil, beskeder og dokumenter vil blive slettet.</p>
+                    </div>
+                  </div>
+                  <div className="flex-1 flex items-center justify-center py-6">
+                    <svg width="200" height="160" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="65" y="45" width="70" height="90" rx="6" fill="#FFCDD2"/>
+                      <rect x="60" y="35" width="80" height="15" rx="4" fill="#EF9A9A"/>
+                      <rect x="90" y="25" width="20" height="12" rx="3" fill="#EF9A9A"/>
+                      <rect x="80" y="60" width="6" height="50" rx="3" fill="#E57373"/>
+                      <rect x="97" y="60" width="6" height="50" rx="3" fill="#E57373"/>
+                      <rect x="114" y="60" width="6" height="50" rx="3" fill="#E57373"/>
+                      <circle cx="40" cy="60" r="8" fill="#FFECB3" opacity="0.6"/>
+                      <circle cx="165" cy="80" r="6" fill="#C8E6C9" opacity="0.6"/>
+                      <path d="M30 130 Q35 120 40 130" stroke="#CE93D8" strokeWidth="2" fill="none" opacity="0.5"/>
+                      <path d="M160 40 Q165 30 170 40" stroke="#81D4FA" strokeWidth="2" fill="none" opacity="0.5"/>
+                    </svg>
                   </div>
                   <Button
                     variant="destructive"
-                    className="w-full"
+                    className="w-full shrink-0"
                     onClick={async () => {
                       if (!window.confirm('Er du sikker? Din konto og alle persondata slettes permanent. Denne handling kan IKKE fortrydes.')) return;
                       if (!window.confirm('Sidste chance — bekræft at du vil slette din konto permanent.')) return;
@@ -1375,108 +1579,85 @@ const [evidenceDraft, setEvidenceDraft] = useState({
         </TabsContent>
 
         <TabsContent value="payments" className="space-y-0">
-          <div className="px-1 pt-2 pb-4">
-            <p className="text-[13px] text-muted-foreground">
-              Tilføj betalingsmetoder til udgiftsdeling mellem forældre.
-            </p>
-          </div>
+          {/* Kredit- og debitkort */}
+          <div className="pb-6">
+            <p className="text-[17px] font-bold text-foreground pb-3">Kredit- og debitkort</p>
 
-          {/* Eksisterende konti */}
-          {myPaymentAccounts.length > 0 && (
-            <div className="space-y-2 mb-4">
-              {myPaymentAccounts.map((account) => (
-                <div key={account.id} className="flex items-center justify-between rounded-[8px] border-2 border-border bg-card px-4 py-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] bg-background">
-                      <CreditCard className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="truncate text-[13px] font-semibold text-foreground">{account.accountLabel}</p>
-                      <p className="truncate text-[11px] text-muted-foreground">{account.accountHandle}</p>
-                    </div>
+            {/* Eksisterende kort */}
+            {myPaymentAccounts.filter(a => a.provider === 'card').map((account) => (
+              <div key={account.id} className="flex items-center justify-between py-3 border-b border-border">
+                <div className="flex items-center gap-3 min-w-0">
+                  <CreditCard className="h-5 w-5 text-muted-foreground shrink-0" />
+                  <div className="min-w-0">
+                    <p className="text-[15px] font-medium text-foreground truncate">{account.accountLabel}</p>
+                    <p className="text-[13px] text-muted-foreground truncate">{account.accountHandle}</p>
                   </div>
-                  {account.isPrimary ? (
-                    <span className="shrink-0 rounded-[8px] bg-orange-tint border border-orange-tint px-2.5 py-1 text-[11px] font-semibold text-[#f58a2d]">Primær</span>
-                  ) : (
-                    <button
-                      onClick={() => handleSetPrimaryPayment(account.id)}
-                      className="shrink-0 rounded-[8px] border-2 border-border px-2.5 py-1 text-[11px] font-semibold text-muted-foreground transition-all active:scale-[0.96]"
-                    >
-                      Sæt primær
-                    </button>
-                  )}
                 </div>
-              ))}
-            </div>
-          )}
+                {account.isPrimary && (
+                  <span className="shrink-0 text-[12px] font-semibold text-[#f58a2d]">Primær</span>
+                )}
+              </div>
+            ))}
 
-          {/* Tilføj ny konto */}
-          <div className="rounded-[8px] border-2 border-border bg-card p-4 space-y-3">
-            <p className="text-[13px] font-semibold text-foreground">Tilføj betalingskonto</p>
-            <SelectSheet
-              value={paymentDraft.provider}
-              onValueChange={(value) => setPaymentDraft((prev) => ({ ...prev, provider: value }))}
-              title="Betalingstype"
-              options={[
-                { value: 'mobilepay', label: 'MobilePay' },
-                { value: 'bank', label: 'Bankkonto' },
-                { value: 'card', label: 'Kort' },
-                { value: 'other', label: 'Andet' },
-              ]}
-              className="rounded-[8px] border-border"
-            />
-            <Input
-              value={paymentDraft.accountLabel}
-              onChange={(e) => setPaymentDraft((prev) => ({ ...prev, accountLabel: e.target.value }))}
-              placeholder="Kontonavn (fx 'Min MobilePay')"
-              className="rounded-[8px] border-border"
-            />
-            <Input
-              value={paymentDraft.accountHandle}
-              onChange={(e) => setPaymentDraft((prev) => ({ ...prev, accountHandle: e.target.value }))}
-              placeholder="Telefonnr. eller kontonummer"
-              className="rounded-[8px] border-border"
-            />
             <button
-              onClick={handleAddPaymentAccount}
-              disabled={!features.inAppPayments}
-              className={cn(
-                "w-full rounded-[8px] py-2.5 text-[13px] font-semibold transition-all active:scale-[0.98]",
-                features.inAppPayments
-                  ? "bg-primary text-white"
-                  : "bg-muted text-muted-foreground"
-              )}
+              onClick={() => {
+                setPaymentDraft(prev => ({ ...prev, provider: 'card' }));
+                // Open add card flow
+              }}
+              className="flex w-full items-center gap-3 py-3.5 text-left transition-colors hover:bg-card border-b border-border"
             >
-              Tilføj konto
+              <div className="flex h-8 w-8 items-center justify-center text-muted-foreground">
+                <span className="text-[20px] font-light">+</span>
+              </div>
+              <p className="text-[15px] font-medium text-foreground">Tilføj nyt kort</p>
             </button>
-            {!features.inAppPayments && (
-              <p className="text-[11px] text-muted-foreground text-center">
-                Opgrader til Family Plus for betalingsfunktioner
-              </p>
-            )}
           </div>
 
-          {myPaymentAccounts.length === 0 && (
-            <div className="mt-3 rounded-[8px] border-2 border-dashed border-border bg-card p-4 text-center">
-              <CreditCard className="mx-auto h-6 w-6 text-muted-foreground mb-1.5" />
-              <p className="text-[12px] text-muted-foreground">Ingen betalingskonti tilføjet endnu</p>
-            </div>
-          )}
+          {/* Andre betalingsmetoder */}
+          <div>
+            <p className="text-[17px] font-bold text-foreground pb-3">Andre betalingsmetoder</p>
+            <div className="divide-y divide-border">
+              {/* MobilePay */}
+              <button
+                onClick={() => {
+                  setPaymentDraft(prev => ({ ...prev, provider: 'mobilepay' }));
+                }}
+                className="flex w-full items-center justify-between py-3.5 text-left transition-colors hover:bg-card"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-[8px] bg-[#5A78FF]">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M14 4L8 16M6 4L12 16" stroke="white" strokeWidth="2.5" strokeLinecap="round"/></svg>
+                  </div>
+                  <p className="text-[15px] font-medium text-foreground">MobilePay</p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </button>
 
-          {/* Abonnementsmodel info */}
-          <div className="mt-4 rounded-[8px] border-2 border-border bg-card px-4 py-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-[13px] font-semibold text-foreground">Abonnementsmodel</p>
-                <p className="text-[11px] text-muted-foreground mt-0.5">
-                  {isTogetherMode
-                    ? 'Samboende: abonnement deles automatisk'
-                    : 'Skilt/co-parenting: separat abonnement pr. bruger'}
-                </p>
-              </div>
-              <span className="shrink-0 rounded-[8px] bg-background px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
-                {isTogetherMode ? 'Delt' : 'Separat'}
-              </span>
+              {/* Apple Pay */}
+              <button
+                className="flex w-full items-center justify-between py-3.5 text-left transition-colors hover:bg-card"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-[8px] border border-border bg-card">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M14.5 3.5C13.8 2.7 12.8 2.3 11.9 2.3c-1.1 0-1.8.6-2.4.6-.6 0-1.5-.6-2.5-.6C5.7 2.4 4 3.7 4 6.2c0 1.5.6 3.1 1.3 4.1.6.9 1.2 1.6 2 1.6.8 0 1.1-.5 2.2-.5 1.1 0 1.3.5 2.1.5.8 0 1.4-.8 2-1.6.4-.6.7-1.1.8-1.5-1.1-.5-1.9-1.6-1.9-3 0-1.2.7-2.3 1.8-2.8-.7-.9-1.6-1.4-2.6-1.5z" fill="currentColor"/><path d="M11.5 1c.1-.8-.2-1.6-.6-2.1-.5-.5-1.2-.9-1.9-.9-.1.8.2 1.6.6 2.1.5.5 1.2.9 1.9.9z" fill="currentColor" transform="translate(0,2)"/></svg>
+                  </div>
+                  <p className="text-[15px] font-medium text-foreground">Apple Pay</p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </button>
+
+              {/* PayPal */}
+              <button
+                className="flex w-full items-center justify-between py-3.5 text-left transition-colors hover:bg-card"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-[8px] border border-border bg-card">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7.02 21L8.56 12.26H12.15C15.81 12.26 18.15 9.93 18.65 6.71 19.18 3.28 16.81 1 13.17 1H6.31L3 21H7.02Z" fill="#002C8A"/><path d="M8.8 14.26L10.34 5.52H13.93C17.59 5.52 18.93 7.28 18.43 10.51 17.93 13.73 15.59 14.26 12.93 14.26H8.8Z" fill="#009CDE"/></svg>
+                  </div>
+                  <p className="text-[15px] font-medium text-foreground">PayPal</p>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </button>
             </div>
           </div>
         </TabsContent>
