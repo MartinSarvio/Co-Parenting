@@ -731,7 +731,6 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                     </div>
                     <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0" />
                   </button>
-                </div>
               </div>
 
               {/* ─── Log ud ─── */}
