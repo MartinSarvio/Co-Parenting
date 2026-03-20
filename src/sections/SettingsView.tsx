@@ -763,28 +763,42 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="card-g" x1="40" y1="40" x2="220" y2="150" gradientUnits="userSpaceOnUse"><stop stopColor="#FFF8E1"/><stop offset="1" stopColor="#FFE0B2"/></linearGradient>
-                        <linearGradient id="header-g" x1="40" y1="40" x2="220" y2="75" gradientUnits="userSpaceOnUse"><stop stopColor="#F5A623"/><stop offset="1" stopColor="#FB8C00"/></linearGradient>
-                        <filter id="card-s"><feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.1"/></filter>
+                        <linearGradient id="name-body-g" x1="110" y1="90" x2="150" y2="170" gradientUnits="userSpaceOnUse"><stop stopColor="#F5A623"/><stop offset="1" stopColor="#FB8C00"/></linearGradient>
+                        <linearGradient id="name-badge-g" x1="140" y1="80" x2="220" y2="140" gradientUnits="userSpaceOnUse"><stop stopColor="#FFF9F0"/><stop offset="1" stopColor="#FFE0B2"/></linearGradient>
+                        <filter id="name-ps"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.08"/></filter>
                       </defs>
-                      <rect x="40" y="40" width="180" height="115" rx="18" fill="url(#card-g)" filter="url(#card-s)" stroke="#F5A623" strokeWidth="1.5"/>
-                      <rect x="40" y="40" width="180" height="38" rx="18" fill="url(#header-g)"/>
-                      <rect x="40" y="62" width="180" height="16" fill="url(#header-g)"/>
-                      <circle cx="82" cy="112" r="22" fill="#FFCC80" opacity="0.7"/>
-                      <circle cx="82" cy="106" r="9" fill="#FFE0B2"/>
-                      <ellipse cx="82" cy="125" rx="15" ry="9" fill="#FFE0B2"/>
-                      <rect x="114" y="100" width="85" height="9" rx="4.5" fill="#FFD180"/>
-                      <rect x="114" y="116" width="58" height="7" rx="3.5" fill="#FFE0B2"/>
-                      <rect x="114" y="130" width="68" height="7" rx="3.5" fill="#FFE0B2"/>
-                      <g transform="translate(198, 22) rotate(45)">
-                        <rect x="0" y="0" width="9" height="52" rx="2.5" fill="#42A5F5"/>
-                        <rect x="1" y="2" width="7" height="48" rx="2" fill="#64B5F6"/>
-                        <polygon points="0,52 4.5,65 9,52" fill="#FFD54F"/>
-                        <rect x="0" y="0" width="9" height="9" rx="1.5" fill="#EF5350"/>
+                      {/* Drop shadow group */}
+                      <g filter="url(#name-ps)">
+                        {/* Body */}
+                        <rect x="108" y="108" width="44" height="52" rx="14" fill="url(#name-body-g)"/>
+                        {/* Head */}
+                        <circle cx="130" cy="92" r="20" fill="#FFCC80"/>
+                        {/* Hair */}
+                        <path d="M110 88 Q110 68 130 68 Q150 68 150 88" fill="#5D4037"/>
+                        {/* Eyes */}
+                        <circle cx="123" cy="90" r="2" fill="#333"/>
+                        <circle cx="137" cy="90" r="2" fill="#333"/>
+                        {/* Smile */}
+                        <path d="M124 97 Q130 103 136 97" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Left arm holding badge */}
+                        <path d="M108 120 Q90 115 82 110" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Right arm */}
+                        <path d="M152 120 Q170 115 178 118" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Legs */}
+                        <path d="M122 160 L118 185" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                        <path d="M138 160 L142 185" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
                       </g>
-                      <circle cx="28" cy="168" r="5" fill="#FFCC80" opacity="0.4"/><circle cx="46" cy="182" r="3.5" fill="#90CAF9" opacity="0.35"/>
-                      <circle cx="222" cy="168" r="6" fill="#F5A623" opacity="0.25"/><circle cx="238" cy="184" r="3.5" fill="#FFCC80" opacity="0.35"/>
-                      <path d="M25 50 L30 45 L35 50 L30 55Z" fill="#90CAF9" opacity="0.25"/>
+                      {/* Name badge */}
+                      <rect x="60" y="100" width="68" height="44" rx="8" fill="url(#name-badge-g)" stroke="#F5A623" strokeWidth="1.5"/>
+                      <rect x="66" y="108" width="40" height="6" rx="3" fill="#F5A623" opacity="0.7"/>
+                      <rect x="66" y="120" width="56" height="5" rx="2.5" fill="#FFCC80"/>
+                      <rect x="66" y="131" width="44" height="5" rx="2.5" fill="#FFE0B2"/>
+                      {/* Badge clip/hole */}
+                      <circle cx="94" cy="103" r="3" fill="#F5A623" opacity="0.5"/>
+                      {/* Decorative dots */}
+                      <circle cx="30" cy="60" r="5" fill="#F5A623" opacity="0.2"/>
+                      <circle cx="225" cy="55" r="4" fill="#FFCC80" opacity="0.25"/>
+                      <circle cx="220" cy="170" r="3.5" fill="#F5A623" opacity="0.2"/>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ name: profileDraft.name.trim() })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -803,43 +817,45 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="email-env-g" x1="45" y1="55" x2="215" y2="160" gradientUnits="userSpaceOnUse"><stop stopColor="#E3F2FD"/><stop offset="1" stopColor="#BBDEFB"/></linearGradient>
-                        <linearGradient id="email-flap-g" x1="45" y1="55" x2="215" y2="105" gradientUnits="userSpaceOnUse"><stop stopColor="#90CAF9"/><stop offset="1" stopColor="#64B5F6"/></linearGradient>
-                        <linearGradient id="email-at-g" x1="112" y1="78" x2="148" y2="118" gradientUnits="userSpaceOnUse"><stop stopColor="#42A5F5"/><stop offset="1" stopColor="#1565C0"/></linearGradient>
-                        <filter id="email-s"><feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.12"/></filter>
+                        <linearGradient id="email-body-g" x1="108" y1="90" x2="152" y2="170" gradientUnits="userSpaceOnUse"><stop stopColor="#42A5F5"/><stop offset="1" stopColor="#1976D2"/></linearGradient>
+                        <linearGradient id="email-laptop-g" x1="60" y1="120" x2="170" y2="175" gradientUnits="userSpaceOnUse"><stop stopColor="#E3F2FD"/><stop offset="1" stopColor="#BBDEFB"/></linearGradient>
+                        <linearGradient id="email-env-g2" x1="185" y1="55" x2="235" y2="100" gradientUnits="userSpaceOnUse"><stop stopColor="#90CAF9"/><stop offset="1" stopColor="#42A5F5"/></linearGradient>
+                        <filter id="email-ps"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.08"/></filter>
                       </defs>
-                      {/* Envelope body */}
-                      <rect x="45" y="58" width="170" height="102" rx="16" fill="url(#email-env-g)" filter="url(#email-s)" stroke="#64B5F6" strokeWidth="1.5"/>
-                      {/* Flap fold */}
-                      <path d="M45 74 L130 124 L215 74 L215 58 Q215 58 205 58 L55 58 Q45 58 45 68Z" fill="url(#email-flap-g)" opacity="0.6"/>
-                      {/* Fold lines */}
-                      <path d="M45 160 L102 122" stroke="#90CAF9" strokeWidth="1.5" fill="none"/>
-                      <path d="M215 160 L158 122" stroke="#90CAF9" strokeWidth="1.5" fill="none"/>
-                      {/* @ circle outer */}
-                      <circle cx="130" cy="103" r="20" stroke="url(#email-at-g)" strokeWidth="2.5" fill="white" opacity="0.9"/>
-                      {/* @ inner circle */}
-                      <circle cx="130" cy="103" r="9" stroke="url(#email-at-g)" strokeWidth="2" fill="none"/>
-                      {/* @ tail */}
-                      <path d="M139 103 C139 93 147 91 147 103 C147 116 139 113 139 103" stroke="url(#email-at-g)" strokeWidth="2" fill="none" strokeLinecap="round"/>
-                      {/* Decorative flowers */}
-                      <g transform="translate(30, 36)">
-                        <circle cx="0" cy="-5" r="5" fill="#F8BBD0"/>
-                        <circle cx="5" cy="-2" r="5" fill="#F48FB1"/>
-                        <circle cx="-5" cy="-2" r="5" fill="#F48FB1"/>
-                        <circle cx="3" cy="-9" r="4.5" fill="#F8BBD0"/>
-                        <circle cx="-3" cy="-9" r="4.5" fill="#FCE4EC"/>
-                        <circle cx="0" cy="-5" r="3.5" fill="#FFD54F"/>
+                      <g filter="url(#email-ps)">
+                        {/* Body */}
+                        <rect x="106" y="108" width="48" height="52" rx="14" fill="url(#email-body-g)"/>
+                        {/* Head */}
+                        <circle cx="130" cy="92" r="20" fill="#FFCC80"/>
+                        {/* Hair */}
+                        <rect x="110" y="72" width="40" height="14" rx="7" fill="#8D6E63"/>
+                        {/* Eyes */}
+                        <circle cx="123" cy="90" r="2" fill="#333"/>
+                        <circle cx="137" cy="90" r="2" fill="#333"/>
+                        {/* Smile */}
+                        <path d="M124 97 Q130 103 136 97" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Arms — sitting at laptop */}
+                        <path d="M106 122 Q88 130 72 138" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        <path d="M154 122 Q170 130 182 138" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Legs */}
+                        <path d="M118 160 L115 185" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                        <path d="M142 160 L145 185" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
                       </g>
-                      <g transform="translate(234, 40)">
-                        <circle cx="0" cy="-5" r="4.5" fill="#C5E1A5"/>
-                        <circle cx="4.5" cy="-2" r="4.5" fill="#AED581"/>
-                        <circle cx="-4.5" cy="-2" r="4.5" fill="#AED581"/>
-                        <circle cx="0" cy="-9" r="4" fill="#DCEDC8"/>
-                        <circle cx="0" cy="-5" r="3" fill="#FFE082"/>
+                      {/* Laptop base */}
+                      <rect x="60" y="143" width="120" height="18" rx="6" fill="url(#email-laptop-g)" stroke="#90CAF9" strokeWidth="1.2"/>
+                      {/* Laptop screen */}
+                      <rect x="68" y="118" width="104" height="26" rx="4" fill="#E3F2FD" stroke="#90CAF9" strokeWidth="1.2"/>
+                      {/* Envelope flying away */}
+                      <g transform="translate(195,62) rotate(-18)">
+                        <rect x="0" y="0" width="38" height="26" rx="5" fill="url(#email-env-g2)" stroke="#42A5F5" strokeWidth="1.2"/>
+                        <path d="M0 4 L19 16 L38 4" stroke="#1976D2" strokeWidth="1.2" fill="none"/>
                       </g>
-                      <circle cx="55" cy="180" r="3" fill="#64B5F6" opacity="0.35"/>
-                      <circle cx="205" cy="176" r="4" fill="#F48FB1" opacity="0.3"/>
-                      <circle cx="242" cy="170" r="2.5" fill="#90CAF9" opacity="0.3"/>
+                      {/* Motion lines from envelope */}
+                      <path d="M185 68 L193 64" stroke="#90CAF9" strokeWidth="1.5" strokeDasharray="3 2" strokeLinecap="round"/>
+                      <path d="M183 76 L190 74" stroke="#90CAF9" strokeWidth="1.2" strokeDasharray="2 2" strokeLinecap="round"/>
+                      {/* Decorative */}
+                      <circle cx="30" cy="65" r="4" fill="#42A5F5" opacity="0.2"/>
+                      <circle cx="228" cy="165" r="3.5" fill="#90CAF9" opacity="0.25"/>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ email: profileDraft.email.trim() })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -858,42 +874,49 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="phone-body-g" x1="90" y1="20" x2="170" y2="170" gradientUnits="userSpaceOnUse"><stop stopColor="#E8EAF6"/><stop offset="1" stopColor="#C5CAE9"/></linearGradient>
-                        <linearGradient id="phone-bubble1-g" x1="102" y1="48" x2="147" y2="72" gradientUnits="userSpaceOnUse"><stop stopColor="#9FA8DA"/><stop offset="1" stopColor="#7986CB"/></linearGradient>
-                        <linearGradient id="phone-bubble2-g" x1="120" y1="78" x2="158" y2="103" gradientUnits="userSpaceOnUse"><stop stopColor="#7986CB"/><stop offset="1" stopColor="#5C6BC0"/></linearGradient>
-                        <filter id="phone-s"><feDropShadow dx="0" dy="5" stdDeviation="7" floodOpacity="0.14"/></filter>
+                        <linearGradient id="phone-body-g2" x1="112" y1="90" x2="148" y2="170" gradientUnits="userSpaceOnUse"><stop stopColor="#F5A623"/><stop offset="1" stopColor="#FB8C00"/></linearGradient>
+                        <linearGradient id="phone-device-g" x1="152" y1="55" x2="210" y2="155" gradientUnits="userSpaceOnUse"><stop stopColor="#E8EAF6"/><stop offset="1" stopColor="#C5CAE9"/></linearGradient>
+                        <filter id="phone-ps"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.08"/></filter>
                       </defs>
-                      {/* Phone body */}
-                      <rect x="90" y="20" width="80" height="155" rx="18" fill="url(#phone-body-g)" filter="url(#phone-s)" stroke="#7986CB" strokeWidth="1.5"/>
-                      {/* Screen */}
-                      <rect x="96" y="36" width="68" height="112" rx="6" fill="white"/>
-                      {/* Home button */}
-                      <circle cx="130" cy="160" r="6" stroke="#7986CB" strokeWidth="1.5" fill="#E8EAF6"/>
-                      {/* Speaker notch */}
-                      <rect x="117" y="26" width="26" height="4" rx="2" fill="#9FA8DA"/>
-                      {/* Chat bubble 1 — received */}
-                      <rect x="100" y="48" width="46" height="24" rx="12" fill="url(#phone-bubble1-g)"/>
-                      <path d="M103 72 L100 78 L108 72Z" fill="url(#phone-bubble1-g)"/>
-                      {/* Dots in bubble 1 */}
-                      <circle cx="113" cy="60" r="2.5" fill="white" opacity="0.8"/>
-                      <circle cx="123" cy="60" r="2.5" fill="white" opacity="0.8"/>
-                      <circle cx="133" cy="60" r="2.5" fill="white" opacity="0.8"/>
-                      {/* Chat bubble 2 — sent */}
-                      <rect x="118" y="82" width="42" height="22" rx="11" fill="url(#phone-bubble2-g)"/>
-                      <path d="M157 82 L160 76 L155 82Z" fill="url(#phone-bubble2-g)"/>
-                      <circle cx="130" cy="93" r="2" fill="white" opacity="0.7"/>
-                      <circle cx="139" cy="93" r="2" fill="white" opacity="0.7"/>
-                      {/* Chat bubble 3 — small received */}
-                      <rect x="100" y="114" width="32" height="18" rx="9" fill="#C5CAE9"/>
-                      <circle cx="110" cy="123" r="1.8" fill="#7986CB" opacity="0.7"/>
-                      <circle cx="116" cy="123" r="1.8" fill="#7986CB" opacity="0.7"/>
+                      <g filter="url(#phone-ps)">
+                        {/* Body */}
+                        <rect x="110" y="108" width="46" height="52" rx="14" fill="url(#phone-body-g2)"/>
+                        {/* Head */}
+                        <circle cx="133" cy="92" r="20" fill="#FFCC80"/>
+                        {/* Hair */}
+                        <path d="M113 88 Q113 68 133 68 Q153 68 153 88" fill="#5D4037"/>
+                        {/* Eyes */}
+                        <circle cx="126" cy="90" r="2" fill="#333"/>
+                        <circle cx="140" cy="90" r="2" fill="#333"/>
+                        {/* Smile */}
+                        <path d="M127 97 Q133 103 139 97" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Left arm holding phone up */}
+                        <path d="M110 120 Q92 108 80 95" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Right arm */}
+                        <path d="M156 120 Q172 118 180 125" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Legs */}
+                        <path d="M124 160 L120 185" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                        <path d="M142 160 L146 185" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                      </g>
+                      {/* Large smartphone held by left arm */}
+                      <rect x="52" y="58" width="48" height="78" rx="10" fill="url(#phone-device-g)" stroke="#7986CB" strokeWidth="1.5"/>
+                      <rect x="57" y="68" width="38" height="50" rx="4" fill="white"/>
+                      <rect x="68" y="62" width="16" height="3" rx="1.5" fill="#9FA8DA"/>
+                      {/* Speech bubble 1 */}
+                      <rect x="62" y="73" width="28" height="14" rx="7" fill="#7986CB"/>
+                      <path d="M65 87 L62 93 L70 87Z" fill="#7986CB"/>
+                      <circle cx="71" cy="80" r="1.8" fill="white" opacity="0.8"/>
+                      <circle cx="78" cy="80" r="1.8" fill="white" opacity="0.8"/>
+                      <circle cx="85" cy="80" r="1.8" fill="white" opacity="0.8"/>
+                      {/* Speech bubble 2 */}
+                      <rect x="195" y="68" width="32" height="16" rx="8" fill="#C5CAE9"/>
+                      <path d="M197 84 L195 90 L204 84Z" fill="#C5CAE9"/>
+                      <circle cx="204" cy="76" r="1.8" fill="#7986CB" opacity="0.7"/>
+                      <circle cx="211" cy="76" r="1.8" fill="#7986CB" opacity="0.7"/>
                       {/* Signal arcs */}
-                      <path d="M186 48 Q197 37 208 48" stroke="#7986CB" strokeWidth="2" fill="none" opacity="0.5" strokeLinecap="round"/>
-                      <path d="M181 37 Q197 21 213 37" stroke="#7986CB" strokeWidth="1.8" fill="none" opacity="0.3" strokeLinecap="round"/>
-                      {/* Decorative orbs */}
-                      <circle cx="54" cy="80" r="8" fill="#C5CAE9" opacity="0.28"/>
-                      <circle cx="44" cy="97" r="5" fill="#7986CB" opacity="0.18"/>
-                      <circle cx="212" cy="122" r="6" fill="#9FA8DA" opacity="0.28"/>
+                      <path d="M196 48 Q207 38 218 48" stroke="#7986CB" strokeWidth="2" fill="none" opacity="0.5" strokeLinecap="round"/>
+                      <path d="M191 38 Q207 22 223 38" stroke="#7986CB" strokeWidth="1.5" fill="none" opacity="0.3" strokeLinecap="round"/>
+                      <circle cx="230" cy="160" r="3.5" fill="#9FA8DA" opacity="0.3"/>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ phone: profileDraft.phone.trim() || undefined })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -915,47 +938,47 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="bday-bot-g" x1="65" y1="110" x2="195" y2="165" gradientUnits="userSpaceOnUse"><stop stopColor="#FFAB91"/><stop offset="1" stopColor="#FF8A65"/></linearGradient>
-                        <linearGradient id="bday-mid-g" x1="75" y1="82" x2="185" y2="115" gradientUnits="userSpaceOnUse"><stop stopColor="#FF8A65"/><stop offset="1" stopColor="#FF7043"/></linearGradient>
-                        <linearGradient id="bday-frost-g" x1="75" y1="105" x2="185" y2="118" gradientUnits="userSpaceOnUse"><stop stopColor="#FFF9C4"/><stop offset="1" stopColor="#FFECB3"/></linearGradient>
-                        <filter id="bday-s"><feDropShadow dx="0" dy="5" stdDeviation="7" floodOpacity="0.13"/></filter>
+                        <linearGradient id="bday-body-g" x1="108" y1="95" x2="152" y2="170" gradientUnits="userSpaceOnUse"><stop stopColor="#81C784"/><stop offset="1" stopColor="#388E3C"/></linearGradient>
+                        <linearGradient id="bday-cake-g" x1="155" y1="110" x2="220" y2="175" gradientUnits="userSpaceOnUse"><stop stopColor="#FFAB91"/><stop offset="1" stopColor="#FF7043"/></linearGradient>
+                        <linearGradient id="bday-frost-g2" x1="155" y1="110" x2="220" y2="130" gradientUnits="userSpaceOnUse"><stop stopColor="#FFF9C4"/><stop offset="1" stopColor="#FFECB3"/></linearGradient>
+                        <filter id="bday-ps"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.08"/></filter>
                       </defs>
-                      {/* Shadow under cake */}
-                      <ellipse cx="130" cy="168" rx="78" ry="9" fill="#FFCCBC" opacity="0.6"/>
-                      {/* Bottom cake tier */}
-                      <rect x="65" y="112" width="130" height="52" rx="14" fill="url(#bday-bot-g)" filter="url(#bday-s)"/>
-                      {/* Frosting drips on bottom */}
-                      <path d="M75 112 Q85 104 95 112 Q105 104 115 112 Q125 104 135 112 Q145 104 155 112 Q165 104 175 112 Q182 105 185 112" fill="url(#bday-frost-g)" stroke="none"/>
-                      {/* Middle tier */}
-                      <rect x="78" y="82" width="104" height="34" rx="12" fill="url(#bday-mid-g)"/>
-                      {/* Frosting on middle */}
-                      <path d="M88 82 Q96 74 104 82 Q112 74 120 82 Q128 74 136 82 Q144 74 152 82 Q158 75 162 82" fill="url(#bday-frost-g)" stroke="none"/>
-                      {/* Candle 1 */}
-                      <rect x="100" y="54" width="7" height="30" rx="3.5" fill="#64B5F6"/>
-                      <ellipse cx="103.5" cy="49" rx="5.5" ry="8" fill="#FFD54F"/>
-                      <ellipse cx="103.5" cy="46" rx="2.5" ry="4.5" fill="#FFF9C4"/>
-                      <ellipse cx="103.5" cy="44" rx="1.2" ry="2.5" fill="white" opacity="0.8"/>
-                      {/* Candle 2 */}
-                      <rect x="126.5" y="48" width="7" height="36" rx="3.5" fill="#F48FB1"/>
-                      <ellipse cx="130" cy="43" rx="5.5" ry="8" fill="#FFD54F"/>
-                      <ellipse cx="130" cy="40" rx="2.5" ry="4.5" fill="#FFF9C4"/>
-                      <ellipse cx="130" cy="38" rx="1.2" ry="2.5" fill="white" opacity="0.8"/>
-                      {/* Candle 3 */}
-                      <rect x="153" y="54" width="7" height="30" rx="3.5" fill="#81C784"/>
-                      <ellipse cx="156.5" cy="49" rx="5.5" ry="8" fill="#FFD54F"/>
-                      <ellipse cx="156.5" cy="46" rx="2.5" ry="4.5" fill="#FFF9C4"/>
-                      <ellipse cx="156.5" cy="44" rx="1.2" ry="2.5" fill="white" opacity="0.8"/>
+                      <g filter="url(#bday-ps)">
+                        {/* Body */}
+                        <rect x="106" y="108" width="48" height="52" rx="14" fill="url(#bday-body-g)"/>
+                        {/* Head */}
+                        <circle cx="130" cy="88" r="20" fill="#FFCC80"/>
+                        {/* Party hat */}
+                        <path d="M115 82 L130 48 L145 82Z" fill="#F5A623"/>
+                        <path d="M115 82 L130 48 L145 82" stroke="#FB8C00" strokeWidth="1" fill="none"/>
+                        <circle cx="130" cy="47" r="4" fill="#FF5252"/>
+                        <rect x="113" y="82" width="34" height="4" rx="2" fill="#FFD54F"/>
+                        {/* Eyes */}
+                        <circle cx="123" cy="87" r="2" fill="#333"/>
+                        <circle cx="137" cy="87" r="2" fill="#333"/>
+                        {/* Big smile */}
+                        <path d="M121 94 Q130 103 139 94" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Arms */}
+                        <path d="M106 120 Q90 118 78 125" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        <path d="M154 120 Q168 112 176 105" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Legs */}
+                        <path d="M120 160 L116 185" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                        <path d="M140 160 L144 185" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                      </g>
+                      {/* Cake held by right arm */}
+                      <rect x="162" y="130" width="58" height="40" rx="10" fill="url(#bday-cake-g)" stroke="#FF7043" strokeWidth="1.2"/>
+                      <path d="M166 130 Q175 122 184 130 Q193 122 202 130 Q211 122 218 130" fill="url(#bday-frost-g2)" stroke="none"/>
+                      {/* Candle on cake */}
+                      <rect x="186" y="116" width="6" height="16" rx="3" fill="#64B5F6"/>
+                      <ellipse cx="189" cy="113" rx="4" ry="6" fill="#FFD54F"/>
+                      <ellipse cx="189" cy="110" rx="2" ry="3.5" fill="#FFF9C4"/>
                       {/* Confetti */}
-                      <rect x="40" y="28" width="9" height="4.5" rx="2" fill="#F48FB1" transform="rotate(-22 40 28)"/>
-                      <rect x="208" y="24" width="9" height="4.5" rx="2" fill="#64B5F6" transform="rotate(16 208 24)"/>
-                      <circle cx="50" cy="58" r="3.5" fill="#FFD54F"/>
-                      <circle cx="214" cy="54" r="3" fill="#81C784"/>
-                      <rect x="55" y="44" width="7" height="3.5" rx="1.5" fill="#CE93D8" transform="rotate(-36 55 44)"/>
-                      <rect x="200" y="39" width="7" height="3.5" rx="1.5" fill="#FFAB91" transform="rotate(26 200 39)"/>
-                      <circle cx="35" cy="80" r="2.5" fill="#64B5F6" opacity="0.45"/>
-                      <circle cx="225" cy="74" r="2.5" fill="#F48FB1" opacity="0.45"/>
-                      <rect x="230" y="48" width="7" height="3" rx="1.5" fill="#FFD54F" transform="rotate(-14 230 48)"/>
-                      <rect x="28" y="50" width="6" height="3" rx="1.5" fill="#81C784" transform="rotate(20 28 50)"/>
+                      <rect x="38" y="32" width="8" height="4" rx="2" fill="#F48FB1" transform="rotate(-22 38 32)"/>
+                      <rect x="210" y="28" width="8" height="4" rx="2" fill="#64B5F6" transform="rotate(16 210 28)"/>
+                      <circle cx="48" cy="60" r="3.5" fill="#FFD54F"/>
+                      <circle cx="216" cy="58" r="3" fill="#81C784"/>
+                      <rect x="32" y="78" width="7" height="3" rx="1.5" fill="#CE93D8" transform="rotate(20 32 78)"/>
+                      <rect x="222" y="72" width="7" height="3" rx="1.5" fill="#FFAB91" transform="rotate(-14 222 72)"/>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ birthDate: profileDraft.birthDate || undefined })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -989,27 +1012,46 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="gender-p1-g" x1="70" y1="45" x2="120" y2="170" gradientUnits="userSpaceOnUse"><stop stopColor="#90CAF9"/><stop offset="1" stopColor="#42A5F5"/></linearGradient>
-                        <linearGradient id="gender-p2-g" x1="140" y1="45" x2="195" y2="170" gradientUnits="userSpaceOnUse"><stop stopColor="#F48FB1"/><stop offset="1" stopColor="#E91E8C"/></linearGradient>
-                        <linearGradient id="gender-heart-g" x1="118" y1="72" x2="148" y2="105" gradientUnits="userSpaceOnUse"><stop stopColor="#FF6B6B"/><stop offset="1" stopColor="#C62828"/></linearGradient>
-                        <filter id="gender-s"><feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.13"/></filter>
+                        <linearGradient id="gender-p1-g2" x1="70" y1="95" x2="110" y2="175" gradientUnits="userSpaceOnUse"><stop stopColor="#42A5F5"/><stop offset="1" stopColor="#1976D2"/></linearGradient>
+                        <linearGradient id="gender-p2-g2" x1="150" y1="95" x2="190" y2="175" gradientUnits="userSpaceOnUse"><stop stopColor="#F48FB1"/><stop offset="1" stopColor="#E91E63"/></linearGradient>
+                        <linearGradient id="gender-heart-g2" x1="118" y1="80" x2="142" y2="110" gradientUnits="userSpaceOnUse"><stop stopColor="#FF6B6B"/><stop offset="1" stopColor="#C62828"/></linearGradient>
+                        <filter id="gender-ps"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.08"/></filter>
                       </defs>
-                      {/* Person 1 — blue silhouette */}
-                      <circle cx="95" cy="70" r="26" fill="url(#gender-p1-g)" filter="url(#gender-s)"/>
-                      <ellipse cx="95" cy="133" rx="31" ry="42" fill="url(#gender-p1-g)" filter="url(#gender-s)"/>
-                      {/* Person 2 — pink silhouette */}
-                      <circle cx="165" cy="70" r="26" fill="url(#gender-p2-g)" filter="url(#gender-s)"/>
-                      <ellipse cx="165" cy="133" rx="31" ry="42" fill="url(#gender-p2-g)" filter="url(#gender-s)"/>
-                      {/* Large heart between them */}
-                      <path d="M122 87 C122 79 129 75 133 80 C137 75 144 79 144 87 C144 99 133 106 133 106 C133 106 122 99 122 87Z" fill="url(#gender-heart-g)" opacity="0.85"/>
-                      {/* Small heart below */}
-                      <path d="M116 110 C116 105 121 103 123 106 C125 103 130 105 130 110 C130 117 123 121 123 121 C123 121 116 117 116 110Z" fill="#EF5350" opacity="0.4"/>
+                      {/* Person 1 — male, blue */}
+                      <g filter="url(#gender-ps)">
+                        <rect x="72" y="108" width="40" height="50" rx="12" fill="url(#gender-p1-g2)"/>
+                        <circle cx="92" cy="90" r="18" fill="#FFCC80"/>
+                        <path d="M74 86 Q74 68 92 68 Q110 68 110 86" fill="#5D4037"/>
+                        <circle cx="86" cy="88" r="1.8" fill="#333"/>
+                        <circle cx="98" cy="88" r="1.8" fill="#333"/>
+                        <path d="M87 95 Q92 100 97 95" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        <path d="M72 118 Q58 115 50 120" stroke="#FFCC80" strokeWidth="3.5" strokeLinecap="round" fill="none"/>
+                        <path d="M112 118 Q122 115 128 120" stroke="#FFCC80" strokeWidth="3.5" strokeLinecap="round" fill="none"/>
+                        <path d="M82 158 L78 182" stroke="#5D4037" strokeWidth="3.5" strokeLinecap="round"/>
+                        <path d="M102 158 L106 182" stroke="#5D4037" strokeWidth="3.5" strokeLinecap="round"/>
+                      </g>
+                      {/* Person 2 — female, pink */}
+                      <g filter="url(#gender-ps)">
+                        <rect x="148" y="108" width="40" height="50" rx="12" fill="url(#gender-p2-g2)"/>
+                        <circle cx="168" cy="90" r="18" fill="#FFCC80"/>
+                        {/* Longer hair */}
+                        <path d="M150 86 Q150 65 168 65 Q186 65 186 86" fill="#8D6E63"/>
+                        <path d="M150 86 Q148 104 150 110" fill="#8D6E63"/>
+                        <path d="M186 86 Q188 104 186 110" fill="#8D6E63"/>
+                        <circle cx="162" cy="88" r="1.8" fill="#333"/>
+                        <circle cx="174" cy="88" r="1.8" fill="#333"/>
+                        <path d="M163 95 Q168 100 173 95" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        <path d="M148 118 Q138 115 132 120" stroke="#FFCC80" strokeWidth="3.5" strokeLinecap="round" fill="none"/>
+                        <path d="M188 118 Q200 115 208 120" stroke="#FFCC80" strokeWidth="3.5" strokeLinecap="round" fill="none"/>
+                        <path d="M158 158 L154 182" stroke="#5D4037" strokeWidth="3.5" strokeLinecap="round"/>
+                        <path d="M178 158 L182 182" stroke="#5D4037" strokeWidth="3.5" strokeLinecap="round"/>
+                      </g>
+                      {/* Heart between them */}
+                      <path d="M120 90 C120 83 126 80 130 84 C134 80 140 83 140 90 C140 100 130 107 130 107 C130 107 120 100 120 90Z" fill="url(#gender-heart-g2)"/>
                       {/* Sparkles */}
-                      <circle cx="40" cy="58" r="4" fill="#CE93D8" opacity="0.3"/>
-                      <circle cx="222" cy="54" r="5" fill="#CE93D8" opacity="0.28"/>
-                      <circle cx="50" cy="171" r="3" fill="#90CAF9" opacity="0.38"/>
-                      <circle cx="210" cy="176" r="3" fill="#F48FB1" opacity="0.38"/>
-                      <circle cx="130" cy="160" r="2.5" fill="#EF5350" opacity="0.25"/>
+                      <circle cx="35" cy="60" r="4" fill="#CE93D8" opacity="0.3"/>
+                      <circle cx="225" cy="55" r="4.5" fill="#CE93D8" opacity="0.28"/>
+                      <circle cx="130" cy="168" r="3" fill="#EF5350" opacity="0.25"/>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ gender: profileDraft.gender || undefined })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -1043,47 +1085,46 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="addr-house-g" x1="80" y1="95" x2="180" y2="175" gradientUnits="userSpaceOnUse"><stop stopColor="#FFF9F0"/><stop offset="1" stopColor="#FFF3E0"/></linearGradient>
-                        <linearGradient id="addr-roof-g" x1="70" y1="55" x2="190" y2="102" gradientUnits="userSpaceOnUse"><stop stopColor="#FF8A65"/><stop offset="1" stopColor="#E64A19"/></linearGradient>
-                        <linearGradient id="addr-pin-g" x1="108" y1="20" x2="152" y2="75" gradientUnits="userSpaceOnUse"><stop stopColor="#EF5350"/><stop offset="1" stopColor="#B71C1C"/></linearGradient>
-                        <linearGradient id="addr-tree-g" x1="27" y1="115" x2="59" y2="165" gradientUnits="userSpaceOnUse"><stop stopColor="#81C784"/><stop offset="1" stopColor="#388E3C"/></linearGradient>
-                        <linearGradient id="addr-tree2-g" x1="202" y1="118" x2="232" y2="165" gradientUnits="userSpaceOnUse"><stop stopColor="#81C784"/><stop offset="1" stopColor="#388E3C"/></linearGradient>
-                        <filter id="addr-house-s"><feDropShadow dx="0" dy="5" stdDeviation="7" floodOpacity="0.12"/></filter>
-                        <filter id="addr-pin-s"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.2"/></filter>
+                        <linearGradient id="addr-body-g" x1="85" y1="100" x2="118" y2="175" gradientUnits="userSpaceOnUse"><stop stopColor="#7E57C2"/><stop offset="1" stopColor="#4527A0"/></linearGradient>
+                        <linearGradient id="addr-house-g2" x1="145" y1="90" x2="230" y2="175" gradientUnits="userSpaceOnUse"><stop stopColor="#FFF9F0"/><stop offset="1" stopColor="#FFF3E0"/></linearGradient>
+                        <linearGradient id="addr-roof-g2" x1="145" y1="58" x2="235" y2="98" gradientUnits="userSpaceOnUse"><stop stopColor="#FF8A65"/><stop offset="1" stopColor="#E64A19"/></linearGradient>
+                        <linearGradient id="addr-pin-g2" x1="178" y1="30" x2="200" y2="70" gradientUnits="userSpaceOnUse"><stop stopColor="#EF5350"/><stop offset="1" stopColor="#B71C1C"/></linearGradient>
+                        <filter id="addr-ps"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.08"/></filter>
                       </defs>
-                      {/* Ground */}
-                      <ellipse cx="130" cy="172" rx="110" ry="12" fill="#C8E6C9" opacity="0.7"/>
-                      {/* House body */}
-                      <rect x="80" y="97" width="100" height="74" rx="6" fill="url(#addr-house-g)" filter="url(#addr-house-s)" stroke="#F5A623" strokeWidth="1.2"/>
-                      {/* Roof */}
-                      <path d="M68 103 L130 56 L192 103Z" fill="url(#addr-roof-g)"/>
-                      <path d="M68 103 L130 56 L192 103" stroke="#BF360C" strokeWidth="1.2" fill="none"/>
-                      {/* Roof ridge cap */}
-                      <ellipse cx="130" cy="56" rx="5" ry="5" fill="#FF8A65" opacity="0.5"/>
-                      {/* Door */}
-                      <rect x="115" y="132" width="30" height="39" rx="5" fill="#8D6E63"/>
-                      <rect x="115" y="132" width="30" height="39" rx="5" stroke="#6D4C41" strokeWidth="1"/>
-                      <circle cx="140" cy="153" r="2.8" fill="#FFD54F"/>
-                      {/* Window left */}
-                      <rect x="88" y="108" width="20" height="20" rx="4" fill="#B3E5FC" stroke="#29B6F6" strokeWidth="1"/>
-                      <line x1="98" y1="108" x2="98" y2="128" stroke="#29B6F6" strokeWidth="0.7"/>
-                      <line x1="88" y1="118" x2="108" y2="118" stroke="#29B6F6" strokeWidth="0.7"/>
-                      {/* Window right */}
-                      <rect x="152" y="108" width="20" height="20" rx="4" fill="#B3E5FC" stroke="#29B6F6" strokeWidth="1"/>
-                      <line x1="162" y1="108" x2="162" y2="128" stroke="#29B6F6" strokeWidth="0.7"/>
-                      <line x1="152" y1="118" x2="172" y2="118" stroke="#29B6F6" strokeWidth="0.7"/>
-                      {/* Map pin */}
-                      <path d="M130 18 C117 18 106 29 106 42 C106 59 130 77 130 77 C130 77 154 59 154 42 C154 29 143 18 130 18Z" fill="url(#addr-pin-g)" filter="url(#addr-pin-s)"/>
-                      <circle cx="130" cy="41" r="9" fill="white" opacity="0.9"/>
-                      <circle cx="130" cy="41" r="4" fill="#EF5350" opacity="0.5"/>
-                      {/* Tree left */}
-                      <rect x="40" y="142" width="7" height="28" rx="3" fill="#795548"/>
-                      <circle cx="43" cy="129" r="17" fill="url(#addr-tree-g)"/>
-                      <circle cx="37" cy="137" r="13" fill="#66BB6A"/>
-                      {/* Tree right */}
-                      <rect x="214" y="143" width="6" height="26" rx="3" fill="#795548"/>
-                      <circle cx="217" cy="131" r="15" fill="url(#addr-tree2-g)"/>
-                      <circle cx="222" cy="139" r="11" fill="#66BB6A"/>
+                      <g filter="url(#addr-ps)">
+                        {/* Body */}
+                        <rect x="83" y="108" width="44" height="52" rx="13" fill="url(#addr-body-g)"/>
+                        {/* Head */}
+                        <circle cx="105" cy="90" r="20" fill="#FFCC80"/>
+                        {/* Hair */}
+                        <path d="M85 86 Q85 66 105 66 Q125 66 125 86" fill="#5D4037"/>
+                        {/* Eyes */}
+                        <circle cx="98" cy="88" r="2" fill="#333"/>
+                        <circle cx="112" cy="88" r="2" fill="#333"/>
+                        {/* Smile */}
+                        <path d="M99 95 Q105 101 111 95" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Right arm pointing at house */}
+                        <path d="M127 118 Q145 110 158 105" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Left arm */}
+                        <path d="M83 118 Q68 115 60 120" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Legs */}
+                        <path d="M97 160 L93 185" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                        <path d="M113 160 L117 185" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                      </g>
+                      {/* House */}
+                      <rect x="152" y="98" width="76" height="72" rx="5" fill="url(#addr-house-g2)" stroke="#F5A623" strokeWidth="1.2"/>
+                      <path d="M144 104 L190 62 L236 104Z" fill="url(#addr-roof-g2)"/>
+                      <rect x="173" y="130" width="24" height="40" rx="4" fill="#8D6E63"/>
+                      <circle cx="192" cy="151" r="2.5" fill="#FFD54F"/>
+                      <rect x="157" y="108" width="16" height="16" rx="3" fill="#B3E5FC" stroke="#29B6F6" strokeWidth="1"/>
+                      <rect x="211" y="108" width="14" height="16" rx="3" fill="#B3E5FC" stroke="#29B6F6" strokeWidth="1"/>
+                      {/* Map pin above house */}
+                      <path d="M190 28 C181 28 173 36 173 45 C173 58 190 70 190 70 C190 70 207 58 207 45 C207 36 199 28 190 28Z" fill="url(#addr-pin-g2)"/>
+                      <circle cx="190" cy="44" r="7" fill="white" opacity="0.9"/>
+                      <circle cx="190" cy="44" r="3" fill="#EF5350" opacity="0.6"/>
+                      {/* Decorative */}
+                      <ellipse cx="190" cy="172" rx="90" ry="8" fill="#C8E6C9" opacity="0.5"/>
+                      <circle cx="32" cy="65" r="4" fill="#7E57C2" opacity="0.2"/>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ address: profileDraft.address.trim() || undefined, zipCode: profileDraft.zipCode.trim() || undefined, city: profileDraft.city.trim() || undefined })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -1102,40 +1143,41 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <radialGradient id="globe-fill-g" cx="40%" cy="35%" r="65%" gradientUnits="objectBoundingBox"><stop stopColor="#E3F2FD"/><stop offset="1" stopColor="#BBDEFB"/></radialGradient>
-                        <linearGradient id="globe-land-g" x1="90" y1="70" x2="160" y2="130" gradientUnits="userSpaceOnUse"><stop stopColor="#A5D6A7"/><stop offset="1" stopColor="#4CAF50"/></linearGradient>
-                        <filter id="globe-s"><feDropShadow dx="0" dy="5" stdDeviation="8" floodOpacity="0.14"/></filter>
-                        <filter id="globe-flag-s"><feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity="0.18"/></filter>
+                        <linearGradient id="country-body-g" x1="108" y1="100" x2="152" y2="175" gradientUnits="userSpaceOnUse"><stop stopColor="#42A5F5"/><stop offset="1" stopColor="#1976D2"/></linearGradient>
+                        <radialGradient id="country-globe-g" cx="38%" cy="35%" r="65%" gradientUnits="objectBoundingBox"><stop stopColor="#E3F2FD"/><stop offset="1" stopColor="#BBDEFB"/></radialGradient>
+                        <linearGradient id="country-land-g" x1="90" y1="70" x2="160" y2="140" gradientUnits="userSpaceOnUse"><stop stopColor="#A5D6A7"/><stop offset="1" stopColor="#4CAF50"/></linearGradient>
+                        <filter id="country-ps"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.08"/></filter>
                       </defs>
-                      {/* Globe */}
-                      <circle cx="130" cy="102" r="66" fill="url(#globe-fill-g)" filter="url(#globe-s)" stroke="#64B5F6" strokeWidth="1.8"/>
-                      {/* Latitude lines */}
-                      <ellipse cx="130" cy="102" rx="66" ry="25" stroke="#90CAF9" strokeWidth="0.9" fill="none" opacity="0.7"/>
-                      <ellipse cx="130" cy="102" rx="48" ry="66" stroke="#90CAF9" strokeWidth="0.9" fill="none" opacity="0.7"/>
-                      <line x1="64" y1="102" x2="196" y2="102" stroke="#90CAF9" strokeWidth="0.9" opacity="0.7"/>
-                      <line x1="130" y1="36" x2="130" y2="168" stroke="#90CAF9" strokeWidth="0.9" opacity="0.7"/>
-                      {/* Continents */}
-                      <ellipse cx="109" cy="87" rx="21" ry="15" fill="url(#globe-land-g)" opacity="0.65"/>
-                      <ellipse cx="155" cy="92" rx="15" ry="20" fill="url(#globe-land-g)" opacity="0.65"/>
-                      <ellipse cx="120" cy="118" rx="18" ry="11" fill="url(#globe-land-g)" opacity="0.55"/>
-                      <ellipse cx="148" cy="120" rx="9" ry="7" fill="url(#globe-land-g)" opacity="0.5"/>
-                      {/* Danish flag on pole */}
-                      <rect x="184" y="36" width="2.5" height="32" rx="1" fill="#8D6E63"/>
-                      <g transform="translate(186, 36)" filter="url(#globe-flag-s)">
-                        <rect x="0" y="0" width="32" height="22" rx="2" fill="#C8102E"/>
-                        <rect x="9.5" y="0" width="4.5" height="22" fill="white"/>
-                        <rect x="0" y="8.5" width="32" height="4.5" fill="white"/>
+                      {/* Globe held by person */}
+                      <circle cx="130" cy="118" r="52" fill="url(#country-globe-g)" stroke="#64B5F6" strokeWidth="1.8"/>
+                      <ellipse cx="130" cy="118" rx="52" ry="20" stroke="#90CAF9" strokeWidth="0.9" fill="none" opacity="0.6"/>
+                      <ellipse cx="130" cy="118" rx="38" ry="52" stroke="#90CAF9" strokeWidth="0.9" fill="none" opacity="0.6"/>
+                      <line x1="78" y1="118" x2="182" y2="118" stroke="#90CAF9" strokeWidth="0.9" opacity="0.6"/>
+                      <ellipse cx="115" cy="105" rx="17" ry="12" fill="url(#country-land-g)" opacity="0.65"/>
+                      <ellipse cx="148" cy="110" rx="12" ry="16" fill="url(#country-land-g)" opacity="0.65"/>
+                      <ellipse cx="122" cy="130" rx="14" ry="9" fill="url(#country-land-g)" opacity="0.55"/>
+                      <g filter="url(#country-ps)">
+                        {/* Body */}
+                        <rect x="108" y="100" width="44" height="52" rx="13" fill="url(#country-body-g)"/>
+                        {/* Head */}
+                        <circle cx="130" cy="82" r="20" fill="#FFCC80"/>
+                        {/* Hair */}
+                        <path d="M110 78 Q110 58 130 58 Q150 58 150 78" fill="#8D6E63"/>
+                        {/* Eyes */}
+                        <circle cx="123" cy="80" r="2" fill="#333"/>
+                        <circle cx="137" cy="80" r="2" fill="#333"/>
+                        {/* Smile */}
+                        <path d="M124 87 Q130 94 136 87" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Arms hugging globe */}
+                        <path d="M108 112 Q90 120 82 135" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        <path d="M152 112 Q170 120 178 135" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Legs */}
+                        <path d="M122 152 L118 180" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                        <path d="M138 152 L142 180" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
                       </g>
-                      {/* Airplane */}
-                      <g transform="translate(50, 38) rotate(-22)">
-                        <ellipse cx="0" cy="0" rx="14" ry="3.5" fill="#7986CB"/>
-                        <path d="M-6 0 L-2 -9 L3 0" fill="#9FA8DA"/>
-                        <path d="M9 0 L14 -5 L14 0" fill="#9FA8DA"/>
-                      </g>
-                      {/* Flight path */}
-                      <path d="M54 43 Q90 20 130 38" stroke="#7986CB" strokeWidth="1.2" strokeDasharray="3 3" fill="none" opacity="0.45"/>
-                      <circle cx="27" cy="170" r="3" fill="#BBDEFB" opacity="0.4"/>
-                      <circle cx="234" cy="168" r="3.5" fill="#90CAF9" opacity="0.35"/>
+                      {/* Decorative */}
+                      <circle cx="35" cy="62" r="4" fill="#42A5F5" opacity="0.2"/>
+                      <circle cx="224" cy="58" r="4" fill="#90CAF9" opacity="0.25"/>
                     </svg>
                   </div>
                   <Button onClick={handleSaveField({ country: profileDraft.country.trim() || undefined })} className="w-full shrink-0 rounded-[12px] py-3" disabled={isSaving}>
@@ -1191,27 +1233,42 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="alglist-p1-g" x1="78" y1="45" x2="122" y2="155" gradientUnits="userSpaceOnUse"><stop stopColor="#FFE0B2"/><stop offset="1" stopColor="#FFCC80"/></linearGradient>
-                        <linearGradient id="alglist-p2-g" x1="140" y1="52" x2="182" y2="147" gradientUnits="userSpaceOnUse"><stop stopColor="#FFCC80"/><stop offset="1" stopColor="#FFA726"/></linearGradient>
-                        <linearGradient id="alglist-shield-g" x1="105" y1="138" x2="155" y2="200" gradientUnits="userSpaceOnUse"><stop stopColor="#FFF8E1"/><stop offset="1" stopColor="#FFE0B2"/></linearGradient>
-                        <filter id="alglist-s"><feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.12"/></filter>
-                        <filter id="alglist-shield-s"><feDropShadow dx="0" dy="3" stdDeviation="5" floodOpacity="0.15"/></filter>
+                        <linearGradient id="alglist-parent-g" x1="70" y1="85" x2="112" y2="170" gradientUnits="userSpaceOnUse"><stop stopColor="#F5A623"/><stop offset="1" stopColor="#FB8C00"/></linearGradient>
+                        <linearGradient id="alglist-child-g" x1="148" y1="100" x2="180" y2="165" gradientUnits="userSpaceOnUse"><stop stopColor="#81C784"/><stop offset="1" stopColor="#388E3C"/></linearGradient>
+                        <linearGradient id="alglist-shield-g2" x1="118" y1="55" x2="158" y2="115" gradientUnits="userSpaceOnUse"><stop stopColor="#FFF8E1"/><stop offset="1" stopColor="#FFE0B2"/></linearGradient>
+                        <filter id="alglist-ps"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.08"/></filter>
                       </defs>
-                      {/* Person 1 — parent */}
-                      <circle cx="98" cy="68" r="24" fill="url(#alglist-p1-g)" filter="url(#alglist-s)"/>
-                      <ellipse cx="98" cy="122" rx="27" ry="32" fill="url(#alglist-p1-g)" filter="url(#alglist-s)"/>
-                      {/* Person 2 — child */}
-                      <circle cx="160" cy="74" r="19" fill="url(#alglist-p2-g)" filter="url(#alglist-s)"/>
-                      <ellipse cx="160" cy="120" rx="21" ry="27" fill="url(#alglist-p2-g)" filter="url(#alglist-s)"/>
-                      {/* Shield */}
-                      <path d="M130 136 L157 149 L157 173 C157 187 143 195 130 200 C117 195 103 187 103 173 L103 149 Z" fill="url(#alglist-shield-g)" filter="url(#alglist-shield-s)" stroke="#F5A623" strokeWidth="1.8"/>
-                      {/* Check in shield */}
-                      <path d="M121 170 L127 177 L141 161" stroke="#F5A623" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"/>
-                      {/* Heart above */}
-                      <path d="M124 40 C124 34 130 31 133 36 C136 31 142 34 142 40 C142 48 133 53 133 53 C133 53 124 48 124 40Z" fill="#F48FB1" opacity="0.55"/>
-                      <circle cx="54" cy="100" r="3.5" fill="#FFCC80" opacity="0.38"/>
-                      <circle cx="211" cy="94" r="4" fill="#FFE0B2" opacity="0.38"/>
-                      <circle cx="42" cy="165" r="2.5" fill="#F5A623" opacity="0.25"/>
+                      {/* Parent figure */}
+                      <g filter="url(#alglist-ps)">
+                        <rect x="68" y="108" width="44" height="56" rx="13" fill="url(#alglist-parent-g)"/>
+                        <circle cx="90" cy="88" r="20" fill="#FFCC80"/>
+                        <path d="M70 84 Q70 64 90 64 Q110 64 110 84" fill="#5D4037"/>
+                        <circle cx="83" cy="86" r="1.8" fill="#333"/>
+                        <circle cx="97" cy="86" r="1.8" fill="#333"/>
+                        <path d="M84 93 Q90 99 96 93" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Left arm around child */}
+                        <path d="M112 118 Q130 115 142 120" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        <path d="M68 118 Q55 115 48 122" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        <path d="M80 164 L76 185" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                        <path d="M100 164 L104 185" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                      </g>
+                      {/* Child figure */}
+                      <g filter="url(#alglist-ps)">
+                        <rect x="142" y="122" width="36" height="46" rx="11" fill="url(#alglist-child-g)"/>
+                        <circle cx="160" cy="106" r="16" fill="#FFCC80"/>
+                        <path d="M144 102 Q144 86 160 86 Q176 86 176 102" fill="#8D6E63"/>
+                        <circle cx="154" cy="104" r="1.6" fill="#333"/>
+                        <circle cx="166" cy="104" r="1.6" fill="#333"/>
+                        <path d="M155 110 Q160 115 165 110" stroke="#333" strokeWidth="1.4" fill="none" strokeLinecap="round"/>
+                        <path d="M148 168 L145 185" stroke="#5D4037" strokeWidth="3.5" strokeLinecap="round"/>
+                        <path d="M172 168 L175 185" stroke="#5D4037" strokeWidth="3.5" strokeLinecap="round"/>
+                      </g>
+                      {/* Shield between them */}
+                      <path d="M130 52 L152 64 L152 86 C152 98 142 106 130 110 C118 106 108 98 108 86 L108 64 Z" fill="url(#alglist-shield-g2)" stroke="#F5A623" strokeWidth="1.8"/>
+                      <path d="M121 82 L127 89 L140 74" stroke="#F5A623" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      {/* Decorative */}
+                      <circle cx="35" cy="75" r="4" fill="#F5A623" opacity="0.2"/>
+                      <circle cx="222" cy="80" r="3.5" fill="#81C784" opacity="0.25"/>
                     </svg>
                   </div>
                 </div>
@@ -1259,24 +1316,49 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                     <div className="flex-1 flex items-center justify-center py-8">
                       <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <defs>
-                          <linearGradient id="algsub-shield-g" x1="75" y1="25" x2="185" y2="182" gradientUnits="userSpaceOnUse"><stop stopColor="#FFF8E1"/><stop offset="1" stopColor="#FFE0B2"/></linearGradient>
-                          <linearGradient id="algsub-inner-g" x1="90" y1="45" x2="170" y2="164" gradientUnits="userSpaceOnUse"><stop stopColor="#FFE0B2"/><stop offset="1" stopColor="#FFCA28"/></linearGradient>
-                          <linearGradient id="algsub-heart-g" x1="115" y1="78" x2="145" y2="122" gradientUnits="userSpaceOnUse"><stop stopColor="#FF6B6B"/><stop offset="1" stopColor="#C62828"/></linearGradient>
-                          <filter id="algsub-s"><feDropShadow dx="0" dy="6" stdDeviation="10" floodOpacity="0.15"/></filter>
+                          <linearGradient id="algsub-body-g" x1="85" y1="100" x2="128" y2="175" gradientUnits="userSpaceOnUse"><stop stopColor="#F5A623"/><stop offset="1" stopColor="#FB8C00"/></linearGradient>
+                          <linearGradient id="algsub-board-g" x1="148" y1="55" x2="215" y2="155" gradientUnits="userSpaceOnUse"><stop stopColor="#FFF9F0"/><stop offset="1" stopColor="#FFE0B2"/></linearGradient>
+                          <filter id="algsub-ps"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.08"/></filter>
                         </defs>
-                        {/* Outer shield */}
-                        <path d="M130 22 L187 54 L187 117 C187 148 156 173 130 183 C104 173 73 148 73 117 L73 54 Z" fill="url(#algsub-shield-g)" filter="url(#algsub-s)" stroke="#F5A623" strokeWidth="2"/>
-                        {/* Inner shield */}
-                        <path d="M130 42 L172 66 L172 113 C172 137 152 158 130 165 C108 158 88 137 88 113 L88 66 Z" fill="url(#algsub-inner-g)"/>
-                        {/* Heart */}
-                        <path d="M114 96 C114 82 124 78 130 86 C136 78 146 82 146 96 C146 114 130 122 130 122 C130 122 114 114 114 96Z" fill="url(#algsub-heart-g)" opacity="0.88"/>
-                        {/* Checkmark */}
-                        <path d="M120 98 L128 108 L143 88" stroke="white" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"/>
-                        {/* Sparkles */}
-                        <circle cx="48" cy="100" r="4" fill="#FFE0B2" opacity="0.5"/>
-                        <circle cx="214" cy="96" r="5" fill="#F5A623" opacity="0.3"/>
-                        <circle cx="60" cy="165" r="3" fill="#FFCA28" opacity="0.35"/>
-                        <circle cx="202" cy="168" r="3" fill="#FFE0B2" opacity="0.4"/>
+                        <g filter="url(#algsub-ps)">
+                          {/* Body */}
+                          <rect x="83" y="108" width="44" height="55" rx="13" fill="url(#algsub-body-g)"/>
+                          {/* Head */}
+                          <circle cx="105" cy="88" r="20" fill="#FFCC80"/>
+                          {/* Hair */}
+                          <path d="M85 84 Q85 64 105 64 Q125 64 125 84" fill="#5D4037"/>
+                          {/* Eyes */}
+                          <circle cx="98" cy="86" r="2" fill="#333"/>
+                          <circle cx="112" cy="86" r="2" fill="#333"/>
+                          {/* Smile */}
+                          <path d="M99 93 Q105 100 111 93" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                          {/* Right arm holding clipboard */}
+                          <path d="M127 118 Q142 112 152 108" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                          {/* Left arm */}
+                          <path d="M83 118 Q68 115 60 122" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                          {/* Legs */}
+                          <path d="M97 163 L93 185" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                          <path d="M113 163 L117 185" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                        </g>
+                        {/* Clipboard */}
+                        <rect x="152" y="68" width="64" height="80" rx="8" fill="url(#algsub-board-g)" stroke="#F5A623" strokeWidth="1.5"/>
+                        {/* Clipboard clip */}
+                        <rect x="172" y="62" width="24" height="12" rx="4" fill="#F5A623"/>
+                        <rect x="178" y="65" width="12" height="6" rx="3" fill="#FFE0B2"/>
+                        {/* Check items */}
+                        <circle cx="163" cy="86" r="4" fill="#81C784"/>
+                        <path d="M161 86 L163 88.5 L167 84" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <rect x="172" y="83" width="36" height="5" rx="2.5" fill="#FFCC80"/>
+                        <circle cx="163" cy="101" r="4" fill="#81C784"/>
+                        <path d="M161 101 L163 103.5 L167 99" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <rect x="172" y="98" width="30" height="5" rx="2.5" fill="#FFCC80"/>
+                        <circle cx="163" cy="116" r="4" fill="#E0E0E0" stroke="#BDBDBD" strokeWidth="1"/>
+                        <rect x="172" y="113" width="36" height="5" rx="2.5" fill="#FFE0B2"/>
+                        <circle cx="163" cy="131" r="4" fill="#E0E0E0" stroke="#BDBDBD" strokeWidth="1"/>
+                        <rect x="172" y="128" width="26" height="5" rx="2.5" fill="#FFE0B2"/>
+                        {/* Decorative */}
+                        <circle cx="38" cy="80" r="4" fill="#F5A623" opacity="0.2"/>
+                        <circle cx="230" cy="155" r="3.5" fill="#FFCC80" opacity="0.3"/>
                       </svg>
                     </div>
                   </div>
@@ -1296,31 +1378,41 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="export-doc-g" x1="80" y1="28" x2="180" y2="152" gradientUnits="userSpaceOnUse"><stop stopColor="#EDE7F6"/><stop offset="1" stopColor="#E8EAF6"/></linearGradient>
-                        <linearGradient id="export-btn-g" x1="108" y1="138" x2="152" y2="183" gradientUnits="userSpaceOnUse"><stop stopColor="#7986CB"/><stop offset="1" stopColor="#5C6BC0"/></linearGradient>
-                        <filter id="export-doc-s"><feDropShadow dx="0" dy="4" stdDeviation="7" floodOpacity="0.12"/></filter>
-                        <filter id="export-btn-s"><feDropShadow dx="0" dy="4" stdDeviation="6" floodOpacity="0.2"/></filter>
+                        <linearGradient id="export-body-g" x1="95" y1="105" x2="138" y2="175" gradientUnits="userSpaceOnUse"><stop stopColor="#7E57C2"/><stop offset="1" stopColor="#4527A0"/></linearGradient>
+                        <linearGradient id="export-box-g" x1="90" y1="115" x2="175" y2="180" gradientUnits="userSpaceOnUse"><stop stopColor="#EDE7F6"/><stop offset="1" stopColor="#D1C4E9"/></linearGradient>
+                        <linearGradient id="export-arrow-g" x1="120" y1="125" x2="150" y2="160" gradientUnits="userSpaceOnUse"><stop stopColor="#7986CB"/><stop offset="1" stopColor="#5C6BC0"/></linearGradient>
+                        <filter id="export-ps"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.08"/></filter>
                       </defs>
-                      {/* Document */}
-                      <rect x="80" y="28" width="100" height="120" rx="14" fill="url(#export-doc-g)" filter="url(#export-doc-s)" stroke="#9FA8DA" strokeWidth="1.5"/>
-                      {/* Dog-ear fold */}
-                      <path d="M158 28 L180 50 L158 50 Z" fill="#C5CAE9" opacity="0.5"/>
-                      {/* Text lines */}
-                      <rect x="95" y="56" width="72" height="7" rx="3.5" fill="#9FA8DA" opacity="0.7"/>
-                      <rect x="95" y="70" width="52" height="6" rx="3" fill="#C5CAE9"/>
-                      <rect x="95" y="83" width="62" height="6" rx="3" fill="#C5CAE9"/>
-                      <rect x="95" y="96" width="42" height="6" rx="3" fill="#C5CAE9"/>
-                      <rect x="95" y="109" width="55" height="6" rx="3" fill="#C5CAE9" opacity="0.6"/>
-                      {/* Download circle button */}
-                      <circle cx="130" cy="162" r="24" fill="url(#export-btn-g)" filter="url(#export-btn-s)"/>
-                      {/* Arrow */}
-                      <line x1="130" y1="150" x2="130" y2="171" stroke="white" strokeWidth="3" strokeLinecap="round"/>
-                      <path d="M121 164 L130 173 L139 164" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-                      {/* Sparkles */}
-                      <circle cx="54" cy="50" r="4.5" fill="#FFD54F" opacity="0.45"/>
-                      <circle cx="207" cy="44" r="3.5" fill="#9FA8DA" opacity="0.4"/>
-                      <circle cx="58" cy="152" r="3" fill="#C5CAE9" opacity="0.4"/>
-                      <circle cx="205" cy="158" r="3" fill="#7986CB" opacity="0.3"/>
+                      <g filter="url(#export-ps)">
+                        {/* Body */}
+                        <rect x="93" y="105" width="44" height="52" rx="13" fill="url(#export-body-g)"/>
+                        {/* Head */}
+                        <circle cx="115" cy="86" r="20" fill="#FFCC80"/>
+                        {/* Hair */}
+                        <path d="M95 82 Q95 62 115 62 Q135 62 135 82" fill="#8D6E63"/>
+                        {/* Eyes */}
+                        <circle cx="108" cy="84" r="2" fill="#333"/>
+                        <circle cx="122" cy="84" r="2" fill="#333"/>
+                        {/* Smile */}
+                        <path d="M109 91 Q115 97 121 91" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Arms carrying box */}
+                        <path d="M93 118 Q80 128 74 140" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        <path d="M137 118 Q150 128 156 140" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Legs */}
+                        <path d="M105 157 L101 182" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                        <path d="M125 157 L129 182" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                      </g>
+                      {/* Download box being carried */}
+                      <rect x="72" y="140" width="86" height="44" rx="10" fill="url(#export-box-g)" stroke="#9FA8DA" strokeWidth="1.5"/>
+                      {/* Box flap top */}
+                      <path d="M80 140 L115 128 L158 140" stroke="#C5CAE9" strokeWidth="1.2" fill="none"/>
+                      {/* Down arrow on box */}
+                      <line x1="115" y1="150" x2="115" y2="168" stroke="url(#export-arrow-g)" strokeWidth="3" strokeLinecap="round"/>
+                      <path d="M107 162 L115 172 L123 162" stroke="url(#export-arrow-g)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                      {/* Decorative */}
+                      <circle cx="38" cy="70" r="4" fill="#7E57C2" opacity="0.2"/>
+                      <circle cx="220" cy="65" r="4" fill="#9FA8DA" opacity="0.25"/>
+                      <circle cx="210" cy="178" r="3.5" fill="#C5CAE9" opacity="0.3"/>
                     </svg>
                   </div>
                   <Button
@@ -1353,23 +1445,42 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="del-tri-g" x1="50" y1="30" x2="210" y2="165" gradientUnits="userSpaceOnUse"><stop stopColor="#FFEBEE"/><stop offset="1" stopColor="#FFCDD2"/></linearGradient>
-                        <linearGradient id="del-inner-g" x1="70" y1="55" x2="190" y2="155" gradientUnits="userSpaceOnUse"><stop stopColor="#FFCDD2"/><stop offset="1" stopColor="#EF9A9A"/></linearGradient>
-                        <filter id="del-s"><feDropShadow dx="0" dy="5" stdDeviation="8" floodOpacity="0.14"/></filter>
+                        <linearGradient id="del-body-g" x1="95" y1="100" x2="138" y2="175" gradientUnits="userSpaceOnUse"><stop stopColor="#EF5350"/><stop offset="1" stopColor="#B71C1C"/></linearGradient>
+                        <linearGradient id="del-sign-g" x1="155" y1="55" x2="230" y2="155" gradientUnits="userSpaceOnUse"><stop stopColor="#FFEBEE"/><stop offset="1" stopColor="#FFCDD2"/></linearGradient>
+                        <filter id="del-ps"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.08"/></filter>
                       </defs>
-                      {/* Outer triangle */}
-                      <path d="M130 28 L215 165 L45 165 Z" fill="url(#del-tri-g)" filter="url(#del-s)" stroke="#EF5350" strokeWidth="2.2"/>
-                      {/* Inner fill triangle */}
-                      <path d="M130 52 L196 152 L64 152 Z" fill="url(#del-inner-g)"/>
-                      {/* Exclamation bar */}
-                      <rect x="126.5" y="80" width="7" height="42" rx="3.5" fill="#EF5350"/>
-                      {/* Exclamation dot */}
-                      <circle cx="130" cy="135" r="5" fill="#EF5350"/>
-                      {/* Small orbiting triangles */}
-                      <path d="M42 52 L50 40 L58 52 Z" fill="#FFCDD2" opacity="0.5" stroke="#EF5350" strokeWidth="1"/>
-                      <path d="M202 45 L209 34 L216 45 Z" fill="#FFCDD2" opacity="0.4" stroke="#EF5350" strokeWidth="0.8"/>
-                      <circle cx="44" cy="175" r="3" fill="#FFCDD2" opacity="0.4"/>
-                      <circle cx="218" cy="174" r="3" fill="#EF9A9A" opacity="0.4"/>
+                      <g filter="url(#del-ps)">
+                        {/* Body */}
+                        <rect x="93" y="108" width="44" height="52" rx="13" fill="url(#del-body-g)"/>
+                        {/* Head */}
+                        <circle cx="115" cy="88" r="20" fill="#FFCC80"/>
+                        {/* Hair */}
+                        <path d="M95 84 Q95 64 115 64 Q135 64 135 84" fill="#5D4037"/>
+                        {/* Eyes — worried */}
+                        <circle cx="108" cy="86" r="2" fill="#333"/>
+                        <circle cx="122" cy="86" r="2" fill="#333"/>
+                        {/* Worried brow */}
+                        <path d="M106 80 Q108 78 111 80" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        <path d="M119 80 Q122 78 124 80" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Flat/worried mouth */}
+                        <path d="M109 94 Q115 92 121 94" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Arm gesturing at sign */}
+                        <path d="M137 118 Q152 112 162 105" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Left arm */}
+                        <path d="M93 118 Q78 115 70 120" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Legs */}
+                        <path d="M105 160 L101 182" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                        <path d="M125 160 L129 182" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                      </g>
+                      {/* Warning sign */}
+                      <path d="M190 55 L225 118 L155 118 Z" fill="url(#del-sign-g)" stroke="#EF5350" strokeWidth="2"/>
+                      <rect x="187.5" y="75" width="5" height="26" rx="2.5" fill="#EF5350"/>
+                      <circle cx="190" cy="112" r="3.5" fill="#EF5350"/>
+                      {/* Decorative */}
+                      <circle cx="38" cy="75" r="4" fill="#EF5350" opacity="0.2"/>
+                      <path d="M45 48 L50 40 L55 48 Z" fill="#FFCDD2" opacity="0.5" stroke="#EF5350" strokeWidth="1"/>
+                      <circle cx="42" cy="178" r="3" fill="#FFCDD2" opacity="0.35"/>
+                      <circle cx="228" cy="142" r="3" fill="#EF9A9A" opacity="0.3"/>
                     </svg>
                   </div>
                   <Button
@@ -1837,7 +1948,10 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-[#5A78FF]">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="4" y="3" width="12" height="14" rx="2" fill="white"/><path d="M7 8 L10 12 L13 7" stroke="#5A78FF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                          <path d="M17.5 4L8 20" stroke="white" strokeWidth="3" strokeLinecap="round"/>
+                          <path d="M12 4L6 14" stroke="white" strokeWidth="3" strokeLinecap="round" opacity="0.6"/>
+                        </svg>
                       </div>
                       <p className="text-[15px] font-medium text-foreground">MobilePay</p>
                     </div>
@@ -1849,7 +1963,10 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] border border-border bg-white">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M14.5 5.5C13.8 4.7 12.8 4.3 11.9 4.3C10.6 4.3 10 5 9.2 5C8.4 5 7.6 4.3 6.5 4.3C5.5 4.3 4.4 4.9 3.7 5.9C2.6 7.5 2.8 10.5 4.5 13.2C5.1 14.2 5.9 15.3 7 15.3C8 15.3 8.3 14.7 9.5 14.7C10.7 14.7 10.9 15.3 12 15.3C13.1 15.3 13.9 14.1 14.5 13.1C14.9 12.4 15 12.1 15.3 11.3C13.2 10.5 12.9 7.5 14.5 5.5Z" fill="black"/></svg>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                          <path d="M13.2 3.4C12.6 2.7 11.7 2.3 10.9 2.3C10.9 3.3 10.5 4.2 9.8 4.8C9.2 5.4 8.3 5.9 7.3 5.8C7.2 4.9 7.7 3.9 8.2 3.4C8.9 2.7 9.9 2.2 10.8 2.2C10.8 2.3 13.2 3.4 13.2 3.4Z" fill="black"/>
+                          <path d="M13.5 6C12.2 6 11.3 6.7 10.7 6.7C10 6.7 9.2 6.1 8.1 6.1C6.1 6.1 4 7.8 4 11.1C4 13.1 4.8 15.2 5.8 16.6C6.6 17.8 7.4 18.8 8.5 18.8C9.5 18.8 10 18.2 11.2 18.2C12.5 18.2 12.8 18.8 14 18.8C15.1 18.8 15.9 17.7 16.7 16.6C17.1 16 17.4 15.3 17.6 14.8C15.5 13.9 15.2 10.8 17.2 9.5C16.3 8.3 15 6 13.5 6Z" fill="black"/>
+                        </svg>
                       </div>
                       <p className="text-[15px] font-medium text-foreground">Apple Pay</p>
                     </div>
@@ -1861,7 +1978,11 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] border border-border bg-white">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M7.5 16.5L8.2 12.5H10.5C13.5 12.5 15.5 10.5 16 7.5C16.3 5.5 15 4 12.5 4H8L5.5 16.5H7.5Z" fill="#003087"/><path d="M8.5 14L9 11H11C13.5 11 15 9.5 15.3 7C15.5 5.5 14.5 4.5 12.5 4.5H9L7 14H8.5Z" fill="#009CDE"/></svg>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                          <path d="M15.4 5.8C15.4 3.6 13.6 2.5 11.2 2.5H6.5L4 16.5H6.8L7.6 12H9.8C12.8 12 15 10.2 15.5 7.5C15.5 7 15.4 6.4 15.4 5.8Z" fill="#003087"/>
+                          <path d="M17.4 7.5C17 10.5 14.8 12 11.8 12H10.2L9.2 17.5H6.8L7.6 12H9.8C12.8 12 15 10.2 15.5 7.5C16.5 7 17.4 7 17.4 7.5Z" fill="#0070E0"/>
+                          <path d="M8.2 8H10.5C12 8 13 7.2 13.2 6C13.4 4.8 12.6 4 11.2 4H8.8L8.2 8Z" fill="white" opacity="0.4"/>
+                        </svg>
                       </div>
                       <p className="text-[15px] font-medium text-foreground">PayPal</p>
                     </div>
@@ -1942,37 +2063,50 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="gift-card-g" x1="50" y1="48" x2="210" y2="152" gradientUnits="userSpaceOnUse"><stop stopColor="#FFF9F0"/><stop offset="1" stopColor="#FFE0B2"/></linearGradient>
-                        <linearGradient id="gift-header-g" x1="50" y1="48" x2="210" y2="88" gradientUnits="userSpaceOnUse"><stop stopColor="#FFE0B2"/><stop offset="1" stopColor="#FFCC80"/></linearGradient>
-                        <linearGradient id="gift-ribbon-g" x1="130" y1="48" x2="130" y2="152" gradientUnits="userSpaceOnUse"><stop stopColor="#EF5350"/><stop offset="1" stopColor="#B71C1C"/></linearGradient>
-                        <linearGradient id="gift-bow-g" x1="112" y1="78" x2="148" y2="102" gradientUnits="userSpaceOnUse"><stop stopColor="#EF5350"/><stop offset="1" stopColor="#C62828"/></linearGradient>
-                        <filter id="gift-s"><feDropShadow dx="0" dy="5" stdDeviation="8" floodOpacity="0.14"/></filter>
-                        <filter id="gift-bow-s"><feDropShadow dx="0" dy="2" stdDeviation="4" floodOpacity="0.2"/></filter>
+                        <linearGradient id="pgift-p1-g" x1="52" y1="90" x2="92" y2="172" gradientUnits="userSpaceOnUse"><stop stopColor="#F5A623"/><stop offset="1" stopColor="#FB8C00"/></linearGradient>
+                        <linearGradient id="pgift-p2-g" x1="165" y1="90" x2="205" y2="172" gradientUnits="userSpaceOnUse"><stop stopColor="#81C784"/><stop offset="1" stopColor="#388E3C"/></linearGradient>
+                        <linearGradient id="pgift-box-g" x1="108" y1="105" x2="162" y2="175" gradientUnits="userSpaceOnUse"><stop stopColor="#FFF9F0"/><stop offset="1" stopColor="#FFE0B2"/></linearGradient>
+                        <filter id="pgift-ps"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.08"/></filter>
                       </defs>
-                      {/* Card */}
-                      <rect x="50" y="48" width="160" height="104" rx="18" fill="url(#gift-card-g)" filter="url(#gift-s)" stroke="#F5A623" strokeWidth="1.5"/>
-                      {/* Card header band */}
-                      <rect x="50" y="48" width="160" height="36" rx="18" fill="url(#gift-header-g)"/>
-                      <rect x="50" y="67" width="160" height="17" fill="url(#gift-header-g)"/>
-                      {/* Vertical ribbon */}
-                      <rect x="122" y="48" width="16" height="104" fill="url(#gift-ribbon-g)" opacity="0.72"/>
-                      {/* Horizontal ribbon */}
-                      <rect x="50" y="89" width="160" height="15" fill="url(#gift-ribbon-g)" opacity="0.72"/>
-                      {/* Bow loops */}
-                      <ellipse cx="119" cy="87" rx="19" ry="13" fill="url(#gift-bow-g)" filter="url(#gift-bow-s)"/>
-                      <ellipse cx="141" cy="87" rx="19" ry="13" fill="url(#gift-bow-g)" filter="url(#gift-bow-s)"/>
-                      {/* Bow center knot */}
-                      <circle cx="130" cy="88" r="7" fill="#B71C1C"/>
-                      <circle cx="130" cy="88" r="4" fill="#EF5350"/>
-                      {/* Heart on card */}
-                      <path d="M82 118 C82 112 87 110 90 113 C93 110 98 112 98 118 C98 126 90 131 90 131 C90 131 82 126 82 118Z" fill="#F48FB1" opacity="0.6"/>
+                      {/* Person 1 — giver */}
+                      <g filter="url(#pgift-ps)">
+                        <rect x="50" y="108" width="40" height="50" rx="12" fill="url(#pgift-p1-g)"/>
+                        <circle cx="70" cy="90" r="18" fill="#FFCC80"/>
+                        <path d="M52 86 Q52 68 70 68 Q88 68 88 86" fill="#5D4037"/>
+                        <circle cx="64" cy="88" r="1.8" fill="#333"/>
+                        <circle cx="76" cy="88" r="1.8" fill="#333"/>
+                        <path d="M65 95 Q70 100 75 95" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Right arm extending gift */}
+                        <path d="M90 118 Q105 115 114 118" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        <path d="M50 118 Q38 115 32 122" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        <path d="M60 158 L56 180" stroke="#5D4037" strokeWidth="3.5" strokeLinecap="round"/>
+                        <path d="M80 158 L84 180" stroke="#5D4037" strokeWidth="3.5" strokeLinecap="round"/>
+                      </g>
+                      {/* Gift box in middle */}
+                      <rect x="108" y="118" width="44" height="38" rx="8" fill="url(#pgift-box-g)" stroke="#F5A623" strokeWidth="1.5"/>
+                      <rect x="128" y="118" width="4" height="38" fill="#EF5350" opacity="0.6"/>
+                      <rect x="108" y="133" width="44" height="4" fill="#EF5350" opacity="0.6"/>
+                      <ellipse cx="118" cy="132" rx="12" ry="8" fill="#EF5350" opacity="0.5"/>
+                      <ellipse cx="142" cy="132" rx="12" ry="8" fill="#EF5350" opacity="0.5"/>
+                      <circle cx="130" cy="132" r="5" fill="#B71C1C"/>
+                      {/* Person 2 — receiver */}
+                      <g filter="url(#pgift-ps)">
+                        <rect x="170" y="108" width="40" height="50" rx="12" fill="url(#pgift-p2-g)"/>
+                        <circle cx="190" cy="90" r="18" fill="#FFCC80"/>
+                        <path d="M172 86 Q172 68 190 68 Q208 68 208 86" fill="#8D6E63"/>
+                        <circle cx="184" cy="88" r="1.8" fill="#333"/>
+                        <circle cx="196" cy="88" r="1.8" fill="#333"/>
+                        <path d="M185 95 Q190 101 195 95" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Left arm reaching for gift */}
+                        <path d="M170 118 Q158 115 152 118" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        <path d="M210 118 Q222 115 228 122" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        <path d="M180 158 L176 180" stroke="#5D4037" strokeWidth="3.5" strokeLinecap="round"/>
+                        <path d="M200 158 L204 180" stroke="#5D4037" strokeWidth="3.5" strokeLinecap="round"/>
+                      </g>
                       {/* Sparkles */}
-                      <circle cx="34" cy="38" r="4.5" fill="#FFD54F" opacity="0.5"/>
-                      <circle cx="230" cy="34" r="3.5" fill="#F5A623" opacity="0.4"/>
-                      <circle cx="38" cy="167" r="3.5" fill="#EF5350" opacity="0.3"/>
-                      <circle cx="226" cy="170" r="4" fill="#FFD54F" opacity="0.38"/>
-                      <path d="M44 72 L50 66 L56 72 L50 78Z" fill="#FFD54F" opacity="0.4"/>
-                      <path d="M208 60 L214 54 L220 60 L214 66Z" fill="#F48FB1" opacity="0.38"/>
+                      <circle cx="130" cy="60" r="4" fill="#FFD54F" opacity="0.45"/>
+                      <rect x="32" y="50" width="7" height="3.5" rx="1.5" fill="#F48FB1" transform="rotate(-20 32 50)"/>
+                      <rect x="220" y="48" width="7" height="3.5" rx="1.5" fill="#64B5F6" transform="rotate(18 220 48)"/>
                     </svg>
                   </div>
                   <Button className="w-full shrink-0 rounded-[12px] py-3">
@@ -2014,33 +2148,45 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <radialGradient id="cred-coin-g" cx="38%" cy="35%" r="65%" gradientUnits="objectBoundingBox"><stop stopColor="#FFF9C4"/><stop offset="1" stopColor="#FFD54F"/></radialGradient>
-                        <radialGradient id="cred-coin2-g" cx="38%" cy="35%" r="65%" gradientUnits="objectBoundingBox"><stop stopColor="#FFECB3"/><stop offset="1" stopColor="#FFE082"/></radialGradient>
-                        <filter id="cred-coin-s"><feDropShadow dx="0" dy="4" stdDeviation="7" floodOpacity="0.16"/></filter>
-                        <filter id="cred-sm-s"><feDropShadow dx="0" dy="2" stdDeviation="4" floodOpacity="0.12"/></filter>
+                        <linearGradient id="pcred-body-g" x1="108" y1="108" x2="152" y2="178" gradientUnits="userSpaceOnUse"><stop stopColor="#81C784"/><stop offset="1" stopColor="#388E3C"/></linearGradient>
+                        <radialGradient id="pcred-coin-g" cx="38%" cy="35%" r="65%" gradientUnits="objectBoundingBox"><stop stopColor="#FFF9C4"/><stop offset="1" stopColor="#FFD54F"/></radialGradient>
+                        <radialGradient id="pcred-coin2-g" cx="38%" cy="35%" r="65%" gradientUnits="objectBoundingBox"><stop stopColor="#FFECB3"/><stop offset="1" stopColor="#FFE082"/></radialGradient>
+                        <filter id="pcred-ps"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.08"/></filter>
                       </defs>
-                      {/* Large centre coin */}
-                      <circle cx="130" cy="96" r="42" fill="url(#cred-coin-g)" filter="url(#cred-coin-s)" stroke="#F9A825" strokeWidth="2"/>
-                      <circle cx="130" cy="96" r="32" stroke="#FFB300" strokeWidth="1.5" fill="none"/>
-                      <text x="130" y="103" textAnchor="middle" fontSize="24" fontWeight="bold" fill="#F57F17">kr</text>
-                      {/* Small coin top-left */}
-                      <circle cx="64" cy="60" r="20" fill="url(#cred-coin2-g)" filter="url(#cred-sm-s)" stroke="#FFB300" strokeWidth="1.5"/>
-                      <circle cx="64" cy="60" r="13" stroke="#FFB300" strokeWidth="1" fill="none"/>
-                      {/* Small coin top-right */}
-                      <circle cx="200" cy="55" r="17" fill="url(#cred-coin2-g)" filter="url(#cred-sm-s)" stroke="#FFB300" strokeWidth="1.5"/>
-                      <circle cx="200" cy="55" r="11" stroke="#FFB300" strokeWidth="1" fill="none"/>
-                      {/* Small coins bottom */}
-                      <circle cx="186" cy="142" r="13" fill="url(#cred-coin2-g)" filter="url(#cred-sm-s)" stroke="#FFB300" strokeWidth="1"/>
-                      <circle cx="74" cy="147" r="11" fill="url(#cred-coin2-g)" filter="url(#cred-sm-s)" stroke="#FFB300" strokeWidth="1"/>
-                      {/* Star shapes */}
-                      <path d="M44 100 L47.5 91 L51 100 L44 95.5 L51 95.5Z" fill="#66BB6A" opacity="0.65"/>
-                      <path d="M214 100 L217.5 91 L221 100 L214 95.5 L221 95.5Z" fill="#66BB6A" opacity="0.65"/>
-                      <path d="M99 29 L103 20 L107 29 L99 24.5 L107 24.5Z" fill="#FFD54F" opacity="0.55"/>
-                      <path d="M159 24 L163 15 L167 24 L159 19.5 L167 19.5Z" fill="#FFD54F" opacity="0.55"/>
-                      {/* Sparkle dots */}
-                      <circle cx="40" cy="171" r="3.5" fill="#66BB6A" opacity="0.4"/>
-                      <circle cx="225" cy="169" r="3.5" fill="#FFD54F" opacity="0.38"/>
-                      <circle cx="130" cy="176" r="2.5" fill="#FFB300" opacity="0.3"/>
+                      {/* Falling coins */}
+                      <circle cx="80" cy="48" r="16" fill="url(#pcred-coin2-g)" stroke="#FFB300" strokeWidth="1.5"/>
+                      <circle cx="80" cy="48" r="10" stroke="#FFB300" strokeWidth="1" fill="none"/>
+                      <circle cx="130" cy="38" r="20" fill="url(#pcred-coin-g)" stroke="#F9A825" strokeWidth="1.5"/>
+                      <circle cx="130" cy="38" r="13" stroke="#FFB300" strokeWidth="1.2" fill="none"/>
+                      <text x="130" y="44" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#F57F17">kr</text>
+                      <circle cx="185" cy="52" r="14" fill="url(#pcred-coin2-g)" stroke="#FFB300" strokeWidth="1.5"/>
+                      <circle cx="185" cy="52" r="9" stroke="#FFB300" strokeWidth="1" fill="none"/>
+                      {/* Stars falling */}
+                      <path d="M58 28 L61 19 L64 28 L57 23.5 L65 23.5Z" fill="#FFD54F"/>
+                      <path d="M195 30 L198 21 L201 30 L194 25.5 L202 25.5Z" fill="#66BB6A" opacity="0.8"/>
+                      <path d="M155 22 L158 14 L161 22 L154 17.5 L162 17.5Z" fill="#FFD54F" opacity="0.8"/>
+                      <g filter="url(#pcred-ps)">
+                        {/* Body */}
+                        <rect x="108" y="118" width="44" height="50" rx="13" fill="url(#pcred-body-g)"/>
+                        {/* Head */}
+                        <circle cx="130" cy="98" r="20" fill="#FFCC80"/>
+                        {/* Hair */}
+                        <path d="M110 94 Q110 74 130 74 Q150 74 150 94" fill="#8D6E63"/>
+                        {/* Eyes — happy catching coins */}
+                        <circle cx="123" cy="96" r="2" fill="#333"/>
+                        <circle cx="137" cy="96" r="2" fill="#333"/>
+                        {/* Big smile */}
+                        <path d="M122 103 Q130 111 138 103" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Arms raised to catch */}
+                        <path d="M108 125 Q90 112 78 105" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        <path d="M152 125 Q170 112 182 105" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Legs */}
+                        <path d="M122 168 L118 185" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                        <path d="M138 168 L142 185" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                      </g>
+                      {/* Coins near hands */}
+                      <circle cx="82" cy="110" r="10" fill="url(#pcred-coin2-g)" stroke="#FFB300" strokeWidth="1.2"/>
+                      <circle cx="178" cy="108" r="10" fill="url(#pcred-coin2-g)" stroke="#FFB300" strokeWidth="1.2"/>
                     </svg>
                   </div>
                 </div>
@@ -2057,36 +2203,43 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <defs>
-                        <linearGradient id="redeem-ticket-g" x1="40" y1="52" x2="220" y2="148" gradientUnits="userSpaceOnUse"><stop stopColor="#EDE7F6"/><stop offset="1" stopColor="#D1C4E9"/></linearGradient>
-                        <linearGradient id="redeem-bar-g" x1="85" y1="68" x2="175" y2="92" gradientUnits="userSpaceOnUse"><stop stopColor="#CE93D8"/><stop offset="1" stopColor="#AB47BC"/></linearGradient>
-                        <filter id="redeem-s"><feDropShadow dx="0" dy="5" stdDeviation="8" floodOpacity="0.13"/></filter>
+                        <linearGradient id="predeem-body-g" x1="95" y1="100" x2="138" y2="175" gradientUnits="userSpaceOnUse"><stop stopColor="#7E57C2"/><stop offset="1" stopColor="#4527A0"/></linearGradient>
+                        <linearGradient id="predeem-ticket-g" x1="118" y1="72" x2="218" y2="148" gradientUnits="userSpaceOnUse"><stop stopColor="#EDE7F6"/><stop offset="1" stopColor="#D1C4E9"/></linearGradient>
+                        <linearGradient id="predeem-bar-g" x1="130" y1="85" x2="205" y2="108" gradientUnits="userSpaceOnUse"><stop stopColor="#CE93D8"/><stop offset="1" stopColor="#AB47BC"/></linearGradient>
+                        <filter id="predeem-ps"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.08"/></filter>
                       </defs>
-                      {/* Ticket body */}
-                      <rect x="40" y="52" width="180" height="96" rx="16" fill="url(#redeem-ticket-g)" filter="url(#redeem-s)" stroke="#9575CD" strokeWidth="1.8"/>
-                      {/* Notch left */}
-                      <circle cx="40" cy="100" r="13" fill="white" stroke="#9575CD" strokeWidth="1.8"/>
-                      {/* Notch right */}
-                      <circle cx="220" cy="100" r="13" fill="white" stroke="#9575CD" strokeWidth="1.8"/>
-                      {/* Dashed divider */}
-                      <line x1="76" y1="100" x2="184" y2="100" stroke="#B39DDB" strokeWidth="1.5" strokeDasharray="6 4"/>
-                      {/* Code bar top */}
-                      <rect x="82" y="65" width="96" height="22" rx="8" fill="url(#redeem-bar-g)" opacity="0.8"/>
-                      <rect x="90" y="71" width="80" height="9" rx="4" fill="white" opacity="0.3"/>
-                      {/* Bottom text placeholder */}
-                      <rect x="92" y="110" width="76" height="14" rx="5" fill="#B39DDB" opacity="0.6"/>
-                      {/* Star sparkle top-left */}
-                      <path d="M51 37 L54.5 27 L58 37 L51 32.5 L58 32.5Z" fill="#FFD54F"/>
-                      <circle cx="54.5" cy="32" r="3" fill="#FFF9C4"/>
-                      {/* Star sparkle top-right */}
-                      <path d="M200 28 L204 18 L208 28 L200 23.5 L208 23.5Z" fill="#9575CD" opacity="0.55"/>
-                      <circle cx="204" cy="23" r="2.5" fill="#CE93D8"/>
-                      {/* Star centre top */}
-                      <path d="M128 32 L132 23 L136 32 L128 27.5 L136 27.5Z" fill="#CE93D8" opacity="0.65"/>
-                      {/* Bottom decorative */}
-                      <path d="M33 160 L38 152 L43 160 L38 156Z" fill="#FFD54F" opacity="0.42"/>
-                      <circle cx="226" cy="161" r="3.5" fill="#9575CD" opacity="0.3"/>
-                      <circle cx="78" cy="166" r="2.8" fill="#B39DDB" opacity="0.4"/>
-                      <circle cx="182" cy="170" r="2.5" fill="#FFD54F" opacity="0.4"/>
+                      <g filter="url(#predeem-ps)">
+                        {/* Body */}
+                        <rect x="93" y="108" width="44" height="52" rx="13" fill="url(#predeem-body-g)"/>
+                        {/* Head */}
+                        <circle cx="115" cy="88" r="20" fill="#FFCC80"/>
+                        {/* Hair */}
+                        <path d="M95 84 Q95 64 115 64 Q135 64 135 84" fill="#5D4037"/>
+                        {/* Eyes */}
+                        <circle cx="108" cy="86" r="2" fill="#333"/>
+                        <circle cx="122" cy="86" r="2" fill="#333"/>
+                        {/* Smile */}
+                        <path d="M109 93 Q115 100 121 93" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Arms holding ticket up */}
+                        <path d="M137 118 Q150 112 158 108" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        <path d="M93 118 Q78 115 70 120" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Legs */}
+                        <path d="M105 160 L101 182" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                        <path d="M125 160 L129 182" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                      </g>
+                      {/* Ticket/coupon held up */}
+                      <rect x="150" y="72" width="72" height="48" rx="10" fill="url(#predeem-ticket-g)" stroke="#9575CD" strokeWidth="1.5"/>
+                      <circle cx="150" cy="96" r="8" fill="white" stroke="#9575CD" strokeWidth="1.5"/>
+                      <circle cx="222" cy="96" r="8" fill="white" stroke="#9575CD" strokeWidth="1.5"/>
+                      <line x1="162" y1="96" x2="210" y2="96" stroke="#B39DDB" strokeWidth="1.5" strokeDasharray="5 3"/>
+                      <rect x="160" y="80" width="52" height="12" rx="5" fill="url(#predeem-bar-g)" opacity="0.8"/>
+                      <rect x="164" y="83" width="44" height="5" rx="2.5" fill="white" opacity="0.35"/>
+                      <rect x="164" y="103" width="38" height="7" rx="3.5" fill="#B39DDB" opacity="0.6"/>
+                      {/* Sparkles */}
+                      <path d="M50 38 L54 28 L58 38 L50 33.5 L58 33.5Z" fill="#FFD54F"/>
+                      <path d="M202 30 L206 20 L210 30 L202 25.5 L210 25.5Z" fill="#CE93D8" opacity="0.7"/>
+                      <circle cx="36" cy="165" r="3.5" fill="#9575CD" opacity="0.3"/>
+                      <circle cx="226" cy="160" r="3" fill="#FFD54F" opacity="0.4"/>
                     </svg>
                   </div>
                   <Button className="w-full shrink-0 rounded-[12px] py-3">
@@ -2124,7 +2277,50 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                       Du kan bruge dit debit- eller kreditkort (Visa/Dankort, Visa Electron, MasterCard, American Express) til at betale med Huska.
                     </p>
                   </div>
-                  <div className="flex-1" />
+                  <div className="flex-1 flex items-center justify-center py-8">
+                    <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <defs>
+                        <linearGradient id="addcard-body-g" x1="108" y1="100" x2="152" y2="175" gradientUnits="userSpaceOnUse"><stop stopColor="#42A5F5"/><stop offset="1" stopColor="#1976D2"/></linearGradient>
+                        <linearGradient id="addcard-card-g" x1="148" y1="65" x2="228" y2="125" gradientUnits="userSpaceOnUse"><stop stopColor="#4FC3F7"/><stop offset="1" stopColor="#039BE5"/></linearGradient>
+                        <filter id="addcard-ps"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.08"/></filter>
+                      </defs>
+                      <g filter="url(#addcard-ps)">
+                        {/* Body */}
+                        <rect x="108" y="108" width="44" height="52" rx="13" fill="url(#addcard-body-g)"/>
+                        {/* Head */}
+                        <circle cx="130" cy="88" r="20" fill="#FFCC80"/>
+                        {/* Hair */}
+                        <path d="M110 84 Q110 64 130 64 Q150 64 150 84" fill="#5D4037"/>
+                        {/* Eyes */}
+                        <circle cx="123" cy="86" r="2" fill="#333"/>
+                        <circle cx="137" cy="86" r="2" fill="#333"/>
+                        {/* Smile */}
+                        <path d="M124 93 Q130 100 136 93" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Right arm holding card up */}
+                        <path d="M152 118 Q165 108 172 100" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Left arm */}
+                        <path d="M108 118 Q94 115 86 122" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Legs */}
+                        <path d="M122 160 L118 182" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                        <path d="M138 160 L142 182" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                      </g>
+                      {/* Credit card held up */}
+                      <rect x="158" y="58" width="72" height="46" rx="8" fill="url(#addcard-card-g)" stroke="#29B6F6" strokeWidth="1.5"/>
+                      {/* Card chip */}
+                      <rect x="166" y="68" width="14" height="10" rx="3" fill="#FFD54F" opacity="0.9"/>
+                      {/* Card number dots */}
+                      <circle cx="170" cy="88" r="2.5" fill="white" opacity="0.7"/>
+                      <circle cx="178" cy="88" r="2.5" fill="white" opacity="0.7"/>
+                      <circle cx="186" cy="88" r="2.5" fill="white" opacity="0.7"/>
+                      <circle cx="194" cy="88" r="2.5" fill="white" opacity="0.7"/>
+                      {/* Card brand stripe */}
+                      <circle cx="214" cy="72" r="9" fill="#FFD54F" opacity="0.6"/>
+                      <circle cx="222" cy="72" r="9" fill="#FF8A65" opacity="0.5"/>
+                      {/* Decorative */}
+                      <circle cx="38" cy="70" r="4.5" fill="#42A5F5" opacity="0.2"/>
+                      <circle cx="38" cy="165" r="3" fill="#90CAF9" opacity="0.25"/>
+                    </svg>
+                  </div>
                   <Button className="w-full shrink-0 rounded-[12px] py-3 mt-6">
                     Tilføj kort
                   </Button>
@@ -2144,13 +2340,41 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   </div>
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="85" y="25" width="90" height="150" rx="18" fill="#5A78FF" opacity="0.15"/>
-                      <rect x="90" y="30" width="80" height="140" rx="16" fill="white" stroke="#5A78FF" strokeWidth="2"/>
-                      <rect x="100" y="50" width="60" height="80" rx="4" fill="#EEF0FF"/>
-                      <path d="M115 80 L125 95 L145 70" stroke="#5A78FF" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <rect x="118" y="155" width="24" height="4" rx="2" fill="#5A78FF" opacity="0.3"/>
-                      <circle cx="50" cy="80" r="6" fill="#5A78FF" opacity="0.15"/>
-                      <circle cx="215" cy="75" r="5" fill="#5A78FF" opacity="0.1"/>
+                      <defs>
+                        <linearGradient id="mpay-body-g" x1="95" y1="100" x2="138" y2="175" gradientUnits="userSpaceOnUse"><stop stopColor="#42A5F5"/><stop offset="1" stopColor="#1976D2"/></linearGradient>
+                        <linearGradient id="mpay-phone-g" x1="152" y1="45" x2="210" y2="155" gradientUnits="userSpaceOnUse"><stop stopColor="#E8EAF6"/><stop offset="1" stopColor="#C5CAE9"/></linearGradient>
+                        <filter id="mpay-ps"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.08"/></filter>
+                      </defs>
+                      <g filter="url(#mpay-ps)">
+                        {/* Body */}
+                        <rect x="93" y="108" width="44" height="52" rx="13" fill="url(#mpay-body-g)"/>
+                        {/* Head */}
+                        <circle cx="115" cy="88" r="20" fill="#FFCC80"/>
+                        {/* Hair */}
+                        <path d="M95 84 Q95 64 115 64 Q135 64 135 84" fill="#5D4037"/>
+                        {/* Eyes */}
+                        <circle cx="108" cy="86" r="2" fill="#333"/>
+                        <circle cx="122" cy="86" r="2" fill="#333"/>
+                        {/* Big smile */}
+                        <path d="M109 93 Q115 100 121 93" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Right arm with phone */}
+                        <path d="M137 118 Q150 110 158 105" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Left arm */}
+                        <path d="M93 118 Q78 115 70 122" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Legs */}
+                        <path d="M105 160 L101 182" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                        <path d="M125 160 L129 182" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                      </g>
+                      {/* Phone */}
+                      <rect x="154" y="52" width="52" height="88" rx="12" fill="url(#mpay-phone-g)" stroke="#5A78FF" strokeWidth="1.5"/>
+                      <rect x="160" y="64" width="40" height="56" rx="4" fill="#EEF0FF"/>
+                      <rect x="172" y="56" width="16" height="3" rx="1.5" fill="#9FA8DA"/>
+                      <circle cx="180" cy="148" r="4" stroke="#5A78FF" strokeWidth="1.5" fill="#E8EAF6"/>
+                      {/* Check mark on screen */}
+                      <path d="M166 88 L176 100 L196 76" stroke="#5A78FF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                      {/* Decorative circles */}
+                      <circle cx="38" cy="78" r="4" fill="#5A78FF" opacity="0.18"/>
+                      <circle cx="228" cy="160" r="3.5" fill="#9FA8DA" opacity="0.25"/>
                     </svg>
                   </div>
                   <Button className="w-full shrink-0 rounded-[12px] py-3">
@@ -2171,10 +2395,43 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   </div>
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="60" y="50" width="140" height="90" rx="16" fill="#1D1D1F" />
-                      <path d="M115 80C114 77 116 74 118 73C116 70 113 69 111 69C108 69 106 71 104 71C102 71 99 69 97 69C93 69 89 72 87 76C83 84 86 96 90 102C92 105 94 108 97 108C99 108 100 107 103 107C106 107 107 108 110 108C113 108 115 105 117 102C118 100 119 98 119 97C117 96 115 93 115 80Z" fill="white"/>
-                      <path d="M112 66C113 64 114 62 114 60C114 59 113 58 112 57C110 57 108 58 106 60C105 62 104 64 104 66C104 67 105 67 106 67C108 68 110 67 112 66Z" fill="white"/>
-                      <text x="140" y="102" fontSize="18" fontWeight="600" fill="white" fontFamily="system-ui">Pay</text>
+                      <defs>
+                        <linearGradient id="apay-body-g" x1="95" y1="100" x2="138" y2="175" gradientUnits="userSpaceOnUse"><stop stopColor="#5D4037"/><stop offset="1" stopColor="#3E2723"/></linearGradient>
+                        <filter id="apay-ps"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.08"/></filter>
+                      </defs>
+                      <g filter="url(#apay-ps)">
+                        {/* Body */}
+                        <rect x="93" y="108" width="44" height="52" rx="13" fill="url(#apay-body-g)"/>
+                        {/* Head */}
+                        <circle cx="115" cy="88" r="20" fill="#FFCC80"/>
+                        {/* Hair */}
+                        <path d="M95 84 Q95 64 115 64 Q135 64 135 84" fill="#5D4037"/>
+                        {/* Eyes */}
+                        <circle cx="108" cy="86" r="2" fill="#333"/>
+                        <circle cx="122" cy="86" r="2" fill="#333"/>
+                        {/* Smile */}
+                        <path d="M109 93 Q115 100 121 93" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Right arm with phone */}
+                        <path d="M137 118 Q150 112 158 108" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Left arm */}
+                        <path d="M93 118 Q78 116 70 122" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Legs */}
+                        <path d="M105 160 L101 182" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                        <path d="M125 160 L129 182" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                      </g>
+                      {/* Phone — dark (Apple style) */}
+                      <rect x="154" y="52" width="52" height="88" rx="12" fill="#1D1D1F"/>
+                      <rect x="160" y="64" width="40" height="56" rx="4" fill="#2C2C2E"/>
+                      <rect x="172" y="56" width="16" height="3" rx="1.5" fill="#3A3A3C"/>
+                      <circle cx="180" cy="148" r="4" fill="#3A3A3C"/>
+                      {/* Apple logo on screen */}
+                      <path d="M174 87C174 84 176 82 178 81C176 79 174 78 172 78C169 78 167 80 165 80C163 80 161 78 159 78C155 78 152 81 150 84C147 91 150 101 153 106C154 109 156 112 158 112C160 112 161 111 163 111C165 111 166 112 168 112C170 112 172 109 173 106C174 105 175 103 175 102C174 101 174 98 174 87Z" fill="white" transform="translate(8, -4) scale(0.9)"/>
+                      <path d="M171 74C172 73 173 71 173 70C173 69 172 68 171 67C169 67 167 68 166 70C165 71 165 73 165 74C165 75 166 75 167 75C168 75 170 75 171 74Z" fill="white" transform="translate(8, -4) scale(0.9)"/>
+                      {/* Pay text */}
+                      <text x="186" y="106" fontSize="11" fontWeight="600" fill="white" fontFamily="system-ui">Pay</text>
+                      {/* Decorative */}
+                      <circle cx="38" cy="80" r="4" fill="#5D4037" opacity="0.2"/>
+                      <circle cx="228" cy="160" r="3.5" fill="#5D4037" opacity="0.15"/>
                     </svg>
                   </div>
                   <Button className="w-full shrink-0 rounded-[12px] py-3 bg-black text-white hover:bg-gray-900">
@@ -2195,13 +2452,42 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   </div>
                   <div className="flex-1 flex items-center justify-center py-8">
                     <svg width="260" height="200" viewBox="0 0 260 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <rect x="60" y="45" width="140" height="100" rx="16" fill="#F5F7FA" stroke="#003087" strokeWidth="1.5"/>
-                      <path d="M100 70H120C128 70 133 74 132 82C131 92 124 96 116 96H110L108 110H98L100 70Z" fill="#003087"/>
-                      <path d="M105 75H122C128 75 132 78 131 85C130 93 124 96 118 96H113L111 107H103L105 75Z" fill="#009CDE"/>
-                      <path d="M137 70H152C158 70 161 73 160 78C159 85 154 88 149 88H145L143 98H136L137 70Z" fill="#003087"/>
-                      <path d="M140 73H153C157 73 159 76 158 80C157 85 153 87 150 87H147L145 95H139L140 73Z" fill="#009CDE"/>
-                      <circle cx="50" cy="95" r="4" fill="#003087" opacity="0.1"/>
-                      <circle cx="215" cy="90" r="5" fill="#009CDE" opacity="0.1"/>
+                      <defs>
+                        <linearGradient id="ppay-body-g" x1="80" y1="100" x2="120" y2="175" gradientUnits="userSpaceOnUse"><stop stopColor="#003087"/><stop offset="1" stopColor="#001F5B"/></linearGradient>
+                        <linearGradient id="ppay-laptop-g" x1="112" y1="118" x2="215" y2="175" gradientUnits="userSpaceOnUse"><stop stopColor="#F5F7FA"/><stop offset="1" stopColor="#E8EBF0"/></linearGradient>
+                        <filter id="ppay-ps"><feDropShadow dx="0" dy="3" stdDeviation="4" floodOpacity="0.08"/></filter>
+                      </defs>
+                      <g filter="url(#ppay-ps)">
+                        {/* Body */}
+                        <rect x="78" y="108" width="44" height="52" rx="13" fill="url(#ppay-body-g)"/>
+                        {/* Head */}
+                        <circle cx="100" cy="88" r="20" fill="#FFCC80"/>
+                        {/* Hair */}
+                        <path d="M80 84 Q80 64 100 64 Q120 64 120 84" fill="#8D6E63"/>
+                        {/* Eyes */}
+                        <circle cx="93" cy="86" r="2" fill="#333"/>
+                        <circle cx="107" cy="86" r="2" fill="#333"/>
+                        {/* Smile */}
+                        <path d="M94 93 Q100 100 106 93" stroke="#333" strokeWidth="1.5" fill="none" strokeLinecap="round"/>
+                        {/* Arms at laptop */}
+                        <path d="M78 120 Q64 128 56 140" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        <path d="M122 120 Q136 128 144 140" stroke="#FFCC80" strokeWidth="4" strokeLinecap="round" fill="none"/>
+                        {/* Legs */}
+                        <path d="M90 160 L86 182" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                        <path d="M110 160 L114 182" stroke="#5D4037" strokeWidth="4" strokeLinecap="round"/>
+                      </g>
+                      {/* Laptop */}
+                      <rect x="112" y="140" width="104" height="16" rx="5" fill="url(#ppay-laptop-g)" stroke="#BBDEFB" strokeWidth="1.2"/>
+                      <rect x="118" y="118" width="92" height="23" rx="4" fill="#F5F7FA" stroke="#BBDEFB" strokeWidth="1.2"/>
+                      {/* PayPal P letters on screen */}
+                      <path d="M132 122H140C143 122 145 124 144 127C143 131 140 132 137 132H135L134 137H130L132 122Z" fill="#003087"/>
+                      <path d="M134 124H141C143 124 144 126 143 128C143 131 141 132 139 132H137L136 136H133L134 124Z" fill="#009CDE"/>
+                      <path d="M147 122H154C156 122 158 124 157 126C157 129 154 131 152 131H150L149 135H146L147 122Z" fill="#003087"/>
+                      <path d="M149 124H155C156 124 157 126 156 128C155 130 153 131 152 131H151L150 134H148L149 124Z" fill="#009CDE"/>
+                      {/* Decorative accent dots */}
+                      <circle cx="36" cy="78" r="5" fill="#003087" opacity="0.15"/>
+                      <circle cx="36" cy="168" r="3.5" fill="#009CDE" opacity="0.18"/>
+                      <circle cx="228" cy="155" r="4" fill="#003087" opacity="0.12"/>
                     </svg>
                   </div>
                   <Button className="w-full shrink-0 rounded-[12px] py-3" style={{ background: '#0070BA' }}>
