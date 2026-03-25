@@ -1332,6 +1332,7 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                 <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
                   <div className="space-y-5">
                     <h2 className="text-[28px] font-bold text-foreground pb-2">Synlighed</h2>
+                    <img src="/illustrations/privacy.svg" alt="Synlighed" className="w-[260px] h-[200px] object-contain" />
 
                     {/* ─── Profil i feed ─── */}
                     <div>
