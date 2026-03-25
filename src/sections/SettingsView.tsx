@@ -411,6 +411,11 @@ export function SettingsView() {
     showPhone: currentUser?.profileVisibility?.showPhone ?? false,
     showAddress: currentUser?.profileVisibility?.showAddress ?? false,
     bio: currentUser?.profileVisibility?.bio ?? '',
+    groupPostVisibility: currentUser?.profileVisibility?.groupPostVisibility ?? 'all' as 'all' | 'members' | 'none',
+    allowGroupInvites: currentUser?.profileVisibility?.allowGroupInvites ?? true,
+    profileVisibleInFeed: currentUser?.profileVisibility?.profileVisibleInFeed ?? true,
+    commentPermission: currentUser?.profileVisibility?.commentPermission ?? 'all' as 'all' | 'connections' | 'none',
+    commentNotifications: currentUser?.profileVisibility?.commentNotifications ?? true,
   });
   const [avatarDialogOpen, setAvatarDialogOpen] = useState(false);
   const avatarFileRef = useRef<HTMLInputElement>(null);
@@ -540,6 +545,11 @@ const [evidenceDraft, setEvidenceDraft] = useState({
           showPhone: visibilityDraft.showPhone,
           showAddress: visibilityDraft.showAddress,
           bio: visibilityDraft.bio.trim() || undefined,
+          groupPostVisibility: visibilityDraft.groupPostVisibility,
+          allowGroupInvites: visibilityDraft.allowGroupInvites,
+          profileVisibleInFeed: visibilityDraft.profileVisibleInFeed,
+          commentPermission: visibilityDraft.commentPermission,
+          commentNotifications: visibilityDraft.commentNotifications,
         },
       };
       updateUser(currentUser.id, profileData as any);
@@ -1017,6 +1027,22 @@ const [evidenceDraft, setEvidenceDraft] = useState({
 
               <div className="border-t border-border" />
 
+              {/* ─── Synlighed ─── */}
+              <div className="divide-y divide-border">
+                <button
+                  onClick={() => setSettingsDetailView('edit-visibility')}
+                  className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
+                >
+                  <div>
+                    <p className="text-[15px] font-medium text-foreground">Synlighed</p>
+                    <p className="text-[13px] text-muted-foreground">Grupper, kommentarer og profil i feed</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
+                </button>
+              </div>
+
+              <div className="border-t border-border" />
+
               <div className="divide-y divide-border">
                   <button
                     onClick={() => setSettingsDetailView('edit-export')}
@@ -1300,6 +1326,129 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                   </div>
                 );
               })()}
+
+              {/* ─── edit-visibility (Synlighed) ─── */}
+              {settingsDetailView === 'edit-visibility' && (
+                <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+                  <div className="space-y-5">
+                    <h2 className="text-[28px] font-bold text-foreground pb-2">Synlighed</h2>
+
+                    <div className="flex justify-center pb-2">
+                      <img src="/illustrations/privacy.svg" alt="Synlighed" className="h-[140px] w-auto" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                    </div>
+
+                    {/* ─── Profil i feed ─── */}
+                    <div>
+                      <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1 pb-2">Profil i feed</p>
+                      <div className="rounded-[12px] border-2 border-border bg-card divide-y divide-border">
+                        <div className="flex items-center justify-between px-4 py-3">
+                          <div>
+                            <p className="text-[14px] font-medium text-foreground">Vis min profil i feed</p>
+                            <p className="text-[12px] text-muted-foreground">Andre kan se din profil på opslag</p>
+                          </div>
+                          <IOSSwitch
+                            checked={visibilityDraft.profileVisibleInFeed}
+                            onCheckedChange={(checked) => setVisibilityDraft((prev) => ({ ...prev, profileVisibleInFeed: checked }))}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between px-4 py-3">
+                          <p className="text-[14px] font-medium text-foreground">Vis email i grupper</p>
+                          <IOSSwitch
+                            checked={visibilityDraft.showEmail}
+                            onCheckedChange={(checked) => setVisibilityDraft((prev) => ({ ...prev, showEmail: checked }))}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between px-4 py-3">
+                          <p className="text-[14px] font-medium text-foreground">Vis telefon i grupper</p>
+                          <IOSSwitch
+                            checked={visibilityDraft.showPhone}
+                            onCheckedChange={(checked) => setVisibilityDraft((prev) => ({ ...prev, showPhone: checked }))}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between px-4 py-3">
+                          <p className="text-[14px] font-medium text-foreground">Vis adresse i grupper</p>
+                          <IOSSwitch
+                            checked={visibilityDraft.showAddress}
+                            onCheckedChange={(checked) => setVisibilityDraft((prev) => ({ ...prev, showAddress: checked }))}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ─── Grupper ─── */}
+                    <div>
+                      <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1 pb-2">Grupper</p>
+                      <div className="rounded-[12px] border-2 border-border bg-card divide-y divide-border">
+                        <div className="flex items-center justify-between px-4 py-3">
+                          <div className="flex-1 min-w-0 pr-3">
+                            <p className="text-[14px] font-medium text-foreground">Opslag synlige for</p>
+                            <p className="text-[12px] text-muted-foreground">Hvem kan se dine opslag i grupper</p>
+                          </div>
+                          <SelectSheet
+                            value={visibilityDraft.groupPostVisibility}
+                            onValueChange={(value) => setVisibilityDraft((prev) => ({ ...prev, groupPostVisibility: value as 'all' | 'members' | 'none' }))}
+                            title="Opslag synlige for"
+                            options={[
+                              { value: 'all', label: 'Alle' },
+                              { value: 'members', label: 'Kun medlemmer' },
+                              { value: 'none', label: 'Ingen' },
+                            ]}
+                            className="w-[140px] rounded-[8px] border-border text-[13px]"
+                          />
+                        </div>
+                        <div className="flex items-center justify-between px-4 py-3">
+                          <div>
+                            <p className="text-[14px] font-medium text-foreground">Tillad gruppeinvitationer</p>
+                            <p className="text-[12px] text-muted-foreground">Andre kan invitere dig til grupper</p>
+                          </div>
+                          <IOSSwitch
+                            checked={visibilityDraft.allowGroupInvites}
+                            onCheckedChange={(checked) => setVisibilityDraft((prev) => ({ ...prev, allowGroupInvites: checked }))}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ─── Kommentarer ─── */}
+                    <div>
+                      <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1 pb-2">Kommentarer</p>
+                      <div className="rounded-[12px] border-2 border-border bg-card divide-y divide-border">
+                        <div className="flex items-center justify-between px-4 py-3">
+                          <div className="flex-1 min-w-0 pr-3">
+                            <p className="text-[14px] font-medium text-foreground">Hvem kan kommentere</p>
+                            <p className="text-[12px] text-muted-foreground">Hvem kan kommentere dine opslag</p>
+                          </div>
+                          <SelectSheet
+                            value={visibilityDraft.commentPermission}
+                            onValueChange={(value) => setVisibilityDraft((prev) => ({ ...prev, commentPermission: value as 'all' | 'connections' | 'none' }))}
+                            title="Hvem kan kommentere"
+                            options={[
+                              { value: 'all', label: 'Alle' },
+                              { value: 'connections', label: 'Kun forbindelser' },
+                              { value: 'none', label: 'Ingen' },
+                            ]}
+                            className="w-[140px] rounded-[8px] border-border text-[13px]"
+                          />
+                        </div>
+                        <div className="flex items-center justify-between px-4 py-3">
+                          <div>
+                            <p className="text-[14px] font-medium text-foreground">Kommentar-notifikationer</p>
+                            <p className="text-[12px] text-muted-foreground">Få besked når nogen kommenterer</p>
+                          </div>
+                          <IOSSwitch
+                            checked={visibilityDraft.commentNotifications}
+                            onCheckedChange={(checked) => setVisibilityDraft((prev) => ({ ...prev, commentNotifications: checked }))}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex-1" />
+                  <Button onClick={handleSaveProfile} className="w-full shrink-0 rounded-[12px] py-3 mt-6">
+                    Gem indstillinger
+                  </Button>
+                </div>
+              )}
 
               {/* ─── edit-export ─── */}
               {settingsDetailView === 'edit-export' && (

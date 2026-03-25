@@ -26,6 +26,11 @@ export interface User {
     showPhone?: boolean;
     showAddress?: boolean;
     bio?: string;
+    groupPostVisibility?: 'all' | 'members' | 'none';
+    allowGroupInvites?: boolean;
+    profileVisibleInFeed?: boolean;
+    commentPermission?: 'all' | 'connections' | 'none';
+    commentNotifications?: boolean;
   };
 }
 
