@@ -31,44 +31,6 @@ interface AffiliateAd {
   banner_subtitle?: string;
 }
 
-const DEFAULT_SPONSORS: AffiliateAd[] = [
-  {
-    id: 'bulk-dk',
-    name: 'Bulk',
-    url: 'https://www.awin1.com/cread.php?s=2784306&v=18540&q=403732&r=900803',
-    store: 'Bulk',
-    category: 'Kosttilskud',
-    banner_image: 'https://www.awin1.com/cshow.php?s=2784306&v=18540&q=403732&r=900803',
-    banner_position_y: 50,
-  },
-  {
-    id: 'nelly-dk',
-    name: 'Nelly',
-    url: 'https://www.awin1.com/cread.php?s=4696224&v=19564&q=589370&r=900803',
-    store: 'Nelly',
-    category: 'Mode',
-    banner_image: 'https://www.awin1.com/cshow.php?s=4696224&v=19564&q=589370&r=900803',
-    banner_position_y: 50,
-  },
-  {
-    id: 'myprotein-dk-1',
-    name: 'Myprotein',
-    url: 'https://www.awin1.com/cread.php?s=3487002&v=8983&q=349344&r=900803',
-    store: 'Myprotein',
-    category: 'Kosttilskud',
-    banner_image: 'https://www.awin1.com/cshow.php?s=3487002&v=8983&q=349344&r=900803',
-    banner_position_y: 50,
-  },
-  {
-    id: 'myprotein-dk-2',
-    name: 'Myprotein',
-    url: 'https://www.awin1.com/cread.php?s=4680362&v=8983&q=596085&r=900803',
-    store: 'Myprotein',
-    category: 'Kosttilskud',
-    banner_image: 'https://www.awin1.com/cshow.php?s=4680362&v=8983&q=596085&r=900803',
-    banner_position_y: 50,
-  },
-];
 
 interface TilbudMainPageProps {
   offers: Offer[];
@@ -111,10 +73,10 @@ export function TilbudMainPage({
   useEffect(() => {
     supabase
       .from('affiliate_links')
-      .select('id, name, url, store, category, banner_image, banner_position_y')
-      .eq('is_active', true)
+      .select('id, name, affiliate_url, store, category, banner_image, banner_position_y')
+      .eq('enabled', true)
       .order('created_at', { ascending: false })
-      .then(({ data }) => setAffiliateAds(data ?? []));
+      .then(({ data }) => setAffiliateAds((data ?? []).map(d => ({ ...d, url: d.affiliate_url }))));
   }, []);
 
   // Fetch active uploaded batches
@@ -148,11 +110,7 @@ export function TilbudMainPage({
       });
   }, []);
 
-  const allSponsors = useMemo(() => {
-    const supabaseIds = new Set(affiliateAds.map(a => a.id));
-    const hardcoded = DEFAULT_SPONSORS.filter(s => !supabaseIds.has(s.id));
-    return [...affiliateAds, ...hardcoded];
-  }, [affiliateAds]);
+  const allSponsors = affiliateAds;
 
   // Auto-scroll sponsors (infinite loop)
   useEffect(() => {

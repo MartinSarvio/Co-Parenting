@@ -27,14 +27,14 @@ import { parsePdfBatch } from '@/lib/pdfParse';
 interface AffiliateLink {
   id: string;
   name: string;
-  url: string;
+  affiliate_url: string;
   store: string | null;
   partner: string | null;
   category: string | null;
   banner_image: string | null;
   banner_position_y: number;
   source_url: string | null;
-  is_active: boolean;
+  enabled: boolean;
   click_count: number;
   created_at: string;
 }
@@ -139,8 +139,8 @@ function AffiliateTab() {
   };
 
   const handleToggleActive = async (id: string, active: boolean) => {
-    await supabase.from('affiliate_links').update({ is_active: active, updated_at: new Date().toISOString() }).eq('id', id);
-    setLinks(prev => prev.map(l => l.id === id ? { ...l, is_active: active } : l));
+    await supabase.from('affiliate_links').update({ enabled: active, updated_at: new Date().toISOString() }).eq('id', id);
+    setLinks(prev => prev.map(l => l.id === id ? { ...l, enabled: active } : l));
   };
 
   return (
@@ -186,13 +186,13 @@ function AffiliateTab() {
                   <tr key={link.id} className={cn(i % 2 === 0 ? 'bg-card' : 'bg-card')}>
                     <td className="px-3 py-2.5">
                       <p className="text-[12px] font-semibold text-foreground">{link.name}</p>
-                      <p className="text-[10px] text-muted-foreground truncate max-w-[150px]">{link.url}</p>
+                      <p className="text-[10px] text-muted-foreground truncate max-w-[150px]">{link.affiliate_url}</p>
                     </td>
                     <td className="px-3 py-2.5 text-[12px] text-muted-foreground">{link.store ?? '—'}</td>
                     <td className="px-3 py-2.5 text-[12px] text-muted-foreground">{link.category ?? '—'}</td>
                     <td className="px-3 py-2.5 text-center">
                       <IOSSwitch
-                        checked={link.is_active}
+                        checked={link.enabled}
                         onCheckedChange={(v) => handleToggleActive(link.id, v)}
                       />
                     </td>
@@ -271,11 +271,11 @@ function AffiliateCreatePage({
   onSaved: () => void;
 }) {
   const initName = link?.name ?? '';
-  const initUrl = link?.url ?? '';
+  const initUrl = link?.affiliate_url ?? '';
   const initStore = link?.store ?? '';
   const initPartner = link?.partner ?? '';
   const initCategory = link?.category ?? '';
-  const initActive = link?.is_active ?? true;
+  const initActive = link?.enabled ?? true;
   const initBannerImage = link?.banner_image ?? '';
   const initBannerPositionY = link?.banner_position_y ?? 50;
   const initSourceUrl = link?.source_url ?? '';
@@ -342,14 +342,14 @@ function AffiliateCreatePage({
 
       const payload = {
         name: name.trim(),
-        url: url.trim(),
+        affiliate_url: url.trim(),
         store: store.trim() || null,
         partner: partner.trim() || null,
         category: category.trim() || null,
         banner_image: bannerUrl || null,
         banner_position_y: bannerPositionY,
         source_url: sourceUrl.trim() || null,
-        is_active: isActive,
+        enabled: isActive,
         updated_at: new Date().toISOString(),
       };
 
