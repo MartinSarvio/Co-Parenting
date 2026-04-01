@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useAppStore } from '@/store';
+import { useApiActions } from '@/hooks/useApiActions';
 import { formatDate } from '@/lib/utils';
+import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -97,10 +99,14 @@ export function ProfessionalDashboard() {
   } = useAppStore();
   const custodyPlan = custodyPlans[0];
 
+  const { sendProfessionalMessage } = useApiActions();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCase, setSelectedCase] = useState<string | null>(null);
   const [noteText, setNoteText] = useState('');
   const [caseNotes, setCaseNotes] = useState<Record<string, { text: string; date: string }[]>>({});
+  const [showMessageForm, setShowMessageForm] = useState(false);
+  const [messageText, setMessageText] = useState('');
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
 
   const preFilteredCases = professionalCaseFilter === 'all'
     ? professionalCases
@@ -212,7 +218,7 @@ export function ProfessionalDashboard() {
               <Button
                 variant="outline"
                 className="w-full h-auto py-5 flex flex-col items-center gap-2.5 bg-card border border-border rounded-[8px] hover:border-orange-tint hover:bg-orange-tint transition-all shadow-[0_2px_8px_rgba(0,0,0,0.04)] relative"
-                onClick={() => setActiveTab('kommunikation')}
+                onClick={() => setShowMessageForm(v => !v)}
               >
                 <div className="w-10 h-10 rounded-[8px] bg-secondary flex items-center justify-center relative">
                   <MessageCircle className="w-5 h-5 text-muted-foreground" />
@@ -250,6 +256,51 @@ export function ProfessionalDashboard() {
               </Button>
             </motion.div>
           </div>
+
+          {/* Professional Message Form */}
+          {showMessageForm && (
+            <Card className="bg-card border border-border rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+              <CardContent className="p-4 space-y-3">
+                <p className="text-sm font-semibold text-foreground">Send besked til familien</p>
+                <textarea
+                  value={messageText}
+                  onChange={e => setMessageText(e.target.value)}
+                  placeholder="Skriv din besked til forældrene..."
+                  rows={4}
+                  className="w-full rounded-[8px] border border-border bg-background px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-border resize-none"
+                />
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    className="flex-1 border-border text-muted-foreground"
+                    onClick={() => { setShowMessageForm(false); setMessageText(''); }}
+                  >
+                    Annuller
+                  </Button>
+                  <Button
+                    className="flex-1 bg-foreground text-background hover:bg-foreground/90"
+                    disabled={!messageText.trim() || isSendingMessage}
+                    onClick={async () => {
+                      if (!messageText.trim()) return;
+                      setIsSendingMessage(true);
+                      try {
+                        await sendProfessionalMessage(caseData.id, messageText.trim());
+                        toast.success('Besked sendt til familien');
+                        setMessageText('');
+                        setShowMessageForm(false);
+                      } catch {
+                        toast.error('Kunne ikke sende besked');
+                      } finally {
+                        setIsSendingMessage(false);
+                      }
+                    }}
+                  >
+                    {isSendingMessage ? 'Sender…' : 'Send'}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Status Overview */}
           <Card className="bg-card border border-border rounded-[8px] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">

@@ -496,6 +496,59 @@ export function useApiActions() {
     [store],
   );
 
+  // ── Professional Messaging ──────────────────────────────
+
+  const sendProfessionalMessage = useCallback(
+    async (caseId: string, messageContent: string) => {
+      const theCase = store.professionalCases.find(c => c.id === caseId);
+      if (!theCase) throw new Error('Sagen blev ikke fundet');
+
+      // Find household member IDs via householdId
+      let participantIds: string[] = [getCurrentUserId()];
+      if (theCase.householdId) {
+        const { data: members } = await supabase
+          .from('household_members')
+          .select('user_id')
+          .eq('household_id', theCase.householdId);
+        if (members && members.length > 0) {
+          participantIds = [...new Set([...participantIds, ...members.map((m: { user_id: string }) => m.user_id)])];
+        }
+      }
+
+      const threadTitle = `Besked fra sagsbehandler – Sag ${theCase.caseNumber}`;
+
+      // Create the professional thread
+      const { data: raw, error } = await supabase
+        .from('message_threads')
+        .insert({
+          title: threadTitle,
+          participants: participantIds,
+          is_professional_thread: true,
+        })
+        .select('*, messages(id, content, sender_id, created_at, read_by)')
+        .single();
+      if (error) throw error;
+      const thread = mapThread(raw as unknown as import('@/lib/mappers').DbThread);
+      store.addThread(thread);
+
+      // Send the message in the new thread
+      const { data: msgRaw, error: msgErr } = await supabase
+        .from('messages')
+        .insert({
+          content: messageContent,
+          sender_id: getCurrentUserId(),
+          thread_id: thread.id,
+        })
+        .select()
+        .single();
+      if (msgErr) throw msgErr;
+      store.addMessage(mapMessage(msgRaw as unknown as import('@/lib/mappers').DbMessage));
+
+      return thread;
+    },
+    [store],
+  );
+
   // ── Children ────────────────────────────────────────────
 
   const createChild = useCallback(
@@ -1568,6 +1621,7 @@ export function useApiActions() {
     createThread,
     sendMessage,
     deleteThread,
+    sendProfessionalMessage,
     // Children
     createChild,
     updateChild,

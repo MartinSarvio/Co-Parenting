@@ -82,6 +82,16 @@ export function Kommunikation() {
     [threads, currentUser?.id]
   );
 
+  const professionalThreads = useMemo(() =>
+    visibleThreads.filter(t => t.isProfessionalThread),
+    [visibleThreads]
+  );
+
+  const regularThreads = useMemo(() =>
+    visibleThreads.filter(t => !t.isProfessionalThread),
+    [visibleThreads]
+  );
+
   const lastMessageMap = useMemo(() => {
     const map: Record<string, typeof messages[0] | undefined> = {};
     for (const thread of visibleThreads) {
@@ -280,7 +290,54 @@ export function Kommunikation() {
           transition={{ delay: 0.1 }}
           className=""
         >
-          {visibleThreads.map((thread, index) => {
+          {/* Professional threads first */}
+          {professionalThreads.map((thread, index) => {
+            const lastMessage = lastMessageMap[thread.id];
+            return (
+              <motion.div
+                key={thread.id}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className="relative overflow-hidden"
+              >
+                <motion.div
+                  onClick={() => setSelectedThreadId(thread.id)}
+                  className="relative flex items-start gap-3 px-3 sm:px-4 py-3.5 border-b border-border cursor-pointer bg-background active:bg-card transition-colors"
+                >
+                  <div className="w-11 h-11 rounded-full bg-secondary flex items-center justify-center flex-shrink-0">
+                    <span className="text-lg font-bold text-muted-foreground">S</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground border border-border rounded px-1.5 py-0.5">Sagsbehandler</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-[14px] font-semibold text-foreground truncate">{thread.title}</h3>
+                      {lastMessage && (
+                        <span className="text-[11px] text-muted-foreground shrink-0 ml-2">
+                          {formatMessageDate(lastMessage.timestamp)}
+                        </span>
+                      )}
+                    </div>
+                    {lastMessage ? (
+                      <p className="text-[13px] text-muted-foreground truncate mt-0.5">{lastMessage.content}</p>
+                    ) : (
+                      <p className="text-[13px] text-muted-foreground mt-0.5">Ingen beskeder endnu</p>
+                    )}
+                  </div>
+                  {thread.unreadCount > 0 && (
+                    <Badge className="bg-primary text-white shrink-0 self-center">
+                      {thread.unreadCount}
+                    </Badge>
+                  )}
+                </motion.div>
+              </motion.div>
+            );
+          })}
+
+          {/* Regular family threads */}
+          {regularThreads.map((thread, index) => {
             const lastMessage = lastMessageMap[thread.id];
 
             return (
@@ -343,7 +400,7 @@ export function Kommunikation() {
               </motion.div>
             );
           })}
-          
+
           {visibleThreads.length === 0 && (
             <div className="text-center py-16">
               <div className="w-20 h-20 mx-auto rounded-full bg-orange-tint flex items-center justify-center mb-4">

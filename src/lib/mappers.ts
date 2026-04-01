@@ -163,6 +163,7 @@ export interface DbThread {
   created_at: string;
   updated_at: string;
   messages?: DbMessage[];
+  is_professional_thread?: boolean | null;
 }
 
 export interface DbMessage {
@@ -417,6 +418,7 @@ export function mapThread(raw: DbThread): MessageThread {
     unreadCount: raw.unread_count ?? 0,
     createdAt: toISOString(raw.created_at),
     deletedBy: raw.deleted_by ?? [],
+    isProfessionalThread: raw.is_professional_thread ?? false,
     lastMessage: lastMsg
       ? {
           id: lastMsg.id,
