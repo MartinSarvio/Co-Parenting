@@ -17,7 +17,10 @@ import {
 } from 'date-fns';
 import { da } from 'date-fns/locale';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, X, Plus, Clock, MapPin, Calendar, Trash2 } from 'lucide-react';
+import { ArrowLeft, X, Plus, Clock, MapPin, Calendar, Trash2, CheckCircle2 } from 'lucide-react';
+import confetti from 'canvas-confetti';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Checkbox } from '@/components/ui/checkbox';
 import { SavingOverlay } from '@/components/custom/SavingOverlay';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -76,9 +79,18 @@ export function KalenderWeekView() {
     calendarColorPreferences,
     users,
     children,
+    tasks,
+    household,
   } = useAppStore();
 
-  const { createEvent, deleteEvent } = useApiActions();
+  const { createEvent, deleteEvent, updateTask } = useApiActions();
+
+  const rewardLabel = (val: number) => {
+    const type = household?.rewardsType ?? 'point';
+    if (type === 'stjerne') return `+${val} ⭐`;
+    if (type === 'kr') return `+${val} kr.`;
+    return `+${val} pt`;
+  };
 
   const baseDate = calendarWeekViewDate || new Date();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -319,12 +331,73 @@ export function KalenderWeekView() {
     }
   };
 
+  // Compute tasks for current visible week
+  const currentWeekStart = startOfWeek(calendarWeekViewDate || new Date(), { weekStartsOn: 1 });
+  const currentWeekEnd = endOfWeek(calendarWeekViewDate || new Date(), { weekStartsOn: 1 });
+  const weekTasks = useMemo(() => tasks.filter(t => {
+    if (t.completed || !t.deadline) return false;
+    const d = parseISO(t.deadline);
+    return d >= currentWeekStart && d <= currentWeekEnd;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), [tasks, currentWeekStart.toISOString()]);
+
   return (
     <>
+      {/* Family avatars + week tasks */}
+      <div className="bg-background px-3 pt-2 pb-1 space-y-3 border-b border-border">
+        {/* Avatar strip */}
+        {[...users, ...children].length > 0 && (
+          <div className="flex gap-3 overflow-x-auto pb-0.5">
+            {[...users, ...children].map(member => (
+              <div key={member.id} className="flex flex-col items-center gap-1 shrink-0">
+                <Avatar className="h-9 w-9 border-2 border-background shadow-sm">
+                  <AvatarImage src={member.avatar} />
+                  <AvatarFallback className="text-[10px] bg-secondary text-foreground">
+                    {member.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
+                  </AvatarFallback>
+                </Avatar>
+                <span className="text-[10px] text-muted-foreground">{member.name.split(' ')[0]}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        {/* Week tasks */}
+        {weekTasks.length > 0 && (
+          <div className="space-y-1.5 pb-1">
+            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Opgaver denne uge</p>
+            {weekTasks.map(task => {
+              const assignee = users.find(u => u.id === (task.claimedBy || task.assignedTo));
+              return (
+                <div key={task.id} className="flex items-center gap-3 rounded-[8px] bg-card border border-border px-3 py-2.5">
+                  <Checkbox
+                    checked={task.completed}
+                    onCheckedChange={(checked) => {
+                      void updateTask(task.id, { completed: !!checked, completedAt: checked ? new Date().toISOString() : undefined });
+                      if (checked) confetti({ particleCount: 60, spread: 60, origin: { y: 0.4 }, colors: ['#f58a2d', '#f0c080', '#fff7ed'], disableForReducedMotion: true });
+                    }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] font-medium text-foreground truncate">{task.title}</p>
+                    <p className="text-[11px] text-muted-foreground">{format(parseISO(task.deadline!), 'EEEE d. MMM', { locale: da })}</p>
+                  </div>
+                  <span className="text-[11px] font-semibold text-[#f58a2d] shrink-0">{rewardLabel(task.rewardValue ?? household?.rewardsValue ?? 10)}</span>
+                  {assignee && (
+                    <Avatar className="h-6 w-6 shrink-0">
+                      <AvatarImage src={assignee.avatar} />
+                      <AvatarFallback className="text-[8px] bg-secondary">{assignee.name[0]}</AvatarFallback>
+                    </Avatar>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
       {/* Week grid — edge-to-edge, no extra padding */}
       <div
         className="relative flex flex-col bg-card"
-        style={{ height: 'calc(100svh - env(safe-area-inset-top, 0px) - 74px)' }}
+        style={{ height: `calc(100svh - env(safe-area-inset-top, 0px) - 74px - ${[...users, ...children].length > 0 ? (weekTasks.length > 0 ? 180 : 80) : weekTasks.length > 0 ? 120 : 0}px)` }}
       >
         {/* Scrollable weeks */}
         <div

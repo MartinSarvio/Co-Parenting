@@ -424,24 +424,6 @@ export function Opgaver() {
             </div>
           </BottomSheet>
 
-          {/* Scoreboard */}
-          {scoreboard.some(s => s.score > 0) && (
-            <div className="flex gap-2 overflow-x-auto pb-1">
-              {scoreboard.map(({ user, score }) => (
-                <div key={user.id} className="flex-shrink-0 flex items-center gap-2 rounded-[8px] bg-card border border-border px-3 py-2">
-                  <Avatar className="w-7 h-7">
-                    <AvatarImage src={user.avatar} />
-                    <AvatarFallback className="text-[10px] bg-orange-tint text-[#bf6722]">{user.name[0]}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="text-[11px] text-muted-foreground leading-none">{user.name.split(' ')[0]}</p>
-                    <p className="text-[13px] font-bold text-foreground leading-tight">{rewardLabel(score)}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
           {/* Pending Tasks */}
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2">
@@ -1005,6 +987,33 @@ export function Opgaver() {
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Scoreboard Tab */}
+      {activeTab === 'scoreboard' && (
+        <div className="space-y-3 mt-4">
+          <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1">Point optjent ved opgaver</p>
+          {scoreboard.length === 0 || scoreboard.every(s => s.score === 0) ? (
+            <div className="text-center py-12 text-muted-foreground text-[14px]">Ingen point endnu — fuldfør opgaver for at optjene point</div>
+          ) : (
+            <div className="space-y-2">
+              {scoreboard.map(({ user, score }, i) => (
+                <div key={user.id} className="flex items-center gap-3 rounded-[8px] bg-card border border-border px-4 py-3">
+                  <span className="text-[13px] font-bold text-muted-foreground w-5">{i + 1}.</span>
+                  <Avatar className="w-9 h-9">
+                    <AvatarImage src={user.avatar} />
+                    <AvatarFallback className="text-[11px] bg-orange-tint text-[#bf6722]">{user.name[0]}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <p className="text-[14px] font-semibold text-foreground">{user.name.split(' ')[0]}</p>
+                    <p className="text-[12px] text-muted-foreground">{tasks.filter(t => t.completed && (t.claimedBy === user.id || (!t.claimedBy && t.assignedTo === user.id))).length} opgaver</p>
+                  </div>
+                  <p className="text-[16px] font-bold text-[#f58a2d]">{rewardLabel(score)}</p>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

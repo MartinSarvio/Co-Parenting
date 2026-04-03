@@ -8,6 +8,7 @@ import {
   ShoppingCart,
   Layout,
   History,
+  Trophy,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -16,6 +17,7 @@ const OPGAVER_TABS = [
   { id: 'cleaning', label: 'Rengøring', icon: SprayCan },
   { id: 'shopping', label: 'Indkøb', icon: ShoppingCart },
   { id: 'templates', label: 'Skabeloner', icon: Layout },
+  { id: 'scoreboard', label: 'Scoreboard', icon: Trophy },
   { id: 'historik', label: 'Historik', icon: History },
 ] as const;
 

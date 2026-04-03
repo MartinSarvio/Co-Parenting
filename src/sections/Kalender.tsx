@@ -10,6 +10,7 @@ import { isDeviceCalendarAvailable, requestCalendarAccess, listDeviceCalendars, 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { SelectSheet } from '@/components/custom/SelectSheet';
@@ -1658,6 +1659,23 @@ export function Kalender() {
           </div>
         </SheetContent>
       </Sheet>
+
+      {/* Family member avatars */}
+      {[...users, ...children].length > 0 && (
+        <div className="flex gap-3 overflow-x-auto pb-1 pt-1">
+          {[...users, ...children].map(member => (
+            <div key={member.id} className="flex flex-col items-center gap-1 shrink-0">
+              <Avatar className="h-9 w-9 border-2 border-background shadow-sm">
+                <AvatarImage src={member.avatar} />
+                <AvatarFallback className="text-[10px] bg-secondary text-foreground">
+                  {member.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
+                </AvatarFallback>
+              </Avatar>
+              <span className="text-[10px] text-muted-foreground">{member.name.split(' ')[0]}</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Calendar Grid — iOS Calendar style */}
       <motion.div
