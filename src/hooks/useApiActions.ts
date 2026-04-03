@@ -155,6 +155,8 @@ export function useApiActions() {
           is_recurring: data.isRecurring || false,
           planned_weekday: data.plannedWeekday ?? null,
           area: data.area || null,
+          reward_value: data.rewardValue ?? 1,
+          claimed_by: data.claimedBy ?? null,
         })
         .select()
         .single();
@@ -183,6 +185,8 @@ export function useApiActions() {
         if (data.isRecurring !== undefined) updateData.is_recurring = data.isRecurring;
         if (data.plannedWeekday !== undefined) updateData.planned_weekday = data.plannedWeekday;
         if (data.area !== undefined) updateData.area = data.area;
+        if (data.rewardValue !== undefined) updateData.reward_value = data.rewardValue;
+        if (data.claimedBy !== undefined) updateData.claimed_by = data.claimedBy || null;
 
         const { error } = await supabase.from('tasks').update(updateData).eq('id', id);
         if (error) throw error;
@@ -201,6 +205,22 @@ export function useApiActions() {
         if (error) throw error;
       } catch (err) {
         handleError(err, 'Kunne ikke slette opgave');
+      }
+    },
+    [store],
+  );
+
+  const claimTask = useCallback(
+    async (taskId: string, userId: string) => {
+      store.updateTask(taskId, { claimedBy: userId });
+      try {
+        const { error } = await supabase
+          .from('tasks')
+          .update({ claimed_by: userId })
+          .eq('id', taskId);
+        if (error) throw error;
+      } catch (err) {
+        handleError(err, 'Kunne ikke tage opgaven');
       }
     },
     [store],
@@ -1605,6 +1625,7 @@ export function useApiActions() {
     createTask,
     updateTask,
     deleteTask,
+    claimTask,
     // Expenses
     createExpense,
     updateExpense,

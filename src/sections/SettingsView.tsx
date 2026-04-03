@@ -604,6 +604,17 @@ const [evidenceDraft, setEvidenceDraft] = useState({
     }
   };
 
+  const handleSaveRewards = (patch: { rewardsType?: Household['rewardsType']; rewardsValue?: number }) => {
+    if (!household) return;
+    const updated = { ...household, ...patch };
+    setHousehold(updated);
+    supabase.from('households').update({
+      rewards_type: updated.rewardsType ?? 'point',
+      rewards_value: updated.rewardsValue ?? 10,
+    }).eq('id', household.id).then(() => {}, () => {});
+    toast.success('Belønningssystem gemt');
+  };
+
   const handleFamilyModeChange = (mode: HouseholdMode) => {
     if (!household) return;
     const nextBillingModel: BillingModel = mode === 'together' ? 'shared' : 'separate';
@@ -1027,6 +1038,22 @@ const [evidenceDraft, setEvidenceDraft] = useState({
 
               <div className="border-t border-border" />
 
+              {/* ─── Belønningssystem ─── */}
+              <div className="divide-y divide-border">
+                <button
+                  onClick={() => setSettingsDetailView('edit-rewards')}
+                  className="flex w-full items-center justify-between py-3.5 px-1 text-left transition-colors hover:bg-card"
+                >
+                  <div>
+                    <p className="text-[15px] font-medium text-foreground">Belønningssystem</p>
+                    <p className="text-[13px] text-muted-foreground">Point, stjerner eller lommepenge for opgaver</p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
+                </button>
+              </div>
+
+              <div className="border-t border-border" />
+
               {/* ─── Synlighed ─── */}
               <div className="divide-y divide-border">
                 <button
@@ -1322,6 +1349,66 @@ const [evidenceDraft, setEvidenceDraft] = useState({
                     </div>
                     <div className="flex-1 flex items-center justify-center py-8">
                       <img src="/illustrations/healthy-habit.svg" alt="Allergener" className="w-[260px] h-[200px] object-contain" />
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* ─── edit-rewards (Belønningssystem) ─── */}
+              {settingsDetailView === 'edit-rewards' && (() => {
+                const rewardsType = household?.rewardsType ?? 'point';
+                const rewardsValue = household?.rewardsValue ?? 10;
+                const typeOptions: { value: 'point' | 'stjerne' | 'kr'; label: string; desc: string }[] = [
+                  { value: 'point', label: 'Point', desc: 'Børnene optjener point for opgaver' },
+                  { value: 'stjerne', label: 'Stjerner ⭐', desc: 'Saml stjerner for hver fuldført opgave' },
+                  { value: 'kr', label: 'Lommepenge (kr.)', desc: 'Optjen penge direkte for opgaver' },
+                ];
+                return (
+                  <div className="min-h-[calc(100vh-280px)] flex flex-col" style={{ paddingBottom: keyboardHeight > 0 ? keyboardHeight : undefined }}>
+                    <div className="space-y-5 flex-1">
+                      <h2 className="text-[28px] font-bold text-foreground pb-2">Belønningssystem</h2>
+
+                      <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1 pb-1">Belønningstype</p>
+                      <div className="rounded-[12px] border-2 border-border bg-card divide-y divide-border">
+                        {typeOptions.map(opt => (
+                          <button
+                            key={opt.value}
+                            onClick={() => handleSaveRewards({ rewardsType: opt.value })}
+                            className="flex w-full items-center justify-between px-4 py-3.5 text-left"
+                          >
+                            <div>
+                              <p className="text-[14px] font-medium text-foreground">{opt.label}</p>
+                              <p className="text-[12px] text-muted-foreground">{opt.desc}</p>
+                            </div>
+                            {rewardsType === opt.value && (
+                              <div className="w-5 h-5 rounded-full bg-[#f58a2d] flex items-center justify-center shrink-0">
+                                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+
+                      <div>
+                        <p className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide px-1 pb-2">Standardværdi pr. opgave</p>
+                        <div className="rounded-[12px] border-2 border-border bg-card px-4 py-3 flex items-center gap-3">
+                          <button
+                            onClick={() => handleSaveRewards({ rewardsValue: Math.max(1, rewardsValue - 1) })}
+                            className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-foreground font-bold text-lg"
+                          >−</button>
+                          <div className="flex-1 text-center">
+                            <span className="text-[28px] font-bold text-foreground">{rewardsValue}</span>
+                            <span className="text-[14px] text-muted-foreground ml-1">
+                              {rewardsType === 'stjerne' ? '⭐' : rewardsType === 'kr' ? 'kr.' : 'point'}
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => handleSaveRewards({ rewardsValue: rewardsValue + 1 })}
+                            className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-foreground font-bold text-lg"
+                          >+</button>
+                        </div>
+                        <p className="text-[12px] text-muted-foreground px-1 pt-1.5">Kan indstilles per opgave når du opretter den</p>
+                      </div>
                     </div>
                   </div>
                 );

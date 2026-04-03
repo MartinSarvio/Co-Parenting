@@ -93,6 +93,8 @@ export interface Household {
   caseNumber?: string; // Official case number from authorities
   institutions?: string[];
   sharedMeals?: boolean; // Co-parent opt-in for delt madplan
+  rewardsType?: 'point' | 'stjerne' | 'kr'; // reward system type
+  rewardsValue?: number; // default reward value per task completion
 }
 
 export type HouseholdMode = 'co_parenting' | 'together' | 'blended' | 'single_parent';
@@ -440,6 +442,8 @@ export interface Task {
   plannedWeekday?: number; // 0=Monday, 6=Sunday
   area?: string;
   participants?: string[]; // user IDs for together-mode multi-assignment
+  rewardValue?: number;    // how many points/stars/kr this task is worth
+  claimedBy?: string;      // user who claimed to do this task (task pool)
 }
 
 // Shopping list types

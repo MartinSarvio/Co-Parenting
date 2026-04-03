@@ -108,6 +108,8 @@ export interface DbTask {
   is_recurring: boolean;
   planned_weekday?: number | null;
   area?: string | null;
+  reward_value?: number | null;
+  claimed_by?: string | null;
 }
 
 export interface DbExpense {
@@ -304,7 +306,7 @@ export function mapChild(raw: DbChild): Child {
   };
 }
 
-export function mapHousehold(raw: { id: string; name: string; family_mode: string; case_number?: string | null }, members?: DbHouseholdMember[], children?: DbChild[]): Household {
+export function mapHousehold(raw: { id: string; name: string; family_mode: string; case_number?: string | null; rewards_type?: string | null; rewards_value?: number | null }, members?: DbHouseholdMember[], children?: DbChild[]): Household {
   return {
     id: raw.id,
     name: raw.name,
@@ -312,6 +314,8 @@ export function mapHousehold(raw: { id: string; name: string; family_mode: strin
     caseNumber: raw.case_number ?? undefined,
     members: members?.map(m => m.user_id) ?? [],
     children: children?.map(c => c.id) ?? [],
+    rewardsType: (raw.rewards_type as Household['rewardsType']) ?? 'point',
+    rewardsValue: raw.rewards_value ?? 10,
   };
 }
 
@@ -351,6 +355,8 @@ export function mapTask(raw: DbTask): Task {
     isRecurring: raw.is_recurring ?? false,
     plannedWeekday: raw.planned_weekday ?? undefined,
     area: raw.area ?? undefined,
+    rewardValue: raw.reward_value ?? undefined,
+    claimedBy: raw.claimed_by ?? undefined,
   };
 }
 

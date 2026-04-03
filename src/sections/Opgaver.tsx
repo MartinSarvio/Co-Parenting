@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import confetti from 'canvas-confetti';
 import { useAppStore } from '@/store';
 import { useApiActions } from '@/hooks/useApiActions';
 import { cn, getTaskCategoryLabel } from '@/lib/utils';
@@ -122,7 +123,7 @@ export function Opgaver() {
       ? { ...cat, label: children.length > 1 ? 'Børn' : 'Barn' }
       : cat
   );
-  const { createTask, updateTask, deleteTask, createShoppingList, deleteShoppingList } = useApiActions();
+  const { createTask, updateTask, deleteTask, claimTask, createShoppingList, deleteShoppingList } = useApiActions();
   const opgaverAction = useAppStore(s => s.opgaverAction);
 
   const [activeTab, setActiveTab] = useState('tasks');
@@ -213,14 +214,40 @@ export function Opgaver() {
     }
   };
 
+  const rewardLabel = (val: number) => {
+    const type = household?.rewardsType ?? 'point';
+    if (type === 'stjerne') return `${val} ⭐`;
+    if (type === 'kr') return `${val} kr.`;
+    return `${val} point`;
+  };
+
+  const scoreboard = useMemo(() =>
+    users.map(u => ({
+      user: u,
+      score: tasks
+        .filter(t => t.completed && (t.claimedBy === u.id || (!t.claimedBy && t.assignedTo === u.id)))
+        .reduce((sum, t) => sum + (t.rewardValue ?? household?.rewardsValue ?? 10), 0),
+    })).sort((a, b) => b.score - a.score),
+    [tasks, users, household]
+  );
+
   const toggleTask = (id: string, completed: boolean) => {
+    const task = tasks.find(t => t.id === id);
     void updateTask(id, {
       completed,
-      completedAt: completed ? new Date().toISOString() : undefined
+      completedAt: completed ? new Date().toISOString() : undefined,
     });
 
     if (completed) {
-      toast.success('Opgave fuldført!');
+      const val = task?.rewardValue ?? household?.rewardsValue ?? 10;
+      toast.success(`Opgave fuldført! +${rewardLabel(val)}`);
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#f58a2d', '#f0c080', '#fff7ed', '#1a1a1a'],
+        disableForReducedMotion: true,
+      });
     }
   };
 
@@ -397,6 +424,24 @@ export function Opgaver() {
             </div>
           </BottomSheet>
 
+          {/* Scoreboard */}
+          {scoreboard.some(s => s.score > 0) && (
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {scoreboard.map(({ user, score }) => (
+                <div key={user.id} className="flex-shrink-0 flex items-center gap-2 rounded-[8px] bg-card border border-border px-3 py-2">
+                  <Avatar className="w-7 h-7">
+                    <AvatarImage src={user.avatar} />
+                    <AvatarFallback className="text-[10px] bg-orange-tint text-[#bf6722]">{user.name[0]}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-[11px] text-muted-foreground leading-none">{user.name.split(' ')[0]}</p>
+                    <p className="text-[13px] font-bold text-foreground leading-tight">{rewardLabel(score)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Pending Tasks */}
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2">
@@ -453,16 +498,29 @@ export function Opgaver() {
                                   )}
                                   <div className="flex items-center gap-1">
                                     <Avatar className="w-4 h-4">
-                                      <AvatarImage src={users.find(u => u.id === task.assignedTo)?.avatar} />
+                                      <AvatarImage src={users.find(u => u.id === (task.claimedBy || task.assignedTo))?.avatar} />
                                       <AvatarFallback className="text-[8px]">
-                                        {users.find(u => u.id === task.assignedTo)?.name[0]}
+                                        {users.find(u => u.id === (task.claimedBy || task.assignedTo))?.name[0]}
                                       </AvatarFallback>
                                     </Avatar>
                                     <span className="text-xs text-slate-500">
-                                      {users.find(u => u.id === task.assignedTo)?.name}
+                                      {task.claimedBy
+                                        ? users.find(u => u.id === task.claimedBy)?.name
+                                        : users.find(u => u.id === task.assignedTo)?.name}
                                     </span>
                                   </div>
+                                  <span className="text-[11px] font-semibold text-[#f58a2d]">
+                                    +{rewardLabel(task.rewardValue ?? household?.rewardsValue ?? 10)}
+                                  </span>
                                 </div>
+                                {!task.claimedBy && task.assignedTo !== currentUser?.id && currentUser && (
+                                  <button
+                                    onClick={() => void claimTask(task.id, currentUser.id)}
+                                    className="mt-1.5 text-[12px] font-semibold text-[#f58a2d] underline underline-offset-2"
+                                  >
+                                    Tag opgave
+                                  </button>
+                                )}
                               </div>
                               <Button
                                 variant="ghost"
